@@ -10,3 +10,4 @@ samples/
 *.key
 *_key.txt
 .env
+*.egg-info/
