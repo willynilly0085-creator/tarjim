@@ -49,3 +49,15 @@ def test_listen_many_survives_one_failed_pass() -> None:
     assert heard.language == "English"
     assert len(heard.utterances) == len(A)
     assert heard.passes == [A]
+
+
+def test_listening_stops_at_once_when_the_quota_is_used_up() -> None:
+    import pytest
+
+    from tarjim.gemini_client import QuotaExhausted
+
+    def listen() -> tuple[str, list[Utterance]]:
+        raise QuotaExhausted("used up")
+
+    with pytest.raises(QuotaExhausted):
+        listen_many(listen, passes=2)

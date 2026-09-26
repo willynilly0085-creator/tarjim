@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>tarjim</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <header class="bar">
+    <h1 class="mark">
+      <svg class="mark-glyph" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="8" width="18" height="3.2" rx="1.6" class="mark-top"/>
+        <rect x="6" y="13.6" width="12" height="3.2" rx="1.6" class="mark-bottom"/>
+      </svg>
+      <span>tarjim</span>
+    </h1>
+    <p class="link-state" id="link-state" data-state="unknown"><span class="dot" aria-hidden="true"></span><span id="link-text"></span></p>
+    <button class="icon-button" id="open-settings" type="button" data-i18n-label="settings">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.3.9a7.5 7.5 0 0 0-2.6-1.5L14.1 2.6h-4l-.4 2.4a7.5 7.5 0 0 0-2.6 1.5l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.3-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.4h4l.4-2.4a7.5 7.5 0 0 0 2.6-1.5l2.3.9 2-3.4-2-1.5Z"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="view" id="view-main" hidden>
+      <form id="order" novalidate>
+        <div class="source" id="source-tab">
+          <p class="eyebrow" data-i18n="sourceTab"></p>
+          <p class="source-title" id="tab-title"></p>
+          <p class="source-host" id="tab-host"></p>
+        </div>
+        <div class="source source-none" id="source-none" hidden>
+          <p class="source-title" data-i18n="sourceNone"></p>
+          <p class="source-host" data-i18n="sourceNoneHint"></p>
+        </div>
+        <div class="drop" id="drop" hidden>
+          <input type="file" id="file" accept="video/*,audio/*" class="visually-hidden">
+          <label for="file" class="drop-zone" id="drop-zone">
+            <span class="drop-title" data-i18n="dropTitle"></span>
+            <span class="drop-hint" data-i18n="dropHint"></span>
+            <span class="button-quiet" data-i18n="chooseFile"></span>
+          </label>
+          <p class="drop-file" id="drop-file" hidden></p>
+          <label class="field-label" for="link" data-i18n="linkLabel"></label>
+          <input class="text-input" id="link" type="url" inputmode="url" dir="ltr" placeholder="https://">
+        </div>
+        <button class="text-button" id="open-file-page" type="button" data-i18n="pickFile"></button>
+
+        <div class="field">
+          <label class="field-label" for="target" data-i18n="language"></label>
+          <select id="target" class="select"></select>
+        </div>
+
+        <fieldset class="field" id="dialect-field">
+          <legend class="field-label" data-i18n="dialect"></legend>
+          <div class="segments">
+            <label><input type="radio" name="dialect" value="saudi"><span data-i18n="dialectSaudi"></span></label>
+            <label><input type="radio" name="dialect" value="msa"><span data-i18n="dialectMsa"></span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend class="field-label" data-i18n="output"></legend>
+          <div class="segments">
+            <label><input type="radio" name="mode" value="burn"><span data-i18n="outputBurn"></span></label>
+            <label><input type="radio" name="mode" value="srt"><span data-i18n="outputSrt"></span></label>
+          </div>
+        </fieldset>
+
+        <div class="upload" id="upload" hidden>
+          <div class="meter"><span id="upload-bar"></span></div>
+          <p class="meta" id="upload-text"></p>
+        </div>
+        <button class="primary" id="go" type="submit" data-i18n="translate"></button>
+        <p class="notice" id="notice" role="status" aria-live="polite"></p>
+      </form>
+
+      <section class="recent" aria-labelledby="recent-title">
+        <h2 class="section-title" id="recent-title" data-i18n="recent"></h2>
+        <p class="empty" id="empty" data-i18n="empty" hidden></p>
+        <ul class="jobs" id="jobs"></ul>
+      </section>
+    </section>
+
+    <section class="view panel" id="view-offline" hidden>
+      <h2 class="panel-title" data-i18n="offlineTitle"></h2>
+      <p data-i18n="offlineBody"></p>
+      <code class="command" dir="ltr">tarjim-serve</code>
+      <button class="primary" id="retry-connect" type="button" data-i18n="tryAgain"></button>
+    </section>
+
+    <section class="view panel" id="view-pair" hidden>
+      <h2 class="panel-title" data-i18n="pairTitle"></h2>
+      <p data-i18n="pairBody"></p>
+      <code class="command" dir="ltr">tarjim-serve --show-token</code>
+      <form id="pair-form" class="stack" novalidate>
+        <label class="field-label" for="token" data-i18n="tokenLabel"></label>
+        <input class="text-input" id="token" type="password" dir="ltr" autocomplete="off" spellcheck="false" required>
+        <p class="error" id="pair-error" role="alert" hidden data-i18n="pairWrong"></p>
+        <button class="primary" type="submit" data-i18n="pair"></button>
+      </form>
+    </section>
+
+    <section class="view panel" id="view-settings" hidden>
+      <h2 class="panel-title" data-i18n="settings"></h2>
+      <form id="settings-form" class="stack" novalidate>
+        <label class="field-label" for="server" data-i18n="serverLabel"></label>
+        <input class="text-input" id="server" dir="ltr" type="url" required>
+        <label class="field-label" for="settings-token" data-i18n="tokenLabel"></label>
+        <input class="text-input" id="settings-token" type="password" dir="ltr" autocomplete="off" spellcheck="false">
+        <p class="notice" id="settings-notice" role="status" aria-live="polite"></p>
+        <div class="row">
+          <button class="primary" type="submit" data-i18n="save"></button>
+          <button class="button-quiet" id="close-settings" type="button" data-i18n="back"></button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <p class="visually-hidden" id="announcer" aria-live="polite"></p>
+
+  <template id="job-template">
+    <li class="job">
+      <div class="job-head">
+        <p class="job-title"></p>
+        <p class="job-stage"></p>
+      </div>
+      <p class="meta job-meta"></p>
+      <ol class="track" aria-hidden="true"></ol>
+      <p class="error job-error" hidden></p>
+      <div class="job-actions" hidden></div>
+    </li>
+  </template>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

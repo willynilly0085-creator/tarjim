@@ -2,6 +2,7 @@ import json
 import re
 import shutil
 import urllib.parse
+from collections.abc import Callable
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, ClassVar
@@ -22,7 +23,8 @@ GET_ROUTES = [(re.compile(p), name) for p, name in [
     (rf"^/jobs/{JOB}$", "show"), (rf"^/files/{JOB}/([^/]+)$", "send_output"),
     (r"^/translate$", "legacy")]]
 POST_ROUTES = [(re.compile(p), name) for p, name in [
-    (r"^/jobs$", "create_json"), (r"^/upload$", "upload"), (rf"^/reveal/{JOB}$", "reveal")]]
+    (r"^/jobs$", "create_json"), (r"^/upload$", "upload"), (rf"^/reveal/{JOB}$", "reveal"),
+    (rf"^/open/{JOB}$", "play"), (rf"^/retry/{JOB}$", "retry")]]
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -146,11 +148,23 @@ class Handler(BaseHTTPRequestHandler):
     def reveal(self, _query: Query, task_id: str) -> None:
         from tarjim.server.desktop import reveal
 
+        self.on_output(task_id, reveal)
+
+    def play(self, _query: Query, task_id: str) -> None:
+        from tarjim.server.desktop import open_file
+
+        self.on_output(task_id, open_file)
+
+    def on_output(self, task_id: str, action: Callable[[Path], None]) -> None:
         task = self.board.get(task_id)
         if not task or not task.outputs:
             return self.reply(404, {"error": "job"})
-        reveal(task.outputs[0])
+        action(task.outputs[0])
         self.reply(200, {"ok": True})
+
+    def retry(self, _query: Query, task_id: str) -> None:
+        task = self.board.retry(task_id)
+        self.reply(200, task.view()) if task else self.reply(404, {"error": "job"})
 
     def legacy(self, query: Query) -> None:
         mode = first(query, "mode") or "srt"

@@ -2,12 +2,19 @@ import threading
 import time
 import uuid
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from queue import Queue
 
 MODES = ("srt", "burn")
 KEEP = 50
+REASONS = [("quota", ("QuotaExhausted", "quota")), ("key", ("API key missing",)),
+           ("download", ("DownloadError", "download")), ("tools", ("not found; install",))]
+
+
+def classify(error: Exception) -> str:
+    text = f"{type(error).__name__} {error}"
+    return next((code for code, marks in REASONS if any(m in text for m in marks)), "unknown")
 
 
 @dataclass
@@ -25,6 +32,7 @@ class Task:
     id: str = field(default_factory=lambda: uuid.uuid4().hex[:12])
     stage: str = "queued"
     error: str = ""
+    error_code: str = ""
     video: Path | None = None
     outputs: list[Path] = field(default_factory=list)
     created: float = field(default_factory=time.time)
@@ -35,6 +43,8 @@ class Task:
 
     def view(self) -> dict[str, object]:
         return {"id": self.id, "stage": self.stage, "error": self.error,
+                "error_code": self.error_code, "finished": self.finished,
+                "link": self.order.source.startswith(("http://", "https://")),
                 "target": self.order.target, "mode": self.order.mode,
                 "title": self.order.name or (self.video.stem if self.video else self.order.source),
                 "outputs": [p.name for p in self.outputs], "created": self.created}
@@ -60,6 +70,10 @@ class Board:
         self.queue.put(task)
         return task
 
+    def retry(self, task_id: str) -> Task | None:
+        old = self.get(task_id)
+        return self.submit(replace(old.order)) if old and old.stage == "failed" else None
+
     def get(self, task_id: str) -> Task | None:
         with self.lock:
             return self.tasks.get(task_id)
@@ -76,3 +90,4 @@ class Board:
                 task.stage = "done"
             except Exception as error:
                 task.stage, task.error = "failed", str(error)[:300]
+                task.error_code = classify(error)

@@ -4,6 +4,7 @@ from pathlib import Path
 
 from tarjim import media
 from tarjim.asr.base import Transcript
+from tarjim.gemini_client import QuotaExhausted
 from tarjim.job import Job
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.merge import Heard
@@ -66,6 +67,8 @@ def listen_and_align(job: Job, audio: Path) -> Transcript | None:
 
     try:
         language, utterances = heard_for(job, audio)
+    except QuotaExhausted:
+        raise
     except RuntimeError:
         return None
     if not utterances:

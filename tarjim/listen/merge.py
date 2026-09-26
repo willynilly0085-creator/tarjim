@@ -2,6 +2,7 @@ from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 
+from tarjim.gemini_client import QuotaExhausted
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.vote import AGREE, vote
 
@@ -21,7 +22,10 @@ def listen_many(listen: Listen, passes: int = PASSES) -> Heard:
     with ThreadPoolExecutor(max_workers=passes) as pool:
         futures = [pool.submit(listen) for _ in range(passes)]
         results = [f.result() for f in futures if f.exception() is None]
+        errors = [e for f in futures if (e := f.exception()) is not None]
     if not results:
+        if errors and all(isinstance(e, QuotaExhausted) for e in errors):
+            raise errors[0]
         raise RuntimeError("every listening pass failed")
     results.sort(key=lambda r: len(r[1]), reverse=True)
     runs = [utterances for _, utterances in results]

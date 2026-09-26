@@ -2,6 +2,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from tarjim.config import prepare_environment
 from tarjim.fetch import resolve
 from tarjim.job import Job
 from tarjim.pipeline import run
@@ -25,6 +26,7 @@ def parse(argv: list[str]) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+    prepare_environment()
     args = parse(sys.argv[1:] if argv is None else argv)
     for source in args.sources:
         video = resolve(source, args.downloads)

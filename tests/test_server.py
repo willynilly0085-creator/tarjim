@@ -79,3 +79,30 @@ def test_safe_name_strips_paths_and_odd_characters() -> None:
     assert safe_name("..\\..\\Windows\\evil.mp4") == "evil.mp4"
     assert safe_name("مقطع <رائع>.MKV") == "مقطع _رائع_.mkv"
     assert safe_name("notes.txt") is None
+
+
+def test_failures_carry_a_reason_people_can_act_on() -> None:
+    from tarjim.gemini_client import QuotaExhausted
+    from tarjim.server.jobs import classify
+
+    assert classify(QuotaExhausted("used up")) == "quota"
+    assert classify(RuntimeError("Gemini API key missing")) == "key"
+    assert classify(FileNotFoundError("ffmpeg not found; install it")) == "tools"
+    assert classify(ValueError("something odd")) == "unknown"
+
+
+def test_only_a_failed_job_can_be_retried() -> None:
+    from tarjim.server.jobs import Order
+
+    def fail(_task: Task) -> None:
+        raise RuntimeError("boom")
+
+    board = Board(fail)
+    task = board.submit(Order("https://example.com/v", target="en"))
+    for _ in range(50):
+        if task.finished:
+            break
+        time.sleep(0.02)
+    again = board.retry(task.id)
+    assert again is not None and again.id != task.id and again.order.target == "en"
+    assert board.retry("000000000000") is None

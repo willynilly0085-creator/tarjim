@@ -1,0 +1,14 @@
+numpy
+soundfile
+google-genai
+qwen-asr
+transformers
+uroman
+silero-vad
+yt-dlp
+
+[dev]
+pytest
+pytest-cov
+ruff
+mypy

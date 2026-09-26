@@ -11,3 +11,12 @@ def reveal(path: Path) -> None:
         subprocess.Popen(["open", "-R", str(path)])
     else:
         subprocess.Popen(["xdg-open", os.fspath(path.parent)])
+
+
+def open_file(path: Path) -> None:
+    if sys.platform == "win32":
+        os.startfile(path)
+    elif sys.platform == "darwin":
+        subprocess.Popen(["open", str(path)])
+    else:
+        subprocess.Popen(["xdg-open", str(path)])

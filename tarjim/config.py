@@ -36,5 +36,12 @@ def token() -> str:
     return fresh
 
 
+def prepare_environment() -> None:
+    models = setting("models")
+    if models:
+        os.environ.setdefault("HF_HOME", models)
+        os.environ.setdefault("TORCH_HOME", str(Path(models) / "torch"))
+
+
 def gemini_key() -> str:
     return os.environ.get("GEMINI_API_KEY") or setting("gemini_api_key")

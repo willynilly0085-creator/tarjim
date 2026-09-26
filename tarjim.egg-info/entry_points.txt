@@ -1,0 +1,3 @@
+[console_scripts]
+tarjim = tarjim.cli:main
+tarjim-serve = tarjim.server.__main__:main

@@ -2,7 +2,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from tarjim.config import HOME, setting, token
+from tarjim.config import HOME, prepare_environment, save, setting, token
 from tarjim.fetch import is_url, resolve
 from tarjim.job import Job
 from tarjim.server.app import PORT, serve
@@ -29,11 +29,17 @@ def perform(task: Task, downloads: Path) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+    prepare_environment()
     parser = argparse.ArgumentParser(prog="tarjim-serve", description="Local server for "
                                      "the tarjim browser extension")
     parser.add_argument("--port", type=int, default=PORT)
     parser.add_argument("--show-token", action="store_true")
+    parser.add_argument("--gemini-key", default="", help="save your Gemini API key")
     args = parser.parse_args(sys.argv[1:] if argv is None else argv)
+    if args.gemini_key:
+        save("gemini_api_key", args.gemini_key.strip())
+        print("saved")
+        return 0
     secret = token()
     if args.show_token:
         print(secret)
