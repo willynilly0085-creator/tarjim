@@ -12,6 +12,7 @@ dependencies = [
     "transformers",
     "uroman",
     "silero-vad",
+    "yt-dlp",
 ]
 
 [project.optional-dependencies]
@@ -19,6 +20,7 @@ dev = ["pytest", "pytest-cov", "ruff", "mypy"]
 
 [project.scripts]
 tarjim = "tarjim.cli:main"
+tarjim-serve = "tarjim.server.__main__:main"
 
 [build-system]
 requires = ["setuptools>=68"]

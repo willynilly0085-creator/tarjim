@@ -1,4 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+
+from tarjim.languages import Language
 
 
 @dataclass(frozen=True)
@@ -17,6 +19,8 @@ class Rules:
     max_lines: int = 2
     reading_cps: float = 17.0
     min_budget: int = 12
+    rtl: bool = True
+    spaced: bool = True
 
     @property
     def max_chars(self) -> int:
@@ -28,3 +32,8 @@ class Rules:
 
 
 DEFAULT_RULES = Rules()
+
+
+def rules_for(target: Language) -> Rules:
+    return replace(DEFAULT_RULES, line_chars=target.line_chars, reading_cps=target.reading_cps,
+                   rtl=target.rtl, spaced=target.spaced)

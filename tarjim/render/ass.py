@@ -4,6 +4,7 @@ from tarjim.lines import display_lines
 from tarjim.models import Cue
 from tarjim.render.stages import reveal_at
 from tarjim.render.timecode import ass_time
+from tarjim.rules import DEFAULT_RULES, Rules
 
 RLM = chr(0x200F)
 ARABIC_CHARSET = 178
@@ -60,18 +61,19 @@ class Canvas:
         return max(2, round(self.font_size * 0.08))
 
 
-def render_ass(cues: list[Cue], canvas: Canvas) -> str:
+def render_ass(cues: list[Cue], canvas: Canvas, rules: Rules = DEFAULT_RULES) -> str:
     header = HEADER.format(
         w=canvas.width, h=canvas.height, font=canvas.font, size=canvas.font_size,
         outline=canvas.outline, shadow=max(1, canvas.outline // 2),
-        mh=canvas.margin_h, mv=canvas.margin_v, charset=ARABIC_CHARSET,
+        mh=canvas.margin_h, mv=canvas.margin_v, charset=ARABIC_CHARSET if rules.rtl else 1,
     )
-    events = [line for cue in cues if cue.text.strip() for line in event_lines(cue)]
+    events = [line for cue in cues if cue.text.strip() for line in event_lines(cue, rules)]
     return header + "\n".join(events) + "\n"
 
 
-def event_lines(cue: Cue) -> list[str]:
-    lines = [f"{RLM}{clean(line)}{RLM}" for line in display_lines(cue.text)]
+def event_lines(cue: Cue, rules: Rules) -> list[str]:
+    mark = RLM if rules.rtl else ""
+    lines = [f"{mark}{clean(line)}{mark}" for line in display_lines(cue.text, rules)]
     moment = reveal_at(cue)
     if moment is None:
         return [event(cue.start, cue.end, fade(FADE_MS, FADE_MS) + "\\N".join(lines))]

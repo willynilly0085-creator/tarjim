@@ -1,10 +1,11 @@
 import json
-import os
 import re
 import shutil
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
+
+from tarjim.config import setting
 
 SCENE_THRESHOLD = 0.25
 MIN_CUT_SPACING = 0.2
@@ -18,10 +19,13 @@ class VideoInfo:
     height: int
     duration: float
 
+    @property
+    def has_picture(self) -> bool:
+        return self.width > 0 and self.height > 0
+
 
 def tool(name: str) -> str:
-    override = os.environ.get(f"TARJIM_{name.upper()}")
-    found = override or shutil.which(name)
+    found = setting(name) or shutil.which(name)
     if not found:
         raise FileNotFoundError(f"{name} not found; install it or set TARJIM_{name.upper()}")
     return found
@@ -36,9 +40,10 @@ def probe(video: Path) -> VideoInfo:
     out = run([tool("ffprobe"), "-v", "error", "-select_streams", "v:0",
                "-show_entries", "stream=width,height:format=duration", "-of", "json",
                str(video)])
-    data = json.loads(out.stdout)
-    stream = data["streams"][0]
-    return VideoInfo(stream["width"], stream["height"], float(data["format"]["duration"]))
+    data = json.loads(out.stdout or "{}")
+    streams = data.get("streams") or [{"width": 0, "height": 0}]
+    duration = float(data.get("format", {}).get("duration", 0.0))
+    return VideoInfo(streams[0]["width"], streams[0]["height"], duration)
 
 
 def extract_audio(video: Path, target: Path) -> Path:
@@ -47,9 +52,10 @@ def extract_audio(video: Path, target: Path) -> Path:
     return target
 
 
-def audio_bytes(video: Path) -> bytes:
+def audio_bytes(video: Path, start: float = 0.0, end: float | None = None) -> bytes:
+    window = ["-ss", f"{start:.3f}"] + (["-to", f"{end:.3f}"] if end is not None else [])
     result = subprocess.run(
-        [tool("ffmpeg"), "-hide_banner", "-loglevel", "error", "-i", str(video), "-vn",
+        [tool("ffmpeg"), "-hide_banner", "-loglevel", "error", *window, "-i", str(video), "-vn",
          "-ac", "1", "-ar", str(SAMPLE_RATE), "-b:a", "48k", "-f", "mp3", "-"],
         capture_output=True, check=False)
     return result.stdout

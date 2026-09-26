@@ -3,19 +3,22 @@ from tarjim.rules import DEFAULT_RULES, Rules
 EASTERN_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
 
 
-def normalize(text: str) -> str:
-    text = text.translate(EASTERN_DIGITS)
-    text = text.replace("؟!", "؟").replace("!؟", "؟").replace("?!", "؟")
+def normalize(text: str, arabic: bool = True) -> str:
+    if arabic:
+        text = text.translate(EASTERN_DIGITS)
+    question = "؟" if arabic else "?"
+    text = text.replace("؟!", "؟").replace("!؟", "؟").replace("?!", question)
     return " ".join(text.split())
 
 
-def map_results(items: list[dict[str, object]], count: int) -> dict[int, str]:
+def map_results(items: list[dict[str, object]], count: int,
+                arabic: bool = True) -> dict[int, str]:
     results: dict[int, str] = {}
     for item in items:
         number = item.get("id")
-        text = item.get("ar")
+        text = item.get("text")
         if isinstance(number, int) and 1 <= number <= count and isinstance(text, str):
-            results[number] = normalize(text)
+            results[number] = normalize(text, arabic)
     return results
 
 
