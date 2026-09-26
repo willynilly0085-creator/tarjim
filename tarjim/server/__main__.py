@@ -28,8 +28,17 @@ def perform(task: Task, downloads: Path) -> None:
     task.outputs = [p for p in candidates if p.exists()]
 
 
+def attach_output() -> None:
+    if sys.stdout is None:
+        HOME.mkdir(parents=True, exist_ok=True)
+        log = (HOME / "server.log").open("a", encoding="utf-8", buffering=1)
+        sys.stdout = sys.stderr = log
+    else:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+
+
 def main(argv: list[str] | None = None) -> int:
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+    attach_output()
     prepare_environment()
     parser = argparse.ArgumentParser(prog="tarjim-serve", description="Local server for "
                                      "the tarjim browser extension")
