@@ -9,6 +9,9 @@ dependencies = [
     "soundfile",
     "google-genai",
     "qwen-asr",
+    "transformers",
+    "uroman",
+    "silero-vad",
 ]
 
 [project.optional-dependencies]

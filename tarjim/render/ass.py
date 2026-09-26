@@ -2,11 +2,14 @@ from dataclasses import dataclass
 
 from tarjim.lines import display_lines
 from tarjim.models import Cue
+from tarjim.render.stages import reveal_at
 from tarjim.render.timecode import ass_time
 
 RLM = chr(0x200F)
 ARABIC_CHARSET = 178
 FADE_MS = 90
+HIDDEN = "{\\alpha&HFF&}"
+APPEAR = f"{{\\alpha&HFF&\\t(0,{FADE_MS},\\alpha&H00&)}}"
 PORTRAIT_FONT = 0.066
 LANDSCAPE_FONT = 0.058
 
@@ -63,14 +66,28 @@ def render_ass(cues: list[Cue], canvas: Canvas) -> str:
         outline=canvas.outline, shadow=max(1, canvas.outline // 2),
         mh=canvas.margin_h, mv=canvas.margin_v, charset=ARABIC_CHARSET,
     )
-    events = [event_line(cue) for cue in cues if cue.text.strip()]
+    events = [line for cue in cues if cue.text.strip() for line in event_lines(cue)]
     return header + "\n".join(events) + "\n"
 
 
-def event_line(cue: Cue) -> str:
+def event_lines(cue: Cue) -> list[str]:
     lines = [f"{RLM}{clean(line)}{RLM}" for line in display_lines(cue.text)]
-    body = f"{{\\fad({FADE_MS},{FADE_MS})}}" + "\\N".join(lines)
-    return f"Dialogue: 0,{ass_time(cue.start)},{ass_time(cue.end)},Default,,0,0,0,,{body}"
+    moment = reveal_at(cue)
+    if moment is None:
+        return [event(cue.start, cue.end, fade(FADE_MS, FADE_MS) + "\\N".join(lines))]
+    *first, last = lines
+    waiting = "\\N".join([*first, HIDDEN + last])
+    arriving = "\\N".join([*first, APPEAR + last])
+    return [event(cue.start, moment, fade(FADE_MS, 0) + waiting),
+            event(moment, cue.end, fade(0, FADE_MS) + arriving)]
+
+
+def event(start: float, end: float, body: str) -> str:
+    return f"Dialogue: 0,{ass_time(start)},{ass_time(end)},Default,,0,0,0,,{body}"
+
+
+def fade(fade_in: int, fade_out: int) -> str:
+    return f"{{\\fad({fade_in},{fade_out})}}"
 
 
 def clean(text: str) -> str:

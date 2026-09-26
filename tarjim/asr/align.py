@@ -1,13 +1,34 @@
+from dataclasses import dataclass
+from itertools import pairwise
 from typing import Any
 
-from tarjim.asr.qwen import ALIGNER_MODEL, attach_punctuation, core
+import numpy as np
+
+from tarjim.asr.ctc import FRAME, Emitter, Span, token_spans
+from tarjim.asr.qwen import core
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
 
-SAMPLE_RATE = 16000
 CHUNK_SECONDS = 240.0
 PAD = 2.0
-MIN_COVERAGE = 0.8
+EXTRA_TAG = "p"
+MIN_EXTRA_SCORE = 0.3
+SPECIAL_IDS = 4
+GAP_FALLBACK = 0.2
+WINDOW_MARGIN = 1.0
+WORD_BASE = 0.3
+WORD_PER_LETTER = 0.1
+
+
+@dataclass
+class Slot:
+    text: str
+    speaker: str
+    owner: int
+    start: float = 0.0
+    end: float = 0.0
+    score: float = 0.0
+    timed: bool = False
 
 
 def proportional(utterance: Utterance) -> list[Word]:
@@ -31,38 +52,88 @@ def chunks(utterances: list[Utterance]) -> list[list[Utterance]]:
     return groups
 
 
-def speakers_by_token(utterances: list[Utterance]) -> list[str]:
-    return [u.speaker for u in utterances for token in u.text.split() if core(token)]
+def windows(utterances: list[Utterance], low: int) -> tuple[np.ndarray, np.ndarray]:
+    starts = np.array([(u.start - WINDOW_MARGIN) / FRAME - low for u in utterances])
+    ends = np.array([(u.end + WINDOW_MARGIN) / FRAME - low for u in utterances])
+    return starts.astype(np.int64), ends.astype(np.int64)
+
+
+def densest(spans: list[Span], speech: np.ndarray) -> tuple[float, float]:
+    groups = [[spans[0]]]
+    for previous, current in pairwise(spans):
+        between = speech[int(previous[1] / FRAME):int(current[0] / FRAME)]
+        if not between.all():
+            groups.append([])
+        groups[-1].append(current)
+    best = max(groups, key=len)
+    return best[0][0], best[-1][1]
+
+
+def longest(text: str) -> float:
+    return WORD_BASE + WORD_PER_LETTER * len(core(text))
+
+
+def fill_gaps(slots: list[Slot]) -> None:
+    for index, slot in enumerate(slots):
+        if slot.timed:
+            continue
+        slot.start = slots[index - 1].end if index else 0.0
+        later = [s.start for s in slots[index + 1:] if s.timed]
+        slot.end = later[0] if later else slot.start + GAP_FALLBACK
+        slot.start = min(slot.start, slot.end)
+
+
+def keep_real(slots: list[Slot]) -> list[Slot]:
+    scores: dict[int, list[float]] = {}
+    for slot in slots:
+        if slot.timed:
+            scores.setdefault(slot.owner, []).append(slot.score)
+    doubtful = {owner for owner, values in scores.items() if np.mean(values) < MIN_EXTRA_SCORE}
+    return [s for s in slots if not (s.speaker.startswith(EXTRA_TAG) and s.owner in doubtful)]
 
 
 class AlignEngine:
     def __init__(self, device: str = "cuda:0") -> None:
-        import torch
-        from qwen_asr import Qwen3ForcedAligner
+        import uroman
 
-        self.aligner = Qwen3ForcedAligner.from_pretrained(
-            ALIGNER_MODEL, dtype=torch.bfloat16, device_map=device)
-        supported = self.aligner.get_supported_languages() or []
-        self.languages = {name.lower() for name in supported}
+        self.emitter = Emitter(device)
+        self.roman = uroman.Uroman()
 
     def align(self, wav: Any, utterances: list[Utterance], language: str) -> list[Word]:
-        if language.lower() not in self.languages:
-            return [word for u in utterances for word in proportional(u)]
-        return [w for group in chunks(utterances) for w in self.align_chunk(wav, group, language)]
+        from tarjim.asr.vad import mute_silence, speech_mask, speech_regions
 
-    def align_chunk(self, wav: Any, group: list[Utterance], language: str) -> list[Word]:
-        low = max(0.0, group[0].start - PAD)
-        high = min(len(wav) / SAMPLE_RATE, max(u.end for u in group) + PAD)
-        text = " ".join(u.text for u in group)
-        clip = wav[int(low * SAMPLE_RATE):int(high * SAMPLE_RATE)]
-        try:
-            items = list(self.aligner.align(audio=(clip, SAMPLE_RATE), text=text,
-                                            language=language)[0])
-        except (RuntimeError, ValueError):
+        logp = self.emitter.emissions(wav)
+        self.speech = speech_mask(speech_regions(wav), len(logp))
+        logp = mute_silence(logp, self.speech)
+        return [w for group in chunks(utterances) for w in self.align_group(logp, group)]
+
+    def tokens(self, text: str) -> list[int]:
+        vocab = self.emitter.vocab
+        roman = self.roman.romanize_string(text).lower()
+        return [vocab[ch] for ch in roman if vocab.get(ch, 0) >= SPECIAL_IDS]
+
+    def align_group(self, logp: np.ndarray, group: list[Utterance]) -> list[Word]:
+        low = max(0, int((group[0].start - PAD) / FRAME))
+        high = min(len(logp), int((max(u.end for u in group) + PAD) / FRAME))
+        slots = [Slot(tok, u.speaker, i) for i, u in enumerate(group) for tok in u.text.split()]
+        if not self.time_slots(logp[low:high], slots, group, low):
             return [word for u in group for word in proportional(u)]
-        words = attach_punctuation(text, items)
-        speakers = speakers_by_token(group)
-        if len(words) < MIN_COVERAGE * len(speakers):
-            return [word for u in group for word in proportional(u)]
-        return [Word(w.text, low + w.start, low + w.end, speakers[min(i, len(speakers) - 1)])
-                for i, w in enumerate(words)]
+        fill_gaps(slots)
+        return [Word(s.text, s.start, s.end, s.speaker) for s in keep_real(slots)]
+
+    def time_slots(
+            self, logp: np.ndarray, slots: list[Slot], group: list[Utterance], low: int) -> bool:
+        owners = [(k, t) for k, s in enumerate(slots) for t in self.tokens(s.text)]
+        bounds = windows([group[slots[k].owner] for k, _ in owners], low)
+        spans = token_spans(logp, [t for _, t in owners], bounds)
+        if spans is None:
+            return False
+        per_slot: dict[int, list[Span]] = {}
+        for (k, _), (start, end, score) in zip(owners, spans, strict=True):
+            per_slot.setdefault(k, []).append((start + low * FRAME, end + low * FRAME, score))
+        for k, word in per_slot.items():
+            slot = slots[k]
+            start, slot.end = densest(word, self.speech)
+            slot.start = max(start, slot.end - longest(slot.text))
+            slot.score, slot.timed = max(s[2] for s in word), True
+        return True
