@@ -20,14 +20,21 @@ def ends_sentence(word: Word) -> bool:
 
 
 def split_blocks(words: list[Word], cuts: list[float], rules: Rules) -> list[Piece]:
-    cut_breaks = snap_cuts(words, cuts, rules.cut_snap)
+    labelled = any(word.speaker for word in words)
+    cut_breaks = set() if labelled else snap_cuts(words, cuts, rules.cut_snap)
     blocks: list[Piece] = []
     for index, word in enumerate(words):
         at_cut = index in cut_breaks
-        if not blocks or is_break(blocks[-1].words[-1], word, at_cut, rules):
-            blocks.append(Piece([], after_cut=at_cut))
+        prev = blocks[-1].words[-1] if blocks else None
+        changed = prev is not None and speaker_changed(prev, word, labelled, at_cut)
+        if prev is None or changed or is_break(prev, word, at_cut, rules):
+            blocks.append(Piece([], new_speaker=changed))
         blocks[-1].words.append(word)
     return blocks
+
+
+def speaker_changed(prev: Word, word: Word, labelled: bool, at_cut: bool) -> bool:
+    return prev.speaker != word.speaker if labelled else at_cut
 
 
 def is_break(prev: Word, word: Word, at_cut: bool, rules: Rules) -> bool:
@@ -62,8 +69,8 @@ def split_long(block: Piece, rules: Rules) -> list[Piece]:
     if len(block.words) < MIN_SPLITTABLE or fits(block.words, rules):
         return [block]
     index = best_split(block.words)
-    head = Piece(block.words[:index], after_cut=block.after_cut)
-    tail = Piece(block.words[index:], after_cut=False)
+    head = Piece(block.words[:index], new_speaker=block.new_speaker)
+    tail = Piece(block.words[index:], new_speaker=False)
     return split_long(head, rules) + split_long(tail, rules)
 
 

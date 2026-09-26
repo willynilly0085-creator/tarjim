@@ -9,7 +9,7 @@ MAX_SPEAKERS = 2
 @dataclass
 class Piece:
     words: list[Word] = field(default_factory=list)
-    after_cut: bool = False
+    new_speaker: bool = False
 
     @property
     def span(self) -> float:
@@ -43,11 +43,11 @@ def should_join(cue: Cue, piece: Piece, rules: Rules) -> bool:
 
 
 def room_for(cue: Cue, piece: Piece) -> bool:
-    return not piece.after_cut or len(cue.parts) < MAX_SPEAKERS
+    return not piece.new_speaker or len(cue.parts) < MAX_SPEAKERS
 
 
 def join(cue: Cue, piece: Piece) -> None:
-    if piece.after_cut:
+    if piece.new_speaker:
         cue.parts.append(list(piece.words))
     else:
         cue.parts[-1].extend(piece.words)

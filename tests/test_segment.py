@@ -50,6 +50,27 @@ def test_rapid_exchange_becomes_one_dialogue_subtitle() -> None:
     assert cues[0].source == "- Yeah? || - Yeah."
 
 
+def test_speaker_labels_decide_dialogue_not_cuts() -> None:
+    ws = [Word("Never.", 32.5, 33.2, "S9"), Word("Never?", 34.0, 34.5, "S1")]
+    cues = build_cues(ws, cuts=[])
+    assert [c.source for c in cues] == ["- Never. || - Never?"]
+
+
+def test_cut_inside_one_speaker_is_not_dialogue() -> None:
+    ws = [Word("At", 44.8, 45.0, "S12"), Word("least", 45.0, 45.3, "S12"),
+          Word("once.", 45.3, 45.6, "S12"), Word("Sometimes", 45.9, 46.4, "S12")]
+    cues = build_cues(ws, cuts=[45.75])
+    assert not any(c.is_dialogue for c in cues)
+
+
+def test_labelled_speaker_is_never_split_by_a_cut_mid_sentence() -> None:
+    ws = [Word("Dude,", 40.9, 41.0, "S11"), Word("so", 41.05, 41.2, "S11"),
+          Word("me", 41.2, 41.4, "S11"), Word("personally,", 41.4, 41.9, "S11"),
+          Word("never.", 41.9, 42.7, "S11")]
+    cues = build_cues(ws, cuts=[41.02])
+    assert [c.source for c in cues] == ["Dude, so me personally, never."]
+
+
 def test_long_block_is_split_under_max_duration() -> None:
     ws = [Word(f"w{i}", i * 0.5, i * 0.5 + 0.4) for i in range(20)]
     cues = build_cues(ws, cuts=[], rules=Rules())

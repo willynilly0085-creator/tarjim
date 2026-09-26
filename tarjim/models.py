@@ -6,6 +6,7 @@ class Word:
     text: str
     start: float
     end: float
+    speaker: str = ""
 
 
 DIALOGUE_SEPARATOR = " || "

@@ -33,12 +33,35 @@ def transcript_for(job: Job) -> Transcript:
     cached = job.cache / "transcript.json"
     if cached.exists():
         return Transcript.load(cached)
-    from tarjim.asr.qwen import QwenEngine
-
     audio = media.extract_audio(job.video, job.cache / "audio.wav")
-    transcript = QwenEngine().transcribe(str(audio))
+    transcript = listen_and_align(job, audio) or qwen_transcript(audio)
     transcript.save(cached)
     return transcript
+
+
+def listen_and_align(job: Job, audio: Path) -> Transcript | None:
+    import soundfile
+
+    from tarjim.asr.align import AlignEngine
+    from tarjim.listen.gemini_listen import listen
+    from tarjim.listen.merge import listen_many
+
+    sound = media.audio_bytes(job.video)
+    try:
+        language, utterances = listen_many(lambda: listen(sound))
+    except RuntimeError:
+        return None
+    if not utterances:
+        return None
+    wav, _ = soundfile.read(str(audio), dtype="float32")
+    words = AlignEngine().align(wav, utterances, language)
+    return Transcript(language=language, text=" ".join(u.text for u in utterances), words=words)
+
+
+def qwen_transcript(audio: Path) -> Transcript:
+    from tarjim.asr.qwen import QwenEngine
+
+    return QwenEngine().transcribe(str(audio))
 
 
 def cuts_for(job: Job) -> list[float]:
@@ -56,9 +79,17 @@ def translate(job: Job, cues: list[Cue]) -> list[Cue]:
     return GeminiTranslator().translate(cues, media.audio_bytes(job.video), job.dialect)
 
 
+def save_review(job: Job, cues: list[Cue]) -> None:
+    rows = [{"start": round(c.start, 2), "end": round(c.end, 2), "source": c.source,
+             "text": c.text} for c in cues]
+    review = job.cache / "cues.json"
+    review.write_text(json.dumps(rows, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
 def run(job: Job) -> tuple[list[Cue], list[Issue]]:
     cues = build_cues(transcript_for(job).words, cuts_for(job))
     cues = translate(job, cues)
+    save_review(job, cues)
     info = media.probe(job.video)
     ass = job.output(".ass")
     ass.write_text(render_ass(cues, Canvas(info.width, info.height, job.font)), encoding="utf-8")
