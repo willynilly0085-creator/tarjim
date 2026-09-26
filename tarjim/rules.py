@@ -1,0 +1,29 @@
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Rules:
+    long_pause: float = 2.5
+    cut_snap: float = 0.35
+    min_readable: float = 0.9
+    join_gap: float = 1.0
+    max_duration: float = 6.0
+    min_duration: float = 1.0
+    min_gap: float = 0.083
+    linger: float = 0.5
+    max_source_chars: int = 84
+    line_chars: int = 42
+    max_lines: int = 2
+    reading_cps: float = 17.0
+    min_budget: int = 12
+
+    @property
+    def max_chars(self) -> int:
+        return self.line_chars * self.max_lines
+
+    def char_budget(self, duration: float) -> int:
+        budget = int(self.reading_cps * duration)
+        return max(self.min_budget, min(self.max_chars, budget))
+
+
+DEFAULT_RULES = Rules()

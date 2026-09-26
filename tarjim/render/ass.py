@@ -1,0 +1,77 @@
+from dataclasses import dataclass
+
+from tarjim.lines import display_lines
+from tarjim.models import Cue
+from tarjim.render.timecode import ass_time
+
+RLM = chr(0x200F)
+ARABIC_CHARSET = 178
+FADE_MS = 90
+PORTRAIT_FONT = 0.066
+LANDSCAPE_FONT = 0.058
+
+HEADER = """[Script Info]
+ScriptType: v4.00+
+PlayResX: {w}
+PlayResY: {h}
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, \
+BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, \
+BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,{font},{size},&H00FFFFFF,&H00FFFFFF,&H00141414,&H8C000000,-1,0,0,0,\
+100,100,0,0,1,{outline},{shadow},2,{mh},{mh},{mv},{charset}
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+"""
+
+
+@dataclass(frozen=True)
+class Canvas:
+    width: int
+    height: int
+    font: str = "Dubai"
+
+    @property
+    def portrait(self) -> bool:
+        return self.height > self.width
+
+    @property
+    def font_size(self) -> int:
+        ratio = PORTRAIT_FONT if self.portrait else LANDSCAPE_FONT
+        return round(min(self.width, self.height) * ratio)
+
+    @property
+    def margin_v(self) -> int:
+        return round(self.height * (0.14 if self.portrait else 0.07))
+
+    @property
+    def margin_h(self) -> int:
+        return round(self.width * 0.06)
+
+    @property
+    def outline(self) -> int:
+        return max(2, round(self.font_size * 0.08))
+
+
+def render_ass(cues: list[Cue], canvas: Canvas) -> str:
+    header = HEADER.format(
+        w=canvas.width, h=canvas.height, font=canvas.font, size=canvas.font_size,
+        outline=canvas.outline, shadow=max(1, canvas.outline // 2),
+        mh=canvas.margin_h, mv=canvas.margin_v, charset=ARABIC_CHARSET,
+    )
+    events = [event_line(cue) for cue in cues if cue.text.strip()]
+    return header + "\n".join(events) + "\n"
+
+
+def event_line(cue: Cue) -> str:
+    lines = [f"{RLM}{clean(line)}{RLM}" for line in display_lines(cue.text)]
+    body = f"{{\\fad({FADE_MS},{FADE_MS})}}" + "\\N".join(lines)
+    return f"Dialogue: 0,{ass_time(cue.start)},{ass_time(cue.end)},Default,,0,0,0,,{body}"
+
+
+def clean(text: str) -> str:
+    return text.replace("{", "(").replace("}", ")").replace("\n", " ")
