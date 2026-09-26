@@ -6,10 +6,13 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 from queue import Queue
 
-MODES = ("srt", "burn")
+DUBBING = {"dub-clone": "clone", "dub-studio": "studio", "dub-fish": "fish",
+           "dub-fishvoice": "fish:saved"}
+MODES = ("srt", "burn", *DUBBING)
 KEEP = 50
 REASONS = [("quota", ("QuotaExhausted", "quota")), ("key", ("API key missing",)),
-           ("download", ("DownloadError", "download")), ("tools", ("not found; install",))]
+           ("download", ("DownloadError", "download")), ("tools", ("not found; install",)),
+           ("dub", ("DubUnavailable",))]
 
 
 def classify(error: Exception) -> str:

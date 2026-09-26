@@ -6,7 +6,7 @@ from tarjim.config import HOME, prepare_environment, save, setting, token
 from tarjim.fetch import is_url, resolve
 from tarjim.job import Job
 from tarjim.server.app import PORT, serve
-from tarjim.server.jobs import Board, Task
+from tarjim.server.jobs import DUBBING, Board, Task
 
 DOWNLOADS = Path.home() / "Downloads" / "tarjim"
 
@@ -15,7 +15,8 @@ def perform(task: Task, downloads: Path) -> None:
     order = task.order
     task.stage = "downloading" if is_url(order.source) else "hearing"
     task.video = resolve(order.source, downloads)
-    job = Job(task.video, order.target, order.dialect, burn=order.mode == "burn")
+    job = Job(task.video, order.target, order.dialect, burn=order.mode != "srt",
+              dub=DUBBING.get(order.mode, ""))
 
     def report(stage: str) -> None:
         task.stage = stage
@@ -23,7 +24,7 @@ def perform(task: Task, downloads: Path) -> None:
     from tarjim.pipeline import run
 
     run(job, report)
-    candidates = [job.output(".mp4"), job.output(".srt")]
+    candidates = [job.output(".dub.mp4"), job.output(".mp4"), job.output(".srt")]
     task.outputs = [p for p in candidates if p.exists()]
 
 

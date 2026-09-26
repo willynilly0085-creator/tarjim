@@ -76,8 +76,11 @@ async function openMain() {
   const saved = await settings();
   await loadLanguages(saved.target);
   document.querySelector(`input[name=dialect][value=${saved.dialect}]`).checked = true;
-  document.querySelector(`input[name=mode][value=${saved.mode}]`).checked = true;
+  const [output, dubVoice] = saved.mode.startsWith("dub-") ? ["dub", saved.mode.slice(4)] : [saved.mode, saved.voice];
+  document.querySelector(`input[name=mode][value=${output}]`).checked = true;
+  $("voice").value = dubVoice || "clone";
   syncDialect();
+  syncVoice();
   await describeSource();
   refreshButton();
   state.poll = watchJobs(state.languages);
@@ -85,7 +88,13 @@ async function openMain() {
 
 function choices() {
   const form = $("order");
-  return { target: $("target").value, dialect: form.dialect.value, mode: form.mode.value };
+  const output = form.mode.value;
+  const mode = output === "dub" ? `dub-${$("voice").value}` : output;
+  return { target: $("target").value, dialect: form.dialect.value, mode };
+}
+
+function syncVoice() {
+  $("voice-field").hidden = $("order").mode.value !== "dub";
 }
 
 function sourceReady() {
@@ -112,7 +121,7 @@ async function submit(event) {
   event.preventDefault();
   if (!sourceReady()) return;
   const options = choices();
-  await remember(options);
+  await remember({ ...options, voice: $("voice").value });
   $("go").disabled = true;
   $("go").textContent = t("sending");
   try {
@@ -190,6 +199,7 @@ async function saveSettings(event) {
 function wire() {
   $("order").addEventListener("submit", submit);
   $("target").addEventListener("change", syncDialect);
+  document.querySelectorAll("input[name=mode]").forEach((el) => el.addEventListener("change", syncVoice));
   $("open-file-page").addEventListener("click", () => {
     chrome.tabs.create({ url: chrome.runtime.getURL("app.html?page=1") });
     window.close();

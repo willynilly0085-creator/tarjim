@@ -16,6 +16,7 @@ MAX_UPLOAD = 8 * 1024**3
 BLOCK = 1024 * 1024
 TOKEN_HEADERS = ("X-Tarjim-Token", "X-Trans-Token")
 OPEN_PATHS = {"/ping", "/languages"}
+LEGACY = {"dub": "dub-clone"}
 JOB = "([0-9a-f]{12})"
 Query = dict[str, list[str]]
 GET_ROUTES = [(re.compile(p), name) for p, name in [
@@ -167,7 +168,7 @@ class Handler(BaseHTTPRequestHandler):
         self.reply(200, task.view()) if task else self.reply(404, {"error": "job"})
 
     def legacy(self, query: Query) -> None:
-        mode = first(query, "mode") or "srt"
+        mode = LEGACY.get(first(query, "mode"), first(query, "mode") or "srt")
         self.create({"url": first(query, "url"), "mode": mode if mode in MODES else "burn"})
 
     def log_message(self, format: str, *args: Any) -> None:

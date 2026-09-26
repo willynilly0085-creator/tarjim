@@ -4,7 +4,7 @@ from collections.abc import Callable
 from tarjim import media
 from tarjim.hearing import transcript_for
 from tarjim.job import Job
-from tarjim.models import Cue
+from tarjim.models import Cue, Word
 from tarjim.qa import Issue, check
 from tarjim.render.ass import Canvas, render_ass
 from tarjim.render.burn import burn
@@ -45,7 +45,7 @@ def save_review(job: Job, cues: list[Cue]) -> None:
     review.write_text(json.dumps(rows, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
-def write_outputs(job: Job, cues: list[Cue], report: Report) -> None:
+def write_outputs(job: Job, cues: list[Cue], words: list[Word], report: Report) -> None:
     job.output(".srt").write_text(render_srt(cues, job.rules), encoding="utf-8-sig")
     info = media.probe(job.video)
     if not info.has_picture:
@@ -56,15 +56,22 @@ def write_outputs(job: Job, cues: list[Cue], report: Report) -> None:
     if job.burn:
         report("burning")
         burn(job.video, ass, job.output(".mp4"))
+    if job.dub:
+        from tarjim.dub.make import dub_video
+
+        report("dubbing")
+        picture = job.output(".mp4") if job.burn else job.video
+        dub_video(job, cues, words, picture)
 
 
 def run(job: Job, report: Report = quiet) -> tuple[list[Cue], list[Issue]]:
     report("hearing")
-    cues = build_cues(transcript_for(job).words, cuts_for(job))
+    words = transcript_for(job).words
+    cues = build_cues(words, cuts_for(job))
     report("translating")
     cues = translate(job, cues)
     save_review(job, cues)
     report("writing")
-    write_outputs(job, cues, report)
+    write_outputs(job, cues, words, report)
     report("done")
     return cues, check(cues, job.rules)

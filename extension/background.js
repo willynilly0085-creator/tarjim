@@ -1,7 +1,7 @@
 import { api, errorLabel, mediaUrl, post, settings, t } from "./shared.js";
 
 const MENU_ROOT = "tarjim";
-const MENU_MODES = { "tarjim-burn": "burn", "tarjim-srt": "srt" };
+const MENU_MODES = { "tarjim-burn": "burn", "tarjim-srt": "srt", "tarjim-dub": "dub-clone" };
 const POLL = "poll";
 const CONTEXTS = ["link", "video", "audio", "page"];
 
@@ -10,6 +10,7 @@ chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({ id: MENU_ROOT, title: t("menuRoot"), contexts: CONTEXTS });
     chrome.contextMenus.create({ id: "tarjim-burn", parentId: MENU_ROOT, title: t("menuBurn"), contexts: CONTEXTS });
     chrome.contextMenus.create({ id: "tarjim-srt", parentId: MENU_ROOT, title: t("menuSrt"), contexts: CONTEXTS });
+    chrome.contextMenus.create({ id: "tarjim-dub", parentId: MENU_ROOT, title: t("menuDub"), contexts: CONTEXTS });
   });
   chrome.alarms.create(POLL, { periodInMinutes: 0.5 });
 });

@@ -64,8 +64,19 @@
           <div class="segments">
             <label><input type="radio" name="mode" value="burn"><span data-i18n="outputBurn"></span></label>
             <label><input type="radio" name="mode" value="srt"><span data-i18n="outputSrt"></span></label>
+            <label><input type="radio" name="mode" value="dub"><span data-i18n="outputDub"></span></label>
           </div>
         </fieldset>
+
+        <div class="field" id="voice-field" hidden>
+          <label class="field-label" for="voice" data-i18n="voice"></label>
+          <select id="voice" class="select">
+            <option value="clone" data-i18n="voiceClone"></option>
+            <option value="studio" data-i18n="voiceStudio"></option>
+            <option value="fish" data-i18n="voiceFish"></option>
+            <option value="fishvoice" data-i18n="voiceNarrator"></option>
+          </select>
+        </div>
 
         <div class="upload" id="upload" hidden>
           <div class="meter"><span id="upload-bar"></span></div>

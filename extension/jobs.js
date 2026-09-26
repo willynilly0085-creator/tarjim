@@ -1,4 +1,4 @@
-import { api, errorLabel, post, stageLabel, stepsFor, t } from "./shared.js";
+import { api, errorLabel, modeLabel, post, stageLabel, stepsFor, t } from "./shared.js";
 
 const rows = new Map();
 const spoken = new Map();
@@ -38,7 +38,7 @@ function actionsFor(job, box, refresh) {
 
 function metaText(job, languages) {
   const language = languages.get(job.target) || job.target;
-  return `${language} · ${t(job.mode === "burn" ? "outputBurn" : "outputSrt")}`;
+  return `${language} · ${modeLabel(job.mode)}`;
 }
 
 function paint(row, job, languages, refresh) {

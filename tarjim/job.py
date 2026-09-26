@@ -12,6 +12,7 @@ class Job:
     dialect: str = "saudi"
     burn: bool = True
     font: str = ""
+    dub: str = ""
 
     @property
     def language(self) -> Language:
