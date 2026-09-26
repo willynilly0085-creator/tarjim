@@ -2,7 +2,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from tarjim.config import HOME, prepare_environment, save, setting, token
+from tarjim.config import HOME, prepare_environment, private_home, save, setting, token
 from tarjim.fetch import is_url, resolve
 from tarjim.job import Job
 from tarjim.server.app import PORT, serve
@@ -29,8 +29,8 @@ def perform(task: Task, downloads: Path) -> None:
 
 
 def attach_output() -> None:
+    private_home()
     if sys.stdout is None:
-        HOME.mkdir(parents=True, exist_ok=True)
         log = (HOME / "server.log").open("a", encoding="utf-8", buffering=1)
         sys.stdout = sys.stderr = log
     else:

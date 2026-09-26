@@ -1,11 +1,15 @@
+import contextlib
 import json
 import os
 import secrets
+import tempfile
 from pathlib import Path
 
 HOME = Path(os.environ.get("TARJIM_HOME", Path.home() / ".tarjim"))
 CONFIG = HOME / "config.json"
 TOKEN_BYTES = 16
+OWNER_DIR = 0o700
+OWNER_FILE = 0o600
 
 
 def settings() -> dict[str, str]:
@@ -20,11 +24,26 @@ def setting(name: str) -> str:
     return os.environ.get(f"TARJIM_{name.upper()}") or settings().get(name, "")
 
 
+def private_home() -> None:
+    HOME.mkdir(parents=True, exist_ok=True, mode=OWNER_DIR)
+    with contextlib.suppress(OSError):
+        os.chmod(HOME, OWNER_DIR)
+
+
 def save(name: str, value: str) -> None:
-    HOME.mkdir(parents=True, exist_ok=True)
+    private_home()
     data = settings()
     data[name] = value
-    CONFIG.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+    handle, temporary = tempfile.mkstemp(dir=HOME, prefix=".config-")
+    try:
+        os.chmod(temporary, OWNER_FILE)
+        with os.fdopen(handle, "w", encoding="utf-8") as out:
+            out.write(json.dumps(data, ensure_ascii=False, indent=1))
+        os.replace(temporary, CONFIG)
+    except BaseException:
+        with contextlib.suppress(OSError):
+            os.unlink(temporary)
+        raise
 
 
 def token() -> str:
