@@ -90,3 +90,23 @@ def test_no_word_is_lost_or_duplicated() -> None:
     ws = words(("a", 0, 0.2), ("b.", 0.3, 0.5), ("c", 2, 2.2), ("d", 2.25, 2.4))
     cues = build_cues(ws, cuts=[2.23])
     assert [w.text for c in cues for w in c.words] == ["a", "b.", "c", "d"]
+
+
+def labelled(*items: tuple[str, float, float, str]) -> list[Word]:
+    return [Word(t, s, e, who) for t, s, e, who in items]
+
+
+def test_subtitle_never_runs_into_the_next_shot() -> None:
+    ws = labelled(("three", 12.2, 12.5, "S3"), ("months.", 12.5, 13.1, "S3"),
+                  ("Once", 16.6, 16.9, "S4"))
+    cues = build_cues(ws, cuts=[13.47])
+    assert cues[0].end <= 13.47
+
+
+def test_reaction_before_a_cut_is_not_glued_to_a_long_line_after_it() -> None:
+    ws = labelled(("Nice.", 17.6, 18.0, "S1"), ("Oh", 18.8, 19.0, "S5"), ("my", 19.0, 19.2, "S5"),
+                  ("gosh,", 19.2, 19.9, "S5"), ("18", 19.9, 20.2, "S5"),
+                  ("times.", 20.2, 21.1, "S5"))
+    cues = build_cues(ws, cuts=[18.77])
+    assert [c.source for c in cues] == ["Nice.", "Oh my gosh, 18 times."]
+    assert cues[0].end <= 18.77

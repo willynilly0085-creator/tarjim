@@ -7,6 +7,7 @@ from tarjim.asr.ctc import BLANK, FRAME
 THRESHOLD = 0.5
 PAD = 0.1
 SILENCE_PENALTY = 30.0
+BLANK_IN_SPEECH = 0.0
 MIN_SILENCE_MS = 150
 MIN_SPEECH_MS = 100
 
@@ -34,4 +35,5 @@ def mute_silence(logp: np.ndarray, speech: np.ndarray) -> np.ndarray:
     silent = ~speech[:len(logp)]
     letters = np.arange(logp.shape[1]) != BLANK
     muted[np.ix_(silent, letters)] -= SILENCE_PENALTY
+    muted[~silent, BLANK] -= BLANK_IN_SPEECH
     return muted

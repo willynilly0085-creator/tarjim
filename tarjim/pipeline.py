@@ -1,9 +1,10 @@
 import json
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from tarjim import media
 from tarjim.asr.base import Transcript
+from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Cue
 from tarjim.qa import Issue, check
 from tarjim.render.ass import Canvas, render_ass
@@ -39,22 +40,37 @@ def transcript_for(job: Job) -> Transcript:
     return transcript
 
 
+def heard_for(job: Job) -> tuple[str, list[Utterance]]:
+    from tarjim.listen.gemini_listen import listen
+    from tarjim.listen.merge import listen_many
+
+    cached = job.cache / "heard.json"
+    if cached.exists():
+        data = json.loads(cached.read_text(encoding="utf-8"))
+        return data["language"], [Utterance(**u) for u in data["utterances"]]
+    sound = media.audio_bytes(job.video)
+    heard = listen_many(lambda: listen(sound))
+    payload = {"language": heard.language, "utterances": [asdict(u) for u in heard.utterances],
+               "passes": [[asdict(u) for u in run] for run in heard.passes]}
+    cached.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
+    return heard.language, heard.utterances
+
+
 def listen_and_align(job: Job, audio: Path) -> Transcript | None:
     import soundfile
 
     from tarjim.asr.align import AlignEngine
-    from tarjim.listen.gemini_listen import listen
-    from tarjim.listen.merge import listen_many
+    from tarjim.asr.fuse import fuse
 
-    sound = media.audio_bytes(job.video)
     try:
-        language, utterances = listen_many(lambda: listen(sound))
+        language, utterances = heard_for(job)
     except RuntimeError:
         return None
     if not utterances:
         return None
     wav, _ = soundfile.read(str(audio), dtype="float32")
     words = AlignEngine().align(wav, utterances, language)
+    words = fuse(words, utterances, qwen_transcript(audio).words)
     return Transcript(language=language, text=" ".join(u.text for u in utterances), words=words)
 
 

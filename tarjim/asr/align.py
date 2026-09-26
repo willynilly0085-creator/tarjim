@@ -11,8 +11,6 @@ from tarjim.models import Word
 
 CHUNK_SECONDS = 240.0
 PAD = 2.0
-EXTRA_TAG = "p"
-MIN_EXTRA_SCORE = 0.3
 SPECIAL_IDS = 4
 GAP_FALLBACK = 0.2
 WINDOW_MARGIN = 1.0
@@ -27,7 +25,6 @@ class Slot:
     owner: int
     start: float = 0.0
     end: float = 0.0
-    score: float = 0.0
     timed: bool = False
 
 
@@ -83,15 +80,6 @@ def fill_gaps(slots: list[Slot]) -> None:
         slot.start = min(slot.start, slot.end)
 
 
-def keep_real(slots: list[Slot]) -> list[Slot]:
-    scores: dict[int, list[float]] = {}
-    for slot in slots:
-        if slot.timed:
-            scores.setdefault(slot.owner, []).append(slot.score)
-    doubtful = {owner for owner, values in scores.items() if np.mean(values) < MIN_EXTRA_SCORE}
-    return [s for s in slots if not (s.speaker.startswith(EXTRA_TAG) and s.owner in doubtful)]
-
-
 class AlignEngine:
     def __init__(self, device: str = "cuda:0") -> None:
         import uroman
@@ -119,7 +107,7 @@ class AlignEngine:
         if not self.time_slots(logp[low:high], slots, group, low):
             return [word for u in group for word in proportional(u)]
         fill_gaps(slots)
-        return [Word(s.text, s.start, s.end, s.speaker) for s in keep_real(slots)]
+        return [Word(s.text, s.start, s.end, s.speaker) for s in slots]
 
     def time_slots(
             self, logp: np.ndarray, slots: list[Slot], group: list[Utterance], low: int) -> bool:
@@ -135,5 +123,5 @@ class AlignEngine:
             slot = slots[k]
             start, slot.end = densest(word, self.speech)
             slot.start = max(start, slot.end - longest(slot.text))
-            slot.score, slot.timed = max(s[2] for s in word), True
+            slot.timed = True
         return True

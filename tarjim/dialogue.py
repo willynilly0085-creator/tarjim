@@ -10,6 +10,7 @@ MAX_SPEAKERS = 2
 class Piece:
     words: list[Word] = field(default_factory=list)
     new_speaker: bool = False
+    after_cut: bool = False
 
     @property
     def span(self) -> float:
@@ -32,6 +33,8 @@ def new_cue(piece: Piece) -> Cue:
 
 
 def should_join(cue: Cue, piece: Piece, rules: Rules) -> bool:
+    if piece.after_cut and piece.words[-1].end - cue.start > rules.cut_dialogue_span:
+        return False
     cue_span = cue.words[-1].end - cue.start
     if min(cue_span, piece.span) >= rules.min_readable:
         return False

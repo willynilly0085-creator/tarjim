@@ -7,10 +7,11 @@ class Rules:
     cut_snap: float = 0.35
     min_readable: float = 0.9
     join_gap: float = 1.0
+    cut_dialogue_span: float = 2.0
     max_duration: float = 6.0
-    min_duration: float = 1.0
+    min_duration: float = 0.8
     min_gap: float = 0.083
-    linger: float = 0.5
+    linger: float = 0.4
     max_source_chars: int = 84
     line_chars: int = 42
     max_lines: int = 2
