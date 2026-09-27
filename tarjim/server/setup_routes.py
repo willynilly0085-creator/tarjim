@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, ClassVar
 
 from tarjim.config import save, setting
@@ -8,6 +9,7 @@ from tarjim.server.pairing import Pairing
 from tarjim.tools import Shelf
 
 UI_LANGUAGES = ("ar", "en")
+EXTENSION = Path(__file__).resolve().parents[2] / "extension"
 FIELDS: dict[str, tuple[str, ...]] = {"ui_language": UI_LANGUAGES, "listen_provider": LISTENERS,
                                       "translate_provider": TRANSLATORS, "setup_done": ("yes",)}
 Query = dict[str, list[str]]
@@ -34,6 +36,8 @@ class SetupRoutes:
         state: dict[str, Any] = {name: setting(name) for name in FIELDS}
         state["keys"] = status()
         state["chosen"] = {"listen": chosen("listen"), "translate": chosen("translate")}
+        folder = EXTENSION if EXTENSION.is_dir() else None
+        state["extension_path"] = str(folder) if folder else ""
         self.reply(200, state)
 
     def save_setup(self, query: Query) -> None:

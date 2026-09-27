@@ -238,5 +238,20 @@
   },
   "keyBody": {
     "message": "tarjim يستخدم Gemini عشان يسمع المقطع ويترجمه. المفتاح مجاني وتاخذه من حساب Google حقك خلال دقيقة."
+  },
+  "pairAuto": {
+    "message": "اربط تلقائياً"
+  },
+  "pairDenied": {
+    "message": "انرفض طلب الربط."
+  },
+  "openTarjim": {
+    "message": "افتح صفحة tarjim"
+  },
+  "pairManual": {
+    "message": "أو الصق رمز الأمان يدوياً:"
+  },
+  "pairWaiting": {
+    "message": "افتح صفحة tarjim ووافق على طلب الربط اللي بيطلع لك."
   }
 }

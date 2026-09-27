@@ -102,7 +102,10 @@
 
     <section class="view panel" id="view-pair" hidden>
       <h2 class="panel-title" data-i18n="pairTitle"></h2>
-      <p data-i18n="pairBody"></p>
+      <button class="primary" id="pair-auto" type="button" data-i18n="pairAuto"></button>
+      <p class="notice" id="pair-waiting" role="status" hidden></p>
+      <button class="text-button" id="open-tarjim" type="button" data-i18n="openTarjim" hidden></button>
+      <p class="meta" data-i18n="pairManual"></p>
       <code class="command" dir="ltr">tarjim-serve --show-token</code>
       <form id="pair-form" class="stack" novalidate>
         <label class="field-label" for="token" data-i18n="tokenLabel"></label>

@@ -238,5 +238,20 @@
   },
   "keyBody": {
     "message": "tarjim uses Gemini to listen to the video and translate it. The key is free and takes a minute to get from your Google account."
+  },
+  "pairAuto": {
+    "message": "Connect automatically"
+  },
+  "pairDenied": {
+    "message": "The connection request was denied."
+  },
+  "openTarjim": {
+    "message": "Open the tarjim page"
+  },
+  "pairManual": {
+    "message": "Or paste the security token by hand:"
+  },
+  "pairWaiting": {
+    "message": "Open the tarjim page and allow the connection request that appears."
   }
 }

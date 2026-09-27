@@ -14,6 +14,38 @@ async function pair(event, ready) {
   }
 }
 
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const ATTEMPTS = 120;
+
+async function serverBase() {
+  return (await settings()).server.replace(/\/+$/, "");
+}
+
+async function askToPair() {
+  const base = await serverBase();
+  const reply = await fetch(`${base}/pair`, { method: "POST" }).catch(() => null);
+  return reply?.ok ? (await reply.json()).id : null;
+}
+
+async function autoPair(ready) {
+  const id = await askToPair();
+  if (!id) return show("offline");
+  $("pair-waiting").hidden = false;
+  $("pair-waiting").textContent = t("pairWaiting");
+  $("open-tarjim").hidden = false;
+  for (let i = 0; i < ATTEMPTS; i += 1) {
+    await wait(1500);
+    const reply = await fetch(`${await serverBase()}/pair/${id}`).catch(() => null);
+    const state = reply?.ok ? await reply.json() : {};
+    if (state.token) {
+      await remember({ token: state.token });
+      return ready();
+    }
+    if (state.state === "denied" || state.state === "unknown") break;
+  }
+  $("pair-waiting").textContent = t("pairDenied");
+}
+
 export async function openSettings() {
   const saved = await settings();
   $("server").value = saved.server;
@@ -48,6 +80,8 @@ async function saveSettings(event) {
 
 export function wirePanels({ ready, back, leave }) {
   $("pair-form").addEventListener("submit", (event) => pair(event, ready));
+  $("pair-auto").addEventListener("click", () => autoPair(ready));
+  $("open-tarjim").addEventListener("click", async () => chrome.tabs.create({ url: `${await serverBase()}/` }));
   $("key-form").addEventListener("submit", (event) => submitKey(event, ready));
   $("settings-form").addEventListener("submit", saveSettings);
   $("retry-connect").addEventListener("click", back);

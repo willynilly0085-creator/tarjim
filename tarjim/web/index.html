@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>tarjim</title>
+  <link rel="icon" href="/web/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/web/web.css">
+</head>
+<body>
+  <header class="bar">
+    <p class="mark">
+      <svg class="mark-glyph" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="8" width="18" height="3.2" rx="1.6" class="mark-top"/>
+        <rect x="6" y="13.6" width="12" height="3.2" rx="1.6" class="mark-bottom"/>
+      </svg>
+      <span>tarjim</span>
+    </p>
+    <label class="visually-hidden" for="ui-language">Language</label>
+    <select id="ui-language" class="select compact">
+      <option value="ar">العربية</option>
+      <option value="en">English</option>
+    </select>
+    <button class="button-quiet" id="open-settings" type="button" data-t="settings" hidden></button>
+  </header>
+
+  <aside class="pairing" id="pairing" hidden aria-live="polite">
+    <p data-t="pairAsk"></p>
+    <div class="row">
+      <button class="primary small" id="pair-allow" type="button" data-t="allow"></button>
+      <button class="button-quiet" id="pair-deny" type="button" data-t="deny"></button>
+    </div>
+  </aside>
+
+  <main id="wizard" hidden>
+    <div class="progress">
+      <p class="meta" id="step-count"></p>
+      <ol class="track" id="step-track" aria-hidden="true"></ol>
+    </div>
+
+    <section class="step" data-step="language">
+      <h1 data-t="langTitle"></h1>
+      <p class="lede" data-t="langHint"></p>
+      <div class="choices" id="language-choices">
+        <label class="choice"><input type="radio" name="ui" value="ar"><span class="choice-name">العربية</span><span class="choice-note">Arabic</span></label>
+        <label class="choice"><input type="radio" name="ui" value="en"><span class="choice-name">English</span><span class="choice-note">الإنجليزية</span></label>
+      </div>
+    </section>
+
+    <section class="step" data-step="device">
+      <h1 data-t="deviceTitle"></h1>
+      <p class="lede" data-t="deviceHint"></p>
+      <dl class="facts" id="facts"></dl>
+      <p class="advice" id="device-advice"></p>
+    </section>
+
+    <section class="step" data-step="engine">
+      <h1 data-t="engineTitle"></h1>
+      <div class="choices">
+        <label class="choice"><input type="radio" name="engine" value="cloud"><span class="choice-name"><span data-t="engineCloud"></span> <em class="tag" data-t="recommended"></em></span><span class="choice-note" data-t="engineCloudHint"></span></label>
+        <label class="choice"><input type="radio" name="engine" value="local"><span class="choice-name" data-t="engineLocal"></span><span class="choice-note" data-t="engineLocalHint"></span></label>
+        <label class="choice"><input type="radio" name="engine" value="advanced"><span class="choice-name" data-t="engineAdvanced"></span><span class="choice-note" data-t="engineAdvancedHint"></span></label>
+      </div>
+      <div class="pair-fields" id="advanced" hidden>
+        <label class="field"><span class="field-label" data-t="listenLabel"></span><select class="select" id="listen-provider"></select></label>
+        <label class="field"><span class="field-label" data-t="translateLabel"></span><select class="select" id="translate-provider"></select></label>
+      </div>
+    </section>
+
+    <section class="step" data-step="keys">
+      <h1 data-t="keyTitle"></h1>
+      <p class="lede" data-t="keyHint"></p>
+      <p class="advice" id="keys-none" data-t="keyNone" hidden></p>
+      <div class="key-list" id="key-list"></div>
+    </section>
+
+    <section class="step" data-step="tools">
+      <h1 data-t="toolsTitle"></h1>
+      <p class="lede" data-t="toolsHint"></p>
+      <ul class="tool-list" id="tool-list"></ul>
+    </section>
+
+    <section class="step" data-step="extension">
+      <h1 data-t="extTitle"></h1>
+      <p class="lede" data-t="extHint"></p>
+      <ol class="how">
+        <li data-t="extStep1"></li>
+        <li><span data-t="extStep2"></span>
+          <span class="path-row"><code class="command" id="extension-path" dir="ltr"></code><button class="button-quiet" id="copy-path" type="button" data-t="copy"></button></span>
+        </li>
+        <li data-t="extStep3"></li>
+      </ol>
+    </section>
+
+    <section class="step" data-step="done">
+      <h1 data-t="doneTitle"></h1>
+      <p class="lede" data-t="doneHint"></p>
+    </section>
+
+    <p class="error" id="step-error" role="alert" hidden></p>
+    <nav class="step-nav">
+      <button class="button-quiet" id="step-back" type="button" data-t="back"></button>
+      <button class="primary" id="step-next" type="button" data-t="next"></button>
+    </nav>
+  </main>
+
+  <main id="workspace" hidden>
+    <form id="order" class="order" novalidate>
+      <input type="file" id="file" accept="video/*,audio/*" class="visually-hidden">
+      <label for="file" class="drop-zone" id="drop-zone">
+        <span class="drop-title" data-t="dropTitle"></span>
+        <span class="drop-hint" data-t="dropHint"></span>
+        <span class="button-quiet" data-t="chooseFile"></span>
+      </label>
+      <p class="drop-file" id="drop-file" hidden></p>
+      <label class="field"><span class="field-label" data-t="linkLabel"></span>
+        <input class="text-input" id="link" type="url" inputmode="url" dir="ltr" placeholder="https://"></label>
+      <div class="options">
+        <label class="field"><span class="field-label" data-t="language"></span><select id="target" class="select"></select></label>
+        <fieldset class="field" id="dialect-field"><legend class="field-label" data-t="dialect"></legend>
+          <div class="segments">
+            <label><input type="radio" name="dialect" value="saudi" checked><span data-t="dialectSaudi"></span></label>
+            <label><input type="radio" name="dialect" value="msa"><span data-t="dialectMsa"></span></label>
+          </div></fieldset>
+      </div>
+      <fieldset class="field"><legend class="field-label" data-t="output"></legend>
+        <div class="segments">
+          <label><input type="radio" name="mode" value="burn" checked><span data-t="outputBurn"></span></label>
+          <label><input type="radio" name="mode" value="srt"><span data-t="outputSrt"></span></label>
+          <label><input type="radio" name="mode" value="dub"><span data-t="outputDub"></span></label>
+        </div></fieldset>
+      <label class="field" id="voice-field" hidden><span class="field-label" data-t="voice"></span>
+        <select id="voice" class="select">
+          <option value="clone" data-t="voiceClone"></option>
+          <option value="studio" data-t="voiceStudio"></option>
+          <option value="fish" data-t="voiceFish"></option>
+          <option value="fishvoice" id="voice-narrator" data-t="voiceNarrator"></option>
+        </select></label>
+      <div class="upload" id="upload" hidden><div class="meter"><span id="upload-bar"></span></div><p class="meta" id="upload-text"></p></div>
+      <button class="primary" id="go" type="submit" data-t="translate" disabled></button>
+      <p class="notice" id="notice" role="status" aria-live="polite"></p>
+    </form>
+    <section class="recent" aria-labelledby="recent-title">
+      <h2 class="section-title" id="recent-title" data-t="recent"></h2>
+      <p class="meta" id="empty" data-t="empty" hidden></p>
+      <ul class="jobs" id="jobs"></ul>
+    </section>
+  </main>
+
+  <template id="job-row">
+    <li class="job">
+      <div class="job-head"><p class="job-title"></p><p class="job-stage"></p></div>
+      <p class="meta job-meta"></p>
+      <ol class="track" aria-hidden="true"></ol>
+      <p class="error job-error" hidden></p>
+      <div class="row job-actions" hidden></div>
+    </li>
+  </template>
+  <p class="visually-hidden" id="announcer" aria-live="polite"></p>
+
+  <template id="key-row">
+    <form class="key-row" novalidate>
+      <label class="field"><span class="field-label"></span><input class="text-input" type="password" dir="ltr" autocomplete="off" spellcheck="false"></label>
+      <div class="row"><a class="text-link" target="_blank" rel="noopener noreferrer" data-t="getKey"></a><button class="button-quiet" type="submit" data-t="keySave"></button><span class="meta key-state" role="status"></span></div>
+    </form>
+  </template>
+
+  <template id="tool-row">
+    <li class="tool">
+      <div><p class="tool-name"></p><p class="meta tool-hint"></p></div>
+      <p class="meta tool-size"></p>
+      <div class="tool-action"></div>
+    </li>
+  </template>
+
+  <script type="module" src="/web/main.js"></script>
+</body>
+</html>
