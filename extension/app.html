@@ -74,6 +74,7 @@
         <div class="field" id="voice-field" hidden>
           <label class="field-label" for="voice" data-i18n="voice"></label>
           <select id="voice" class="select">
+            <option value="gemini" data-i18n="voiceNatural"></option>
             <option value="clone" data-i18n="voiceClone"></option>
             <option value="studio" data-i18n="voiceStudio"></option>
             <option value="fish" data-i18n="voiceFish"></option>
@@ -145,12 +146,18 @@
         <select class="select" id="settings-engine">
           <option value="cloud" data-i18n="engineCloud"></option>
           <option value="local" data-i18n="engineLocal"></option>
+          <option value="subscription" data-i18n="engineSubscription"></option>
           <option value="advanced" data-i18n="engineAdvanced"></option>
         </select>
         <div class="stack" id="local-model-field" hidden>
           <label class="field-label" for="settings-local-model" data-i18n="localModelLabel"></label>
           <select class="select" id="settings-local-model"></select>
           <p class="meta" id="local-model-hint" data-i18n="localModelHint"></p>
+        </div>
+        <div class="stack" id="subscription-field" hidden>
+          <label class="field-label" for="settings-subscription" data-i18n="subscriptionLabel"></label>
+          <select class="select" id="settings-subscription"></select>
+          <p class="meta" id="subscription-none" data-i18n="subscriptionNone" hidden></p>
         </div>
         <p class="notice" id="settings-notice" role="status" aria-live="polite"></p>
         <div class="row">

@@ -6,7 +6,7 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 from queue import Queue
 
-DUBBING = {"dub-clone": "clone", "dub-studio": "studio", "dub-fish": "fish",
+DUBBING = {"dub-gemini": "gemini", "dub-clone": "clone", "dub-studio": "studio", "dub-fish": "fish",
            "dub-fishvoice": "fish:saved"}
 MODES = ("srt", "burn", *DUBBING)
 KEEP = 50

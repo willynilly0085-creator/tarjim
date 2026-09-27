@@ -87,7 +87,7 @@ async function openMain() {
   document.querySelector(`input[name=dialect][value=${saved.dialect}]`).checked = true;
   const [output, dubVoice] = saved.mode.startsWith("dub-") ? ["dub", saved.mode.slice(4)] : [saved.mode, saved.voice];
   document.querySelector(`input[name=mode][value=${output}]`).checked = true;
-  $("voice").value = dubVoice || "clone";
+  $("voice").value = dubVoice || "gemini";
   syncDialect();
   syncVoice();
   await describeSource();

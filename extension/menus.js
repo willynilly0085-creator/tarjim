@@ -6,6 +6,7 @@ export const CONTEXTS = ["link", "video", "audio", "page"];
 const ITEMS = [
   ["srt", "menuSrt"],
   ["burn", "menuBurn"],
+  ["dub-gemini", "menuDubNatural"],
   ["dub-clone", "menuDubClone"],
   ["dub-fish", "menuDubFish"],
   ["dub-fishvoice", "menuDubNarrator"],

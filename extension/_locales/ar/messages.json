@@ -350,5 +350,26 @@
   },
   "localModelNone": {
     "message": "ما فيه نماذج محلية مركّبة. ركّب Ollama وحمّل نموذج."
+  },
+  "engineSubscription": {
+    "message": "اشتراكي (Claude أو ChatGPT)"
+  },
+  "subscriptionLabel": {
+    "message": "الاشتراك"
+  },
+  "subscriptionNone": {
+    "message": "ركّب Claude Code أو Codex وسجّل دخول باشتراكك."
+  },
+  "providerClaude": {
+    "message": "Claude (Claude Code)"
+  },
+  "providerCodex": {
+    "message": "ChatGPT (Codex)"
+  },
+  "voiceNatural": {
+    "message": "صوت طبيعي لكل متكلم (Gemini)"
+  },
+  "menuDubNatural": {
+    "message": "دبلجة بصوت طبيعي"
   }
 }

@@ -350,5 +350,26 @@
   },
   "localModelNone": {
     "message": "No local models installed. Install Ollama and pull a model."
+  },
+  "engineSubscription": {
+    "message": "My subscription (Claude or ChatGPT)"
+  },
+  "subscriptionLabel": {
+    "message": "Subscription"
+  },
+  "subscriptionNone": {
+    "message": "Install Claude Code or Codex and sign in with your plan."
+  },
+  "providerClaude": {
+    "message": "Claude (Claude Code)"
+  },
+  "providerCodex": {
+    "message": "ChatGPT (Codex)"
+  },
+  "voiceNatural": {
+    "message": "Natural voice per speaker (Gemini)"
+  },
+  "menuDubNatural": {
+    "message": "Dub with a natural voice"
   }
 }

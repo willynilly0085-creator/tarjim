@@ -4,6 +4,7 @@ from typing import Any, ClassVar
 
 from tarjim.config import save, setting
 from tarjim.engines.choice import LISTENERS, TRANSLATORS, chosen
+from tarjim.engines.subscription import installed
 from tarjim.keys import status
 from tarjim.server.guard import extension_origin
 from tarjim.server.pairing import Pairing
@@ -49,6 +50,7 @@ class SetupRoutes:
         folder = EXTENSION if EXTENSION.is_dir() else None
         state["extension_path"] = str(folder) if folder else ""
         state["local_model"] = setting("local_model")
+        state["subscriptions"] = installed()
         self.reply(200, state)
 
     def save_setup(self, query: Query) -> None:

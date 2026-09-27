@@ -132,5 +132,12 @@
   "resume": "كمّل",
   "cancel": "إلغاء",
   "stage_cancelled": "انلغت",
-  "stage_paused": "موقفة مؤقتاً"
+  "stage_paused": "موقفة مؤقتاً",
+  "engineSubscription": "اشتراكك في Claude أو ChatGPT",
+  "engineSubscriptionHint": "الترجمة من اشتراكك الشهري عبر برنامجه المركّب عندك، بدون مفاتيح.",
+  "subscriptionLabel": "الاشتراك",
+  "subscriptionNone": "ما لقينا Claude Code ولا Codex على جهازك. ركّب واحد منهم وسجّل دخول باشتراكك، وبعدها ارجع هنا.",
+  "provider_claude": "اشتراك Claude (عبر Claude Code)",
+  "provider_codex": "اشتراك ChatGPT (عبر Codex)",
+  "voiceNatural": "صوت طبيعي لكل متكلم (Gemini)"
 }

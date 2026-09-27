@@ -1,7 +1,8 @@
 import { $, show } from "./dom.js";
+import { fillEngine, saveEngine, syncEngine } from "./engine.js";
 import { keyStatus, saveKey } from "./keys.js";
 import { askToPair, claimPending, serverBase } from "./pairing.js";
-import { api, post, remember, settings, t } from "./shared.js";
+import { api, remember, settings, t } from "./shared.js";
 
 async function pair(event, ready) {
   event.preventDefault();
@@ -33,39 +34,6 @@ async function autoPair(ready) {
   }
   $("pair-waiting").textContent = t("pairDenied");
 }
-let engineAtOpen = "";
-
-function syncEngine() {
-  $("local-model-field").hidden = $("settings-engine").value !== "local";
-}
-
-async function fillEngine() {
-  const setup = await api("/setup").catch(() => null);
-  if (!setup) return;
-  const { listen, translate } = setup.chosen;
-  const engine = listen === "local" && translate === "local" ? "local"
-    : listen === "gemini" && translate === "gemini" ? "cloud" : "advanced";
-  $("settings-engine").value = engine;
-  engineAtOpen = engine;
-  const { models = [], chosen = "" } = await api("/local-models").catch(() => ({}));
-  $("settings-local-model").replaceChildren(...models.map((m) => new Option(m, m, false, m === chosen)));
-  $("local-model-hint").textContent = t(models.length ? "localModelHint" : "localModelNone");
-  syncEngine();
-}
-
-async function saveEngine() {
-  const engine = $("settings-engine").value;
-  if (engine === "advanced") {
-    if (engineAtOpen !== "advanced") chrome.tabs.create({ url: `${await serverBase()}/` });
-    return;
-  }
-  const provider = engine === "local" ? "local" : "gemini";
-  const model = $("settings-local-model").value;
-  const extra = engine === "local" && model ? { local_model: model } : {};
-  await post("/setup", { listen_provider: provider, translate_provider: provider, ...extra });
-  engineAtOpen = engine;
-}
-
 export async function openSettings() {
   const saved = await settings();
   $("server").value = saved.server;

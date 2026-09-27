@@ -27,7 +27,7 @@ PORT = 17653
 MAX_UPLOAD = 8 * 1024**3
 BLOCK = 1024 * 1024
 TOKEN_HEADERS = ("X-Tarjim-Token", "X-Trans-Token")
-LEGACY = {"dub": "dub-clone"}
+LEGACY = {"dub": "dub-gemini"}
 
 
 class Handler(KeyRoutes, SetupRoutes, PageRoutes):

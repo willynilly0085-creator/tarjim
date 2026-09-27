@@ -132,5 +132,12 @@
   "resume": "Resume",
   "cancel": "Cancel",
   "stage_cancelled": "Cancelled",
-  "stage_paused": "Paused"
+  "stage_paused": "Paused",
+  "engineSubscription": "Your Claude or ChatGPT subscription",
+  "engineSubscriptionHint": "Translate with the plan you already pay for, through its own app on this computer. No keys.",
+  "subscriptionLabel": "Subscription",
+  "subscriptionNone": "Claude Code or Codex was not found on this computer. Install one, sign in with your plan, then come back.",
+  "provider_claude": "Claude subscription (via Claude Code)",
+  "provider_codex": "ChatGPT subscription (via Codex)",
+  "voiceNatural": "Natural voice per speaker (Gemini)"
 }

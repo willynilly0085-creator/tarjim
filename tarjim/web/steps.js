@@ -7,7 +7,8 @@ const KEY_LINKS = {
   anthropic: "https://console.anthropic.com/settings/keys",
 };
 const LISTEN = ["gemini", "openai", "local"];
-const TRANSLATE = ["gemini", "openai", "anthropic", "local"];
+const TRANSLATE = ["gemini", "openai", "anthropic", "claude", "codex", "local"];
+const SUBSCRIPTIONS = ["claude", "codex"];
 
 function fact(term, value, bad = false) {
   const dt = document.createElement("dt");
@@ -32,19 +33,36 @@ function fillProviders(select, options, picked) {
   select.replaceChildren(...options.map((p) => new Option(t(`provider_${p}`), p, false, p === picked)));
 }
 
+function engineMode(listen, translate) {
+  if (SUBSCRIPTIONS.includes(translate)) return "subscription";
+  if (listen === translate && ["gemini", "local"].includes(listen)) return listen === "gemini" ? "cloud" : "local";
+  return "advanced";
+}
+
+function renderSubscriptions(state, translate) {
+  const found = state.setup.subscriptions || [];
+  fillProviders($("subscription-provider"), found, translate);
+  $("subscription-provider").closest(".field").hidden = found.length === 0;
+  $("subscription-none").hidden = found.length > 0;
+}
+
 export function renderEngine(state) {
   const fresh = !state.setup.listen_provider && !state.setup.translate_provider;
   const { listen, translate } = fresh ? { listen: "gemini", translate: "gemini" } : state.setup.chosen;
-  const mode = listen === "gemini" && translate === "gemini" ? "cloud"
-    : listen === "local" && translate === "local" ? "local" : "advanced";
+  const mode = engineMode(listen, translate);
   document.querySelector(`input[name=engine][value=${mode}]`).checked = true;
+  renderSubscriptions(state, translate);
+  $("subscription").hidden = mode !== "subscription";
   fillProviders($("listen-provider"), LISTEN, listen);
   fillProviders($("translate-provider"), TRANSLATE, translate);
   $("advanced").hidden = mode !== "advanced";
 }
 
-export function engineChoice() {
+export function engineChoice(state) {
   const mode = document.querySelector("input[name=engine]:checked")?.value || "cloud";
+  if (mode === "subscription" && $("subscription-provider").value) {
+    return { listen_provider: state.setup.keys.gemini ? "gemini" : "local", translate_provider: $("subscription-provider").value };
+  }
   if (mode === "cloud") return { listen_provider: "gemini", translate_provider: "gemini" };
   if (mode === "local") return { listen_provider: "local", translate_provider: "local" };
   return { listen_provider: $("listen-provider").value, translate_provider: $("translate-provider").value };

@@ -27,7 +27,7 @@ const LEAVE = {
     if (language) await load(language);
     $("ui-language").value = document.documentElement.lang;
   },
-  engine: async () => { state.setup = { ...state.setup, ...(await post("/setup", engineChoice())) }; },
+  engine: async () => { state.setup = { ...state.setup, ...(await post("/setup", engineChoice(state))) }; },
   keys: () => (neededKeys(state).every((p) => state.setup.keys[p]) ? "" : "keysMissing"),
   tools: () => (state.tools?.every((tool) => !tool.required || tool.installed) ? "" : "requiredMissing"),
   done: async () => { await post("/setup", { setup_done: "yes" }); finish(); },
@@ -77,6 +77,7 @@ export function wireWizard() {
   $("step-back").addEventListener("click", () => { at = Math.max(0, at - 1); clearInterval(poll); paint(); });
   document.querySelectorAll("input[name=engine]").forEach((el) => el.addEventListener("change", () => {
     $("advanced").hidden = el.value !== "advanced" || !el.checked;
+    $("subscription").hidden = el.value !== "subscription" || !el.checked;
   }));
   $("copy-path").addEventListener("click", async () => {
     await navigator.clipboard.writeText($("extension-path").textContent);

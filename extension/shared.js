@@ -1,4 +1,4 @@
-export const DEFAULTS = { server: "http://127.0.0.1:17653", token: "", target: "ar", dialect: "saudi", mode: "burn", voice: "clone" };
+export const DEFAULTS = { server: "http://127.0.0.1:17653", token: "", target: "ar", dialect: "saudi", mode: "burn", voice: "gemini" };
 
 export const STAGES = ["downloading", "hearing", "timing", "translating", "writing", "burning", "dubbing"];
 const STAGE_KEYS = {

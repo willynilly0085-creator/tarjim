@@ -11,7 +11,7 @@ from tarjim.config import setting
 
 SERVER = "http://127.0.0.1:17653"
 OUTPUTS = {"subtitles": "srt", "burned": "burn", "dubbed": "dub"}
-VOICES = ("clone", "studio", "fish", "fishvoice")
+VOICES = ("natural", "clone", "studio", "fish", "fishvoice")
 
 tarjim = MCPServer("tarjim", instructions=(
     "tarjim translates videos into subtitles or dubbing on this computer. Use translate_video "
@@ -35,17 +35,19 @@ def call(path: str, body: dict[str, Any] | None = None) -> Any:
 
 def mode_for(output: str, voice: str) -> str:
     mode = OUTPUTS.get(output, "burn")
-    return f"dub-{voice if voice in VOICES else 'clone'}" if mode == "dub" else mode
+    chosen = {"natural": "gemini"}.get(voice, voice if voice in VOICES else "gemini")
+    return f"dub-{chosen}" if mode == "dub" else mode
 
 
 @tarjim.tool()
 def translate_video(source: str, language: str = "ar", output: str = "burned",
-                    voice: str = "clone") -> Any:
+                    voice: str = "natural") -> Any:
     """Translate a video from a link (YouTube, X, ...) or a local file path.
 
     language: target language code such as ar, en, fr, ja.
     output: "burned" (subtitles inside the video), "subtitles" (an .srt file) or "dubbed".
-    voice (dubbing only): "clone" each speaker's own voice on this computer, "studio",
+    voice (dubbing only): "natural" lifelike Gemini voices matched to each speaker (default),
+    "clone" each speaker's own voice on this computer, "studio",
     "fish" cloning in the cloud, or "fishvoice" the calm Arabic narrator.
     """
     order = {"target": language, "mode": mode_for(output, voice), "dialect": "saudi"}
@@ -84,7 +86,8 @@ def change_settings(interface_language: str = "", listening_engine: str = "",
     """Change settings. Leave a field empty to keep it.
 
     interface_language: ar or en. listening_engine: gemini, openai or local.
-    translation_engine: gemini, openai, anthropic or local.
+    translation_engine: gemini, openai, anthropic, local, or a subscription the person already
+    has: claude (Claude Code) or codex (ChatGPT through Codex).
     local_model: an Ollama model name for local translation, e.g. aya-expanse:8b.
     """
     wanted = {"ui_language": interface_language, "listen_provider": listening_engine,

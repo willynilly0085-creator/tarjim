@@ -60,7 +60,12 @@
       <div class="choices">
         <label class="choice"><input type="radio" name="engine" value="cloud"><span class="choice-name"><span data-t="engineCloud"></span> <em class="tag" data-t="recommended"></em></span><span class="choice-note" data-t="engineCloudHint"></span></label>
         <label class="choice"><input type="radio" name="engine" value="local"><span class="choice-name" data-t="engineLocal"></span><span class="choice-note" data-t="engineLocalHint"></span></label>
+        <label class="choice"><input type="radio" name="engine" value="subscription"><span class="choice-name" data-t="engineSubscription"></span><span class="choice-note" data-t="engineSubscriptionHint"></span></label>
         <label class="choice"><input type="radio" name="engine" value="advanced"><span class="choice-name" data-t="engineAdvanced"></span><span class="choice-note" data-t="engineAdvancedHint"></span></label>
+      </div>
+      <div class="pair-fields" id="subscription" hidden>
+        <label class="field"><span class="field-label" data-t="subscriptionLabel"></span><select class="select" id="subscription-provider"></select></label>
+        <p class="meta" id="subscription-none" data-t="subscriptionNone" hidden></p>
       </div>
       <div class="pair-fields" id="advanced" hidden>
         <label class="field"><span class="field-label" data-t="listenLabel"></span><select class="select" id="listen-provider"></select></label>
@@ -131,7 +136,8 @@
         </div></fieldset>
       <label class="field" id="voice-field" hidden><span class="field-label" data-t="voice"></span>
         <select id="voice" class="select">
-          <option value="clone" data-t="voiceClone"></option>
+          <option value="gemini" data-t="voiceNatural"></option>
+            <option value="clone" data-t="voiceClone"></option>
           <option value="studio" data-t="voiceStudio"></option>
           <option value="fish" data-t="voiceFish"></option>
           <option value="fishvoice" id="voice-narrator" data-t="voiceNarrator"></option>

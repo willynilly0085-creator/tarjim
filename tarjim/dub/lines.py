@@ -12,6 +12,7 @@ class Line:
     until: float
     speaker: str
     text: str
+    source: str = ""
 
     @property
     def room(self) -> float:
@@ -30,10 +31,10 @@ def pieces(cue: Cue) -> list[tuple[list[Word], str]]:
 
 
 def lines_from(cues: list[Cue], total: float) -> list[Line]:
-    spoken = [(words[0].start, words[0].speaker, text)
+    spoken = [(words[0].start, words[0].speaker, text, " ".join(w.text for w in words))
               for cue in cues for words, text in pieces(cue) if words and text.strip()]
     lines = []
-    for index, (start, speaker, text) in enumerate(spoken):
+    for index, (start, speaker, text, source) in enumerate(spoken):
         following = spoken[index + 1][0] if index + 1 < len(spoken) else min(total, start + 30)
-        lines.append(Line(start, max(following, start + TAIL / 3), speaker, text))
+        lines.append(Line(start, max(following, start + TAIL / 3), speaker, text, source))
     return lines

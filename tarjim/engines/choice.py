@@ -3,7 +3,8 @@ from typing import Any, Protocol
 from tarjim.config import setting
 
 LISTENERS = ("gemini", "openai", "local")
-TRANSLATORS = ("gemini", "openai", "anthropic", "local")
+TRANSLATORS = ("gemini", "openai", "anthropic", "claude", "codex", "local")
+SUBSCRIPTIONS = ("claude", "codex")
 KEYS = {"gemini": "gemini_api_key", "openai": "openai_api_key",
         "anthropic": "anthropic_api_key"}
 LOCAL = "local"
@@ -25,7 +26,15 @@ def local_translation_ready() -> bool:
     return available()
 
 
+def subscribed(provider: str) -> bool:
+    from tarjim.engines.subscription import launcher
+
+    return bool(launcher(provider))
+
+
 def usable(provider: str, role: str) -> bool:
+    if provider in SUBSCRIPTIONS:
+        return role == "translate" and subscribed(provider)
     if provider == LOCAL:
         return role == "listen" or local_translation_ready()
     return has_key(provider)
@@ -54,6 +63,10 @@ def asker(provider: str) -> Asker:
         from tarjim.engines.anthropic_api import AnthropicAsker
 
         return AnthropicAsker()
+    if provider in SUBSCRIPTIONS:
+        from tarjim.engines.subscription import ClaudeAsker, CodexAsker
+
+        return ClaudeAsker() if provider == "claude" else CodexAsker()
     if provider == LOCAL:
         from tarjim.engines.ollama import OllamaAsker
 
