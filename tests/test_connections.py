@@ -92,3 +92,15 @@ def test_an_install_that_died_is_reported_as_failed(tmp_path: Path,
 
     state.write_text(json.dumps({"state": "installing", "pid": os.getpid()}))
     assert assistant_setup.status()["engine"] == "installing"
+
+
+def test_the_windows_launch_line_carries_the_settings_and_the_log(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from tarjim import installer
+
+    monkeypatch.setenv("PYTHONPATH", "C:/plugin")
+    monkeypatch.delenv("TARJIM_HOME", raising=False)
+    command = ["python", "-m", "tarjim.installer", "file:///x"]
+    line = installer.windows_line(command, tmp_path / "i.log")
+    assert line.startswith('cmd /d /s /c "set "PYTHONPATH=C:/plugin"&& python -m tarjim.installer')
+    assert line.endswith(f'>> "{tmp_path / "i.log"}" 2>&1"')

@@ -71,8 +71,41 @@ def server_program(uv: str) -> str:
     return str(tool_bin(uv) / name)
 
 
+KEEP_ENV = ("PYTHONPATH", "TARJIM_HOME", "TARJIM_SERVER", "UV_TOOL_DIR", "UV_TOOL_BIN_DIR")
+CREATE_OUTSIDE_JOB = "\n".join((
+    "$si = New-CimInstance -ClassName Win32_ProcessStartup -ClientOnly "
+    "-Property @{{ShowWindow=[uint16]0}}",
+    "$r = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments "
+    "@{{CommandLine='{line}'; CurrentDirectory='{folder}'; ProcessStartupInformation=$si}}",
+    "exit $r.ReturnValue"))
+
+
+def windows_line(command: list[str], log: Path) -> str:
+    settings = "".join(f'set "{k}={os.environ[k]}"&& ' for k in KEEP_ENV if os.environ.get(k))
+    return f'cmd /d /s /c "{settings}{subprocess.list2cmdline(command)} >> "{log}" 2>&1"'
+
+
+def spawn_outside_job(command: list[str], log: Path) -> bool:
+    """Let Windows' WMI service create the process, so no job object of the chat session holds
+    it (uv run forbids breakaway, and closing the session would kill the child)."""
+    import base64
+
+    script = CREATE_OUTSIDE_JOB.format(line=windows_line(command, log).replace("'", "''"),
+                                       folder=str(HOME).replace("'", "''"))
+    encoded = base64.b64encode(script.encode("utf-16-le")).decode()
+    try:
+        done = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-EncodedCommand",
+                               encoded], capture_output=True, timeout=60, creationflags=NO_WINDOW,
+                              check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return done.returncode == 0
+
+
 def start_detached(command: list[str], log: Path) -> None:
     """Start a program that outlives the chat session that asked for it."""
+    if sys.platform == "win32" and spawn_outside_job(command, log):
+        return
     with log.open("ab") as out:
         for flags in (NO_WINDOW | DETACHED | BREAKAWAY, NO_WINDOW | DETACHED):
             try:
