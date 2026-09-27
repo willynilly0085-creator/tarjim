@@ -27,3 +27,12 @@ def test_unknown_actions_are_refused_before_reaching_the_server() -> None:
     from tarjim.assistant import control_translation
 
     assert "error" in control_translation("abc123abc123", "delete")
+
+
+def test_status_can_wait_until_the_job_finishes(monkeypatch: pytest.MonkeyPatch) -> None:
+    from tarjim import assistant_http
+
+    stages = iter(["hearing", "translating", "done"])
+    monkeypatch.setattr(assistant_http, "call", lambda _path: {"stage": (s := next(stages)),
+                                                               "finished": s == "done"})
+    assert assistant_http.wait_for("abc", 60, tick=0)["stage"] == "done"

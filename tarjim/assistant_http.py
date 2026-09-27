@@ -1,5 +1,6 @@
 """How the chat connector talks to the local tarjim server."""
 import json
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -33,3 +34,13 @@ def fetch_text(path: str) -> Any:
             return reply.read().decode("utf-8-sig", "replace")
     except urllib.error.URLError as error:
         return {"error": str(error)}
+
+
+def wait_for(job_id: str, seconds: int, tick: float = 3.0) -> Any:
+    deadline = time.monotonic() + seconds
+    while True:
+        job = call(f"/jobs/{job_id}")
+        done = not isinstance(job, dict) or job.get("finished") or "error" in job
+        if done or time.monotonic() >= deadline:
+            return job
+        time.sleep(tick)

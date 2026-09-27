@@ -5,7 +5,7 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
-from tarjim.assistant_http import SERVER, call, fetch_text
+from tarjim.assistant_http import SERVER, call, fetch_text, wait_for
 from tarjim.assistant_setup import install, start, status
 from tarjim.config import setting
 
@@ -13,11 +13,11 @@ OUTPUTS = {"subtitles": "srt", "burned": "burn", "dubbed": "dub"}
 VOICES = ("natural", "clone", "studio", "fish", "fishvoice")
 ACTIONS = ("pause", "resume", "cancel")
 SUBTITLES = (".srt",)
+MAX_WAIT = 240
 
 tarjim = MCPServer("tarjim", instructions=(
-    "tarjim translates videos into subtitles or dubbing on this computer. Use translate_video "
-    "with a link or a local file path, then translation_status to follow it. API keys are never "
-    "set through chat: send the person to open_tarjim_page for keys."))
+    "tarjim is a tool on this computer that subtitles and dubs videos, any language to any "
+    "language. Start with setup_status. Never take API keys in chat: use open_tarjim_page."))
 
 
 def mode_for(output: str, voice: str) -> str:
@@ -53,9 +53,10 @@ def list_translations() -> Any:
 
 
 @tarjim.tool()
-def translation_status(job_id: str) -> Any:
-    """One translation: its stage, any error, and the full paths of the finished files."""
-    return call(f"/jobs/{job_id}")
+def translation_status(job_id: str, wait_seconds: int = 0) -> Any:
+    """One translation: stage, error, finished files. wait_seconds (up to 240) waits for
+    the job to finish first, for assistants that cannot pause on their own."""
+    return wait_for(job_id, max(0, min(wait_seconds, MAX_WAIT)))
 
 
 @tarjim.tool()
@@ -164,9 +165,8 @@ def setup_status() -> Any:
 
 @tarjim.tool()
 def install_tarjim() -> Any:
-    """Install the tarjim engine on this computer in the background (several minutes: the
-    graphics-card build when an NVIDIA card is present), then start it. Follow with setup_status
-    and open_tarjim_page so the person can finish setup (keys, tools) in their browser."""
+    """Install and start the tarjim engine in the background (takes minutes). Then use
+    setup_status, and open_tarjim_page so the person finishes setup in their browser."""
     return install()
 
 
