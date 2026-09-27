@@ -110,3 +110,12 @@ def test_reaction_before_a_cut_is_not_glued_to_a_long_line_after_it() -> None:
     cues = build_cues(ws, cuts=[18.77])
     assert [c.source for c in cues] == ["Nice.", "Oh my gosh, 18 times."]
     assert cues[0].end <= 18.77
+
+
+def test_a_short_sentence_joins_the_closer_neighbour() -> None:
+    ws = words(("It", 14.64, 14.72), ("follows", 16.16, 16.7), ("every", 16.72, 16.95),
+               ("cut.", 16.96, 17.3), ("Want", 18.28, 18.36), ("it", 18.36, 18.44),
+               ("dubbed?", 18.44, 18.9), ("Every", 19.16, 19.4), ("speaker", 19.4, 19.8),
+               ("gets", 19.8, 19.96), ("a", 19.96, 20.04), ("voice.", 20.04, 20.9))
+    cues = build_cues(ws, cuts=[])
+    assert [c.source for c in cues][-1] == "Want it dubbed? Every speaker gets a voice."

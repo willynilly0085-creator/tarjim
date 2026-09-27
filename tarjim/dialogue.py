@@ -19,12 +19,24 @@ class Piece:
 
 def merge_short(pieces: list[Piece], rules: Rules) -> list[Cue]:
     cues: list[Cue] = []
-    for piece in pieces:
-        if cues and should_join(cues[-1], piece, rules):
+    for index, piece in enumerate(pieces):
+        following = pieces[index + 1] if index + 1 < len(pieces) else None
+        if cues and should_join(cues[-1], piece, rules) and not closer_ahead(
+                cues[-1], piece, following, rules):
             join(cues[-1], piece)
         else:
             cues.append(new_cue(piece))
     return cues
+
+
+def closer_ahead(cue: Cue, piece: Piece, following: Piece | None, rules: Rules) -> bool:
+    if following is None or following.after_cut or piece.span >= rules.min_readable:
+        return False
+    if cue.words[-1].end - cue.start < rules.min_readable:
+        return False
+    behind = piece.words[0].start - cue.words[-1].end
+    ahead = following.words[0].start - piece.words[-1].end
+    return ahead < behind and ahead <= rules.join_gap
 
 
 def new_cue(piece: Piece) -> Cue:
