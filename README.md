@@ -57,13 +57,24 @@ SHA-256). Without a usable graphics card everything still works on the processor
 
 ### Browser extension
 
+tarjim lives in your browser: right-click any video or link and choose **ترجم للعربية** (or your
+language), then pick subtitles, burned-in subtitles or dubbing. The popup shows every job's stage
+and lets you pause, cancel or open the result.
+
 In Chrome open `chrome://extensions`, turn on Developer mode, choose **Load unpacked** and pick the
 `extension` folder. The extension pairs itself: press **Allow** on the tarjim page.
 
 ### Chat
 
 On the setup page, step "Use tarjim from a chat", press **Add** next to the Claude app, Claude Code
-or Codex. Then say "translate this link and dub it". Keys are never entered through chat.
+or Codex. Your AI can then run the whole tool for you:
+
+- "Translate this link into Arabic and dub it", "what stage is it at?", "pause it", "open the result";
+- change the settings: "use my Claude subscription for translation", "switch to the local model",
+  "list the AIs I can connect", "make the interface English";
+- read the finished subtitles back to you, retry a failed job, or download a missing tool.
+
+Keys are never entered through chat; the AI opens the tarjim page for that.
 
 ### Command line
 
