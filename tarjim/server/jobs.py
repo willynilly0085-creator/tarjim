@@ -10,7 +10,8 @@ DUBBING = {"dub-clone": "clone", "dub-studio": "studio", "dub-fish": "fish",
            "dub-fishvoice": "fish:saved"}
 MODES = ("srt", "burn", *DUBBING)
 KEEP = 50
-REASONS = [("quota", ("QuotaExhausted", "quota")), ("key", ("API key missing",)),
+REASONS = [("quota", ("QuotaExhausted", "quota", " 429:")),
+           ("key", ("API key missing", " 401:", " 403:")),
            ("download", ("DownloadError", "download")), ("tools", ("not found; install",)),
            ("dub", ("DubUnavailable",))]
 

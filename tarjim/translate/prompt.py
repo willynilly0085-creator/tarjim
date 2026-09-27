@@ -10,13 +10,12 @@ DIALECTS = {
     "msa": "العربية الفصحى المبسطة الواضحة كما في ترجمات الأفلام",
 }
 
-ARABIC = """أنت مترجم أفلام ومسلسلات محترف. معك الصوت الأصلي للمقطع، وقائمة خانات ترجمة \
+ARABIC = """أنت مترجم أفلام ومسلسلات محترف. {have}قائمة خانات ترجمة \
 مقسّمة مسبقاً بتوقيت ثابت. كل خانة تخص متكلماً واحداً.
 
 المطلوب لكل خانة ترجمة عربية:
 - بـ{style}، وبنفس نبرة المتكلم (مزح، تعجب، سخرية، استغراب).
-- اسمع الصوت بنفسك وصحّح أي كلمة سمعها التفريغ الآلي غلط.
-- لا تتجاوز عدد الحروف المسموح للخانة (budget) — اختصر واحذف الحشو مثل \
+{listen}- لا تتجاوز عدد الحروف المسموح للخانة (budget) — اختصر واحذف الحشو مثل \
 um و like و you know، مثل الترجمة الاحترافية.
 - ترجم الخانة لوحدها: لا تنقل كلاماً من خانة لخانة، ولا تدمج خانتين.
 - {dialogue_rule}
@@ -30,15 +29,14 @@ um و like و you know، مثل الترجمة الاحترافية.
 الخانات:
 {items}"""
 
-ANY = """You are a professional film and TV subtitle translator. You have the original audio of \
-the clip and a list of subtitle slots that are already segmented with fixed timing. Each slot \
+ANY = """You are a professional film and TV subtitle translator. You have {have}a list of \
+subtitle slots that are already segmented with fixed timing. Each slot \
 belongs to one speaker.
 
 For every slot write a {style} subtitle:
 - Natural, idiomatic, spoken {style} as in professional subtitles, keeping the speaker's tone \
 (joking, surprise, sarcasm, doubt).
-- Listen to the audio yourself and fix any word the automatic transcript misheard.
-- Never exceed the slot's character budget: condense and drop fillers such as um, like and \
+{listen}- Never exceed the slot's character budget: condense and drop fillers such as um, like and \
 you know, the way professional subtitlers do.
 - Translate each slot on its own: never move words between slots and never merge slots.
 - {dialogue_rule}
@@ -69,6 +67,13 @@ GUESSED_SPEAKERS = {
 
 
 ARABIC_TARGET = language("ar")
+HEARING = {
+    "ar": ("معك الصوت الأصلي للمقطع، و",
+           "- اسمع الصوت بنفسك وصحّح أي كلمة سمعها التفريغ الآلي غلط.\n"),
+    "any": ("the original audio of the clip and ",
+            "- Listen to the audio yourself and fix any word the automatic transcript misheard.\n"),
+}
+NOT_HEARING = {"ar": ("معك ", ""), "any": ("", "")}
 
 
 @dataclass(frozen=True)
@@ -77,6 +82,7 @@ class Brief:
     dialect: str = "saudi"
     rules: Rules = DEFAULT_RULES
     offset: float = 0.0
+    hears: bool = True
 
     @property
     def arabic(self) -> bool:
@@ -89,11 +95,14 @@ def has_speakers(cues: list[Cue]) -> bool:
 
 def build_prompt(cues: list[Cue], brief: Brief) -> str:
     key = "ar" if brief.arabic else "any"
-    rule = (KNOWN_SPEAKERS if has_speakers(cues) else GUESSED_SPEAKERS)[key]
+    guessing = brief.hears and not has_speakers(cues)
+    rule = (GUESSED_SPEAKERS if guessing else KNOWN_SPEAKERS)[key]
+    have, listen = (HEARING if brief.hears else NOT_HEARING)[key]
     items = "\n".join(format_item(i, cue, brief) for i, cue in enumerate(cues, start=1))
     template = ARABIC if brief.arabic else ANY
     style = DIALECTS[brief.dialect] if brief.arabic else brief.target.name
-    return template.format(style=style, count=len(cues), items=items, dialogue_rule=rule)
+    return template.format(style=style, count=len(cues), items=items, dialogue_rule=rule,
+                           have=have, listen=listen)
 
 
 def format_item(number: int, cue: Cue, brief: Brief) -> str:

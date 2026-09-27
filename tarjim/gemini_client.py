@@ -29,6 +29,8 @@ def used_up_today(error: Exception) -> bool:
 
 
 class GeminiClient:
+    hears = True
+
     def __init__(self, api_key: str | None = None) -> None:
         from google import genai
 
@@ -39,7 +41,7 @@ class GeminiClient:
         self.model_used = ""
         self.spent: set[str] = set()
 
-    def ask(self, prompt: str, audio: bytes, schema: dict[str, Any]) -> Any:
+    def ask(self, prompt: str, audio: bytes | None, schema: dict[str, Any]) -> Any:
         errors: list[str] = []
         for model in MODELS * ROUNDS:
             if model in self.spent:
@@ -60,15 +62,13 @@ class GeminiClient:
             time.sleep(pause_for(error) if getattr(error, "code", None) == TOO_MANY
                        else RETRY_PAUSE)
 
-    def call(self, model: str, prompt: str, audio: bytes, schema: dict[str, Any]) -> Any:
+    def call(self, model: str, prompt: str, audio: bytes | None, schema: dict[str, Any]) -> Any:
         from google.genai import types
 
         config = types.GenerateContentConfig(
             response_mime_type="application/json", response_schema=schema, temperature=0.2)
-        content = types.Content(role="user", parts=[
-            types.Part.from_bytes(data=audio, mime_type="audio/mp3"),
-            types.Part.from_text(text=prompt),
-        ])
+        sound = [types.Part.from_bytes(data=audio, mime_type="audio/mp3")] if audio else []
+        content = types.Content(role="user", parts=[*sound, types.Part.from_text(text=prompt)])
         response = self.client.models.generate_content(
             model=model, contents=content, config=config)
         self.model_used = model

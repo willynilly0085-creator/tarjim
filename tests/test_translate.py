@@ -7,6 +7,8 @@ from tarjim.translate.prompt import Brief, build_prompt
 
 
 class FakeClient:
+    hears = True
+
     def __init__(self, answers: list[list[dict[str, Any]]]) -> None:
         self.answers = answers
         self.prompts: list[str] = []

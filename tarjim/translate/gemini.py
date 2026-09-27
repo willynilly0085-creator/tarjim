@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from dataclasses import replace
 
+from tarjim.engines.choice import Asker
 from tarjim.gemini_client import GeminiClient
 from tarjim.models import Cue
 from tarjim.translate.clean import map_results
@@ -31,27 +32,30 @@ def batches(cues: list[Cue], span: float = BATCH_SECONDS) -> list[list[Cue]]:
     return groups
 
 
-class GeminiTranslator:
-    def __init__(self, client: GeminiClient | None = None) -> None:
-        self.client = client or GeminiClient()
+class Translator:
+    def __init__(self, client: Asker | None = None) -> None:
+        self.client: Asker = client or GeminiClient()
 
     def translate(self, cues: list[Cue], audio: AudioSlice, brief: Brief) -> list[Cue]:
         for batch in batches(cues):
             start = max(0.0, batch[0].start - PAD)
-            sound = audio(start, batch[-1].end + PAD)
-            self.fill_twice(batch, sound, replace(brief, offset=start))
+            sound = audio(start, batch[-1].end + PAD) if self.client.hears else None
+            self.fill_twice(batch, sound, replace(brief, offset=start, hears=self.client.hears))
         return cues
 
-    def fill_twice(self, cues: list[Cue], sound: bytes, brief: Brief) -> None:
+    def fill_twice(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
         self.fill(cues, sound, brief)
         strict = has_speakers(cues)
         retry = [cue for cue in cues if needs_retry(cue, strict)]
         if retry:
             self.fill(retry, sound, brief)
 
-    def fill(self, cues: list[Cue], sound: bytes, brief: Brief) -> None:
+    def fill(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
         answer = self.client.ask(build_prompt(cues, brief), sound, SCHEMA)
         items = answer if isinstance(answer, list) else []
         results = map_results(items, len(cues), arabic=brief.arabic)
         for number, cue in enumerate(cues, start=1):
             cue.text = results.get(number, cue.text)
+
+
+GeminiTranslator = Translator

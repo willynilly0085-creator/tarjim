@@ -28,14 +28,21 @@ def cuts_for(job: Job) -> list[float]:
 
 
 def translate(job: Job, cues: list[Cue]) -> list[Cue]:
-    from tarjim.translate.gemini import GeminiTranslator
+    from tarjim.engines.choice import asker, chain
+    from tarjim.translate.gemini import Translator
     from tarjim.translate.prompt import Brief
 
     def audio(start: float, end: float) -> bytes:
         return media.audio_bytes(job.video, start, end)
 
     brief = Brief(job.language, job.dialect, job.rules)
-    return GeminiTranslator().translate(cues, audio, brief)
+    failures: list[Exception] = []
+    for provider in chain("translate"):
+        try:
+            return Translator(asker(provider)).translate(cues, audio, brief)
+        except RuntimeError as error:
+            failures.append(error)
+    raise failures[-1] if failures else RuntimeError("no translation engine")
 
 
 def save_review(job: Job, cues: list[Cue]) -> None:

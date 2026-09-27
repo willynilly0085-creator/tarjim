@@ -1,4 +1,5 @@
 import json
+from collections.abc import Callable
 from dataclasses import asdict
 from pathlib import Path
 
@@ -36,18 +37,48 @@ def heard_for(job: Job, audio: Path) -> tuple[str, list[Utterance]]:
 
 
 def listen_video(video: Path, audio: Path) -> Heard:
-    from tarjim.listen.chunks import is_long, listen_in_chunks
-    from tarjim.listen.gemini_listen import listen
-    from tarjim.listen.merge import listen_many
+    from tarjim.engines.choice import chain
 
+    failures: list[Exception] = []
+    for provider in chain("listen"):
+        try:
+            return listen_with(provider, video, audio)
+        except (RuntimeError, OSError) as error:
+            failures.append(error)
+    raise failures[-1] if failures else RuntimeError("no listening engine")
+
+
+def listen_with(provider: str, video: Path, audio: Path) -> Heard:
+    from tarjim.listen.chunks import is_long, listen_in_chunks
+
+    if provider == "local":
+        from tarjim.engines.local_listen import listen_file
+
+        language, utterances = listen_file(audio)
+        return Heard(language, utterances, [utterances])
     duration = media.probe(video).duration
+    once = cloud_listener(provider)
 
     def listen_span(start: float, end: float) -> Heard:
-        sound = media.audio_bytes(video, start, end if end > start else None)
-        return listen_many(lambda: listen(sound))
+        return once(media.audio_bytes(video, start, end if end > start else None))
 
     regions = speech_regions_of(audio) if is_long(duration) else []
     return listen_in_chunks(duration, regions, listen_span)
+
+
+def cloud_listener(provider: str) -> Callable[[bytes], Heard]:
+    if provider == "openai":
+        from tarjim.engines.openai_api import listen as openai_listen
+
+        def single(sound: bytes) -> Heard:
+            language, utterances = openai_listen(sound)
+            return Heard(language, utterances, [utterances])
+
+        return single
+    from tarjim.listen.gemini_listen import listen
+    from tarjim.listen.merge import listen_many
+
+    return lambda sound: listen_many(lambda: listen(sound))
 
 
 def speech_regions_of(audio: Path) -> Regions:
