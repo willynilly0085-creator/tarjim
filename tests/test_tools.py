@@ -17,8 +17,10 @@ def test_a_tool_downloads_in_the_background_and_reports_failure_plainly(
     monkeypatch.setattr(tools, "fetch", fake_fetch)
     monkeypatch.setattr(tools, "installed", lambda _tool: False)
     shelf = tools.Shelf()
-    assert shelf.start("timing") and shelf.start("dubbing")
-    assert not shelf.start("unknown-tool")
+    assert shelf.start("dubbing") == "license"
+    assert shelf.start("timing") == "started"
+    assert shelf.start("dubbing", accepted=True) == "started"
+    assert shelf.start("unknown-tool") == "unknown"
     for _ in range(50):
         if all(shelf.progress[k].state != "downloading" for k in ("timing", "dubbing")):
             break
@@ -27,3 +29,10 @@ def test_a_tool_downloads_in_the_background_and_reports_failure_plainly(
     assert view["timing"]["state"] == "done"
     assert view["dubbing"]["state"] == "failed" and "disk full" in str(view["dubbing"]["detail"])
     assert sorted(calls) == ["dubbing", "timing"]
+
+
+def test_every_tool_says_its_license_and_non_commercial_ones_are_marked() -> None:
+    views = {t.id: t.license for t in tools.TOOLS}
+    assert views["dubbing"].consent and not views["dubbing"].commercial
+    assert not views["timing"].commercial and not views["local_translation"].commercial
+    assert views["accuracy"].commercial

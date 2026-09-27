@@ -1,4 +1,3 @@
-import os
 import re
 from functools import lru_cache
 from pathlib import Path
@@ -58,7 +57,6 @@ def voice_model(device: str) -> Any:
 
 class CloneVoices:
     def __init__(self, references: dict[str, Path], language: str) -> None:
-        os.environ.setdefault("COQUI_TOS_AGREED", "1")
         import torch
 
         self.model: Any = voice_model("cuda" if torch.cuda.is_available() else "cpu")

@@ -12,19 +12,35 @@ XTTS_FOLDER = "tts/tts_models--multilingual--multi-dataset--xtts_v2"
 
 
 @dataclass(frozen=True)
+class License:
+    name: str
+    url: str
+    commercial: bool
+    consent: bool = False
+
+
+@dataclass(frozen=True)
 class Tool:
     id: str
     sources: tuple[str, ...]
     size_gb: float
     required: bool
     kind: str
+    license: License
 
 
+MMS = License("CC-BY-NC-4.0", "https://huggingface.co/MahmoudAshraf/mms-300m-1130-forced-aligner",
+              commercial=False)
+QWEN = License("Apache-2.0", "https://huggingface.co/Qwen/Qwen3-ASR-1.7B", commercial=True)
+CPML = License("Coqui Public Model License", "https://coqui.ai/cpml", commercial=False,
+               consent=True)
+AYA = License("CC-BY-NC-4.0", "https://ollama.com/library/aya-expanse", commercial=False)
 TOOLS = [
-    Tool("timing", ("MahmoudAshraf/mms-300m-1130-forced-aligner",), 1.3, True, "hub"),
-    Tool("accuracy", ("Qwen/Qwen3-ASR-1.7B", "Qwen/Qwen3-ForcedAligner-0.6B"), 5.9, False, "hub"),
-    Tool("dubbing", (XTTS_REPO,), 1.9, False, "voice"),
-    Tool("local_translation", ("aya-expanse:8b",), 5.1, False, "ollama"),
+    Tool("timing", ("MahmoudAshraf/mms-300m-1130-forced-aligner",), 1.3, True, "hub", MMS),
+    Tool("accuracy", ("Qwen/Qwen3-ASR-1.7B", "Qwen/Qwen3-ForcedAligner-0.6B"), 5.9, False, "hub",
+         QWEN),
+    Tool("dubbing", (XTTS_REPO,), 1.9, False, "voice", CPML),
+    Tool("local_translation", ("aya-expanse:8b",), 5.1, False, "ollama", AYA),
 ]
 BY_ID = {tool.id: tool for tool in TOOLS}
 
@@ -97,7 +113,7 @@ def download(tool: Tool) -> None:
     if tool.kind == "voice":
         folder = voice_folder()
         snapshot_download(XTTS_REPO, local_dir=str(folder))
-        (folder / "tos_agreed.txt").write_text("I have read, understood and agreed to the CPML.",
+        (folder / "tos_agreed.txt").write_text("Accepted by the user in tarjim (CPML).",
                                                encoding="utf-8")
     elif tool.kind == "ollama":
         from tarjim.engines.ollama import base_url
@@ -118,16 +134,22 @@ class Shelf:
     def view(self) -> list[dict[str, object]]:
         return [{"id": t.id, "size_gb": t.size_gb, "required": t.required,
                  "installed": installed(t), "state": self.progress[t.id].state,
-                 "detail": self.progress[t.id].detail} for t in TOOLS]
+                 "detail": self.progress[t.id].detail, "license": t.license.name,
+                 "license_url": t.license.url, "commercial": t.license.commercial,
+                 "consent": t.license.consent} for t in TOOLS]
 
-    def start(self, tool_id: str) -> bool:
+    def start(self, tool_id: str, accepted: bool = False) -> str:
         tool = BY_ID.get(tool_id)
+        if tool is None:
+            return "unknown"
+        if tool.license.consent and not accepted:
+            return "license"
         with self.lock:
-            if tool is None or self.progress[tool_id].state == "downloading":
-                return False
+            if self.progress[tool_id].state == "downloading":
+                return "busy"
             self.progress[tool_id] = Progress("downloading")
         threading.Thread(target=self.run, args=(tool,), daemon=True).start()
-        return True
+        return "started"
 
     def run(self, tool: Tool) -> None:
         try:

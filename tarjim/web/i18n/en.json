@@ -172,5 +172,8 @@
   "chatAdded": "Added",
   "chatRestart": "Restart the Claude app to see tarjim.",
   "chatFailed": "Could not add it. Make sure the app is installed.",
-  "keySet": "Key saved (type a new one to replace it)"
+  "keySet": "Key saved (type a new one to replace it)",
+  "licenseLabel": "License",
+  "nonCommercial": "non-commercial use only",
+  "consentCheck": "I have read and accept the {name} (non-commercial use only)"
 }

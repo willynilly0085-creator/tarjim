@@ -20,6 +20,15 @@ export async function renderDevice(state) {
   $("device-advice").textContent = `${t("recommendCloud")} ${t(s.local_ready ? "localCapable" : "localNot")}`;
 }
 
+function consentBox(tool, button) {
+  const box = Object.assign(document.createElement("input"), { type: "checkbox" });
+  const label = Object.assign(document.createElement("label"), { className: "consent" });
+  label.append(box, document.createTextNode(` ${t("consentCheck", { name: tool.license })}`));
+  button.disabled = true;
+  box.addEventListener("change", () => { button.disabled = !box.checked; });
+  return label;
+}
+
 function toolAction(tool, refresh) {
   if (tool.installed) return Object.assign(document.createElement("span"), { className: "ready", textContent: t("installed") });
   if (tool.state === "downloading") return Object.assign(document.createElement("span"), { className: "meta", textContent: t("downloading") });
@@ -27,8 +36,20 @@ function toolAction(tool, refresh) {
     type: "button", className: tool.required ? "primary small" : "button-quiet",
     textContent: t(tool.state === "failed" ? "retry" : "download"),
   });
-  button.addEventListener("click", () => post(`/tools/${tool.id}`).finally(refresh));
-  return button;
+  button.addEventListener("click", () => post(`/tools/${tool.id}`, { accept_license: tool.consent }).finally(refresh));
+  if (!tool.consent) return button;
+  const wrap = Object.assign(document.createElement("div"), { className: "stack" });
+  wrap.append(consentBox(tool, button), button);
+  return wrap;
+}
+
+function licenseLine(tool) {
+  const link = Object.assign(document.createElement("a"), { className: "text-link", href: tool.license_url,
+    target: "_blank", rel: "noopener noreferrer", textContent: tool.license });
+  const note = tool.commercial ? "" : ` · ${t("nonCommercial")}`;
+  const line = Object.assign(document.createElement("p"), { className: "meta tool-license" });
+  line.append(`${t("licenseLabel")}: `, link, note);
+  return line;
 }
 
 export async function renderTools(state) {
@@ -38,6 +59,7 @@ export async function renderTools(state) {
     const row = $("tool-row").content.firstElementChild.cloneNode(true);
     row.querySelector(".tool-name").textContent = `${t(`tool_${tool.id}`)} · ${t(tool.required ? "required" : "optional")}`;
     row.querySelector(".tool-hint").textContent = tool.state === "failed" ? t("failed") : t(`tool_${tool.id}_hint`);
+    row.querySelector(".tool-hint").after(licenseLine(tool));
     row.querySelector(".tool-size").textContent = t("sizeGb", { n: tool.size_gb });
     row.querySelector(".tool-action").replaceChildren(toolAction(tool, refresh));
     return row;

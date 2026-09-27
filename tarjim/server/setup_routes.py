@@ -68,8 +68,10 @@ class SetupRoutes:
         self.reply(200, self.shelf.view())
 
     def get_tool(self, _query: Query, tool_id: str) -> None:
-        started = self.shelf.start(tool_id)
-        self.reply(200 if started else 409, {"started": started})
+        accepted = self.read_json().get("accept_license") is True
+        result = self.shelf.start(tool_id, accepted)
+        self.reply(200 if result == "started" else 409, {"started": result == "started",
+                                                         "result": result})
 
     def ask_pair(self, _query: Query) -> None:
         origin = self.headers.get("Origin", "")

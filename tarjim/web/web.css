@@ -182,3 +182,5 @@ h1 { margin: 0; font-size: var(--text-title); font-weight: 650; line-height: 1.2
 .connect-detail { display: grid; gap: var(--space-sm); justify-items: start; }
 .connect-detail .key-row, .connect-detail .command { justify-self: stretch; }
 .grow { flex: 1; min-width: 0; }
+.consent { display: flex; gap: var(--space-xs); align-items: flex-start; font-size: var(--text-meta); color: var(--muted); max-width: 32ch; }
+.stack { display: grid; gap: var(--space-xs); justify-items: start; }
