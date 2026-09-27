@@ -1,0 +1,18 @@
+{
+  "name": "tarjim",
+  "displayName": "tarjim",
+  "version": "0.1.0",
+  "description": "Translate, subtitle and dub any video from any language to any language with tarjim running on your computer. Your AI calls tarjim's tools: translate a link or a file, follow and control jobs, and change tarjim's settings (engines, subscriptions, local models, glossary).",
+  "author": { "name": "tarjim", "email": "willy.nilly0085@gmail.com" },
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "keywords": ["video", "subtitles", "translation", "dubbing", "arabic"],
+  "mcpServers": {
+    "tarjim": {
+      "command": "uv",
+      "args": ["run", "--quiet", "--no-project", "--python", "3.11",
+               "--with", "mcp>=2.2", "--with", "keyring", "--with", "requests",
+               "python", "-m", "tarjim.assistant"],
+      "env": { "PYTHONPATH": "${CLAUDE_PLUGIN_ROOT}" }
+    }
+  }
+}

@@ -8,6 +8,7 @@ from typing import Any
 from tarjim.config import setting
 
 SERVER = "http://127.0.0.1:17653"
+NOT_RUNNING = "tarjim is not running. Call setup_status, then start_tarjim or install_tarjim."
 
 
 def call(path: str, body: dict[str, Any] | None = None) -> Any:
@@ -21,7 +22,7 @@ def call(path: str, body: dict[str, Any] | None = None) -> Any:
     except urllib.error.HTTPError as error:
         return {"error": error.code, "detail": error.read().decode("utf-8", "replace")[:200]}
     except urllib.error.URLError:
-        return {"error": "tarjim is not running on this computer. Start it with: tarjim-serve"}
+        return {"error": NOT_RUNNING}
 
 
 def fetch_text(path: str) -> Any:

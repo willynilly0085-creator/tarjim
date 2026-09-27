@@ -6,6 +6,7 @@ from typing import Any
 from mcp.server.mcpserver import MCPServer
 
 from tarjim.assistant_http import SERVER, call, fetch_text
+from tarjim.assistant_setup import install, start, status
 from tarjim.config import setting
 
 OUTPUTS = {"subtitles": "srt", "burned": "burn", "dubbed": "dub"}
@@ -152,6 +153,27 @@ def sign_in(provider: str) -> Any:
     """Open the sign-in window of a subscription (claude, codex, copilot, antigravity) so the
     person can log in with their own account."""
     return call("/connections/sign-in", {"provider": provider})
+
+
+@tarjim.tool()
+def setup_status() -> Any:
+    """Is the tarjim engine on this computer running, installed but stopped, being installed,
+    or missing? Call this first; it says what to do next."""
+    return status()
+
+
+@tarjim.tool()
+def install_tarjim() -> Any:
+    """Install the tarjim engine on this computer in the background (several minutes: the
+    graphics-card build when an NVIDIA card is present), then start it. Follow with setup_status
+    and open_tarjim_page so the person can finish setup (keys, tools) in their browser."""
+    return install()
+
+
+@tarjim.tool()
+def start_tarjim() -> Any:
+    """Start the installed tarjim engine in the background, without any window."""
+    return start()
 
 
 @tarjim.tool()

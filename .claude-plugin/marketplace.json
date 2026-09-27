@@ -1,0 +1,13 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "tarjim",
+  "description": "Subtitles and dubbing for any video, in any language, on your own computer.",
+  "owner": { "name": "tarjim", "email": "willy.nilly0085@gmail.com" },
+  "plugins": [
+    {
+      "name": "tarjim",
+      "source": ".",
+      "description": "Let your AI translate, subtitle and dub any video with tarjim, and change tarjim's settings for you."
+    }
+  ]
+}

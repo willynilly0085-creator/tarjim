@@ -1,4 +1,5 @@
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -39,12 +40,17 @@ def attach_output() -> None:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
 
 
-def main(argv: list[str] | None = None) -> int:
+def start_up() -> None:
     from tarjim.quiet import hide_child_windows
 
     hide_child_windows()
     attach_output()
+    save("server_command", json.dumps([sys.executable, "-m", "tarjim.server"]))
     prepare_environment()
+
+
+def main(argv: list[str] | None = None) -> int:
+    start_up()
     parser = argparse.ArgumentParser(prog="tarjim-serve", description="Local server for "
                                      "the tarjim browser extension")
     parser.add_argument("--port", type=int, default=PORT)
