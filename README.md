@@ -34,7 +34,26 @@ an `.srt`, or dubs it with a voice for every speaker.
 Pick any model a provider offers. If the chosen engine fails or runs out of quota, tarjim falls
 back to the local engine when one is available.
 
-## Install (Windows)
+## Install with your AI (one step)
+
+In Claude Code:
+
+```bash
+claude plugin marketplace add <owner>/tarjim
+claude plugin install tarjim@tarjim
+```
+
+Then tell your AI "set up tarjim". It installs the engine in the background (the graphics-card
+build when you have an NVIDIA card), starts it without any window and opens the setup page. From
+then on your AI uses tarjim's tools directly: "translate this link into French and burn the
+subtitles", "use my Claude subscription for translation", "switch to the local model". tarjim is a
+tool your AI operates, not another assistant to talk to. The plugin needs
+[uv](https://docs.astral.sh/uv/).
+
+Other MCP apps (Codex, Cursor, and more): after the engine is installed, add the command
+`tarjim-mcp` as an MCP server, for example `codex mcp add tarjim -- tarjim-mcp`.
+
+## Install by hand (Windows)
 
 Needs Python 3.11 and about 10 GB of disk for the local models.
 
