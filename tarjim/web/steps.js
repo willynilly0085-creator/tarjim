@@ -13,11 +13,13 @@ function fact(term, value, bad = false) {
 export async function renderDevice(state) {
   state.system ??= await api("/system");
   const s = state.system;
-  const gpu = s.gpu ? `${s.gpu.name} (${s.gpu.memory_gb} GB)` : t("gpuNone");
-  $("facts").replaceChildren(...fact(t("gpu"), gpu), ...fact(t("memory"), `${s.memory_gb} GB`),
+  const gpu = s.gpu ? `${s.gpu.name} (${s.gpu.memory_gb} GB)${s.gpu.usable ? "" : ` · ${t("gpuUnused")}`}` : t("gpuNone");
+  $("facts").replaceChildren(...fact(t("gpu"), gpu, s.gpu && !s.gpu.usable), ...fact(t("memory"), `${s.memory_gb} GB`),
     ...fact(t("disk"), `${s.disk_free_gb} GB`),
-    ...fact(t("ffmpegRow"), t(s.ffmpeg ? "present" : "missing"), !s.ffmpeg));
+    ...fact(t("ffmpegRow"), t(s.ffmpeg ? "present" : "ffmpegLater"), !s.ffmpeg));
   $("device-advice").textContent = `${t("recommendCloud")} ${t(s.local_ready ? "localCapable" : "localNot")}`;
+  $("gpu-fix").hidden = !(s.gpu && s.gpu.fix);
+  $("gpu-fix-command").textContent = s.gpu?.fix || "";
 }
 
 function consentBox(tool, button) {

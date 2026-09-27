@@ -35,7 +35,9 @@ QWEN = License("Apache-2.0", "https://huggingface.co/Qwen/Qwen3-ASR-1.7B", comme
 CPML = License("Coqui Public Model License", "https://coqui.ai/cpml", commercial=False,
                consent=True)
 AYA = License("CC-BY-NC-4.0", "https://ollama.com/library/aya-expanse", commercial=False)
+LGPL = License("LGPL-2.1", "https://ffmpeg.org/legal.html", commercial=True)
 TOOLS = [
+    Tool("ffmpeg", ("BtbN/FFmpeg-Builds",), 0.08, True, "ffmpeg", LGPL),
     Tool("timing", ("MahmoudAshraf/mms-300m-1130-forced-aligner",), 1.3, True, "hub", MMS),
     Tool("accuracy", ("Qwen/Qwen3-ASR-1.7B", "Qwen/Qwen3-ForcedAligner-0.6B"), 5.9, False, "hub",
          QWEN),
@@ -82,7 +84,22 @@ def ollama_ready(model: str) -> bool:
     return model in {m.get("name") for m in reply.json().get("models", [])}
 
 
+def ffmpeg_ready() -> bool:
+    import shutil
+
+    chosen = setting("ffmpeg")
+    return bool(chosen and Path(chosen).exists()) or bool(shutil.which("ffmpeg"))
+
+
+def listening_locally() -> bool:
+    from tarjim.engines.choice import chosen
+
+    return chosen("listen") == "local"
+
+
 def installed(tool: Tool) -> bool:
+    if tool.kind == "ffmpeg":
+        return ffmpeg_ready()
     if tool.kind == "voice":
         return (voice_folder() / "model.pth").exists()
     if tool.kind == "ollama":
@@ -110,7 +127,11 @@ def fetch(tool: Tool) -> None:
 def download(tool: Tool) -> None:
     from huggingface_hub import snapshot_download
 
-    if tool.kind == "voice":
+    if tool.kind == "ffmpeg":
+        from tarjim.ffmpeg_setup import install_ffmpeg
+
+        install_ffmpeg()
+    elif tool.kind == "voice":
         folder = voice_folder()
         snapshot_download(XTTS_REPO, local_dir=str(folder))
         (folder / "tos_agreed.txt").write_text("Accepted by the user in tarjim (CPML).",
@@ -132,7 +153,9 @@ class Shelf:
         self.lock = threading.Lock()
 
     def view(self) -> list[dict[str, object]]:
-        return [{"id": t.id, "size_gb": t.size_gb, "required": t.required,
+        local = listening_locally()
+        return [{"id": t.id, "size_gb": t.size_gb,
+                 "required": t.required or (t.id == "accuracy" and local),
                  "installed": installed(t), "state": self.progress[t.id].state,
                  "detail": self.progress[t.id].detail, "license": t.license.name,
                  "license_url": t.license.url, "commercial": t.license.commercial,
