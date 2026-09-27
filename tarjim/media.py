@@ -66,3 +66,20 @@ def scene_cuts(video: Path, threshold: float = SCENE_THRESHOLD) -> list[float]:
                "-vf", f"select='gt(scene,{threshold})',showinfo", "-f", "null", "-"])
     times = sorted({round(float(t), 2) for t in PTS.findall(out.stderr)})
     return [t for i, t in enumerate(times) if i == 0 or t - times[i - 1] > MIN_CUT_SPACING]
+
+
+BRIGHT = 150.0
+YAVG = re.compile(r"lavfi\.signalstats\.YAVG=(\d+(?:\.\d+)?)")
+BOTTOM_STRIP = ("fps=1/4,crop=iw:ih/4:0:ih*3/4,scale=160:-1,signalstats,"
+                "metadata=print:key=lavfi.signalstats.YAVG")
+
+
+def mean_brightness(report: str) -> float:
+    values = [float(v) for v in YAVG.findall(report)]
+    return sum(values) / len(values) if values else 0.0
+
+
+def bright_bottom(video: Path) -> bool:
+    done = run([tool("ffmpeg"), "-hide_banner", "-i", str(video), "-vf", BOTTOM_STRIP, "-an",
+                "-f", "null", "-"])
+    return mean_brightness(done.stderr) > BRIGHT

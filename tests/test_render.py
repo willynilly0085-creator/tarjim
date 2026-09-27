@@ -43,3 +43,20 @@ def test_reply_right_at_the_start_shows_both_lines_together() -> None:
 def test_srt_skips_empty_cues_and_numbers_the_rest() -> None:
     srt = render_srt([Cue(0, 1, text=""), Cue(1, 2, text="حلو")])
     assert srt.startswith("1\n00:00:01,000 --> 00:00:02,000")
+
+
+def test_light_videos_get_a_box_behind_the_subtitles_instead_of_an_outline() -> None:
+    from tarjim.render.ass import Canvas, render_ass
+
+    dark = render_ass([], Canvas(1920, 1080))
+    light = render_ass([], Canvas(1920, 1080, bright=True))
+    assert ",1,5,2,2," in dark and "&H00141414" in dark
+    assert ",3,19,0,2," in light and "&H3A141414" in light
+
+
+def test_brightness_is_read_from_the_ffmpeg_report() -> None:
+    from tarjim.media import mean_brightness
+
+    report = "lavfi.signalstats.YAVG=200.5\nnoise\nlavfi.signalstats.YAVG=180.5\n"
+    assert mean_brightness(report) == 190.5
+    assert mean_brightness("") == 0.0

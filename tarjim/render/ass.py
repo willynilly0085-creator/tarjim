@@ -13,6 +13,10 @@ HIDDEN = "{\\alpha&HFF&}"
 APPEAR = f"{{\\alpha&HFF&\\t(0,{FADE_MS},\\alpha&H00&)}}"
 PORTRAIT_FONT = 0.066
 LANDSCAPE_FONT = 0.058
+OUTLINED, BOXED = 1, 3
+OUTLINE_COLOUR = "&H00141414"
+BOX_COLOUR = "&H3A141414"
+BOX_PADDING = 0.3
 
 HEADER = """[Script Info]
 ScriptType: v4.00+
@@ -25,8 +29,8 @@ ScaledBorderAndShadow: yes
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, \
 BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, \
 BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,{font},{size},&H00FFFFFF,&H00FFFFFF,&H00141414,&H8C000000,-1,0,0,0,\
-100,100,0,0,1,{outline},{shadow},2,{mh},{mh},{mv},{charset}
+Style: Default,{font},{size},&H00FFFFFF,&H00FFFFFF,{edge},&H8C000000,-1,0,0,0,\
+100,100,0,0,{border},{outline},{shadow},2,{mh},{mh},{mv},{charset}
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -38,6 +42,7 @@ class Canvas:
     width: int
     height: int
     font: str = "Dubai"
+    bright: bool = False
 
     @property
     def portrait(self) -> bool:
@@ -58,13 +63,20 @@ class Canvas:
 
     @property
     def outline(self) -> int:
+        if self.bright:
+            return max(4, round(self.font_size * BOX_PADDING))
         return max(2, round(self.font_size * 0.08))
+
+    @property
+    def shadow(self) -> int:
+        return 0 if self.bright else max(1, self.outline // 2)
 
 
 def render_ass(cues: list[Cue], canvas: Canvas, rules: Rules = DEFAULT_RULES) -> str:
     header = HEADER.format(
         w=canvas.width, h=canvas.height, font=canvas.font, size=canvas.font_size,
-        outline=canvas.outline, shadow=max(1, canvas.outline // 2),
+        outline=canvas.outline, shadow=canvas.shadow, border=BOXED if canvas.bright else OUTLINED,
+        edge=BOX_COLOUR if canvas.bright else OUTLINE_COLOUR,
         mh=canvas.margin_h, mv=canvas.margin_v, charset=ARABIC_CHARSET if rules.rtl else 1,
     )
     events = [line for cue in cues if cue.text.strip() for line in event_lines(cue, rules)]

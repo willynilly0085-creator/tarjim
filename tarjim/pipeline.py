@@ -60,7 +60,7 @@ def write_outputs(job: Job, cues: list[Cue], words: list[Word], report: Report) 
     if not info.has_picture:
         return
     ass = job.output(".ass")
-    canvas = Canvas(info.width, info.height, job.font_name)
+    canvas = Canvas(info.width, info.height, job.font_name, media.bright_bottom(job.video))
     ass.write_text(render_ass(cues, canvas, job.rules), encoding="utf-8")
     if job.burn:
         report("burning")
