@@ -5,14 +5,11 @@
   "appDesc": {
     "message": "Professional subtitles for any video, in the language you choose, timed to the speech."
   },
-  "menuRoot": {
-    "message": "Translate with tarjim"
-  },
   "menuBurn": {
-    "message": "Burned into the video"
+    "message": "Subtitles in the video"
   },
   "menuSrt": {
-    "message": "Subtitle file only"
+    "message": "Subtitle file (SRT)"
   },
   "statusOnline": {
     "message": "Connected"
@@ -185,9 +182,6 @@
   "voiceClone": {
     "message": "Each speaker's own voice (on your computer)"
   },
-  "menuDub": {
-    "message": "Dub in the speaker's voice"
-  },
   "voiceStudio": {
     "message": "Studio voice (sends the text only)"
   },
@@ -253,5 +247,37 @@
   },
   "pairWaiting": {
     "message": "Open the tarjim page and allow the connection request that appears."
+  },
+  "menuRootArabic": {
+    "message": "Translate to Arabic"
+  },
+  "menuDubClone": {
+    "message": "Dub in the speaker's own voice (local)"
+  },
+  "menuDubFish": {
+    "message": "Dub with Fish cloning (cloud)"
+  },
+  "menuDubNarrator": {
+    "message": "Dub with the Arabic narrator (Fish)"
+  },
+  "menuDubStudio": {
+    "message": "Dub with a studio voice"
+  },
+  "menuOther": {
+    "message": "Another language or a file on this computer"
+  },
+  "menuNoVideo": {
+    "message": "Could not find a video link on this page."
+  },
+  "notifyStarted": {
+    "message": "Translation started. You will be notified when it finishes."
+  },
+  "menuRootTo": {
+    "message": "Translate to $LANG$",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
   }
 }

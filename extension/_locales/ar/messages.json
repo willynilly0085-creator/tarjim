@@ -5,14 +5,11 @@
   "appDesc": {
     "message": "ترجمة احترافية لأي مقطع، باللغة اللي تختارها، ومضبوطة على وقت الكلام."
   },
-  "menuRoot": {
-    "message": "ترجم بـ tarjim"
-  },
   "menuBurn": {
-    "message": "داخل الفيديو"
+    "message": "الترجمة داخل الفيديو"
   },
   "menuSrt": {
-    "message": "ملف ترجمة فقط"
+    "message": "ملف ترجمة (SRT)"
   },
   "statusOnline": {
     "message": "متصل"
@@ -185,9 +182,6 @@
   "voiceClone": {
     "message": "صوت المتكلم نفسه (على جهازك)"
   },
-  "menuDub": {
-    "message": "دبلجة بصوت المتكلم"
-  },
   "voiceStudio": {
     "message": "صوت استوديو (يرسل النص فقط)"
   },
@@ -253,5 +247,37 @@
   },
   "pairWaiting": {
     "message": "افتح صفحة tarjim ووافق على طلب الربط اللي بيطلع لك."
+  },
+  "menuRootArabic": {
+    "message": "ترجم للعربية"
+  },
+  "menuDubClone": {
+    "message": "دبلجة بصوت المتكلم نفسه (محلي)"
+  },
+  "menuDubFish": {
+    "message": "دبلجة باستنساخ Fish (سحابي)"
+  },
+  "menuDubNarrator": {
+    "message": "دبلجة بصوت الراوي العربي (Fish)"
+  },
+  "menuDubStudio": {
+    "message": "دبلجة بصوت استوديو"
+  },
+  "menuOther": {
+    "message": "لغة ثانية أو ملف من جهازك"
+  },
+  "menuNoVideo": {
+    "message": "ما قدرت أحدد رابط الفيديو في هذي الصفحة."
+  },
+  "notifyStarted": {
+    "message": "بدأت الترجمة، وبيوصلك تنبيه لما تخلص."
+  },
+  "menuRootTo": {
+    "message": "ترجم إلى $LANG$",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
   }
 }

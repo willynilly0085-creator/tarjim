@@ -1,35 +1,41 @@
+import { buildMenus, isMode, OTHER } from "./menus.js";
 import { api, errorLabel, mediaUrl, post, settings, t } from "./shared.js";
 
-const MENU_ROOT = "tarjim";
-const MENU_MODES = { "tarjim-burn": "burn", "tarjim-srt": "srt", "tarjim-dub": "dub-clone" };
 const POLL = "poll";
-const CONTEXTS = ["link", "video", "audio", "page"];
 
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.removeAll(() => {
-    chrome.contextMenus.create({ id: MENU_ROOT, title: t("menuRoot"), contexts: CONTEXTS });
-    chrome.contextMenus.create({ id: "tarjim-burn", parentId: MENU_ROOT, title: t("menuBurn"), contexts: CONTEXTS });
-    chrome.contextMenus.create({ id: "tarjim-srt", parentId: MENU_ROOT, title: t("menuSrt"), contexts: CONTEXTS });
-    chrome.contextMenus.create({ id: "tarjim-dub", parentId: MENU_ROOT, title: t("menuDub"), contexts: CONTEXTS });
-  });
+function start() {
+  buildMenus();
   chrome.alarms.create(POLL, { periodInMinutes: 0.5 });
-});
+}
 
-chrome.runtime.onStartup.addListener(() => chrome.alarms.create(POLL, { periodInMinutes: 0.5 }));
+chrome.runtime.onInstalled.addListener(start);
+chrome.runtime.onStartup.addListener(start);
+chrome.storage.onChanged.addListener((changes) => { if (changes.target) buildMenus(); });
 
 function pickUrl(info, tab) {
   const candidates = [info.linkUrl, info.srcUrl, info.pageUrl, tab?.url];
   return candidates.find(mediaUrl);
 }
 
+function notify(id, title, message) {
+  chrome.notifications.create(id, { type: "basic", iconUrl: "icons/128.png", title, message });
+}
+
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  const mode = MENU_MODES[info.menuItemId];
+  if (info.menuItemId === OTHER) {
+    chrome.tabs.create({ url: chrome.runtime.getURL("app.html?page=1") });
+    return;
+  }
+  if (!isMode(info.menuItemId)) return;
   const url = pickUrl(info, tab);
-  if (!mode || !url) return;
+  if (!url) {
+    notify(`nourl-${Date.now()}`, t("appName"), t("menuNoVideo"));
+    return;
+  }
   const { target, dialect } = await settings();
   try {
-    await post("/jobs", { url, target, dialect, mode });
-    chrome.action.setBadgeText({ text: "…" });
+    await post("/jobs", { url, target, dialect, mode: info.menuItemId });
+    notify(`start-${Date.now()}`, t("appName"), t("notifyStarted"));
     refresh();
   } catch (error) {
     const body = error.kind === "offline" ? t("offlineTitle") : t("pairTitle");
@@ -38,10 +44,6 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => alarm.name === POLL && refresh());
-
-function notify(id, title, message) {
-  chrome.notifications.create(id, { type: "basic", iconUrl: "icons/128.png", title, message });
-}
 
 async function refresh() {
   let jobs;
