@@ -86,14 +86,17 @@ class Emitter:
     OVERLAP = 1.0
     RATE = 16000
 
-    def __init__(self, device: str = "cuda:0") -> None:
+    def __init__(self, device: str | None = None) -> None:
         import torch
         from transformers import AutoModelForCTC, AutoTokenizer
 
+        from tarjim.device import best_device, precision
+
         self.torch = torch
-        self.device = device
-        self.model = AutoModelForCTC.from_pretrained(self.MODEL, torch_dtype=torch.float16)
-        self.model = self.model.to(device).eval()
+        self.device = device or best_device()
+        self.dtype = precision(self.device, torch.float16)
+        self.model = AutoModelForCTC.from_pretrained(self.MODEL, torch_dtype=self.dtype)
+        self.model = self.model.to(self.device).eval()
         tokenizer = AutoTokenizer.from_pretrained(self.MODEL)  # type: ignore[no-untyped-call]
         self.vocab: dict[str, int] = tokenizer.get_vocab()
 
@@ -114,6 +117,6 @@ class Emitter:
         audio = torch.from_numpy(np.asarray(clip, dtype=np.float32))
         audio = (audio - audio.mean()) / (audio.std() + 1e-7)
         with torch.inference_mode():
-            logits = self.model(audio[None].to(self.device, torch.float16)).logits[0]
+            logits = self.model(audio[None].to(self.device, self.dtype)).logits[0]
         result: np.ndarray = torch.log_softmax(logits.float(), dim=-1).cpu().numpy()
         return result

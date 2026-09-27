@@ -33,11 +33,14 @@ def shared_engine() -> "QwenEngine":
 
 
 class QwenEngine:
-    def __init__(self, device: str = "cuda:0") -> None:
+    def __init__(self, device: str | None = None) -> None:
         import torch
         from qwen_asr import Qwen3ASRModel
 
-        options = {"dtype": torch.bfloat16, "device_map": device}
+        from tarjim.device import best_device, precision
+
+        device = device or best_device()
+        options = {"dtype": precision(device, torch.bfloat16), "device_map": device}
         self.model = Qwen3ASRModel.from_pretrained(
             ASR_MODEL, forced_aligner=ALIGNER_MODEL, forced_aligner_kwargs=options,
             max_inference_batch_size=BATCH, max_new_tokens=MAX_TOKENS, **options,

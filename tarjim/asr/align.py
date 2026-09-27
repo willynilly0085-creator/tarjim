@@ -87,7 +87,7 @@ def shared_aligner() -> "AlignEngine":
 
 
 class AlignEngine:
-    def __init__(self, device: str = "cuda:0") -> None:
+    def __init__(self, device: str | None = None) -> None:
         import uroman
 
         self.emitter = Emitter(device)

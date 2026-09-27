@@ -58,3 +58,15 @@ def test_local_listening_makes_its_model_required(monkeypatch: pytest.MonkeyPatc
     assert required["accuracy"] and required["ffmpeg"]
     monkeypatch.setattr(tools, "listening_locally", lambda: False)
     assert not {v["id"]: v["required"] for v in tools.Shelf().view()}["accuracy"]
+
+
+def test_models_fall_back_to_the_processor_without_a_usable_card(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    import torch
+
+    from tarjim.device import best_device, precision
+
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
+    assert best_device() == "cpu"
+    assert precision("cpu", torch.float16) is torch.float32
+    assert precision("cuda:0", torch.float16) is torch.float16
