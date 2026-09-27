@@ -51,7 +51,14 @@ tool your AI operates, not another assistant to talk to. The plugin needs
 [uv](https://docs.astral.sh/uv/).
 
 Other MCP apps (Codex, Cursor, and more): after the engine is installed, add the command
-`tarjim-mcp` as an MCP server, for example `codex mcp add tarjim -- tarjim-mcp`.
+`tarjim-mcp` as an MCP server, for example `codex mcp add tarjim -- tarjim-mcp`. Codex asks you to
+approve each tool call; to let tarjim's tools run without asking, add
+`default_tools_approval_mode = "approve"` under `[mcp_servers.tarjim]` in `~/.codex/config.toml`.
+
+Tested: a Claude Code session with the plugin read the settings, set the glossary, translated a
+YouTube link into Spanish and returned the subtitles; Codex (ChatGPT plan) read the settings and set
+the glossary. The ChatGPT website and desktop app cannot reach tools on your computer yet (they
+only accept remote MCP servers), so use Codex for ChatGPT.
 
 ## Install by hand (Windows)
 

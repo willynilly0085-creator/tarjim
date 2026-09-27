@@ -34,7 +34,7 @@ def prompt(lines: list[Line], language: str, dialect: str, full_vowels: bool) ->
                      f"   seconds: {line.room:.1f}" for n, line in enumerate(lines, start=1))
     from tarjim.translate.glossary import current, instructions
 
-    return f"{head}{instructions(current())}\n{body}"
+    return f"{head}{instructions(current(language))}\n{body}"
 
 
 def spoken_lines(lines: list[Line], language: str, dialect: str,

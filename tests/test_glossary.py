@@ -14,3 +14,10 @@ def test_the_translator_is_told_to_keep_the_terms() -> None:
     prompt = build_prompt([cue], Brief(glossary=parse("tarjim = ترجم")))
     assert "tarjim → ترجم" in prompt
     assert instructions(()) == ""
+
+
+def test_a_language_code_limits_a_term_to_that_language() -> None:
+    text = "ar: tarjim = ترجم\nPocketflow = Pocketflow\nja: tarjim = タルジム"
+    assert parse(text, "ar") == (("tarjim", "ترجم"), ("Pocketflow", "Pocketflow"))
+    assert parse(text, "fr") == (("Pocketflow", "Pocketflow"),)
+    assert parse(text, "Japanese") == (("Pocketflow", "Pocketflow"), ("tarjim", "タルジム"))

@@ -113,8 +113,8 @@ def change_settings(interface_language: str = "", listening_engine: str = "",
 
 @tarjim.tool()
 def set_glossary(terms: str) -> Any:
-    """Fix how names and brands are translated, one per line as "term = translation",
-    e.g. "tarjim = ترجم". Replaces the whole list; send an empty string to clear it."""
+    """Fix how names are translated, one per line "term = translation"; prefix a language
+    code to limit a line to it ("ar: tarjim = ترجم"). Replaces the list; "" clears it."""
     return call("/setup", {"glossary": terms})
 
 

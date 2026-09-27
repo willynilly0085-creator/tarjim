@@ -37,7 +37,7 @@ def translate(job: Job, cues: list[Cue]) -> list[Cue]:
 
     from tarjim.translate.glossary import current
 
-    brief = Brief(job.language, job.dialect, job.rules, glossary=current())
+    brief = Brief(job.language, job.dialect, job.rules, glossary=current(job.target))
     failures: list[Exception] = []
     for provider in chain("translate"):
         try:
