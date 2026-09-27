@@ -1,42 +1,121 @@
-# tarjim — ترجمة احترافية بالعربي لأي فيديو
+# tarjim
 
-`tarjim` يطلع ترجمة عربية للفيديو بقواعد الترجمة الاحترافية: كل ترجمة مضبوطة على وقت كلامها، ولا يختلط كلام شخص بشخص، وبلهجة طبيعية بدل الترجمة الحرفية.
+**Subtitles and dubbing for any video, in your language, on your own computer.**
+[العربية](README.ar.md)
 
-## كيف يشتغل
+Paste a link or drop a file. tarjim listens, times every line to the moment it is spoken, keeps
+each speaker apart, translates into natural speech, and burns the subtitles into the video, writes
+an `.srt`, or dubs it with a voice for every speaker.
 
-| المرحلة | الأداة | ليش |
+## What it does
+
+- **Any source:** YouTube, X and other links (yt-dlp), or any video or audio file on your device.
+- **34 target languages**, right-to-left and left-to-right. Arabic defaults to a Saudi dialect;
+  Modern Standard Arabic is one click away.
+- **Careful listening:** the audio is heard three times and every word is voted on, so a single
+  mishearing does not reach the subtitle.
+- **Exact timing:** words are aligned to the audio on your computer (CTC forced alignment plus
+  voice-activity detection). Subtitles never run across a shot cut into the next person's shot.
+- **Speaker aware:** dialogue lines with dashes, one line per speaker.
+- **Dubbing:** a natural Gemini voice per speaker (matched by pitch), a local voice clone of each
+  speaker (XTTS-v2), studio voices, or Fish Audio. A separate voice script writes names as they
+  are pronounced and numbers as words, so the voice says them correctly.
+- **Three ways to use it:** a right-click menu in the browser ("ترجم للعربية"), a local web page,
+  or a chat: add tarjim to the Claude app, Claude Code or Codex and ask it to translate a link.
+
+## Connect an AI: three ways
+
+| Way | Choices | Notes |
 |---|---|---|
-| السماع | `Qwen3-ASR-1.7B` | أدق من Whisper في 52 لغة، ويحفظ علامات الترقيم |
-| توقيت الكلمات | `Qwen3-ForcedAligner-0.6B` | توقيت كل كلمة على الصوت نفسه |
-| تغيّر المتكلم | قَصّات اللقطات + الوقفات + نهايات الجمل | المونتاج يغيّر المتكلم بدون أي سكتة |
-| التقطيع | قواعد Netflix للترجمة | 42 حرف للسطر، سطران، 17 حرف بالثانية، من 1 إلى 6 ثواني |
-| الحوار | سطر لكل متكلم بشرطة | بدل ومضات لا تُقرأ |
-| الترجمة | Gemini يسمع الصوت | يصحح أخطاء السماع، ويلتزم بميزانية حروف لكل خانة |
-| العرض | ASS بمقاس الفيديو الحقيقي | خط أكبر للفيديو الطولي، وهامش آمن |
-| الفحص | تقرير آلي قبل الإخراج | تداخل، سرعة قراءة، طول سطر |
+| API key | Gemini, OpenAI, Anthropic, OpenRouter, DeepSeek, Qwen, Mistral, Groq, xAI, or any OpenAI-compatible address | Gemini and OpenAI can also listen (speech to text). |
+| Your subscription | Claude (through Claude Code), ChatGPT (through Codex), GitHub Copilot, Google AI (through Antigravity) | tarjim runs the vendor's own program with your sign-in. Usage counts against your plan and each vendor's terms apply. |
+| On your computer | Ollama, LM Studio, Jan, llama.cpp, vLLM, KoboldCpp | Found automatically with their models. Nothing leaves your device. |
 
-التوقيت لا يأتي من نموذج اللغة أبداً: الكلمات تُحاذى محلياً، والمترجم يملأ خانات ثابتة لا يقدر يدمجها أو يقسمها.
+Pick any model a provider offers. If the chosen engine fails or runs out of quota, tarjim falls
+back to the local engine when one is available.
 
-## التشغيل
+## Install (Windows)
 
-```bash
+Needs Python 3.11 and about 10 GB of disk for the local models.
+
+```powershell
+git clone https://github.com/<owner>/tarjim
+cd tarjim
 python -m venv .venv
-.venv/Scripts/pip install torch --index-url https://download.pytorch.org/whl/cu128
-.venv/Scripts/pip install -e ".[dev]"
-set GEMINI_API_KEY=...
-tarjim video.mp4                 # سعودي، ويحرق الترجمة داخل الفيديو
-tarjim video.mp4 --dialect msa   # فصحى مبسطة
-tarjim video.mp4 --no-burn       # ملفات .ass و .srt فقط
+# NVIDIA graphics card: install the CUDA build of PyTorch first (the default one is CPU only)
+.venv\Scripts\python -m pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu128
+.venv\Scripts\python -m pip install -e ".[dub]"
+.venv\Scripts\tarjim-serve
 ```
 
-يحتاج `ffmpeg` و`ffprobe` في PATH، أو حدد مكانهما بـ `TARJIM_FFMPEG` و`TARJIM_FFPROBE`.
+Open <http://127.0.0.1:17653>. The setup page checks your device, connects an AI, and downloads
+what you need, including ffmpeg (on Windows it is downloaded and checked against its published
+SHA-256). Without a usable graphics card everything still works on the processor, only slower.
 
-المخرجات بجانب الفيديو: `name.ar.mp4` و`name.ar.ass` و`name.ar.srt`.
+**macOS and Linux** follow the same steps with `.venv/bin/...`, plus `brew install ffmpeg` or
+`sudo apt install ffmpeg`. These platforms have not been tested yet.
 
-## الخصوصية
+### Browser extension
 
-التفريغ والتوقيت يشتغلان محلياً. الترجمة ترسل صوت المقطع إلى Gemini.
+In Chrome open `chrome://extensions`, turn on Developer mode, choose **Load unpacked** and pick the
+`extension` folder. The extension pairs itself: press **Allow** on the tarjim page.
 
-## الترخيص
+### Chat
 
-MIT. النماذج لها تراخيصها: Qwen3-ASR بترخيص Apache 2.0.
+On the setup page, step "Use tarjim from a chat", press **Add** next to the Claude app, Claude Code
+or Codex. Then say "translate this link and dub it". Keys are never entered through chat.
+
+### Command line
+
+```bash
+tarjim video.mp4                 # Arabic (Saudi), burned into the video
+tarjim video.mp4 --to fr         # any target language
+tarjim video.mp4 --no-burn       # .srt and .ass only
+```
+
+## Privacy and security
+
+- **Keys** are stored in your operating system's encrypted vault (Windows Credential Manager,
+  macOS Keychain, Secret Service). The settings file holds none.
+- **What leaves your device** depends on the way you connect: the audio of the clip goes to the
+  listening provider you chose, and the text goes to the translation and voice providers you chose.
+  In local mode nothing leaves: this was measured by watching every connection during a full local
+  job, dubbing included (zero external connections). Models load offline; the internet is used only
+  when you download a tool.
+- **The local server** listens on 127.0.0.1 only. Every request needs a token or the page's
+  same-site cookie, foreign `Host` headers are refused (DNS rebinding), websites cannot reach it or
+  ask to pair, and it serves no file outside its own folders.
+
+See [SECURITY.md](SECURITY.md) to report a problem.
+
+## Model licenses
+
+tarjim's code does not include model weights; you download them from their owners. Some of them
+are **not licensed for commercial use**:
+
+| Tool | License | Commercial use |
+|---|---|---|
+| Timing aligner `MahmoudAshraf/mms-300m-1130-forced-aligner` (required) | CC-BY-NC-4.0 | No |
+| Voice clone XTTS-v2 (optional, asks for consent) | Coqui Public Model License | No |
+| Local translation `aya-expanse:8b` (optional) | CC-BY-NC-4.0 | No |
+| Local listening Qwen3-ASR-1.7B and Qwen3-ForcedAligner | Apache-2.0 | Yes |
+| ffmpeg (LGPL build) | LGPL-2.1 | Yes |
+
+The setup page shows each license next to its download.
+
+## Status
+
+Tested on Windows 11 with an RTX 5080, and from a clean install with no graphics support: links and
+files, burned subtitles and `.srt`, French and Arabic, pause, resume, cancel and retry, the three
+ways to connect (Claude and ChatGPT subscriptions, local Ollama), the chat tools, and the security
+checks above. Not tested yet: macOS, Linux, GitHub Copilot and Antigravity subscriptions.
+
+## Development
+
+```bash
+pip install -e ".[dub,dev]"
+pytest && ruff check tarjim tests && mypy tarjim
+```
+
+Design decisions and measurements are recorded in [docs/decisions.md](docs/decisions.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md).
