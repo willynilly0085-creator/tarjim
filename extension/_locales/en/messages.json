@@ -279,5 +279,8 @@
         "content": "$1"
       }
     }
+  },
+  "pairedNotice": {
+    "message": "The extension is connected. You can translate now."
   }
 }

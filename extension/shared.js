@@ -8,7 +8,40 @@ const STAGE_KEYS = {
 };
 const ERROR_KEYS = { quota: "errQuota", key: "errKey", download: "errDownload", tools: "errTools", dub: "errDub" };
 
-export const t = (key, ...subs) => chrome.i18n.getMessage(key, subs) || key;
+const RTL = new Set(["ar", "fa", "ur", "he"]);
+const LOCALES = new Set(["ar", "en"]);
+let words = null;
+let chosen = "";
+
+function fill(entry, subs) {
+  return entry.message.replace(/\$([A-Za-z_]+)\$/g, (_, name) => {
+    const slot = entry.placeholders?.[name.toLowerCase()]?.content || "$1";
+    return subs[Number(slot.slice(1)) - 1] ?? "";
+  });
+}
+
+export const t = (key, ...subs) =>
+  (words?.[key] ? fill(words[key], subs) : chrome.i18n.getMessage(key, subs)) || key;
+
+export const uiLanguage = () => chosen || chrome.i18n.getUILanguage().slice(0, 2);
+export const uiDirection = () => (RTL.has(uiLanguage()) ? "rtl" : "ltr");
+
+async function askLanguage() {
+  const { server } = await settings();
+  const reply = await fetch(`${server.replace(/\/+$/, "")}/ui-language`).catch(() => null);
+  return reply?.ok ? (await reply.json()).language : "";
+}
+
+export async function loadWords() {
+  const stored = (await chrome.storage.local.get("uiLanguage")).uiLanguage || "";
+  const language = (await askLanguage()) || stored;
+  if (!LOCALES.has(language)) return false;
+  const changed = language !== chosen;
+  words = await (await fetch(chrome.runtime.getURL(`_locales/${language}/messages.json`))).json();
+  chosen = language;
+  if (language !== stored) await chrome.storage.local.set({ uiLanguage: language });
+  return changed;
+}
 
 export class ApiError extends Error {
   constructor(kind, status = 0) {

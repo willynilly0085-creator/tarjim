@@ -4,6 +4,7 @@ import { t } from "./i18n.js";
 let current = null;
 
 async function check() {
+  if ($("pairing").querySelector(".row").hidden) return;
   const pending = await api("/pairs").catch(() => []);
   current = pending[0]?.id ?? null;
   $("pairing").hidden = !current;
@@ -12,9 +13,18 @@ async function check() {
 async function decide(verdict) {
   if (!current) return;
   await post(`/pairs/${current}/${verdict}`);
-  $("pairing").hidden = true;
-  if (verdict === "allow") document.getElementById("announcer").textContent = t("paired");
   current = null;
+  if (verdict !== "allow") {
+    $("pairing").hidden = true;
+    return;
+  }
+  $("pairing").querySelector("p").textContent = t("paired");
+  $("pairing").querySelector(".row").hidden = true;
+  setTimeout(() => {
+    $("pairing").hidden = true;
+    $("pairing").querySelector("p").textContent = t("pairAsk");
+    $("pairing").querySelector(".row").hidden = false;
+  }, 5000);
 }
 
 export function watchPairing() {

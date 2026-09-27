@@ -1,9 +1,11 @@
 import { buildMenus, isMode, OTHER } from "./menus.js";
-import { api, errorLabel, mediaUrl, post, settings, t } from "./shared.js";
+import { claimPending } from "./pairing.js";
+import { api, errorLabel, loadWords, mediaUrl, post, settings, t } from "./shared.js";
 
 const POLL = "poll";
 
-function start() {
+async function start() {
+  await loadWords();
   buildMenus();
   chrome.alarms.create(POLL, { periodInMinutes: 0.5 });
 }
@@ -22,6 +24,7 @@ function notify(id, title, message) {
 }
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  await loadWords();
   if (info.menuItemId === OTHER) {
     chrome.tabs.create({ url: chrome.runtime.getURL("app.html?page=1") });
     return;
@@ -43,7 +46,12 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
 });
 
-chrome.alarms.onAlarm.addListener((alarm) => alarm.name === POLL && refresh());
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+  if (alarm.name !== POLL) return;
+  if (await loadWords()) buildMenus();
+  if ((await claimPending()) === "paired") notify(`paired-${Date.now()}`, t("appName"), t("pairedNotice"));
+  refresh();
+});
 
 async function refresh() {
   let jobs;

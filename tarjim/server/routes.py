@@ -19,14 +19,15 @@ GET_ROUTES = table([
     (r"^/translate$", "legacy"), (r"^/keys$", "key_status"), (r"^/$", "home"),
     (r"^/web/([\w.-]+(?:/[\w.-]+)?)$", "asset"), (r"^/system$", "system"),
     (r"^/setup$", "setup_state"), (r"^/tools$", "list_tools"),
-    (rf"^/pair/{PAIR}$", "pair_state"), (r"^/pairs$", "list_pairs")])
+    (rf"^/pair/{PAIR}$", "pair_state"), (r"^/pairs$", "list_pairs"),
+    (r"^/ui-language$", "ui_language")])
 POST_ROUTES = table([
     (r"^/jobs$", "create_json"), (r"^/upload$", "upload"), (rf"^/reveal/{JOB}$", "reveal"),
     (rf"^/open/{JOB}$", "play"), (rf"^/retry/{JOB}$", "retry"), (r"^/keys$", "save_key"),
     (r"^/setup$", "save_setup"), (r"^/tools/([a-z_]+)$", "get_tool"), (r"^/pair$", "ask_pair"),
     (rf"^/pairs/{PAIR}/(allow|deny)$", "decide_pair")])
 OPEN = [re.compile(p) for p in (r"^/$", r"^/web/", r"^/ping$", r"^/languages$", r"^/pair$",
-                                  rf"^/pair/{PAIR}$")]
+                                  rf"^/pair/{PAIR}$", r"^/ui-language$")]
 
 
 def is_open(path: str) -> bool:

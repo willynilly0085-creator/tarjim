@@ -1,7 +1,8 @@
 import { watchJobs } from "./jobs.js";
-import { api, mediaUrl, post, remember, settings, t } from "./shared.js";
+import { api, loadWords, mediaUrl, post, remember, settings, t, uiDirection, uiLanguage } from "./shared.js";
 import { $, show } from "./dom.js";
 import { keyStatus } from "./keys.js";
+import { claimPending } from "./pairing.js";
 import { openSettings, wirePanels } from "./panels.js";
 import { isMedia, upload } from "./upload.js";
 
@@ -10,8 +11,8 @@ const pageMode = params.get("page") === "1";
 const state = { url: "", file: null, languages: new Map(), poll: 0 };
 
 function applyText() {
-  document.documentElement.lang = chrome.i18n.getUILanguage();
-  document.documentElement.dir = chrome.i18n.getMessage("@@bidi_dir") || "ltr";
+  document.documentElement.lang = uiLanguage();
+  document.documentElement.dir = uiDirection();
   document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
   document.querySelectorAll("[data-i18n-label]").forEach((el) => {
     el.setAttribute("aria-label", t(el.dataset.i18nLabel));
@@ -34,6 +35,7 @@ async function connect() {
     return show("offline");
   }
   linkState(true);
+  await claimPending();
   try {
     await api("/jobs");
   } catch (error) {
@@ -190,6 +192,7 @@ function wire() {
   wireDrop();
 }
 
+await loadWords();
 applyText();
 wire();
 if (params.get("view") === "settings") openSettings();

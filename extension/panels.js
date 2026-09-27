@@ -1,5 +1,6 @@
 import { $, show } from "./dom.js";
 import { keyStatus, saveKey } from "./keys.js";
+import { askToPair, claimPending, serverBase } from "./pairing.js";
 import { api, remember, settings, t } from "./shared.js";
 
 async function pair(event, ready) {
@@ -15,17 +16,7 @@ async function pair(event, ready) {
 }
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const ATTEMPTS = 120;
-
-async function serverBase() {
-  return (await settings()).server.replace(/\/+$/, "");
-}
-
-async function askToPair() {
-  const base = await serverBase();
-  const reply = await fetch(`${base}/pair`, { method: "POST" }).catch(() => null);
-  return reply?.ok ? (await reply.json()).id : null;
-}
+const ATTEMPTS = 400;
 
 async function autoPair(ready) {
   const id = await askToPair();
@@ -33,19 +24,15 @@ async function autoPair(ready) {
   $("pair-waiting").hidden = false;
   $("pair-waiting").textContent = t("pairWaiting");
   $("open-tarjim").hidden = false;
+  chrome.tabs.create({ url: `${await serverBase()}/` });
   for (let i = 0; i < ATTEMPTS; i += 1) {
     await wait(1500);
-    const reply = await fetch(`${await serverBase()}/pair/${id}`).catch(() => null);
-    const state = reply?.ok ? await reply.json() : {};
-    if (state.token) {
-      await remember({ token: state.token });
-      return ready();
-    }
-    if (state.state === "denied" || state.state === "unknown") break;
+    const result = await claimPending();
+    if (result === "paired") return ready();
+    if (result !== "waiting") break;
   }
   $("pair-waiting").textContent = t("pairDenied");
 }
-
 export async function openSettings() {
   const saved = await settings();
   $("server").value = saved.server;

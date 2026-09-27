@@ -27,6 +27,9 @@ class SetupRoutes:
     def read_json(self) -> dict[str, Any]:
         raise NotImplementedError
 
+    def ui_language(self, _query: Query) -> None:
+        self.reply(200, {"language": setting("ui_language")})
+
     def system(self, _query: Query) -> None:
         from tarjim.system import describe
 
