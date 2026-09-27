@@ -11,12 +11,21 @@ function steps(job) {
   return STAGES.filter((stage) => wanted[stage] ?? true);
 }
 
+function stepItem(stage, index, current, labelled) {
+  const item = document.createElement("li");
+  item.className = index < current ? "past" : index === current ? "now" : "";
+  item.append(Object.assign(document.createElement("i"), { className: "dash" }));
+  if (labelled) item.append(Object.assign(document.createElement("span"), { className: "dash-label", textContent: t(`step_${stage}`) }));
+  return item;
+}
+
 function track(job, list) {
   const all = steps(job);
   const current = job.stage === "done" ? all.length : all.indexOf(job.stage);
-  list.replaceChildren(...all.map((_, i) => Object.assign(document.createElement("li"), {
-    className: i < current ? "past" : i === current && job.stage !== "queued" ? "now" : "",
-  })));
+  const key = `${job.stage}|${job.paused}|${job.finished}`;
+  if (list.dataset.key === key) return;
+  list.dataset.key = key;
+  list.replaceChildren(...all.map((stage, i) => stepItem(stage, i, current, !job.finished)));
 }
 
 function button(label, action) {
@@ -25,24 +34,31 @@ function button(label, action) {
   return el;
 }
 
-function actions(job, box, refresh) {
-  const kind = job.stage === "done" ? "done" : job.stage === "failed" ? "failed" : "";
-  if (box.dataset.kind === kind) return;
-  box.dataset.kind = kind;
-  box.hidden = !kind;
-  box.replaceChildren(...(kind === "done"
-    ? [button(t("play"), () => post(`/open/${job.id}`)), button(t("openFolder"), () => post(`/reveal/${job.id}`))]
-    : kind === "failed" ? [button(t("retry"), () => post(`/retry/${job.id}`).then(refresh))] : []));
+function steering(job, refresh) {
+  const steer = (action) => () => post(`/jobs/${job.id}/${action}`).then(refresh);
+  return [button(t(job.paused ? "resume" : "pause"), steer(job.paused ? "resume" : "pause")),
+    button(t("cancel"), steer("cancel"))];
 }
 
+function actions(job, box, refresh) {
+  const ended = job.stage === "failed" || job.stage === "cancelled";
+  const kind = job.stage === "done" ? "done" : ended ? "again" : job.paused ? "paused" : "running";
+  if (box.dataset.kind === kind) return;
+  box.dataset.kind = kind;
+  box.hidden = false;
+  box.replaceChildren(...(kind === "done"
+    ? [button(t("play"), () => post(`/open/${job.id}`)), button(t("openFolder"), () => post(`/reveal/${job.id}`))]
+    : kind === "again" ? [button(t("retry"), () => post(`/retry/${job.id}`).then(refresh))] : steering(job, refresh)));
+}
 function modeText(mode) {
   return t(mode.startsWith("dub") ? "outputDub" : mode === "srt" ? "outputSrt" : "outputBurn");
 }
 
 function paint(row, job, languages, refresh) {
   row.dataset.stage = job.stage;
+  row.dataset.paused = String(Boolean(job.paused));
   row.querySelector(".job-title").textContent = job.title;
-  row.querySelector(".job-stage").textContent = t(`stage_${job.stage}`);
+  row.querySelector(".job-stage").textContent = t(job.paused ? "stage_paused" : `stage_${job.stage}`);
   const minutes = Math.floor((Date.now() / 1000 - job.created) / 60);
   const since = job.finished ? "" : ` · ${minutes < 1 ? t("agoNow") : t("agoMinutes", { n: minutes })}`;
   row.querySelector(".job-meta").textContent = `${languages.get(job.target) || job.target} · ${modeText(job.mode)}${since}`;

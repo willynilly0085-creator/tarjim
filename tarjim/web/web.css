@@ -73,9 +73,16 @@ h1 { margin: 0; font-size: var(--text-title); font-weight: 650; line-height: 1.2
 .track { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; margin: 0; padding: 0; list-style: none; }
 .track li { height: 4px; border-radius: 2px; background: var(--track); }
 .track li.past, .track li.now { background: var(--accent-line); }
-.job .track li { height: 3px; }
-.job .track li.now { animation: working 1.4s var(--ease) infinite alternate; }
-.job[data-stage="done"] .track li { background: var(--ok); }
+.job .track li { display: grid; gap: 4px; min-width: 0; height: auto; background: none; }
+.job .track .dash { height: 3px; border-radius: 2px; background: var(--track); }
+.job .track .dash-label { overflow: hidden; color: var(--muted); font-size: 0.75rem; line-height: 1.2; text-align: center; white-space: nowrap; text-overflow: ellipsis; }
+.job .track li.past .dash { background: var(--accent-line); }
+.job .track li.now .dash { background: var(--accent-line); animation: working 1.4s var(--ease) infinite alternate; }
+.job .track li.now .dash-label { color: var(--text); font-weight: 650; }
+.job[data-paused="true"] .track li.now .dash { animation: none; opacity: 0.45; }
+.job[data-stage="done"] .track .dash { background: var(--ok); }
+.job[data-stage="failed"] .track li.now .dash { background: var(--danger); animation: none; }
+.job[data-stage="cancelled"] .job-stage { color: var(--muted); }
 @keyframes working { from { opacity: 1; } to { opacity: 0.35; } }
 
 .step { display: grid; gap: var(--space-md); }

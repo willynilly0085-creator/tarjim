@@ -1,6 +1,13 @@
+import os
+from pathlib import Path
 from typing import Any
 
-SERVICE = "tarjim"
+
+def service_for(home: str) -> str:
+    return f"tarjim:{Path(home).resolve()}" if home else "tarjim"
+
+
+SERVICE = service_for(os.environ.get("TARJIM_HOME", ""))
 SECRETS = frozenset({"gemini_api_key", "openai_api_key", "anthropic_api_key", "fish_api_key",
                      "token"})
 

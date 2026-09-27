@@ -209,9 +209,6 @@
   "keyShape": {
     "message": "هذا ما يشبه مفتاح، تأكد إنك نسخته كامل."
   },
-  "keyPrivacy": {
-    "message": "المفتاح ينحفظ على جهازك بس، وما يروح إلا لـ Google نفسها."
-  },
   "keyFishLabel": {
     "message": "مفتاح Fish (اختياري، للدبلجة السحابية)"
   },
@@ -296,5 +293,62 @@
         "content": "$1"
       }
     }
+  },
+  "step_downloading": {
+    "message": "تحميل"
+  },
+  "step_hearing": {
+    "message": "استماع"
+  },
+  "step_timing": {
+    "message": "توقيت"
+  },
+  "step_translating": {
+    "message": "ترجمة"
+  },
+  "step_writing": {
+    "message": "كتابة"
+  },
+  "step_burning": {
+    "message": "دمج"
+  },
+  "step_dubbing": {
+    "message": "دبلجة"
+  },
+  "pause": {
+    "message": "إيقاف مؤقت"
+  },
+  "resume": {
+    "message": "كمّل"
+  },
+  "cancel": {
+    "message": "إلغاء"
+  },
+  "stageCancelled": {
+    "message": "انلغت"
+  },
+  "stagePaused": {
+    "message": "موقفة مؤقتاً"
+  },
+  "engineLabel": {
+    "message": "المحرك"
+  },
+  "engineCloud": {
+    "message": "سحابي (Gemini، الأدق)"
+  },
+  "engineLocal": {
+    "message": "محلي على جهازي، بدون إنترنت"
+  },
+  "engineAdvanced": {
+    "message": "متقدم (من صفحة tarjim)"
+  },
+  "localModelLabel": {
+    "message": "النموذج المحلي"
+  },
+  "localModelHint": {
+    "message": "النماذج المركّبة في Ollama على جهازك."
+  },
+  "localModelNone": {
+    "message": "ما فيه نماذج محلية مركّبة. ركّب Ollama وحمّل نموذج."
   }
 }

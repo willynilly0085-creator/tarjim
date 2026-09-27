@@ -33,7 +33,6 @@
   "provider_anthropic": "Anthropic Claude (ترجمة فقط)",
   "provider_local": "محلي على جهازك",
   "keyTitle": "المفاتيح",
-  "keyHint": "كل مفتاح ينحفظ على جهازك بس، وما يروح إلا للمزود نفسه.",
   "keyNone": "الخيار اللي اخترته ما يحتاج أي مفتاح.",
   "getKey": "خذ المفتاح من هنا",
   "key_gemini": "مفتاح Gemini (مجاني)",
@@ -121,5 +120,17 @@
   "err_unknown": "صار خطأ غير متوقع.",
   "stage_timing": "ضبط التوقيت",
   "agoNow": "توّه بادي",
-  "agoMinutes": "منذ {n} د"
+  "agoMinutes": "منذ {n} د",
+  "step_downloading": "تحميل",
+  "step_hearing": "استماع",
+  "step_timing": "توقيت",
+  "step_translating": "ترجمة",
+  "step_writing": "كتابة",
+  "step_burning": "دمج",
+  "step_dubbing": "دبلجة",
+  "pause": "إيقاف مؤقت",
+  "resume": "كمّل",
+  "cancel": "إلغاء",
+  "stage_cancelled": "انلغت",
+  "stage_paused": "موقفة مؤقتاً"
 }

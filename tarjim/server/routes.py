@@ -20,7 +20,7 @@ GET_ROUTES = table([
     (r"^/web/([\w.-]+(?:/[\w.-]+)?)$", "asset"), (r"^/system$", "system"),
     (r"^/setup$", "setup_state"), (r"^/tools$", "list_tools"),
     (rf"^/pair/{PAIR}$", "pair_state"), (r"^/pairs$", "list_pairs"),
-    (r"^/ui-language$", "ui_language")])
+    (r"^/ui-language$", "ui_language"), (r"^/local-models$", "local_models")])
 POST_ROUTES = table([
     (r"^/jobs$", "create_json"), (r"^/upload$", "upload"), (rf"^/reveal/{JOB}$", "reveal"),
     (rf"^/open/{JOB}$", "play"), (rf"^/retry/{JOB}$", "retry"), (r"^/keys$", "save_key"),

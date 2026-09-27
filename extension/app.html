@@ -44,7 +44,10 @@
           <label class="field-label" for="link" data-i18n="linkLabel"></label>
           <input class="text-input" id="link" type="url" inputmode="url" dir="ltr" placeholder="https://">
         </div>
-        <button class="text-button" id="open-file-page" type="button" data-i18n="pickFile"></button>
+        <button class="button-quiet wide" id="open-file-page" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>
+          <span data-i18n="pickFile"></span>
+        </button>
 
         <div class="field">
           <label class="field-label" for="target" data-i18n="language"></label>
@@ -122,7 +125,6 @@
       <form id="key-form" class="stack" novalidate>
         <label class="field-label" for="gemini-key" data-i18n="keyGeminiLabel"></label>
         <input class="text-input" id="gemini-key" type="password" dir="ltr" autocomplete="off" spellcheck="false" required>
-        <p class="meta" data-i18n="keyPrivacy"></p>
         <p class="error" id="key-error" role="alert" hidden></p>
         <button class="primary" type="submit" data-i18n="keySave"></button>
       </form>
@@ -139,7 +141,17 @@
         <input class="text-input" id="settings-gemini" type="password" dir="ltr" autocomplete="off" spellcheck="false">
         <label class="field-label" for="settings-fish" data-i18n="keyFishLabel"></label>
         <input class="text-input" id="settings-fish" type="password" dir="ltr" autocomplete="off" spellcheck="false">
-        <p class="meta" data-i18n="keyPrivacy"></p>
+        <label class="field-label" for="settings-engine" data-i18n="engineLabel"></label>
+        <select class="select" id="settings-engine">
+          <option value="cloud" data-i18n="engineCloud"></option>
+          <option value="local" data-i18n="engineLocal"></option>
+          <option value="advanced" data-i18n="engineAdvanced"></option>
+        </select>
+        <div class="stack" id="local-model-field" hidden>
+          <label class="field-label" for="settings-local-model" data-i18n="localModelLabel"></label>
+          <select class="select" id="settings-local-model"></select>
+          <p class="meta" id="local-model-hint" data-i18n="localModelHint"></p>
+        </div>
         <p class="notice" id="settings-notice" role="status" aria-live="polite"></p>
         <div class="row">
           <button class="primary" type="submit" data-i18n="save"></button>

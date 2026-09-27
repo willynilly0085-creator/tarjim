@@ -39,6 +39,11 @@ def test_keys_left_in_an_old_file_move_into_the_vault(home: Path, memory_vault: 
     assert config.setting("fish_api_key") == "old"
 
 
+def test_each_home_folder_has_its_own_vault_entry(tmp_path: Path) -> None:
+    assert vault.service_for("") == "tarjim"
+    assert vault.service_for(str(tmp_path)) == f"tarjim:{tmp_path.resolve()}"
+
+
 def test_without_a_vault_keys_stay_in_the_owner_only_file(
         home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(vault, "backend", lambda: None)

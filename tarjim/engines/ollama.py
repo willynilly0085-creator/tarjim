@@ -24,3 +24,14 @@ class OllamaAsker:
                 "messages": [{"role": "user", "content": prompt}]}
         answer = post("local", f"{base_url()}/api/chat", {}, json=body)
         return unwrap(parse_json(answer.get("message", {}).get("content", "")))
+
+
+def installed_models() -> list[str]:
+    import requests
+
+    try:
+        reply = requests.get(f"{base_url()}/api/tags", timeout=5)
+        models = reply.json().get("models", []) if reply.ok else []
+    except (requests.RequestException, ValueError):
+        return []
+    return sorted(str(m.get("name")) for m in models if m.get("name"))

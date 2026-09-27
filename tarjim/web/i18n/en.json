@@ -33,7 +33,6 @@
   "provider_anthropic": "Anthropic Claude (translation only)",
   "provider_local": "Local on this computer",
   "keyTitle": "Keys",
-  "keyHint": "Each key stays on this computer and is only sent to its own provider.",
   "keyNone": "Your choice does not need any key.",
   "getKey": "Get the key here",
   "key_gemini": "Gemini key (free)",
@@ -121,5 +120,17 @@
   "err_unknown": "Something unexpected went wrong.",
   "stage_timing": "Timing",
   "agoNow": "just started",
-  "agoMinutes": "{n} min"
+  "agoMinutes": "{n} min",
+  "step_downloading": "Download",
+  "step_hearing": "Listen",
+  "step_timing": "Timing",
+  "step_translating": "Translate",
+  "step_writing": "Write",
+  "step_burning": "Burn",
+  "step_dubbing": "Dub",
+  "pause": "Pause",
+  "resume": "Resume",
+  "cancel": "Cancel",
+  "stage_cancelled": "Cancelled",
+  "stage_paused": "Paused"
 }

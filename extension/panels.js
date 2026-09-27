@@ -1,7 +1,7 @@
 import { $, show } from "./dom.js";
 import { keyStatus, saveKey } from "./keys.js";
 import { askToPair, claimPending, serverBase } from "./pairing.js";
-import { api, remember, settings, t } from "./shared.js";
+import { api, post, remember, settings, t } from "./shared.js";
 
 async function pair(event, ready) {
   event.preventDefault();
@@ -33,6 +33,39 @@ async function autoPair(ready) {
   }
   $("pair-waiting").textContent = t("pairDenied");
 }
+let engineAtOpen = "";
+
+function syncEngine() {
+  $("local-model-field").hidden = $("settings-engine").value !== "local";
+}
+
+async function fillEngine() {
+  const setup = await api("/setup").catch(() => null);
+  if (!setup) return;
+  const { listen, translate } = setup.chosen;
+  const engine = listen === "local" && translate === "local" ? "local"
+    : listen === "gemini" && translate === "gemini" ? "cloud" : "advanced";
+  $("settings-engine").value = engine;
+  engineAtOpen = engine;
+  const { models = [], chosen = "" } = await api("/local-models").catch(() => ({}));
+  $("settings-local-model").replaceChildren(...models.map((m) => new Option(m, m, false, m === chosen)));
+  $("local-model-hint").textContent = t(models.length ? "localModelHint" : "localModelNone");
+  syncEngine();
+}
+
+async function saveEngine() {
+  const engine = $("settings-engine").value;
+  if (engine === "advanced") {
+    if (engineAtOpen !== "advanced") chrome.tabs.create({ url: `${await serverBase()}/` });
+    return;
+  }
+  const provider = engine === "local" ? "local" : "gemini";
+  const model = $("settings-local-model").value;
+  const extra = engine === "local" && model ? { local_model: model } : {};
+  await post("/setup", { listen_provider: provider, translate_provider: provider, ...extra });
+  engineAtOpen = engine;
+}
+
 export async function openSettings() {
   const saved = await settings();
   $("server").value = saved.server;
@@ -40,6 +73,7 @@ export async function openSettings() {
   const keys = await keyStatus().catch(() => ({}));
   $("settings-gemini").placeholder = keys.gemini ? t("keySet") : "";
   $("settings-fish").placeholder = keys.fish ? t("keySet") : "";
+  await fillEngine();
   show("settings");
 }
 
@@ -62,6 +96,7 @@ async function saveSettings(event) {
   $("settings-notice").textContent = t("keyChecking");
   const problems = [await saveKey("gemini", $("settings-gemini").value),
     await saveKey("fish", $("settings-fish").value)].filter(Boolean);
+  await saveEngine().catch(() => problems.push(t("errUnknown")));
   $("settings-notice").textContent = problems[0] || t("saved");
 }
 
@@ -71,6 +106,7 @@ export function wirePanels({ ready, back, leave }) {
   $("open-tarjim").addEventListener("click", async () => chrome.tabs.create({ url: `${await serverBase()}/` }));
   $("key-form").addEventListener("submit", (event) => submitKey(event, ready));
   $("settings-form").addEventListener("submit", saveSettings);
+  $("settings-engine").addEventListener("change", syncEngine);
   $("retry-connect").addEventListener("click", back);
   $("close-settings").addEventListener("click", back);
   $("open-settings").addEventListener("click", () => { leave(); openSettings(); });

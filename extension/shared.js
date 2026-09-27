@@ -4,7 +4,7 @@ export const STAGES = ["downloading", "hearing", "timing", "translating", "writi
 const STAGE_KEYS = {
   queued: "stageQueued", downloading: "stageDownloading", hearing: "stageHearing", timing: "stageTiming",
   translating: "stageTranslating", writing: "stageWriting", burning: "stageBurning", dubbing: "stageDubbing",
-  done: "stageDone", failed: "stageFailed",
+  done: "stageDone", failed: "stageFailed", cancelled: "stageCancelled",
 };
 const ERROR_KEYS = { quota: "errQuota", key: "errKey", download: "errDownload", tools: "errTools", dub: "errDub" };
 

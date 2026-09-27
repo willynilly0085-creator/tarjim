@@ -209,9 +209,6 @@
   "keyShape": {
     "message": "That does not look like a key. Check that you copied all of it."
   },
-  "keyPrivacy": {
-    "message": "The key stays on your computer and is only sent to Google itself."
-  },
   "keyFishLabel": {
     "message": "Fish key (optional, for cloud dubbing)"
   },
@@ -296,5 +293,62 @@
         "content": "$1"
       }
     }
+  },
+  "step_downloading": {
+    "message": "Download"
+  },
+  "step_hearing": {
+    "message": "Listen"
+  },
+  "step_timing": {
+    "message": "Timing"
+  },
+  "step_translating": {
+    "message": "Translate"
+  },
+  "step_writing": {
+    "message": "Write"
+  },
+  "step_burning": {
+    "message": "Burn"
+  },
+  "step_dubbing": {
+    "message": "Dub"
+  },
+  "pause": {
+    "message": "Pause"
+  },
+  "resume": {
+    "message": "Resume"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "stageCancelled": {
+    "message": "Cancelled"
+  },
+  "stagePaused": {
+    "message": "Paused"
+  },
+  "engineLabel": {
+    "message": "Engine"
+  },
+  "engineCloud": {
+    "message": "Cloud (Gemini, most accurate)"
+  },
+  "engineLocal": {
+    "message": "Local on this computer, offline"
+  },
+  "engineAdvanced": {
+    "message": "Advanced (on the tarjim page)"
+  },
+  "localModelLabel": {
+    "message": "Local model"
+  },
+  "localModelHint": {
+    "message": "Models installed in Ollama on this computer."
+  },
+  "localModelNone": {
+    "message": "No local models installed. Install Ollama and pull a model."
   }
 }
