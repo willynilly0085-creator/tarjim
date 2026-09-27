@@ -166,3 +166,19 @@ def test_a_job_can_be_paused_resumed_and_cancelled_between_steps() -> None:
     assert doomed.stage == "cancelled"
     assert board.steer(doomed.id, "resume") is None
     assert board.retry(doomed.id) is not None
+
+
+def test_models_are_released_once_the_board_goes_idle() -> None:
+    from tarjim.server.jobs import Board, Order
+
+    released: list[int] = []
+    board = Board(lambda _task: None, idle=lambda: released.append(1), idle_after=0.05)
+    time.sleep(0.2)
+    assert released == []
+    task = board.submit(Order("https://example.com/v"))
+    for _ in range(40):
+        if task.finished and released:
+            break
+        time.sleep(0.05)
+    time.sleep(0.2)
+    assert task.stage == "done" and released == [1]

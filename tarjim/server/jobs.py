@@ -4,13 +4,14 @@ import uuid
 from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from pathlib import Path
-from queue import Queue
+from queue import Empty, Queue
 
 DUBBING = {"dub-gemini": "gemini", "dub-clone": "clone", "dub-studio": "studio", "dub-fish": "fish",
            "dub-fishvoice": "fish:saved"}
 MODES = ("srt", "burn", *DUBBING)
 KEEP = 50
 PAUSE_TICK = 0.5
+IDLE_SECONDS = 300.0
 ENDED = ("done", "failed", "cancelled")
 CONTROLS = {"pause": "paused", "resume": "run", "cancel": "cancelled"}
 REASONS = [("quota", ("QuotaExhausted", "quota", " 429:")),
@@ -74,10 +75,12 @@ Worker = Callable[[Task], None]
 
 
 class Board:
-    def __init__(self, work: Worker) -> None:
+    def __init__(self, work: Worker, idle: Callable[[], None] | None = None,
+                 idle_after: float = IDLE_SECONDS) -> None:
         self.tasks: dict[str, Task] = {}
         self.queue: Queue[Task] = Queue()
         self.work = work
+        self.idle, self.idle_after, self.busy_since_idle = idle, idle_after, False
         self.lock = threading.Lock()
         threading.Thread(target=self.loop, daemon=True).start()
 
@@ -119,9 +122,19 @@ class Board:
         with self.lock:
             return sorted(self.tasks.values(), key=lambda t: t.created, reverse=True)
 
+    def next_task(self) -> Task:
+        while True:
+            try:
+                return self.queue.get(timeout=self.idle_after)
+            except Empty:
+                if self.idle and self.busy_since_idle:
+                    self.busy_since_idle = False
+                    self.idle()
+
     def loop(self) -> None:
         while True:
-            task = self.queue.get()
+            task = self.next_task()
+            self.busy_since_idle = True
             try:
                 task.checkpoint()
                 self.work(task)
