@@ -104,3 +104,17 @@ def test_the_windows_launch_line_carries_the_settings_and_the_log(
     line = installer.windows_line(command, tmp_path / "i.log")
     assert line.startswith('cmd /d /s /c "set "PYTHONPATH=C:/plugin"&& python -m tarjim.installer')
     assert line.endswith(f'>> "{tmp_path / "i.log"}" 2>&1"')
+
+
+def test_an_install_just_requested_counts_as_installing(tmp_path: Path,
+                                                        monkeypatch: pytest.MonkeyPatch) -> None:
+    import time
+
+    from tarjim import assistant_setup
+
+    state = tmp_path / "install.json"
+    state.write_text(json.dumps({"state": "installing", "pid": 0, "at": time.time()}))
+    monkeypatch.setattr(assistant_setup, "STATE", state)
+    monkeypatch.setattr(assistant_setup, "running", lambda: False)
+    monkeypatch.setattr(assistant_setup, "server_command", lambda: ["tarjim-serve"])
+    assert assistant_setup.status()["engine"] == "installing"

@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 import sys
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -13,6 +14,7 @@ from tarjim.config import setting
 from tarjim.installer import HOME, STATE, alive, start_detached
 
 OK = 200
+LAUNCH_GRACE = 120.0
 
 
 def running() -> bool:
@@ -38,13 +40,18 @@ def server_command() -> list[str]:
     return [found] if found else []
 
 
+def launching(progress: dict[str, Any]) -> bool:
+    started = float(progress.get("at", 0))
+    return not progress.get("pid") and time.time() - started < LAUNCH_GRACE
+
+
 def status() -> dict[str, Any]:
     page = f"{setting('server') or SERVER}/"
     if running():
         return {"engine": "running", "page": page}
     progress = installing()
     if progress.get("state") == "installing":
-        if alive(int(progress.get("pid", 0))):
+        if alive(int(progress.get("pid", 0))) or launching(progress):
             return {"engine": "installing", "detail": progress.get("detail", "")}
         progress = {"state": "failed", "detail": "the installer stopped; call install_tarjim again"}
     if server_command():
@@ -65,6 +72,8 @@ def install() -> dict[str, Any]:
     if not source():
         return {"engine": "missing", "detail": "install the tarjim plugin, or set TARJIM_SOURCE"}
     HOME.mkdir(parents=True, exist_ok=True)
+    STATE.write_text(json.dumps({"state": "installing", "detail": "starting the installer",
+                                 "pid": 0, "at": time.time()}), encoding="utf-8")
     start_detached([sys.executable, "-m", "tarjim.installer", source()], HOME / "install.log")
     return {"engine": "installing", "detail": "This takes several minutes; ask for the status."}
 
