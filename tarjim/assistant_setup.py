@@ -74,7 +74,8 @@ def install() -> dict[str, Any]:
     HOME.mkdir(parents=True, exist_ok=True)
     STATE.write_text(json.dumps({"state": "installing", "detail": "starting the installer",
                                  "pid": 0, "at": time.time()}), encoding="utf-8")
-    start_detached([sys.executable, "-m", "tarjim.installer", source()], HOME / "installer-output.log")
+    command = [sys.executable, "-m", "tarjim.installer", source()]
+    start_detached(command, HOME / "installer-output.log")
     return {"engine": "installing", "detail": "This takes several minutes; ask for the status."}
 
 
