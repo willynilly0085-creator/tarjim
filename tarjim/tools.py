@@ -1,5 +1,7 @@
 import os
 import threading
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -72,7 +74,24 @@ def installed(tool: Tool) -> bool:
     return all(hub_ready(repo) for repo in tool.sources)
 
 
+@contextmanager
+def online() -> Iterator[None]:
+    from huggingface_hub import constants
+
+    before = constants.HF_HUB_OFFLINE
+    constants.HF_HUB_OFFLINE = False
+    try:
+        yield
+    finally:
+        constants.HF_HUB_OFFLINE = before
+
+
 def fetch(tool: Tool) -> None:
+    with online():
+        download(tool)
+
+
+def download(tool: Tool) -> None:
     from huggingface_hub import snapshot_download
 
     if tool.kind == "voice":

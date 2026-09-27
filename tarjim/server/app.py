@@ -179,7 +179,7 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes):
         self.reply(200, {"ok": True})
 
     def steer_job(self, _query: Query, task_id: str, action: str) -> None:
-        task = self.board.steer(task_id, action)
+        task = self.board.steer(task_id, action, self.headers.get("Origin") or "chat or script")
         self.reply(200, task.view()) if task else self.reply(409, {"error": "job"})
 
     def retry(self, _query: Query, task_id: str) -> None:

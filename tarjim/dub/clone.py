@@ -11,7 +11,6 @@ from tarjim.dub.lines import Line
 
 LANGUAGES = {"ar", "en", "es", "fr", "de", "it", "pt", "pl", "tr", "ru", "nl", "cs", "zh", "ja",
              "hu", "ko", "hi"}
-MODEL = "tts_models/multilingual/multi-dataset/xtts_v2"
 XTTS_RATE = 24000
 LIMIT = 160
 TEMPERATURE = 0.5
@@ -42,9 +41,19 @@ def plausible(text: str) -> float:
 
 @lru_cache(maxsize=1)
 def voice_model(device: str) -> Any:
-    from TTS.api import TTS
+    from TTS.tts.configs.xtts_config import XttsConfig
+    from TTS.tts.models.xtts import Xtts
 
-    return TTS(MODEL).to(device).synthesizer.tts_model
+    from tarjim.tools import voice_folder
+
+    folder = voice_folder()
+    config = XttsConfig()
+    config.load_json(str(folder / "config.json"))
+    model = Xtts.init_from_config(config)
+    model.load_checkpoint(config, checkpoint_dir=str(folder), use_deepspeed=False)
+    model.to(device)
+    model.eval()
+    return model
 
 
 class CloneVoices:

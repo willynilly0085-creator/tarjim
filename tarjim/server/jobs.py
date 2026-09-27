@@ -103,10 +103,11 @@ class Board:
         again = old and old.stage in ("failed", "cancelled")
         return self.submit(replace(old.order)) if old and again else None
 
-    def steer(self, task_id: str, action: str) -> Task | None:
+    def steer(self, task_id: str, action: str, source: str = "") -> Task | None:
         task = self.get(task_id)
         if task is None or task.finished or action not in CONTROLS:
             return None
+        print(f"job {task_id}: {action} at {task.stage} from {source or 'unknown'}", flush=True)
         task.control = CONTROLS[action]
         return task
 

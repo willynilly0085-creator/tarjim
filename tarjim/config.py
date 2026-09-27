@@ -78,6 +78,8 @@ def token() -> str:
 
 def prepare_environment() -> None:
     lock_secrets()
+    for name in ("HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE", "HF_HUB_DISABLE_TELEMETRY"):
+        os.environ.setdefault(name, "1")
     models = setting("models")
     if models:
         os.environ.setdefault("HF_HOME", models)
