@@ -69,5 +69,5 @@ def test_a_boxed_dialogue_hides_only_the_letters_of_the_line_still_to_come() -> 
     first, second = [Word("Nice", 0.0, 0.5, "S1")], [Word("idea", 1.5, 2.0, "S2")]
     cue = Cue(0.0, 3.0, first + second, "- one || - two", parts=[first, second])
     boxed = render_ass([cue], Canvas(1920, 1080, bright=True))
-    assert "\1a&HFF&\3a&HFF&" in boxed and "\alpha" not in boxed
-    assert "\alpha&HFF&" in render_ass([cue], Canvas(1920, 1080))
+    assert r"\1a&HFF&\3a&HFF&" in boxed and r"\alpha" not in boxed
+    assert r"\alpha&HFF&" in render_ass([cue], Canvas(1920, 1080))
