@@ -118,3 +118,11 @@ def test_an_install_just_requested_counts_as_installing(tmp_path: Path,
     monkeypatch.setattr(assistant_setup, "running", lambda: False)
     monkeypatch.setattr(assistant_setup, "server_command", lambda: ["tarjim-serve"])
     assert assistant_setup.status()["engine"] == "installing"
+
+
+def test_the_install_lets_uv_pick_the_graphics_card_build() -> None:
+    from tarjim.installer import install_command
+
+    command = install_command("uv", "file:///plugin")
+    assert command[command.index("--torch-backend") + 1] == "auto"
+    assert command[-1] == "tarjim[dub] @ file:///plugin"

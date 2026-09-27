@@ -14,7 +14,6 @@ from pathlib import Path
 HOME = Path(os.environ.get("TARJIM_HOME", Path.home() / ".tarjim"))
 STATE = HOME / "install.json"
 LOG = HOME / "install.log"
-CUDA_WHEELS = "https://download.pytorch.org/whl/cu128"
 NO_WINDOW = 0x08000000 if sys.platform == "win32" else 0
 DETACHED = 0x00000008 if sys.platform == "win32" else 0
 BREAKAWAY = 0x01000000 if sys.platform == "win32" else 0
@@ -45,19 +44,10 @@ def alive(pid: int) -> bool:
     return code.value == STILL_ACTIVE
 
 
-def has_nvidia_card() -> bool:
-    try:
-        return subprocess.run(["nvidia-smi", "-L"], capture_output=True, timeout=10,
-                              creationflags=NO_WINDOW, check=False).returncode == 0
-    except OSError:
-        return False
-
-
 def install_command(uv: str, source: str) -> list[str]:
-    command = [uv, "tool", "install", "--force", "--python", "3.11", f"tarjim[dub] @ {source}"]
-    if has_nvidia_card():
-        command += ["--index", CUDA_WHEELS, "--index-strategy", "unsafe-best-match"]
-    return command
+    """uv picks the PyTorch build for the graphics card it finds (CPU when there is none)."""
+    return [uv, "tool", "install", "--force", "--python", "3.11", "--torch-backend", "auto",
+            f"tarjim[dub] @ {source}"]
 
 
 def tool_bin(uv: str) -> Path:
