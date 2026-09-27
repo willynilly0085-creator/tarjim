@@ -135,3 +135,34 @@ def test_pressing_translate_twice_on_the_same_video_adds_it_once() -> None:
     other = board.submit(Order("https://x.com/v", target="en", mode="burn"))
     gate.set()
     assert again.id == first.id and other.id != first.id
+
+def wait_until(check, seconds: float = 3.0) -> None:  # type: ignore[no-untyped-def]
+    end = time.time() + seconds
+    while time.time() < end and not check():
+        time.sleep(0.02)
+
+
+def test_a_job_can_be_paused_resumed_and_cancelled_between_steps() -> None:
+    from tarjim.server.jobs import Order
+
+    def work(task: Task) -> None:
+        for stage in ("hearing", "timing", "translating", "writing"):
+            task.stage = stage
+            task.checkpoint()
+            time.sleep(0.05)
+
+    board = Board(work)
+    paused = board.submit(Order("https://x.com/a"))
+    board.steer(paused.id, "pause")
+    time.sleep(0.4)
+    assert not paused.finished and paused.view()["paused"]
+    board.steer(paused.id, "resume")
+    wait_until(lambda: paused.finished)
+    assert paused.stage == "done"
+    doomed = board.submit(Order("https://x.com/b"))
+    wait_until(lambda: doomed.stage in ("timing", "translating"))
+    board.steer(doomed.id, "cancel")
+    wait_until(lambda: doomed.finished)
+    assert doomed.stage == "cancelled"
+    assert board.steer(doomed.id, "resume") is None
+    assert board.retry(doomed.id) is not None

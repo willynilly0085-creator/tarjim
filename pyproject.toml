@@ -14,6 +14,7 @@ dependencies = [
     "silero-vad",
     "yt-dlp",
     "keyring",
+    "mcp>=2.2",
 ]
 
 [project.optional-dependencies]
@@ -24,6 +25,7 @@ dev = ["pytest", "pytest-cov", "ruff", "mypy"]
 [project.scripts]
 tarjim = "tarjim.cli:main"
 tarjim-serve = "tarjim.server.__main__:main"
+tarjim-mcp = "tarjim.assistant:main"
 
 [build-system]
 requires = ["setuptools>=68"]

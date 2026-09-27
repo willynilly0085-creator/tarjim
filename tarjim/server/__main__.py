@@ -21,6 +21,7 @@ def perform(task: Task, downloads: Path) -> None:
 
     def report(stage: str) -> None:
         task.stage = stage
+        task.checkpoint()
 
     from tarjim.pipeline import run
 

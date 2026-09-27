@@ -117,6 +117,13 @@ class Handler(KeyRoutes, SetupRoutes, PageRoutes):
             return self.reply(400, {"error": "bad url"})
         self.accept(order_from(source, data))
 
+    def create_local(self, _query: Query) -> None:
+        data = self.read_json()
+        path = Path(str(data.get("path", ""))).expanduser()
+        if not path.is_file() or safe_name(path.name) is None:
+            return self.reply(400, {"error": "file"})
+        self.accept(order_from(str(path.resolve()), data, path.name))
+
     def accept(self, order: Order) -> None:
         if order.mode not in MODES:
             return self.reply(400, {"error": "mode"})
@@ -169,6 +176,10 @@ class Handler(KeyRoutes, SetupRoutes, PageRoutes):
             return self.reply(404, {"error": "job"})
         action(task.outputs[0])
         self.reply(200, {"ok": True})
+
+    def steer_job(self, _query: Query, task_id: str, action: str) -> None:
+        task = self.board.steer(task_id, action)
+        self.reply(200, task.view()) if task else self.reply(409, {"error": "job"})
 
     def retry(self, _query: Query, task_id: str) -> None:
         task = self.board.retry(task_id)

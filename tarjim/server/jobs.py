@@ -10,10 +10,17 @@ DUBBING = {"dub-clone": "clone", "dub-studio": "studio", "dub-fish": "fish",
            "dub-fishvoice": "fish:saved"}
 MODES = ("srt", "burn", *DUBBING)
 KEEP = 50
+PAUSE_TICK = 0.5
+ENDED = ("done", "failed", "cancelled")
+CONTROLS = {"pause": "paused", "resume": "run", "cancel": "cancelled"}
 REASONS = [("quota", ("QuotaExhausted", "quota", " 429:")),
            ("key", ("API key missing", " 401:", " 403:")),
            ("download", ("DownloadError", "download")), ("tools", ("not found; install",)),
            ("dub", ("DubUnavailable",))]
+
+
+class Stopped(Exception):
+    pass
 
 
 def classify(error: Exception) -> str:
@@ -40,18 +47,27 @@ class Task:
     video: Path | None = None
     outputs: list[Path] = field(default_factory=list)
     created: float = field(default_factory=time.time)
+    control: str = "run"
 
     @property
     def finished(self) -> bool:
-        return self.stage in ("done", "failed")
+        return self.stage in ENDED
+
+    def checkpoint(self) -> None:
+        while self.control == "paused":
+            time.sleep(PAUSE_TICK)
+        if self.control == "cancelled":
+            raise Stopped
 
     def view(self) -> dict[str, object]:
         return {"id": self.id, "stage": self.stage, "error": self.error,
                 "error_code": self.error_code, "finished": self.finished,
+                "paused": self.control == "paused",
                 "link": self.order.source.startswith(("http://", "https://")),
                 "target": self.order.target, "mode": self.order.mode,
                 "title": self.order.name or (self.video.stem if self.video else self.order.source),
-                "outputs": [p.name for p in self.outputs], "created": self.created}
+                "outputs": [p.name for p in self.outputs], "created": self.created,
+                "files": [str(p) for p in self.outputs]}
 
 
 Worker = Callable[[Task], None]
@@ -84,7 +100,15 @@ class Board:
 
     def retry(self, task_id: str) -> Task | None:
         old = self.get(task_id)
-        return self.submit(replace(old.order)) if old and old.stage == "failed" else None
+        again = old and old.stage in ("failed", "cancelled")
+        return self.submit(replace(old.order)) if old and again else None
+
+    def steer(self, task_id: str, action: str) -> Task | None:
+        task = self.get(task_id)
+        if task is None or task.finished or action not in CONTROLS:
+            return None
+        task.control = CONTROLS[action]
+        return task
 
     def get(self, task_id: str) -> Task | None:
         with self.lock:
@@ -98,8 +122,11 @@ class Board:
         while True:
             task = self.queue.get()
             try:
+                task.checkpoint()
                 self.work(task)
                 task.stage = "done"
+            except Stopped:
+                task.stage = "cancelled"
             except Exception as error:
                 task.stage, task.error = "failed", str(error)[:300]
                 task.error_code = classify(error)

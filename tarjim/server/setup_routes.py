@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 from typing import Any, ClassVar
 
@@ -9,6 +10,7 @@ from tarjim.server.pairing import Pairing
 from tarjim.tools import Shelf
 
 UI_LANGUAGES = ("ar", "en")
+MODEL_TAG = re.compile(r"^[\w.:/-]{2,80}$")
 EXTENSION = Path(__file__).resolve().parents[2] / "extension"
 FIELDS: dict[str, tuple[str, ...]] = {"ui_language": UI_LANGUAGES, "listen_provider": LISTENERS,
                                       "translate_provider": TRANSLATORS, "setup_done": ("yes",)}
@@ -41,6 +43,7 @@ class SetupRoutes:
         state["chosen"] = {"listen": chosen("listen"), "translate": chosen("translate")}
         folder = EXTENSION if EXTENSION.is_dir() else None
         state["extension_path"] = str(folder) if folder else ""
+        state["local_model"] = setting("local_model")
         self.reply(200, state)
 
     def save_setup(self, query: Query) -> None:
@@ -48,6 +51,8 @@ class SetupRoutes:
         for name, allowed in FIELDS.items():
             if data.get(name) in allowed:
                 save(name, str(data[name]))
+        if MODEL_TAG.match(str(data.get("local_model", ""))):
+            save("local_model", str(data["local_model"]))
         self.setup_state(query)
 
     def list_tools(self, _query: Query) -> None:
