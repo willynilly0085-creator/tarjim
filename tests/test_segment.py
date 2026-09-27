@@ -119,3 +119,16 @@ def test_a_short_sentence_joins_the_closer_neighbour() -> None:
                ("gets", 19.8, 19.96), ("a", 19.96, 20.04), ("voice.", 20.04, 20.9))
     cues = build_cues(ws, cuts=[])
     assert [c.source for c in cues][-1] == "Want it dubbed? Every speaker gets a voice."
+
+
+def test_japanese_lines_do_not_break_inside_a_word() -> None:
+    from tarjim.languages import language
+    from tarjim.lines import balance_lines, script_of
+    from tarjim.rules import rules_for
+
+    rules = rules_for(language("ja"))
+    for text in ("どんな動画も母語で話せたら？", "タルジムは3回聞いて、単語ごとに投票します"):
+        top, bottom = balance_lines(text, rules)
+        pair = (script_of(top[-1]), script_of(bottom[0]))
+        assert pair not in {("kanji", "kanji"), ("kanji", "hiragana"), ("katakana", "katakana")}
+        assert bottom[0] not in "、。？！ー"
