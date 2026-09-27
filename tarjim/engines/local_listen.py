@@ -20,7 +20,7 @@ def utterances_from(words: list[Word]) -> list[Utterance]:
 
 
 def listen_file(audio: Path) -> tuple[str, list[Utterance]]:
-    from tarjim.asr.qwen import QwenEngine
+    from tarjim.asr.qwen import shared_engine
 
-    transcript = QwenEngine().transcribe(str(audio))
+    transcript = shared_engine().transcribe(str(audio))
     return transcript.language, utterances_from(transcript.words)

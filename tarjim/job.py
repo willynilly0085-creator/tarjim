@@ -13,6 +13,7 @@ class Job:
     burn: bool = True
     font: str = ""
     dub: str = ""
+    out_dir: Path | None = None
 
     @property
     def language(self) -> Language:
@@ -33,4 +34,5 @@ class Job:
         return folder
 
     def output(self, suffix: str) -> Path:
-        return self.video.with_name(f"{self.video.stem}.{self.target}{suffix}")
+        folder = self.out_dir or self.video.parent
+        return folder / f"{self.video.stem}.{self.target}{suffix}"

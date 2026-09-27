@@ -1,8 +1,8 @@
 export const DEFAULTS = { server: "http://127.0.0.1:17653", token: "", target: "ar", dialect: "saudi", mode: "burn", voice: "clone" };
 
-export const STAGES = ["downloading", "hearing", "translating", "writing", "burning", "dubbing"];
+export const STAGES = ["downloading", "hearing", "timing", "translating", "writing", "burning", "dubbing"];
 const STAGE_KEYS = {
-  queued: "stageQueued", downloading: "stageDownloading", hearing: "stageHearing",
+  queued: "stageQueued", downloading: "stageDownloading", hearing: "stageHearing", timing: "stageTiming",
   translating: "stageTranslating", writing: "stageWriting", burning: "stageBurning", dubbing: "stageDubbing",
   done: "stageDone", failed: "stageFailed",
 };
@@ -98,4 +98,8 @@ export function mediaUrl(url) {
 export function modeLabel(mode) {
   if (mode.startsWith("dub")) return t("outputDub");
   return t(mode === "srt" ? "outputSrt" : "outputBurn");
+}
+export function sinceText(job) {
+  const minutes = Math.floor((Date.now() / 1000 - job.created) / 60);
+  return minutes < 1 ? t("agoNow") : t("agoMinutes", String(minutes));
 }

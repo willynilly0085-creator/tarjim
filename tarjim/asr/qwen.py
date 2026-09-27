@@ -1,4 +1,6 @@
 import re
+from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
 from tarjim.asr.base import Transcript
@@ -11,6 +13,25 @@ MAX_TOKENS = 2048
 CORE = re.compile(r"\w+", re.UNICODE)
 
 
+def keep_fast_tokenizer(repo: str, processor: Any) -> None:
+    from huggingface_hub import snapshot_download
+
+    backend = getattr(getattr(processor, "tokenizer", None), "backend_tokenizer", None)
+    if backend is None:
+        return
+    try:
+        target = Path(snapshot_download(repo, local_files_only=True)) / "tokenizer.json"
+        if not target.exists():
+            backend.save(str(target))
+    except (OSError, ValueError):
+        return
+
+
+@lru_cache(maxsize=1)
+def shared_engine() -> "QwenEngine":
+    return QwenEngine()
+
+
 class QwenEngine:
     def __init__(self, device: str = "cuda:0") -> None:
         import torch
@@ -21,6 +42,8 @@ class QwenEngine:
             ASR_MODEL, forced_aligner=ALIGNER_MODEL, forced_aligner_kwargs=options,
             max_inference_batch_size=BATCH, max_new_tokens=MAX_TOKENS, **options,
         )
+        keep_fast_tokenizer(ASR_MODEL, self.model.processor)
+        keep_fast_tokenizer(ALIGNER_MODEL, getattr(self.model.forced_aligner, "processor", None))
 
     def transcribe(self, audio_path: str) -> Transcript:
         result = self.model.transcribe(audio=audio_path, return_time_stamps=True)[0]

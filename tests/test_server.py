@@ -124,3 +124,14 @@ def test_key_shape_rules() -> None:
     assert well_formed("AIzaSyA1234567890abcdefghij")
     assert not well_formed("has space in it 1234567")
     assert store("mistral", "AIzaSyA1234567890abcdefghij") == "shape"
+
+def test_pressing_translate_twice_on_the_same_video_adds_it_once() -> None:
+    from tarjim.server.jobs import Order
+
+    gate = threading.Event()
+    board = Board(lambda _task: gate.wait(2))
+    first = board.submit(Order("https://x.com/v", target="ar", mode="burn"))
+    again = board.submit(Order("https://x.com/v", target="ar", mode="burn"))
+    other = board.submit(Order("https://x.com/v", target="en", mode="burn"))
+    gate.set()
+    assert again.id == first.id and other.id != first.id

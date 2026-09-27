@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from functools import lru_cache
 from itertools import pairwise
 from typing import Any
 
@@ -78,6 +79,11 @@ def fill_gaps(slots: list[Slot]) -> None:
         later = [s.start for s in slots[index + 1:] if s.timed]
         slot.end = later[0] if later else slot.start + GAP_FALLBACK
         slot.start = min(slot.start, slot.end)
+
+
+@lru_cache(maxsize=1)
+def shared_aligner() -> "AlignEngine":
+    return AlignEngine()
 
 
 class AlignEngine:

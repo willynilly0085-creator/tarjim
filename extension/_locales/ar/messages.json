@@ -75,7 +75,7 @@
     "message": "تحميل المقطع"
   },
   "stageHearing": {
-    "message": "استماع وتوقيت"
+    "message": "استماع"
   },
   "stageTranslating": {
     "message": "ترجمة"
@@ -282,5 +282,19 @@
   },
   "pairedNotice": {
     "message": "انربطت الإضافة، تقدر تترجم الحين."
+  },
+  "stageTiming": {
+    "message": "ضبط التوقيت"
+  },
+  "agoNow": {
+    "message": "توّه بادي"
+  },
+  "agoMinutes": {
+    "message": "منذ $N$ د",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

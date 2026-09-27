@@ -68,11 +68,19 @@ class Board:
     def submit(self, order: Order) -> Task:
         task = Task(order)
         with self.lock:
+            twin = self.running_twin(order)
+            if twin is not None:
+                return twin
             self.tasks[task.id] = task
             for old in sorted(self.tasks.values(), key=lambda t: t.created)[:-KEEP]:
                 self.tasks.pop(old.id, None)
         self.queue.put(task)
         return task
+
+    def running_twin(self, order: Order) -> Task | None:
+        same = (order.source, order.target, order.mode, order.dialect)
+        return next((t for t in self.tasks.values() if not t.finished and same == (
+            t.order.source, t.order.target, t.order.mode, t.order.dialect)), None)
 
     def retry(self, task_id: str) -> Task | None:
         old = self.get(task_id)

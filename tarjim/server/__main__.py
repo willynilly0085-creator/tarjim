@@ -14,9 +14,10 @@ DOWNLOADS = Path.home() / "Downloads" / "tarjim"
 def perform(task: Task, downloads: Path) -> None:
     order = task.order
     task.stage = "downloading" if is_url(order.source) else "hearing"
-    task.video = resolve(order.source, downloads)
+    task.video = resolve(order.source, HOME / "sources")
+    downloads.mkdir(parents=True, exist_ok=True)
     job = Job(task.video, order.target, order.dialect, burn=order.mode != "srt",
-              dub=DUBBING.get(order.mode, ""))
+              dub=DUBBING.get(order.mode, ""), out_dir=downloads)
 
     def report(stage: str) -> None:
         task.stage = stage

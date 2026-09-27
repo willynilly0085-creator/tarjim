@@ -75,7 +75,7 @@
     "message": "Downloading"
   },
   "stageHearing": {
-    "message": "Listening and timing"
+    "message": "Listening"
   },
   "stageTranslating": {
     "message": "Translating"
@@ -282,5 +282,19 @@
   },
   "pairedNotice": {
     "message": "The extension is connected. You can translate now."
+  },
+  "stageTiming": {
+    "message": "Timing"
+  },
+  "agoNow": {
+    "message": "just started"
+  },
+  "agoMinutes": {
+    "message": "$N$ min",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { api, errorLabel, modeLabel, post, stageLabel, stepsFor, t } from "./shared.js";
+import { api, errorLabel, modeLabel, post, sinceText, stageLabel, stepsFor, t } from "./shared.js";
 
 const rows = new Map();
 const spoken = new Map();
@@ -38,7 +38,8 @@ function actionsFor(job, box, refresh) {
 
 function metaText(job, languages) {
   const language = languages.get(job.target) || job.target;
-  return `${language} · ${modeLabel(job.mode)}`;
+  const since = job.finished ? "" : ` · ${sinceText(job)}`;
+  return `${language} · ${modeLabel(job.mode)}${since}`;
 }
 
 function paint(row, job, languages, refresh) {

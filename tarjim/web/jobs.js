@@ -1,7 +1,7 @@
 import { $, api, post } from "./api.js";
 import { t } from "./i18n.js";
 
-const STAGES = ["downloading", "hearing", "translating", "writing", "burning", "dubbing"];
+const STAGES = ["downloading", "hearing", "timing", "translating", "writing", "burning", "dubbing"];
 const ERRORS = ["quota", "key", "download", "tools", "dub"];
 const rows = new Map();
 const seen = new Map();
@@ -43,7 +43,9 @@ function paint(row, job, languages, refresh) {
   row.dataset.stage = job.stage;
   row.querySelector(".job-title").textContent = job.title;
   row.querySelector(".job-stage").textContent = t(`stage_${job.stage}`);
-  row.querySelector(".job-meta").textContent = `${languages.get(job.target) || job.target} · ${modeText(job.mode)}`;
+  const minutes = Math.floor((Date.now() / 1000 - job.created) / 60);
+  const since = job.finished ? "" : ` · ${minutes < 1 ? t("agoNow") : t("agoMinutes", { n: minutes })}`;
+  row.querySelector(".job-meta").textContent = `${languages.get(job.target) || job.target} · ${modeText(job.mode)}${since}`;
   const error = row.querySelector(".job-error");
   error.hidden = job.stage !== "failed";
   error.textContent = job.stage === "failed" ? t(`err_${ERRORS.includes(job.error_code) ? job.error_code : "unknown"}`) : "";

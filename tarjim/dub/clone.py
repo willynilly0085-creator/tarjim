@@ -1,5 +1,6 @@
 import os
 import re
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -39,14 +40,19 @@ def plausible(text: str) -> float:
     return BASE_SECONDS + len(text.strip()) / CHARS_PER_SECOND
 
 
+@lru_cache(maxsize=1)
+def voice_model(device: str) -> Any:
+    from TTS.api import TTS
+
+    return TTS(MODEL).to(device).synthesizer.tts_model
+
+
 class CloneVoices:
     def __init__(self, references: dict[str, Path], language: str) -> None:
         os.environ.setdefault("COQUI_TOS_AGREED", "1")
         import torch
-        from TTS.api import TTS
 
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model: Any = TTS(MODEL).to(device).synthesizer.tts_model
+        self.model: Any = voice_model("cuda" if torch.cuda.is_available() else "cpu")
         self.language = "zh-cn" if language == "zh" else language
         self.latents = {speaker: self.model.get_conditioning_latents(audio_path=[str(path)])
                         for speaker, path in references.items()}

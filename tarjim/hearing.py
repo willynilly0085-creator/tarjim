@@ -14,12 +14,12 @@ from tarjim.models import Word
 Regions = list[tuple[float, float]]
 
 
-def transcript_for(job: Job) -> Transcript:
+def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcript:
     cached = job.cache / "transcript.json"
     if cached.exists():
         return Transcript.load(cached)
     audio = media.extract_audio(job.video, job.cache / "audio.wav")
-    transcript = listen_and_align(job, audio) or qwen_transcript(audio)
+    transcript = listen_and_align(job, audio, report) or qwen_transcript(audio)
     transcript.save(cached)
     return transcript
 
@@ -90,10 +90,11 @@ def speech_regions_of(audio: Path) -> Regions:
     return speech_regions(wav)
 
 
-def listen_and_align(job: Job, audio: Path) -> Transcript | None:
+def listen_and_align(job: Job, audio: Path,
+                     report: Callable[[str], None] = print) -> Transcript | None:
     import soundfile
 
-    from tarjim.asr.align import AlignEngine
+    from tarjim.asr.align import shared_aligner
     from tarjim.asr.fuse import fuse
 
     try:
@@ -104,8 +105,9 @@ def listen_and_align(job: Job, audio: Path) -> Transcript | None:
         return None
     if not utterances:
         return None
+    report("timing")
     wav, _ = soundfile.read(str(audio), dtype="float32")
-    words = AlignEngine().align(wav, utterances, language)
+    words = shared_aligner().align(wav, utterances, language)
     words = fuse(words, utterances, second_opinion(audio))
     return Transcript(language=language, text=" ".join(u.text for u in utterances), words=words)
 
@@ -118,6 +120,6 @@ def second_opinion(audio: Path) -> list[Word]:
 
 
 def qwen_transcript(audio: Path) -> Transcript:
-    from tarjim.asr.qwen import QwenEngine
+    from tarjim.asr.qwen import shared_engine
 
-    return QwenEngine().transcribe(str(audio))
+    return shared_engine().transcribe(str(audio))

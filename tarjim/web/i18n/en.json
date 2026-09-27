@@ -104,7 +104,7 @@
   "empty": "Nothing translated yet. Drop a file above or paste a link.",
   "stage_queued": "Waiting",
   "stage_downloading": "Downloading",
-  "stage_hearing": "Listening and timing",
+  "stage_hearing": "Listening",
   "stage_translating": "Translating",
   "stage_writing": "Writing subtitles",
   "stage_burning": "Burning into video",
@@ -118,5 +118,8 @@
   "err_download": "Could not download the video from that link. Check that the link works.",
   "err_tools": "ffmpeg is not installed on this computer.",
   "err_dub": "No dubbing voice for this language yet. Try subtitles instead.",
-  "err_unknown": "Something unexpected went wrong."
+  "err_unknown": "Something unexpected went wrong.",
+  "stage_timing": "Timing",
+  "agoNow": "just started",
+  "agoMinutes": "{n} min"
 }
