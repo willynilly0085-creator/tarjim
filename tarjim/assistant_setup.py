@@ -10,7 +10,7 @@ from typing import Any
 
 from tarjim.assistant_http import SERVER
 from tarjim.config import setting
-from tarjim.installer import HOME, STATE, start_detached
+from tarjim.installer import HOME, STATE, alive, start_detached
 
 OK = 200
 
@@ -44,7 +44,9 @@ def status() -> dict[str, Any]:
         return {"engine": "running", "page": page}
     progress = installing()
     if progress.get("state") == "installing":
-        return {"engine": "installing", "detail": progress.get("detail", "")}
+        if alive(int(progress.get("pid", 0))):
+            return {"engine": "installing", "detail": progress.get("detail", "")}
+        progress = {"state": "failed", "detail": "the installer stopped; call install_tarjim again"}
     if server_command():
         return {"engine": "installed but stopped", "next": "call start_tarjim"}
     return {"engine": "missing", "next": "call install_tarjim", **progress}

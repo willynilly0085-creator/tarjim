@@ -76,3 +76,19 @@ def test_adding_to_the_claude_app_keeps_other_servers(tmp_path: Path,
     saved = json.loads(settings.read_text(encoding="utf-8"))
     assert done and saved["theme"] == "dark" and "other" in saved["mcpServers"]
     assert saved["mcpServers"]["tarjim"]["args"] == ["-m", "tarjim.assistant"]
+
+
+def test_an_install_that_died_is_reported_as_failed(tmp_path: Path,
+                                                    monkeypatch: pytest.MonkeyPatch) -> None:
+    from tarjim import assistant_setup
+
+    state = tmp_path / "install.json"
+    state.write_text(json.dumps({"state": "installing", "pid": 999999999}))
+    monkeypatch.setattr(assistant_setup, "STATE", state)
+    monkeypatch.setattr(assistant_setup, "running", lambda: False)
+    monkeypatch.setattr(assistant_setup, "server_command", lambda: [])
+    assert assistant_setup.status()["state"] == "failed"
+    import os
+
+    state.write_text(json.dumps({"state": "installing", "pid": os.getpid()}))
+    assert assistant_setup.status()["engine"] == "installing"

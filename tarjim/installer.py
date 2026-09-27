@@ -17,12 +17,32 @@ LOG = HOME / "install.log"
 CUDA_WHEELS = "https://download.pytorch.org/whl/cu128"
 NO_WINDOW = 0x08000000 if sys.platform == "win32" else 0
 DETACHED = 0x00000008 if sys.platform == "win32" else 0
+BREAKAWAY = 0x01000000 if sys.platform == "win32" else 0
+STILL_ACTIVE = 259
 
 
 def record(state: str, detail: str = "") -> None:
     HOME.mkdir(parents=True, exist_ok=True)
-    STATE.write_text(json.dumps({"state": state, "detail": detail, "at": time.time()}),
-                     encoding="utf-8")
+    STATE.write_text(json.dumps({"state": state, "detail": detail, "at": time.time(),
+                                 "pid": os.getpid()}), encoding="utf-8")
+
+
+def alive(pid: int) -> bool:
+    if sys.platform != "win32":
+        try:
+            os.kill(pid, 0)
+        except OSError:
+            return False
+        return True
+    import ctypes
+
+    handle = ctypes.windll.kernel32.OpenProcess(0x1000, False, pid)
+    if not handle:
+        return False
+    code = ctypes.c_ulong()
+    ctypes.windll.kernel32.GetExitCodeProcess(handle, ctypes.byref(code))
+    ctypes.windll.kernel32.CloseHandle(handle)
+    return code.value == STILL_ACTIVE
 
 
 def has_nvidia_card() -> bool:
@@ -52,10 +72,15 @@ def server_program(uv: str) -> str:
 
 
 def start_detached(command: list[str], log: Path) -> None:
+    """Start a program that outlives the chat session that asked for it."""
     with log.open("ab") as out:
-        subprocess.Popen(command, stdout=out, stderr=out, stdin=subprocess.DEVNULL,
-                         creationflags=NO_WINDOW | DETACHED,
-                         start_new_session=sys.platform != "win32")
+        for flags in (NO_WINDOW | DETACHED | BREAKAWAY, NO_WINDOW | DETACHED):
+            try:
+                subprocess.Popen(command, stdout=out, stderr=out, stdin=subprocess.DEVNULL,
+                                 creationflags=flags, start_new_session=sys.platform != "win32")
+                return
+            except PermissionError:
+                continue
 
 
 def main(source: str) -> int:
