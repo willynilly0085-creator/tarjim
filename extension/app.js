@@ -1,8 +1,10 @@
 import { watchJobs } from "./jobs.js";
 import { api, mediaUrl, post, remember, settings, t } from "./shared.js";
+import { $, show } from "./dom.js";
+import { keyStatus } from "./keys.js";
+import { openSettings, wirePanels } from "./panels.js";
 import { isMedia, upload } from "./upload.js";
 
-const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 const pageMode = params.get("page") === "1";
 const state = { url: "", file: null, languages: new Map(), poll: 0 };
@@ -16,10 +18,6 @@ function applyText() {
     el.title = t(el.dataset.i18nLabel);
   });
   document.body.classList.toggle("page", pageMode);
-}
-
-function show(view) {
-  document.querySelectorAll(".view").forEach((el) => { el.hidden = el.id !== `view-${view}`; });
 }
 
 function linkState(online) {
@@ -41,6 +39,8 @@ async function connect() {
   } catch (error) {
     return show(error.kind === "token" ? "pair" : "offline");
   }
+  const keys = await keyStatus();
+  if (!keys.gemini) return show("key");
   await openMain();
 }
 
@@ -52,7 +52,14 @@ async function loadLanguages(target) {
 }
 
 function syncDialect() {
-  $("dialect-field").hidden = $("target").value !== "ar";
+  const arabic = $("target").value === "ar";
+  $("dialect-field").hidden = !arabic;
+  $("voice-narrator").hidden = !arabic;
+  if (!arabic && $("voice").value === "fishvoice") $("voice").value = "clone";
+}
+
+function persist() {
+  remember({ ...choices(), voice: $("voice").value });
 }
 
 async function describeSource() {
@@ -170,45 +177,16 @@ function wireDrop() {
   $("link").addEventListener("input", refreshButton);
 }
 
-async function pair(event) {
-  event.preventDefault();
-  await remember({ token: $("token").value.trim() });
-  try {
-    await api("/jobs");
-    $("pair-error").hidden = true;
-    await openMain();
-  } catch {
-    $("pair-error").hidden = false;
-  }
-}
-
-async function openSettings() {
-  clearInterval(state.poll);
-  const saved = await settings();
-  $("server").value = saved.server;
-  $("settings-token").value = saved.token;
-  show("settings");
-}
-
-async function saveSettings(event) {
-  event.preventDefault();
-  await remember({ server: $("server").value.trim(), token: $("settings-token").value.trim() });
-  $("settings-notice").textContent = t("saved");
-}
-
 function wire() {
   $("order").addEventListener("submit", submit);
   $("target").addEventListener("change", syncDialect);
+  $("order").addEventListener("change", persist);
   document.querySelectorAll("input[name=mode]").forEach((el) => el.addEventListener("change", syncVoice));
   $("open-file-page").addEventListener("click", () => {
     chrome.tabs.create({ url: chrome.runtime.getURL("app.html?page=1") });
     window.close();
   });
-  $("retry-connect").addEventListener("click", connect);
-  $("pair-form").addEventListener("submit", pair);
-  $("open-settings").addEventListener("click", openSettings);
-  $("settings-form").addEventListener("submit", saveSettings);
-  $("close-settings").addEventListener("click", connect);
+  wirePanels({ ready: openMain, back: connect, leave: () => clearInterval(state.poll) });
   wireDrop();
 }
 

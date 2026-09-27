@@ -1,5 +1,4 @@
 import json
-import re
 import shutil
 import urllib.parse
 from collections.abc import Callable
@@ -10,6 +9,7 @@ from typing import Any, ClassVar
 from tarjim.languages import LANGUAGES
 from tarjim.server.guard import allowed_origin, local_host, safe_name, token_ok
 from tarjim.server.jobs import MODES, Board, Order, Task
+from tarjim.server.routes import GET_ROUTES, POST_ROUTES, KeyRoutes, Query, Routes
 
 PORT = 17653
 MAX_UPLOAD = 8 * 1024**3
@@ -17,18 +17,7 @@ BLOCK = 1024 * 1024
 TOKEN_HEADERS = ("X-Tarjim-Token", "X-Trans-Token")
 OPEN_PATHS = {"/ping", "/languages"}
 LEGACY = {"dub": "dub-clone"}
-JOB = "([0-9a-f]{12})"
-Query = dict[str, list[str]]
-GET_ROUTES = [(re.compile(p), name) for p, name in [
-    (r"^/ping$", "ping"), (r"^/languages$", "languages"), (r"^/jobs$", "list_jobs"),
-    (rf"^/jobs/{JOB}$", "show"), (rf"^/files/{JOB}/([^/]+)$", "send_output"),
-    (r"^/translate$", "legacy")]]
-POST_ROUTES = [(re.compile(p), name) for p, name in [
-    (r"^/jobs$", "create_json"), (r"^/upload$", "upload"), (rf"^/reveal/{JOB}$", "reveal"),
-    (rf"^/open/{JOB}$", "play"), (rf"^/retry/{JOB}$", "retry")]]
-
-
-class Handler(BaseHTTPRequestHandler):
+class Handler(KeyRoutes, BaseHTTPRequestHandler):
     board: ClassVar[Board]
     token: ClassVar[str]
     uploads: ClassVar[Path]
@@ -72,7 +61,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         self.dispatch(POST_ROUTES)
 
-    def dispatch(self, routes: list[tuple[re.Pattern[str], str]]) -> None:
+    def dispatch(self, routes: Routes) -> None:
         url = urllib.parse.urlparse(self.path)
         if not self.admitted(url.path):
             return

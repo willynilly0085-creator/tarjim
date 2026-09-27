@@ -37,7 +37,11 @@ export async function api(path, init = {}) {
     throw new ApiError("offline");
   }
   if (response.status === 403) throw new ApiError("token", 403);
-  if (!response.ok) throw new ApiError("http", response.status);
+  if (!response.ok) {
+    const error = new ApiError("http", response.status);
+    error.body = await response.json().catch(() => ({}));
+    throw error;
+  }
   return response.json();
 }
 

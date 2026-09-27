@@ -74,7 +74,7 @@
             <option value="clone" data-i18n="voiceClone"></option>
             <option value="studio" data-i18n="voiceStudio"></option>
             <option value="fish" data-i18n="voiceFish"></option>
-            <option value="fishvoice" data-i18n="voiceNarrator"></option>
+            <option value="fishvoice" id="voice-narrator" data-i18n="voiceNarrator"></option>
           </select>
         </div>
 
@@ -112,6 +112,19 @@
       </form>
     </section>
 
+    <section class="view panel" id="view-key" hidden>
+      <h2 class="panel-title" data-i18n="keyTitle"></h2>
+      <p data-i18n="keyBody"></p>
+      <a class="text-button" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" data-i18n="keyGetFree"></a>
+      <form id="key-form" class="stack" novalidate>
+        <label class="field-label" for="gemini-key" data-i18n="keyGeminiLabel"></label>
+        <input class="text-input" id="gemini-key" type="password" dir="ltr" autocomplete="off" spellcheck="false" required>
+        <p class="meta" data-i18n="keyPrivacy"></p>
+        <p class="error" id="key-error" role="alert" hidden></p>
+        <button class="primary" type="submit" data-i18n="keySave"></button>
+      </form>
+    </section>
+
     <section class="view panel" id="view-settings" hidden>
       <h2 class="panel-title" data-i18n="settings"></h2>
       <form id="settings-form" class="stack" novalidate>
@@ -119,6 +132,11 @@
         <input class="text-input" id="server" dir="ltr" type="url" required>
         <label class="field-label" for="settings-token" data-i18n="tokenLabel"></label>
         <input class="text-input" id="settings-token" type="password" dir="ltr" autocomplete="off" spellcheck="false">
+        <label class="field-label" for="settings-gemini" data-i18n="keyGeminiLabel"></label>
+        <input class="text-input" id="settings-gemini" type="password" dir="ltr" autocomplete="off" spellcheck="false">
+        <label class="field-label" for="settings-fish" data-i18n="keyFishLabel"></label>
+        <input class="text-input" id="settings-fish" type="password" dir="ltr" autocomplete="off" spellcheck="false">
+        <p class="meta" data-i18n="keyPrivacy"></p>
         <p class="notice" id="settings-notice" role="status" aria-live="polite"></p>
         <div class="row">
           <button class="primary" type="submit" data-i18n="save"></button>

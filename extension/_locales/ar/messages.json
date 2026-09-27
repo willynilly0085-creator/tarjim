@@ -108,7 +108,7 @@
     "message": "خلصت حصة Gemini المجانية لليوم. ترجع بكرة الصبح تقريباً."
   },
   "errKey": {
-    "message": "مفتاح Gemini مو مضبوط. أضفه بالأمر: tarjim-serve --gemini-key مفتاحك"
+    "message": "مفتاح Gemini مو مضبوط. أضفه من الإعدادات."
   },
   "errDownload": {
     "message": "ما قدرنا ننزّل المقطع من الرابط. تأكد إن الرابط شغّال."
@@ -205,5 +205,38 @@
   },
   "voiceFish": {
     "message": "استنساخ Fish (يرسل عينة الصوت)"
+  },
+  "keyGetFree": {
+    "message": "خذ مفتاح مجاني من Google AI Studio"
+  },
+  "keyChecking": {
+    "message": "جاري التحقق من المفتاح مع Google"
+  },
+  "keyShape": {
+    "message": "هذا ما يشبه مفتاح، تأكد إنك نسخته كامل."
+  },
+  "keyPrivacy": {
+    "message": "المفتاح ينحفظ على جهازك بس، وما يروح إلا لـ Google نفسها."
+  },
+  "keyFishLabel": {
+    "message": "مفتاح Fish (اختياري، للدبلجة السحابية)"
+  },
+  "keyRejected": {
+    "message": "Google رفض هذا المفتاح، تأكد إنك نسخته كامل."
+  },
+  "keyTitle": {
+    "message": "أضف مفتاح Gemini"
+  },
+  "keyGeminiLabel": {
+    "message": "مفتاح Gemini"
+  },
+  "keySet": {
+    "message": "مضبوط، اكتب مفتاح جديد لو تبي تغيّره"
+  },
+  "keySave": {
+    "message": "احفظ المفتاح"
+  },
+  "keyBody": {
+    "message": "tarjim يستخدم Gemini عشان يسمع المقطع ويترجمه. المفتاح مجاني وتاخذه من حساب Google حقك خلال دقيقة."
   }
 }

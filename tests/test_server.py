@@ -106,3 +106,21 @@ def test_only_a_failed_job_can_be_retried() -> None:
     again = board.retry(task.id)
     assert again is not None and again.id != task.id and again.order.target == "en"
     assert board.retry("000000000000") is None
+
+def test_key_status_never_reveals_keys_and_bad_keys_are_refused(server) -> None:  # type: ignore[no-untyped-def]
+    port, _ = server
+    status, raw = call(port, "GET /keys")
+    assert status == 200 and set(json.loads(raw)) == {"gemini", "fish"}
+    assert all(isinstance(v, bool) for v in json.loads(raw).values())
+    body = json.dumps({"provider": "gemini", "key": "short"}).encode()
+    status, raw = call(port, "POST /keys", body=body, headers={"Content-Type": "application/json"})
+    assert status == 400 and json.loads(raw)["result"] == "shape"
+    assert call(port, "GET /keys", headers={"X-Tarjim-Token": "wrong"})[0] == 403
+
+
+def test_key_shape_rules() -> None:
+    from tarjim.keys import store, well_formed
+
+    assert well_formed("AIzaSyA1234567890abcdefghij")
+    assert not well_formed("has space in it 1234567")
+    assert store("openai", "AIzaSyA1234567890abcdefghij") == "shape"
