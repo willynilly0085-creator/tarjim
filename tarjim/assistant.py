@@ -188,6 +188,9 @@ def open_tarjim_page() -> str:
 
 
 def main() -> None:
+    from tarjim.quiet import hide_child_windows
+
+    hide_child_windows()
     tarjim.run(transport="stdio")
 
 

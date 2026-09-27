@@ -40,6 +40,9 @@ def attach_output() -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    from tarjim.quiet import hide_child_windows
+
+    hide_child_windows()
     attach_output()
     prepare_environment()
     parser = argparse.ArgumentParser(prog="tarjim-serve", description="Local server for "

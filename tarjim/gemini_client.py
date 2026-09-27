@@ -11,7 +11,7 @@ ROUNDS = 3
 RETRY_PAUSE = 3.0
 MAX_WAIT = 90.0
 TOO_MANY = 429
-DAILY = "PerDay"
+DAILY = re.compile(r"per ?day", re.IGNORECASE)
 DELAY = re.compile(r"retryDelay'?\"?:\s*'?\"?(\d+(?:\.\d+)?)s")
 
 
@@ -25,7 +25,7 @@ def pause_for(error: Exception) -> float:
 
 
 def used_up_today(error: Exception) -> bool:
-    return getattr(error, "code", None) == TOO_MANY and DAILY in str(error)
+    return getattr(error, "code", None) == TOO_MANY and bool(DAILY.search(str(error)))
 
 
 class GeminiClient:
@@ -40,12 +40,14 @@ class GeminiClient:
         self.client = genai.Client(api_key=key)
         self.model_used = ""
         self.spent: set[str] = set()
+        self.cooling: dict[str, float] = {}
 
     def ask(self, prompt: str, audio: bytes | None, schema: dict[str, Any]) -> Any:
         errors: list[str] = []
         for model in MODELS * ROUNDS:
             if model in self.spent:
                 continue
+            self.wait_for(model)
             try:
                 return self.call(model, prompt, audio, schema)
             except Exception as error:
@@ -58,9 +60,14 @@ class GeminiClient:
     def note(self, model: str, error: Exception) -> None:
         if used_up_today(error):
             self.spent.add(model)
-        else:
-            time.sleep(pause_for(error) if getattr(error, "code", None) == TOO_MANY
-                       else RETRY_PAUSE)
+            return
+        busy = getattr(error, "code", None) == TOO_MANY
+        self.cooling[model] = time.monotonic() + (pause_for(error) if busy else RETRY_PAUSE)
+
+    def wait_for(self, model: str) -> None:
+        remaining = self.cooling.get(model, 0.0) - time.monotonic()
+        if remaining > 0:
+            time.sleep(min(remaining, MAX_WAIT))
 
     def call(self, model: str, prompt: str, audio: bytes | None, schema: dict[str, Any]) -> Any:
         from google.genai import types

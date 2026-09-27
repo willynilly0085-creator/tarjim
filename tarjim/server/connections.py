@@ -85,7 +85,7 @@ def models_for(provider: str) -> list[str]:
 def open_console(command: list[str]) -> bool:
     if sys.platform != "win32" or not command:
         return False
-    subprocess.Popen(["cmd", "/c", "start", "tarjim", "cmd", "/k", *command])
+    subprocess.Popen(["cmd", "/k", *command], creationflags=subprocess.CREATE_NEW_CONSOLE)
     return True
 
 
