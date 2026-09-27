@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, ClassVar
 
 from tarjim.languages import LANGUAGES
+from tarjim.server.connections import ConnectionRoutes
 from tarjim.server.guard import (
     allowed_origin,
     cookie_token,
@@ -30,7 +31,7 @@ TOKEN_HEADERS = ("X-Tarjim-Token", "X-Trans-Token")
 LEGACY = {"dub": "dub-gemini"}
 
 
-class Handler(KeyRoutes, SetupRoutes, PageRoutes):
+class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes):
     board: ClassVar[Board]
     token: ClassVar[str]
     uploads: ClassVar[Path]

@@ -178,3 +178,7 @@ h1 { margin: 0; font-size: var(--text-title); font-weight: 650; line-height: 1.2
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+.connect-detail { display: grid; gap: var(--space-sm); justify-items: start; }
+.connect-detail .key-row, .connect-detail .command { justify-self: stretch; }
+.grow { flex: 1; min-width: 0; }

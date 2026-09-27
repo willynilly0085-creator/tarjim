@@ -34,9 +34,11 @@ class SetupRoutes:
         self.reply(200, {"language": setting("ui_language")})
 
     def local_models(self, _query: Query) -> None:
-        from tarjim.engines.ollama import installed_models
+        from tarjim.engines.local_servers import BY_ID, chosen_server, models_of
 
-        self.reply(200, {"models": installed_models(), "chosen": setting("local_model")})
+        server = chosen_server()
+        models = models_of(server, BY_ID[server][1])
+        self.reply(200, {"models": models, "chosen": setting("local_model"), "server": server})
 
     def system(self, _query: Query) -> None:
         from tarjim.system import describe

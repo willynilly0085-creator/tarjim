@@ -110,7 +110,7 @@ def test_only_a_failed_job_can_be_retried() -> None:
 def test_key_status_never_reveals_keys_and_bad_keys_are_refused(server) -> None:  # type: ignore[no-untyped-def]
     port, _ = server
     status, raw = call(port, "GET /keys")
-    assert status == 200 and set(json.loads(raw)) == {"gemini", "openai", "anthropic", "fish"}
+    assert status == 200 and {"gemini", "openai", "openrouter", "fish"} <= set(json.loads(raw))
     assert all(isinstance(v, bool) for v in json.loads(raw).values())
     body = json.dumps({"provider": "gemini", "key": "short"}).encode()
     status, raw = call(port, "POST /keys", body=body, headers={"Content-Type": "application/json"})
@@ -123,7 +123,7 @@ def test_key_shape_rules() -> None:
 
     assert well_formed("AIzaSyA1234567890abcdefghij")
     assert not well_formed("has space in it 1234567")
-    assert store("mistral", "AIzaSyA1234567890abcdefghij") == "shape"
+    assert store("nonsense", "AIzaSyA1234567890abcdefghij") == "shape"
 
 def test_pressing_translate_twice_on_the_same_video_adds_it_once() -> None:
     from tarjim.server.jobs import Order

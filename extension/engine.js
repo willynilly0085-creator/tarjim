@@ -2,7 +2,7 @@ import { $ } from "./dom.js";
 import { serverBase } from "./pairing.js";
 import { api, post, t } from "./shared.js";
 
-const SUBSCRIPTIONS = { claude: "providerClaude", codex: "providerCodex" };
+const SUBSCRIPTIONS = { claude: "providerClaude", codex: "providerCodex", copilot: "providerCopilot", antigravity: "providerAntigravity" };
 let atOpen = "";
 let geminiKey = false;
 

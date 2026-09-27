@@ -20,13 +20,17 @@ GET_ROUTES = table([
     (r"^/web/([\w.-]+(?:/[\w.-]+)?)$", "asset"), (r"^/system$", "system"),
     (r"^/setup$", "setup_state"), (r"^/tools$", "list_tools"),
     (rf"^/pair/{PAIR}$", "pair_state"), (r"^/pairs$", "list_pairs"),
-    (r"^/ui-language$", "ui_language"), (r"^/local-models$", "local_models")])
+    (r"^/ui-language$", "ui_language"), (r"^/local-models$", "local_models"),
+    (r"^/connections$", "connections")])
 POST_ROUTES = table([
     (r"^/jobs$", "create_json"), (r"^/upload$", "upload"), (rf"^/reveal/{JOB}$", "reveal"),
     (rf"^/open/{JOB}$", "play"), (rf"^/retry/{JOB}$", "retry"), (r"^/keys$", "save_key"),
     (r"^/setup$", "save_setup"), (r"^/tools/([a-z_]+)$", "get_tool"), (r"^/pair$", "ask_pair"),
     (rf"^/pairs/{PAIR}/(allow|deny)$", "decide_pair"),
-    (rf"^/jobs/{JOB}/(pause|resume|cancel)$", "steer_job"), (r"^/jobs/local$", "create_local")])
+    (rf"^/jobs/{JOB}/(pause|resume|cancel)$", "steer_job"), (r"^/jobs/local$", "create_local"),
+    (r"^/connections/models$", "connection_models"), (r"^/connections/use$", "use_connection"),
+    (r"^/connections/address$", "save_address"), (r"^/connections/sign-in$", "sign_in"),
+    (r"^/connections/assistant$", "link_assistant")])
 OPEN = [re.compile(p) for p in (r"^/$", r"^/web/", r"^/ping$", r"^/languages$", r"^/pair$",
                                   rf"^/pair/{PAIR}$", r"^/ui-language$")]
 

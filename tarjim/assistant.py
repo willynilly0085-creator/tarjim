@@ -86,13 +86,32 @@ def change_settings(interface_language: str = "", listening_engine: str = "",
     """Change settings. Leave a field empty to keep it.
 
     interface_language: ar or en. listening_engine: gemini, openai or local.
-    translation_engine: gemini, openai, anthropic, local, or a subscription the person already
-    has: claude (Claude Code) or codex (ChatGPT through Codex).
-    local_model: an Ollama model name for local translation, e.g. aya-expanse:8b.
+    translation_engine: any id from list_connections: an API provider (gemini, openai,
+    anthropic, openrouter, deepseek, qwen, mistral, groq, xai, custom), a subscription
+    (claude, codex, copilot, antigravity) or local.
+    local_model: the model name for local translation, e.g. aya-expanse:8b.
     """
     wanted = {"ui_language": interface_language, "listen_provider": listening_engine,
               "translate_provider": translation_engine, "local_model": local_model}
     return call("/setup", {k: v for k, v in wanted.items() if v})
+
+
+@tarjim.tool()
+def list_connections() -> Any:
+    """Every way to connect an AI and whether it is ready: API providers (key saved or not),
+    subscriptions (app installed or not), and AI programs running on this computer with their
+    models. Also shows which engine listens and which translates now."""
+    return call("/connections")
+
+
+@tarjim.tool()
+def use_connection(provider: str, model: str = "") -> Any:
+    """Translate with this provider from now on, optionally with a specific model.
+
+    provider: an id from list_connections, or "local" for the AI on this computer.
+    model: any model name the provider offers (leave empty for its default).
+    """
+    return call("/connections/use", {"provider": provider, "model": model})
 
 
 @tarjim.tool()

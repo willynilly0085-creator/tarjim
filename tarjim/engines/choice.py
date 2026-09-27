@@ -1,13 +1,12 @@
 from typing import Any, Protocol
 
 from tarjim.config import setting
+from tarjim.engines.catalog import API, BY_ID, PROVIDERS, SUBSCRIPTION, compatible
 
-LISTENERS = ("gemini", "openai", "local")
-TRANSLATORS = ("gemini", "openai", "anthropic", "claude", "codex", "local")
-SUBSCRIPTIONS = ("claude", "codex")
-KEYS = {"gemini": "gemini_api_key", "openai": "openai_api_key",
-        "anthropic": "anthropic_api_key"}
 LOCAL = "local"
+LISTENERS = ("gemini", "openai", LOCAL)
+TRANSLATORS = (*(p.id for p in PROVIDERS), LOCAL)
+SUBSCRIPTIONS = tuple(p.id for p in PROVIDERS if p.method == SUBSCRIPTION)
 
 
 class Asker(Protocol):
@@ -17,10 +16,17 @@ class Asker(Protocol):
 
 
 def has_key(provider: str) -> bool:
-    return bool(setting(KEYS[provider])) if provider in KEYS else False
+    found = BY_ID.get(provider)
+    if found is None or found.method != API or not setting(found.key_name):
+        return False
+    return provider != "custom" or bool(setting("custom_base_url"))
 
 
 def local_translation_ready() -> bool:
+    from tarjim.engines.local_servers import OLLAMA, chosen_server
+
+    if chosen_server() != OLLAMA:
+        return bool(setting("local_model"))
     from tarjim.engines.ollama import available
 
     return available()
@@ -29,7 +35,7 @@ def local_translation_ready() -> bool:
 def subscribed(provider: str) -> bool:
     from tarjim.engines.subscription import launcher
 
-    return bool(launcher(provider))
+    return bool(launcher(BY_ID[provider].program))
 
 
 def usable(provider: str, role: str) -> bool:
@@ -37,7 +43,7 @@ def usable(provider: str, role: str) -> bool:
         return role == "translate" and subscribed(provider)
     if provider == LOCAL:
         return role == "listen" or local_translation_ready()
-    return has_key(provider)
+    return has_key(provider) and (role == "translate" or provider in LISTENERS)
 
 
 def chosen(role: str) -> str:
@@ -54,7 +60,24 @@ def chain(role: str) -> list[str]:
     return [first, *backup]
 
 
+def local_translator() -> Asker:
+    from tarjim.engines.local_servers import local_asker
+
+    found = local_asker()
+    if found is not None:
+        return found
+    from tarjim.engines.ollama import OllamaAsker
+
+    return OllamaAsker()
+
+
 def asker(provider: str) -> Asker:
+    if provider in SUBSCRIPTIONS:
+        from tarjim.engines.subscription import subscription_asker
+
+        return subscription_asker(provider)  # type: ignore[no-any-return]
+    if provider == LOCAL:
+        return local_translator()
     if provider == "openai":
         from tarjim.engines.openai_api import OpenAIAsker
 
@@ -63,14 +86,10 @@ def asker(provider: str) -> Asker:
         from tarjim.engines.anthropic_api import AnthropicAsker
 
         return AnthropicAsker()
-    if provider in SUBSCRIPTIONS:
-        from tarjim.engines.subscription import ClaudeAsker, CodexAsker
+    if provider in BY_ID and compatible(BY_ID[provider]):
+        from tarjim.engines.compatible import api_asker
 
-        return ClaudeAsker() if provider == "claude" else CodexAsker()
-    if provider == LOCAL:
-        from tarjim.engines.ollama import OllamaAsker
-
-        return OllamaAsker()
+        return api_asker(provider)
     from tarjim.gemini_client import GeminiClient
 
     return GeminiClient()

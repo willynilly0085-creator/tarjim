@@ -9,10 +9,11 @@ from pathlib import Path
 from typing import Any
 
 from tarjim.config import save, setting
+from tarjim.engines.catalog import BY_ID, SUBSCRIPTION, of_method
 from tarjim.engines.web import EngineError, parse_json, unwrap, wrap
 
-PROGRAMS = ("claude", "codex")
 TIMEOUT = 900
+LONGEST_ARGUMENT = 24000
 SHIM_TARGET = re.compile(r'"%dp0%\\([^"]+)"')
 NOT_OFFERED = ("reserve", "review")
 REFUSED = "not supported"
@@ -34,7 +35,7 @@ def launcher(name: str) -> list[str]:
 
 
 def installed() -> list[str]:
-    return [name for name in PROGRAMS if launcher(name)]
+    return [p.id for p in of_method(SUBSCRIPTION) if launcher(p.program)]
 
 
 def run(command: list[str], prompt: str, folder: str) -> subprocess.CompletedProcess[str]:
@@ -116,3 +117,37 @@ class CodexAsker:
                        "--output-schema", str(shape), "-o", str(reply), "-"]
             done = run(command, prompt, folder)
             return done, reply.read_text(encoding="utf-8") if reply.exists() else ""
+
+
+class PromptAsker:
+    """Subscriptions whose program takes the prompt as an argument and answers in text."""
+
+    hears = False
+
+    def __init__(self, provider: str) -> None:
+        self.provider = BY_ID[provider]
+
+    def command(self, prompt: str) -> list[str]:
+        model = setting(self.provider.model_name)
+        chosen = [f"--model={model}"] if model else []
+        quiet = ["-s"] if self.provider.id == "copilot" else []
+        return [*launcher(self.provider.program), "-p", prompt, *quiet, *chosen]
+
+    def ask(self, prompt: str, _audio: bytes | None, schema: dict[str, Any]) -> Any:
+        shape = json.dumps(wrap(schema), ensure_ascii=False)
+        full = f"{prompt}\n\nReply with only one JSON object matching this schema: {shape}"
+        if len(full) > LONGEST_ARGUMENT:
+            raise EngineError(self.provider.id, 0, "request too long for this program")
+        with tempfile.TemporaryDirectory() as folder:
+            done = run(self.command(full), "", folder)
+        text = done.stdout.strip()
+        start, end = text.find("{"), text.rfind("}")
+        if done.returncode != 0 or start < 0:
+            raise EngineError(self.provider.id, done.returncode, done.stderr or text)
+        return unwrap(parse_json(text[start:end + 1]))
+
+
+def subscription_asker(provider: str) -> Any:
+    if provider == "claude":
+        return ClaudeAsker()
+    return CodexAsker() if provider == "codex" else PromptAsker(provider)

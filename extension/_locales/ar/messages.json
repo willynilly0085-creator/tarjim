@@ -340,7 +340,7 @@
     "message": "محلي على جهازي، بدون إنترنت"
   },
   "engineAdvanced": {
-    "message": "متقدم (من صفحة tarjim)"
+    "message": "مزوّد آخر أو مفتاح (يفتح صفحة ترجم)"
   },
   "localModelLabel": {
     "message": "النموذج المحلي"
@@ -371,5 +371,11 @@
   },
   "menuDubNatural": {
     "message": "دبلجة بصوت طبيعي"
+  },
+  "providerCopilot": {
+    "message": "GitHub Copilot"
+  },
+  "providerAntigravity": {
+    "message": "Google AI (Antigravity)"
   }
 }

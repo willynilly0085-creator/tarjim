@@ -55,28 +55,20 @@
       <p class="advice" id="device-advice"></p>
     </section>
 
-    <section class="step" data-step="engine">
-      <h1 data-t="engineTitle"></h1>
-      <div class="choices">
-        <label class="choice"><input type="radio" name="engine" value="cloud"><span class="choice-name"><span data-t="engineCloud"></span> <em class="tag" data-t="recommended"></em></span><span class="choice-note" data-t="engineCloudHint"></span></label>
-        <label class="choice"><input type="radio" name="engine" value="local"><span class="choice-name" data-t="engineLocal"></span><span class="choice-note" data-t="engineLocalHint"></span></label>
-        <label class="choice"><input type="radio" name="engine" value="subscription"><span class="choice-name" data-t="engineSubscription"></span><span class="choice-note" data-t="engineSubscriptionHint"></span></label>
-        <label class="choice"><input type="radio" name="engine" value="advanced"><span class="choice-name" data-t="engineAdvanced"></span><span class="choice-note" data-t="engineAdvancedHint"></span></label>
+    <section class="step" data-step="connect">
+      <h1 data-t="connectTitle"></h1>
+      <p class="lede" data-t="connectHint"></p>
+      <div class="segments methods">
+        <label><input type="radio" name="method" value="api" checked><span data-t="methodApi"></span></label>
+        <label><input type="radio" name="method" value="subscription"><span data-t="methodSubscription"></span></label>
+        <label><input type="radio" name="method" value="local"><span data-t="methodLocal"></span></label>
       </div>
-      <div class="pair-fields" id="subscription" hidden>
-        <label class="field"><span class="field-label" data-t="subscriptionLabel"></span><select class="select" id="subscription-provider"></select></label>
-        <p class="meta" id="subscription-none" data-t="subscriptionNone" hidden></p>
-      </div>
-      <div class="pair-fields" id="advanced" hidden>
-        <label class="field"><span class="field-label" data-t="listenLabel"></span><select class="select" id="listen-provider"></select></label>
-        <label class="field"><span class="field-label" data-t="translateLabel"></span><select class="select" id="translate-provider"></select></label>
-      </div>
-    </section>
-
-    <section class="step" data-step="keys">
-      <h1 data-t="keyTitle"></h1>
-      <p class="advice" id="keys-none" data-t="keyNone" hidden></p>
-      <div class="key-list" id="key-list"></div>
+      <label class="field"><span class="field-label" data-t="providerLabel"></span><select class="select" id="connect-provider"></select></label>
+      <div class="connect-detail" id="connect-detail"></div>
+      <label class="field" id="connect-model-field"><span class="field-label" data-t="modelLabel"></span>
+        <input class="text-input" id="connect-model" list="connect-models" dir="ltr" autocomplete="off" spellcheck="false"></label>
+      <datalist id="connect-models"></datalist>
+      <p class="meta" id="connect-listen"></p>
     </section>
 
     <section class="step" data-step="tools">
@@ -95,6 +87,12 @@
         </li>
         <li data-t="extStep3"></li>
       </ol>
+    </section>
+
+    <section class="step" data-step="chat">
+      <h1 data-t="chatTitle"></h1>
+      <p class="lede" data-t="chatHint"></p>
+      <ul class="tool-list" id="chat-apps"></ul>
     </section>
 
     <section class="step" data-step="done">
@@ -164,12 +162,6 @@
   </template>
   <p class="visually-hidden" id="announcer" aria-live="polite"></p>
 
-  <template id="key-row">
-    <form class="key-row" novalidate>
-      <label class="field"><span class="field-label"></span><input class="text-input" type="password" dir="ltr" autocomplete="off" spellcheck="false"></label>
-      <div class="row"><a class="text-link" target="_blank" rel="noopener noreferrer" data-t="getKey"></a><button class="button-quiet" type="submit" data-t="keySave"></button><span class="meta key-state" role="status"></span></div>
-    </form>
-  </template>
 
   <template id="tool-row">
     <li class="tool">

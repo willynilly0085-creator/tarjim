@@ -340,7 +340,7 @@
     "message": "Local on this computer, offline"
   },
   "engineAdvanced": {
-    "message": "Advanced (on the tarjim page)"
+    "message": "Another provider or key (opens the tarjim page)"
   },
   "localModelLabel": {
     "message": "Local model"
@@ -371,5 +371,11 @@
   },
   "menuDubNatural": {
     "message": "Dub with a natural voice"
+  },
+  "providerCopilot": {
+    "message": "GitHub Copilot"
+  },
+  "providerAntigravity": {
+    "message": "Google AI (Antigravity)"
   }
 }

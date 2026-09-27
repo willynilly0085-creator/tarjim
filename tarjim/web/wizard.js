@@ -1,8 +1,10 @@
 import { $, post } from "./api.js";
 import { load, t } from "./i18n.js";
-import { engineChoice, neededKeys, renderDevice, renderEngine, renderKeys, renderTools } from "./steps.js";
+import { renderChat } from "./chat.js";
+import { renderConnect, saveConnect, wireConnect } from "./connect.js";
+import { renderDevice, renderTools } from "./steps.js";
 
-const STEPS = ["language", "device", "engine", "keys", "tools", "extension", "done"];
+const STEPS = ["language", "device", "connect", "tools", "extension", "chat", "done"];
 let at = 0;
 let poll = 0;
 let state;
@@ -14,10 +16,10 @@ const ENTER = {
     if (input) input.checked = true;
   },
   device: () => renderDevice(state),
-  engine: () => renderEngine(state),
-  keys: () => renderKeys(state),
+  connect: () => renderConnect(),
   tools: () => watchTools(),
   extension: () => { $("extension-path").textContent = state.setup.extension_path; },
+  chat: () => renderChat(),
 };
 
 const LEAVE = {
@@ -27,8 +29,7 @@ const LEAVE = {
     if (language) await load(language);
     $("ui-language").value = document.documentElement.lang;
   },
-  engine: async () => { state.setup = { ...state.setup, ...(await post("/setup", engineChoice(state))) }; },
-  keys: () => (neededKeys(state).every((p) => state.setup.keys[p]) ? "" : "keysMissing"),
+  connect: () => saveConnect(),
   tools: () => (state.tools?.every((tool) => !tool.required || tool.installed) ? "" : "requiredMissing"),
   done: async () => { await post("/setup", { setup_done: "yes" }); finish(); },
 };
@@ -75,10 +76,7 @@ export function startWizard(setup, onFinish, from = "language") {
 export function wireWizard() {
   $("step-next").addEventListener("click", next);
   $("step-back").addEventListener("click", () => { at = Math.max(0, at - 1); clearInterval(poll); paint(); });
-  document.querySelectorAll("input[name=engine]").forEach((el) => el.addEventListener("change", () => {
-    $("advanced").hidden = el.value !== "advanced" || !el.checked;
-    $("subscription").hidden = el.value !== "subscription" || !el.checked;
-  }));
+  wireConnect();
   $("copy-path").addEventListener("click", async () => {
     await navigator.clipboard.writeText($("extension-path").textContent);
     $("copy-path").textContent = t("copied");
