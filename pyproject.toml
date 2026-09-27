@@ -3,7 +3,7 @@ name = "tarjim"
 version = "0.1.0"
 description = "Professional, speaker-aware Arabic subtitles for any video"
 requires-python = ">=3.11"
-license = { text = "MIT" }
+license = { text = "PolyForm-Noncommercial-1.0.0" }
 dependencies = [
     "numpy",
     "soundfile",

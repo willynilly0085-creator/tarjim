@@ -110,6 +110,12 @@ files, burned subtitles and `.srt`, French and Arabic, pause, resume, cancel and
 ways to connect (Claude and ChatGPT subscriptions, local Ollama), the chat tools, and the security
 checks above. Not tested yet: macOS, Linux, GitHub Copilot and Antigravity subscriptions.
 
+## License
+
+tarjim is free for everyone to use, study, change and share, for any purpose **except commercial
+use**: nobody may sell it or sell a service built on it. See [LICENSE.md](LICENSE.md)
+(PolyForm Noncommercial 1.0.0). This matches the non-commercial licenses of the models it uses.
+
 ## Development
 
 ```bash
