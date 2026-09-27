@@ -17,7 +17,7 @@ def gemini_works(key: str) -> bool:
 
     try:
         next(iter(genai.Client(api_key=key).models.list()), None)
-    except Exception:  # noqa: BLE001
+    except Exception:
         return False
     return True
 
