@@ -180,5 +180,6 @@
   "ffmpegLater": "missing, we install it in the Tools step",
   "gpuFix": "To let tarjim use your graphics card (much faster local listening), run this once, then restart tarjim.",
   "tool_ffmpeg": "ffmpeg video engine",
-  "tool_ffmpeg_hint": "Reads the video and burns the subtitles. On Windows we install it for you; on macOS or Linux run brew install ffmpeg or sudo apt install ffmpeg."
+  "tool_ffmpeg_hint": "Reads the video and burns the subtitles. On Windows we install it for you; on macOS or Linux run brew install ffmpeg or sudo apt install ffmpeg.",
+  "localAfterFix": "Your card is strong enough for local mode once you run the command below."
 }

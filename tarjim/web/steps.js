@@ -17,7 +17,8 @@ export async function renderDevice(state) {
   $("facts").replaceChildren(...fact(t("gpu"), gpu, s.gpu && !s.gpu.usable), ...fact(t("memory"), `${s.memory_gb} GB`),
     ...fact(t("disk"), `${s.disk_free_gb} GB`),
     ...fact(t("ffmpegRow"), t(s.ffmpeg ? "present" : "ffmpegLater"), !s.ffmpeg));
-  $("device-advice").textContent = `${t("recommendCloud")} ${t(s.local_ready ? "localCapable" : "localNot")}`;
+  const local = s.local_ready ? "localCapable" : s.gpu && !s.gpu.usable ? "localAfterFix" : "localNot";
+  $("device-advice").textContent = `${t("recommendCloud")} ${t(local)}`;
   $("gpu-fix").hidden = !(s.gpu && s.gpu.fix);
   $("gpu-fix-command").textContent = s.gpu?.fix || "";
 }
