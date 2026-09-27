@@ -32,7 +32,9 @@ def prompt(lines: list[Line], language: str, dialect: str, full_vowels: bool) ->
                         vowels=(VOWELS if full_vowels else HINTS) if arabic else "")
     body = "\n".join(f"{n}. original: {line.source}\n   subtitle: {line.text}\n"
                      f"   seconds: {line.room:.1f}" for n, line in enumerate(lines, start=1))
-    return f"{head}\n{body}"
+    from tarjim.translate.glossary import current, instructions
+
+    return f"{head}{instructions(current())}\n{body}"
 
 
 def spoken_lines(lines: list[Line], language: str, dialect: str,

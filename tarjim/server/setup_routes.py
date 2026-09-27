@@ -11,6 +11,7 @@ from tarjim.server.pairing import Pairing
 from tarjim.tools import Shelf
 
 UI_LANGUAGES = ("ar", "en")
+GLOSSARY_CHARS = 5000
 MODEL_TAG = re.compile(r"^[\w.:/-]{2,80}$")
 EXTENSION = Path(__file__).resolve().parents[2] / "extension"
 FIELDS: dict[str, tuple[str, ...]] = {"ui_language": UI_LANGUAGES, "listen_provider": LISTENERS,
@@ -52,6 +53,7 @@ class SetupRoutes:
         folder = EXTENSION if EXTENSION.is_dir() else None
         state["extension_path"] = str(folder) if folder else ""
         state["local_model"] = setting("local_model")
+        state["glossary"] = setting("glossary")
         state["subscriptions"] = installed()
         self.reply(200, state)
 
@@ -60,6 +62,8 @@ class SetupRoutes:
         for name, allowed in FIELDS.items():
             if data.get(name) in allowed:
                 save(name, str(data[name]))
+        if isinstance(data.get("glossary"), str) and len(data["glossary"]) <= GLOSSARY_CHARS:
+            save("glossary", data["glossary"])
         if MODEL_TAG.match(str(data.get("local_model", ""))):
             save("local_model", str(data["local_model"]))
         self.setup_state(query)

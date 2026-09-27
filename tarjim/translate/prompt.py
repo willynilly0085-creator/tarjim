@@ -83,6 +83,7 @@ class Brief:
     rules: Rules = DEFAULT_RULES
     offset: float = 0.0
     hears: bool = True
+    glossary: tuple[tuple[str, str], ...] = ()
 
     @property
     def arabic(self) -> bool:
@@ -101,8 +102,10 @@ def build_prompt(cues: list[Cue], brief: Brief) -> str:
     items = "\n".join(format_item(i, cue, brief) for i, cue in enumerate(cues, start=1))
     template = ARABIC if brief.arabic else ANY
     style = DIALECTS[brief.dialect] if brief.arabic else brief.target.name
+    from tarjim.translate.glossary import instructions
+
     return template.format(style=style, count=len(cues), items=items, dialogue_rule=rule,
-                           have=have, listen=listen)
+                           have=have, listen=listen) + instructions(brief.glossary)
 
 
 def format_item(number: int, cue: Cue, brief: Brief) -> str:

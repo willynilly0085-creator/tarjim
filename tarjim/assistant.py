@@ -1,16 +1,13 @@
 """tarjim as an MCP server: Claude or any MCP client can translate and adjust settings in chat."""
-import json
-import urllib.error
 import urllib.parse
-import urllib.request
 import webbrowser
 from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
+from tarjim.assistant_http import SERVER, call, fetch_text
 from tarjim.config import setting
 
-SERVER = "http://127.0.0.1:17653"
 OUTPUTS = {"subtitles": "srt", "burned": "burn", "dubbed": "dub"}
 VOICES = ("natural", "clone", "studio", "fish", "fishvoice")
 ACTIONS = ("pause", "resume", "cancel")
@@ -20,20 +17,6 @@ tarjim = MCPServer("tarjim", instructions=(
     "tarjim translates videos into subtitles or dubbing on this computer. Use translate_video "
     "with a link or a local file path, then translation_status to follow it. API keys are never "
     "set through chat: send the person to open_tarjim_page for keys."))
-
-
-def call(path: str, body: dict[str, Any] | None = None) -> Any:
-    request = urllib.request.Request(
-        f"{setting('server') or SERVER}{path}", method="POST" if body is not None else "GET",
-        data=json.dumps(body).encode() if body is not None else None,
-        headers={"X-Tarjim-Token": setting("token"), "Content-Type": "application/json"})
-    try:
-        with urllib.request.urlopen(request, timeout=30) as reply:
-            return json.loads(reply.read() or b"null")
-    except urllib.error.HTTPError as error:
-        return {"error": error.code, "detail": error.read().decode("utf-8", "replace")[:200]}
-    except urllib.error.URLError:
-        return {"error": "tarjim is not running on this computer. Start it with: tarjim-serve"}
 
 
 def mode_for(output: str, voice: str) -> str:
@@ -104,16 +87,6 @@ def read_subtitles(job_id: str) -> Any:
     return fetch_text(f"/files/{job_id}/{urllib.parse.quote(wanted[0])}")
 
 
-def fetch_text(path: str) -> Any:
-    request = urllib.request.Request(f"{setting('server') or SERVER}{path}",
-                                     headers={"X-Tarjim-Token": setting("token")})
-    try:
-        with urllib.request.urlopen(request, timeout=30) as reply:
-            return reply.read().decode("utf-8-sig", "replace")
-    except urllib.error.URLError as error:
-        return {"error": str(error)}
-
-
 @tarjim.tool()
 def get_settings() -> Any:
     """Current settings: interface language, engines, which keys are set (never the keys)."""
@@ -134,6 +107,13 @@ def change_settings(interface_language: str = "", listening_engine: str = "",
     wanted = {"ui_language": interface_language, "listen_provider": listening_engine,
               "translate_provider": translation_engine, "local_model": local_model}
     return call("/setup", {k: v for k, v in wanted.items() if v})
+
+
+@tarjim.tool()
+def set_glossary(terms: str) -> Any:
+    """Fix how names and brands are translated, one per line as "term = translation",
+    e.g. "tarjim = ترجم". Replaces the whole list; send an empty string to clear it."""
+    return call("/setup", {"glossary": terms})
 
 
 @tarjim.tool()

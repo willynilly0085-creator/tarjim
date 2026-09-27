@@ -35,7 +35,9 @@ def translate(job: Job, cues: list[Cue]) -> list[Cue]:
     def audio(start: float, end: float) -> bytes:
         return media.audio_bytes(job.video, start, end)
 
-    brief = Brief(job.language, job.dialect, job.rules)
+    from tarjim.translate.glossary import current
+
+    brief = Brief(job.language, job.dialect, job.rules, glossary=current())
     failures: list[Exception] = []
     for provider in chain("translate"):
         try:
