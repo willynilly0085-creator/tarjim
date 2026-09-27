@@ -9,14 +9,15 @@ from tarjim.rules import DEFAULT_RULES, Rules
 RLM = chr(0x200F)
 ARABIC_CHARSET = 178
 FADE_MS = 90
-HIDDEN = "{\\alpha&HFF&}"
-APPEAR = f"{{\\alpha&HFF&\\t(0,{FADE_MS},\\alpha&H00&)}}"
+EVERYTHING = ("\\alpha&HFF&", "\\alpha&H00&")
+LETTERS_ONLY = ("\\1a&HFF&\\3a&HFF&", "\\1a&H00&\\3a&H00&")
 PORTRAIT_FONT = 0.066
 LANDSCAPE_FONT = 0.058
-OUTLINED, BOXED = 1, 3
+OUTLINED, BOXED = 1, 4
+SHADOW_COLOUR = "&H8C000000"
 OUTLINE_COLOUR = "&H00141414"
 BOX_COLOUR = "&H3A141414"
-BOX_PADDING = 0.3
+BOX_PADDING = 0.22
 
 HEADER = """[Script Info]
 ScriptType: v4.00+
@@ -29,7 +30,7 @@ ScaledBorderAndShadow: yes
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, \
 BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, \
 BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,{font},{size},&H00FFFFFF,&H00FFFFFF,{edge},&H8C000000,-1,0,0,0,\
+Style: Default,{font},{size},&H00FFFFFF,&H00FFFFFF,{edge},{back},-1,0,0,0,\
 100,100,0,0,{border},{outline},{shadow},2,{mh},{mh},{mv},{charset}
 
 [Events]
@@ -63,13 +64,13 @@ class Canvas:
 
     @property
     def outline(self) -> int:
-        if self.bright:
-            return max(4, round(self.font_size * BOX_PADDING))
-        return max(2, round(self.font_size * 0.08))
+        return 1 if self.bright else max(2, round(self.font_size * 0.08))
 
     @property
     def shadow(self) -> int:
-        return 0 if self.bright else max(1, self.outline // 2)
+        if self.bright:
+            return max(4, round(self.font_size * BOX_PADDING))
+        return max(1, self.outline // 2)
 
 
 def render_ass(cues: list[Cue], canvas: Canvas, rules: Rules = DEFAULT_RULES) -> str:
@@ -77,21 +78,24 @@ def render_ass(cues: list[Cue], canvas: Canvas, rules: Rules = DEFAULT_RULES) ->
         w=canvas.width, h=canvas.height, font=canvas.font, size=canvas.font_size,
         outline=canvas.outline, shadow=canvas.shadow, border=BOXED if canvas.bright else OUTLINED,
         edge=BOX_COLOUR if canvas.bright else OUTLINE_COLOUR,
+        back=BOX_COLOUR if canvas.bright else SHADOW_COLOUR,
         mh=canvas.margin_h, mv=canvas.margin_v, charset=ARABIC_CHARSET if rules.rtl else 1,
     )
-    events = [line for cue in cues if cue.text.strip() for line in event_lines(cue, rules)]
+    alphas = LETTERS_ONLY if canvas.bright else EVERYTHING
+    events = [line for cue in cues if cue.text.strip() for line in event_lines(cue, rules, alphas)]
     return header + "\n".join(events) + "\n"
 
 
-def event_lines(cue: Cue, rules: Rules) -> list[str]:
+def event_lines(cue: Cue, rules: Rules, alphas: tuple[str, str] = EVERYTHING) -> list[str]:
     mark = RLM if rules.rtl else ""
     lines = [f"{mark}{clean(line)}{mark}" for line in display_lines(cue.text, rules)]
     moment = reveal_at(cue)
     if moment is None:
         return [event(cue.start, cue.end, fade(FADE_MS, FADE_MS) + "\\N".join(lines))]
+    hide, show = alphas
     *first, last = lines
-    waiting = "\\N".join([*first, HIDDEN + last])
-    arriving = "\\N".join([*first, APPEAR + last])
+    waiting = "\\N".join([*first, f"{{{hide}}}" + last])
+    arriving = "\\N".join([*first, f"{{{hide}\\t(0,{FADE_MS},{show})}}" + last])
     return [event(cue.start, moment, fade(FADE_MS, 0) + waiting),
             event(moment, cue.end, fade(0, FADE_MS) + arriving)]
 

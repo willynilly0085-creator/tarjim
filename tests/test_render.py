@@ -45,13 +45,13 @@ def test_srt_skips_empty_cues_and_numbers_the_rest() -> None:
     assert srt.startswith("1\n00:00:01,000 --> 00:00:02,000")
 
 
-def test_light_videos_get_a_box_behind_the_subtitles_instead_of_an_outline() -> None:
+def test_light_videos_get_one_box_behind_the_whole_subtitle() -> None:
     from tarjim.render.ass import Canvas, render_ass
 
     dark = render_ass([], Canvas(1920, 1080))
     light = render_ass([], Canvas(1920, 1080, bright=True))
     assert ",1,5,2,2," in dark and "&H00141414" in dark
-    assert ",3,19,0,2," in light and "&H3A141414" in light
+    assert ",4,1,14,2," in light and light.count("&H3A141414") == 2
 
 
 def test_brightness_is_read_from_the_ffmpeg_report() -> None:
@@ -60,3 +60,14 @@ def test_brightness_is_read_from_the_ffmpeg_report() -> None:
     report = "lavfi.signalstats.YAVG=200.5\nnoise\nlavfi.signalstats.YAVG=180.5\n"
     assert mean_brightness(report) == 190.5
     assert mean_brightness("") == 0.0
+
+
+def test_a_boxed_dialogue_hides_only_the_letters_of_the_line_still_to_come() -> None:
+    from tarjim.models import Cue, Word
+    from tarjim.render.ass import Canvas, render_ass
+
+    first, second = [Word("Nice", 0.0, 0.5, "S1")], [Word("idea", 1.5, 2.0, "S2")]
+    cue = Cue(0.0, 3.0, first + second, "- one || - two", parts=[first, second])
+    boxed = render_ass([cue], Canvas(1920, 1080, bright=True))
+    assert "\1a&HFF&\3a&HFF&" in boxed and "\alpha" not in boxed
+    assert "\alpha&HFF&" in render_ass([cue], Canvas(1920, 1080))
