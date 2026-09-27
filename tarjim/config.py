@@ -5,6 +5,8 @@ import secrets
 import tempfile
 from pathlib import Path
 
+from tarjim import vault
+
 HOME = Path(os.environ.get("TARJIM_HOME", Path.home() / ".tarjim"))
 CONFIG = HOME / "config.json"
 TOKEN_BYTES = 16
@@ -21,7 +23,12 @@ def settings() -> dict[str, str]:
 
 
 def setting(name: str) -> str:
-    return os.environ.get(f"TARJIM_{name.upper()}") or settings().get(name, "")
+    from_env = os.environ.get(f"TARJIM_{name.upper()}")
+    if from_env:
+        return from_env
+    if name in vault.SECRETS:
+        return vault.read(name) or settings().get(name, "")
+    return settings().get(name, "")
 
 
 def private_home() -> None:
@@ -31,9 +38,16 @@ def private_home() -> None:
 
 
 def save(name: str, value: str) -> None:
-    private_home()
     data = settings()
-    data[name] = value
+    if name in vault.SECRETS and vault.write(name, value):
+        data.pop(name, None)
+    else:
+        data[name] = value
+    write_settings(data)
+
+
+def write_settings(data: dict[str, str]) -> None:
+    private_home()
     handle, temporary = tempfile.mkstemp(dir=HOME, prefix=".config-")
     try:
         os.chmod(temporary, OWNER_FILE)
@@ -46,6 +60,13 @@ def save(name: str, value: str) -> None:
         raise
 
 
+def lock_secrets() -> None:
+    data = settings()
+    moved = [name for name in vault.SECRETS if name in data and vault.write(name, data[name])]
+    if moved:
+        write_settings({k: v for k, v in data.items() if k not in moved})
+
+
 def token() -> str:
     existing = setting("token")
     if existing:
@@ -56,6 +77,7 @@ def token() -> str:
 
 
 def prepare_environment() -> None:
+    lock_secrets()
     models = setting("models")
     if models:
         os.environ.setdefault("HF_HOME", models)

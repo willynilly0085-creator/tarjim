@@ -13,6 +13,7 @@ dependencies = [
     "uroman",
     "silero-vad",
     "yt-dlp",
+    "keyring",
 ]
 
 [project.optional-dependencies]
