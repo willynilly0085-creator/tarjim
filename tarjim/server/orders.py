@@ -1,0 +1,25 @@
+from typing import Any
+
+from tarjim.server.jobs import Order
+
+BLOCK = 1024 * 1024
+Query = dict[str, list[str]]
+
+
+def first(query: Query, key: str) -> str:
+    return (query.get(key) or [""])[0].strip()
+
+
+def order_from(source: str, data: dict[str, Any], name: str = "") -> Order:
+    return Order(source, str(data.get("target") or "ar"), str(data.get("mode") or "burn"),
+                 str(data.get("dialect") or "saudi"), name)
+
+
+def copy_limited(source: Any, target: Any, size: int) -> None:
+    left = size
+    while left > 0:
+        chunk = source.read(min(BLOCK, left))
+        if not chunk:
+            break
+        target.write(chunk)
+        left -= len(chunk)

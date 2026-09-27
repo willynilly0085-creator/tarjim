@@ -2,22 +2,35 @@ import json
 import shutil
 import urllib.parse
 from collections.abc import Callable
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, ClassVar
 
 from tarjim.languages import LANGUAGES
-from tarjim.server.guard import allowed_origin, local_host, safe_name, token_ok
+from tarjim.server.guard import (
+    allowed_origin,
+    cookie_token,
+    local_host,
+    safe_name,
+    same_origin,
+    token_ok,
+)
 from tarjim.server.jobs import MODES, Board, Order, Task
-from tarjim.server.routes import GET_ROUTES, POST_ROUTES, KeyRoutes, Query, Routes
+from tarjim.server.orders import copy_limited, first, order_from
+from tarjim.server.pages import PageRoutes
+from tarjim.server.pairing import Pairing
+from tarjim.server.routes import GET_ROUTES, POST_ROUTES, KeyRoutes, Query, Routes, is_open
+from tarjim.server.setup_routes import SetupRoutes
+from tarjim.tools import Shelf
 
 PORT = 17653
 MAX_UPLOAD = 8 * 1024**3
 BLOCK = 1024 * 1024
 TOKEN_HEADERS = ("X-Tarjim-Token", "X-Trans-Token")
-OPEN_PATHS = {"/ping", "/languages"}
 LEGACY = {"dub": "dub-clone"}
-class Handler(KeyRoutes, BaseHTTPRequestHandler):
+
+
+class Handler(KeyRoutes, SetupRoutes, PageRoutes):
     board: ClassVar[Board]
     token: ClassVar[str]
     uploads: ClassVar[Path]
@@ -49,11 +62,16 @@ class Handler(KeyRoutes, BaseHTTPRequestHandler):
         if not local_host(self.headers.get("Host", "")):
             self.reply(403, {"error": "host"})
             return False
-        given = next((self.headers.get(h, "") for h in TOKEN_HEADERS if self.headers.get(h)), "")
-        if path not in OPEN_PATHS and not token_ok(given, self.token):
+        if not is_open(path) and not self.credentialed():
             self.reply(403, {"error": "token"})
             return False
         return True
+
+    def credentialed(self) -> bool:
+        given = next((self.headers.get(h, "") for h in TOKEN_HEADERS if self.headers.get(h)), "")
+        same = same_origin(self.headers.get("Origin", ""), self.headers.get("Host", ""))
+        cookie = cookie_token(self.headers.get("Cookie", "")) if same else ""
+        return token_ok(given, self.token) or token_ok(cookie, self.token)
 
     def do_GET(self) -> None:
         self.dispatch(GET_ROUTES)
@@ -164,25 +182,7 @@ class Handler(KeyRoutes, BaseHTTPRequestHandler):
         return None
 
 
-def first(query: Query, key: str) -> str:
-    return (query.get(key) or [""])[0].strip()
-
-
-def order_from(source: str, data: dict[str, Any], name: str = "") -> Order:
-    return Order(source, str(data.get("target") or "ar"), str(data.get("mode") or "burn"),
-                 str(data.get("dialect") or "saudi"), name)
-
-
-def copy_limited(source: Any, target: Any, size: int) -> None:
-    left = size
-    while left > 0:
-        chunk = source.read(min(BLOCK, left))
-        if not chunk:
-            break
-        target.write(chunk)
-        left -= len(chunk)
-
-
 def serve(board: Board, token: str, uploads: Path, port: int = PORT) -> None:
     Handler.board, Handler.token, Handler.uploads = board, token, uploads
+    Handler.shelf, Handler.pairing = Shelf(), Pairing()
     ThreadingHTTPServer(("127.0.0.1", port), Handler).serve_forever()

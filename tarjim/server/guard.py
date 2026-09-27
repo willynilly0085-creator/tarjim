@@ -1,5 +1,6 @@
 import hmac
 import re
+from http.cookies import CookieError, SimpleCookie
 from pathlib import Path
 
 LOCAL_HOSTS = {"127.0.0.1", "localhost"}
@@ -8,6 +9,7 @@ MEDIA_SUFFIXES = {".mp4", ".mkv", ".webm", ".mov", ".avi", ".m4v", ".mp3", ".m4a
                   ".flac", ".ogg", ".opus", ".aac"}
 UNSAFE = re.compile(r"[^\w\s.\-\[\]()]", re.UNICODE)
 MAX_NAME = 80
+COOKIE = "tarjim"
 
 
 def local_host(host: str) -> bool:
@@ -29,3 +31,21 @@ def safe_name(name: str) -> str | None:
         return None
     clean = UNSAFE.sub("_", stem).strip(" .")[:MAX_NAME] or "video"
     return clean + suffix
+
+
+def cookie_token(header: str) -> str:
+    jar = SimpleCookie()
+    try:
+        jar.load(header)
+    except CookieError:
+        return ""
+    morsel = jar.get(COOKIE)
+    return morsel.value if morsel else ""
+
+
+def same_origin(origin: str, host: str) -> bool:
+    return origin in ("", f"http://{host}")
+
+
+def extension_origin(origin: str) -> bool:
+    return origin.startswith(EXTENSION_ORIGINS)
