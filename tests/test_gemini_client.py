@@ -75,3 +75,13 @@ def test_a_busy_model_is_skipped_and_waiting_happens_once_per_round(
     client.call = later  # type: ignore[method-assign]
     assert client.ask("p", b"", {}) == ["late"]
     assert len(slept) == 1 and slept[0] <= 59.0
+
+
+def test_a_request_that_never_answers_gives_up_instead_of_hanging(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    from google import genai
+
+    made: dict[str, Any] = {}
+    monkeypatch.setattr(genai, "Client", lambda **options: made.update(options))
+    GeminiClient(api_key="AIzaSyA1234567890abcdefghij")
+    assert made["http_options"].timeout == gemini_client.REQUEST_MS

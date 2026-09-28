@@ -8,6 +8,8 @@ from tarjim.engines.catalog import PROVIDERS as CATALOG
 KEY_SHAPE = re.compile(r"^[A-Za-z0-9._-]{16,256}$")
 PROVIDERS = {**{p.id: p.key_name for p in CATALOG if p.key_name}, "fish": "fish_api_key"}
 
+CHECK_MS = 20_000
+
 
 def well_formed(key: str) -> bool:
     return bool(KEY_SHAPE.match(key))
@@ -15,9 +17,11 @@ def well_formed(key: str) -> bool:
 
 def gemini_works(key: str) -> bool:
     from google import genai
+    from google.genai import types
 
+    quick = types.HttpOptions(timeout=CHECK_MS)
     try:
-        next(iter(genai.Client(api_key=key).models.list()), None)
+        next(iter(genai.Client(api_key=key, http_options=quick).models.list()), None)
     except Exception:
         return False
     return True

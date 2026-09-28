@@ -10,6 +10,7 @@ MODELS = ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.
 ROUNDS = 3
 RETRY_PAUSE = 3.0
 MAX_WAIT = 90.0
+REQUEST_MS = 240_000
 TOO_MANY = 429
 DAILY = re.compile(r"per ?day", re.IGNORECASE)
 DELAY = re.compile(r"retryDelay'?\"?:\s*'?\"?(\d+(?:\.\d+)?)s")
@@ -33,11 +34,13 @@ class GeminiClient:
 
     def __init__(self, api_key: str | None = None) -> None:
         from google import genai
+        from google.genai import types
 
         key = api_key or gemini_key()
         if not key:
             raise RuntimeError("Gemini API key missing: set GEMINI_API_KEY or run tarjim setup")
-        self.client = genai.Client(api_key=key)
+        self.client = genai.Client(api_key=key,
+                                   http_options=types.HttpOptions(timeout=REQUEST_MS))
         self.model_used = ""
         self.spent: set[str] = set()
         self.cooling: dict[str, float] = {}
