@@ -1,0 +1,381 @@
+{
+  "appName": {
+    "message": "tarjim"
+  },
+  "appDesc": {
+    "message": "어떤 동영상이든 원하는 언어로, 말하는 타이밍에 딱 맞춘 전문가 수준의 자막."
+  },
+  "menuBurn": {
+    "message": "동영상에 자막 입히기"
+  },
+  "menuSrt": {
+    "message": "자막 파일 (SRT)"
+  },
+  "statusOnline": {
+    "message": "연결됨"
+  },
+  "statusOffline": {
+    "message": "연결 안 됨"
+  },
+  "settings": {
+    "message": "설정"
+  },
+  "sourceTab": {
+    "message": "이 탭"
+  },
+  "sourceNone": {
+    "message": "이 페이지에 동영상이 없어요"
+  },
+  "sourceNoneHint": {
+    "message": "동영상이 있는 페이지를 열거나, 컴퓨터에 있는 파일을 번역하세요."
+  },
+  "pickFile": {
+    "message": "컴퓨터에 있는 파일 번역"
+  },
+  "language": {
+    "message": "번역할 언어"
+  },
+  "dialect": {
+    "message": "스타일"
+  },
+  "dialectSaudi": {
+    "message": "사우디 방언"
+  },
+  "dialectMsa": {
+    "message": "표준어"
+  },
+  "output": {
+    "message": "출력"
+  },
+  "outputBurn": {
+    "message": "동영상에 입히기"
+  },
+  "outputSrt": {
+    "message": "자막 파일만"
+  },
+  "translate": {
+    "message": "번역"
+  },
+  "sending": {
+    "message": "보내는 중"
+  },
+  "started": {
+    "message": "번역을 시작했어요. 이 창은 닫아도 돼요."
+  },
+  "recent": {
+    "message": "최근"
+  },
+  "empty": {
+    "message": "아직 번역한 항목이 없어요. 아무 동영상이나 열고 '번역'을 누르거나, 동영상 링크를 오른쪽 클릭하세요."
+  },
+  "stageQueued": {
+    "message": "대기 중"
+  },
+  "stageDownloading": {
+    "message": "다운로드 중"
+  },
+  "stageHearing": {
+    "message": "듣는 중"
+  },
+  "stageTranslating": {
+    "message": "번역 중"
+  },
+  "stageWriting": {
+    "message": "자막 작성 중"
+  },
+  "stageBurning": {
+    "message": "동영상에 입히는 중"
+  },
+  "stageDone": {
+    "message": "준비됨"
+  },
+  "stageFailed": {
+    "message": "끝나지 않음"
+  },
+  "openFolder": {
+    "message": "폴더에서 보기"
+  },
+  "play": {
+    "message": "재생"
+  },
+  "retry": {
+    "message": "다시 시도"
+  },
+  "errQuota": {
+    "message": "오늘 Gemini 무료 사용량을 다 썼어요. 내일 아침에 다시 채워져요."
+  },
+  "errKey": {
+    "message": "Gemini 키가 설정되지 않았어요. 설정에서 추가하세요."
+  },
+  "errDownload": {
+    "message": "이 링크에서 동영상을 다운로드하지 못했어요. 링크가 작동하는지 확인하세요."
+  },
+  "errTools": {
+    "message": "이 컴퓨터에 ffmpeg가 설치되어 있지 않아요."
+  },
+  "errUnknown": {
+    "message": "예상치 못한 문제가 발생했어요."
+  },
+  "offlineTitle": {
+    "message": "이 컴퓨터에서 tarjim이 실행되고 있지 않아요"
+  },
+  "offlineBody": {
+    "message": "이 명령으로 실행한 뒤 다시 오세요:"
+  },
+  "tryAgain": {
+    "message": "다시 시도"
+  },
+  "pairTitle": {
+    "message": "확장 프로그램을 tarjim에 연결"
+  },
+  "pairBody": {
+    "message": "이 명령으로 보안 토큰을 받아 아래에 붙여 넣으세요:"
+  },
+  "tokenLabel": {
+    "message": "보안 토큰"
+  },
+  "pair": {
+    "message": "연결"
+  },
+  "pairWrong": {
+    "message": "토큰이 올바르지 않아요. 확인하고 다시 시도하세요."
+  },
+  "serverLabel": {
+    "message": "서버 주소"
+  },
+  "save": {
+    "message": "저장"
+  },
+  "saved": {
+    "message": "설정을 저장했어요."
+  },
+  "back": {
+    "message": "뒤로"
+  },
+  "dropTitle": {
+    "message": "여기에 파일을 끌어다 놓으세요"
+  },
+  "dropHint": {
+    "message": "컴퓨터에 있는 어떤 동영상이나 오디오든, 어떤 언어든 괜찮아요."
+  },
+  "chooseFile": {
+    "message": "파일 선택"
+  },
+  "linkLabel": {
+    "message": "또는 동영상 링크 붙여 넣기"
+  },
+  "uploading": {
+    "message": "업로드 중"
+  },
+  "badFile": {
+    "message": "이 파일은 동영상이나 오디오 파일이 아니에요."
+  },
+  "notifyDone": {
+    "message": "자막이 준비됐어요"
+  },
+  "notifyFailed": {
+    "message": "번역이 끝나지 않았어요"
+  },
+  "voice": {
+    "message": "음성"
+  },
+  "voiceClone": {
+    "message": "화자별 원래 목소리 (내 컴퓨터에서)"
+  },
+  "voiceStudio": {
+    "message": "스튜디오 음성 (텍스트만 전송)"
+  },
+  "errDub": {
+    "message": "이 언어는 아직 더빙 음성이 없어요. 대신 자막을 사용해 보세요."
+  },
+  "outputDub": {
+    "message": "더빙"
+  },
+  "voiceNarrator": {
+    "message": "차분한 아랍어 내레이터 (Fish)"
+  },
+  "stageDubbing": {
+    "message": "더빙 중"
+  },
+  "voiceFish": {
+    "message": "Fish 음성 복제 (음성 샘플 전송)"
+  },
+  "keyGetFree": {
+    "message": "Google AI Studio에서 무료 키 받기"
+  },
+  "keyChecking": {
+    "message": "Google에 키를 확인하는 중"
+  },
+  "keyShape": {
+    "message": "키 형식이 아닌 것 같아요. 전부 복사했는지 확인하세요."
+  },
+  "keyFishLabel": {
+    "message": "Fish 키 (선택, 클라우드 더빙용)"
+  },
+  "keyRejected": {
+    "message": "Google이 이 키를 거부했어요. 전부 복사했는지 확인하세요."
+  },
+  "keyTitle": {
+    "message": "Gemini 키 추가"
+  },
+  "keyGeminiLabel": {
+    "message": "Gemini 키"
+  },
+  "keySet": {
+    "message": "설정됨. 바꾸려면 새 키를 입력하세요."
+  },
+  "keySave": {
+    "message": "키 저장"
+  },
+  "keyBody": {
+    "message": "tarjim은 Gemini로 동영상을 듣고 번역해요. 키는 무료이고 Google 계정에서 1분이면 받을 수 있어요."
+  },
+  "pairAuto": {
+    "message": "자동으로 연결"
+  },
+  "pairDenied": {
+    "message": "연결 요청이 거부됐어요."
+  },
+  "openTarjim": {
+    "message": "tarjim 페이지 열기"
+  },
+  "pairManual": {
+    "message": "또는 보안 토큰을 직접 붙여 넣으세요:"
+  },
+  "pairWaiting": {
+    "message": "tarjim 페이지를 열고 나타나는 연결 요청을 허용하세요."
+  },
+  "menuRootArabic": {
+    "message": "아랍어로 번역"
+  },
+  "menuDubClone": {
+    "message": "화자 본인의 목소리로 더빙 (로컬)"
+  },
+  "menuDubFish": {
+    "message": "Fish 음성 복제로 더빙 (클라우드)"
+  },
+  "menuDubNarrator": {
+    "message": "아랍어 내레이터로 더빙 (Fish)"
+  },
+  "menuDubStudio": {
+    "message": "스튜디오 음성으로 더빙"
+  },
+  "menuOther": {
+    "message": "다른 언어 또는 이 컴퓨터의 파일"
+  },
+  "menuNoVideo": {
+    "message": "이 페이지에서 동영상 링크를 찾지 못했어요."
+  },
+  "notifyStarted": {
+    "message": "번역을 시작했어요. 끝나면 알려 드릴게요."
+  },
+  "menuRootTo": {
+    "message": "$LANG$(으)로 번역",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
+  },
+  "pairedNotice": {
+    "message": "확장 프로그램이 연결됐어요. 이제 번역할 수 있어요."
+  },
+  "stageTiming": {
+    "message": "타이밍 맞추는 중"
+  },
+  "agoNow": {
+    "message": "방금 시작함"
+  },
+  "agoMinutes": {
+    "message": "$N$분",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "step_downloading": {
+    "message": "다운로드"
+  },
+  "step_hearing": {
+    "message": "듣기"
+  },
+  "step_timing": {
+    "message": "타이밍"
+  },
+  "step_translating": {
+    "message": "번역"
+  },
+  "step_writing": {
+    "message": "작성"
+  },
+  "step_burning": {
+    "message": "입히기"
+  },
+  "step_dubbing": {
+    "message": "더빙"
+  },
+  "pause": {
+    "message": "일시 정지"
+  },
+  "resume": {
+    "message": "계속"
+  },
+  "cancel": {
+    "message": "취소"
+  },
+  "stageCancelled": {
+    "message": "취소됨"
+  },
+  "stagePaused": {
+    "message": "일시 정지됨"
+  },
+  "engineLabel": {
+    "message": "엔진"
+  },
+  "engineCloud": {
+    "message": "클라우드 (Gemini, 가장 정확)"
+  },
+  "engineLocal": {
+    "message": "이 컴퓨터에서 로컬, 오프라인"
+  },
+  "engineAdvanced": {
+    "message": "다른 제공업체 또는 키 (tarjim 페이지 열림)"
+  },
+  "localModelLabel": {
+    "message": "로컬 모델"
+  },
+  "localModelHint": {
+    "message": "이 컴퓨터의 Ollama에 설치된 모델이에요."
+  },
+  "localModelNone": {
+    "message": "설치된 로컬 모델이 없어요. Ollama를 설치하고 모델을 받으세요."
+  },
+  "engineSubscription": {
+    "message": "내 구독 (Claude 또는 ChatGPT)"
+  },
+  "subscriptionLabel": {
+    "message": "구독"
+  },
+  "subscriptionNone": {
+    "message": "Claude Code나 Codex를 설치하고 요금제 계정으로 로그인하세요."
+  },
+  "providerClaude": {
+    "message": "Claude (Claude Code)"
+  },
+  "providerCodex": {
+    "message": "ChatGPT (Codex)"
+  },
+  "voiceNatural": {
+    "message": "화자별 자연스러운 음성 (Gemini)"
+  },
+  "menuDubNatural": {
+    "message": "자연스러운 음성으로 더빙"
+  },
+  "providerCopilot": {
+    "message": "GitHub Copilot"
+  },
+  "providerAntigravity": {
+    "message": "Google AI (Antigravity)"
+  }
+}

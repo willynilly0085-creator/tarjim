@@ -9,12 +9,12 @@ from tarjim.keys import status
 from tarjim.server.guard import extension_origin
 from tarjim.server.pairing import Pairing
 from tarjim.tools import Shelf
+from tarjim.ui_languages import available, codes
 
-UI_LANGUAGES = ("ar", "en")
 GLOSSARY_CHARS = 5000
 MODEL_TAG = re.compile(r"^[\w.:/-]{2,80}$")
 EXTENSION = Path(__file__).resolve().parents[2] / "extension"
-FIELDS: dict[str, tuple[str, ...]] = {"ui_language": UI_LANGUAGES, "listen_provider": LISTENERS,
+FIELDS: dict[str, tuple[str, ...]] = {"ui_language": codes(), "listen_provider": LISTENERS,
                                       "translate_provider": TRANSLATORS, "setup_done": ("yes",)}
 Query = dict[str, list[str]]
 
@@ -55,6 +55,7 @@ class SetupRoutes:
         state["local_model"] = setting("local_model")
         state["glossary"] = setting("glossary")
         state["subscriptions"] = installed()
+        state["ui_languages"] = list(available())
         self.reply(200, state)
 
     def save_setup(self, query: Query) -> None:

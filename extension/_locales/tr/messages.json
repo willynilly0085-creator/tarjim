@@ -1,0 +1,381 @@
+{
+  "appName": {
+    "message": "tarjim"
+  },
+  "appDesc": {
+    "message": "Her video için, seçtiğin dilde, konuşmaya göre zamanlanmış profesyonel altyazılar."
+  },
+  "menuBurn": {
+    "message": "Videoda altyazı"
+  },
+  "menuSrt": {
+    "message": "Altyazı dosyası (SRT)"
+  },
+  "statusOnline": {
+    "message": "Bağlı"
+  },
+  "statusOffline": {
+    "message": "Bağlı değil"
+  },
+  "settings": {
+    "message": "Ayarlar"
+  },
+  "sourceTab": {
+    "message": "Bu sekme"
+  },
+  "sourceNone": {
+    "message": "Bu sayfada video yok"
+  },
+  "sourceNoneHint": {
+    "message": "Video olan bir sayfa aç ya da bilgisayarındaki bir dosyayı çevir."
+  },
+  "pickFile": {
+    "message": "Bilgisayarındaki bir dosyayı çevir"
+  },
+  "language": {
+    "message": "Çevrilecek dil"
+  },
+  "dialect": {
+    "message": "Üslup"
+  },
+  "dialectSaudi": {
+    "message": "Suudi"
+  },
+  "dialectMsa": {
+    "message": "Standart"
+  },
+  "output": {
+    "message": "Çıktı"
+  },
+  "outputBurn": {
+    "message": "Videoya gömülü"
+  },
+  "outputSrt": {
+    "message": "Yalnızca altyazı dosyası"
+  },
+  "translate": {
+    "message": "Çevir"
+  },
+  "sending": {
+    "message": "Gönderiliyor"
+  },
+  "started": {
+    "message": "Çeviri başladı. Bu pencereyi kapatabilirsin."
+  },
+  "recent": {
+    "message": "Son çeviriler"
+  },
+  "empty": {
+    "message": "Henüz bir şey çevrilmedi. Herhangi bir videoyu aç ve Çevir'e bas ya da bir video bağlantısına sağ tıkla."
+  },
+  "stageQueued": {
+    "message": "Bekliyor"
+  },
+  "stageDownloading": {
+    "message": "İndiriliyor"
+  },
+  "stageHearing": {
+    "message": "Dinleniyor"
+  },
+  "stageTranslating": {
+    "message": "Çevriliyor"
+  },
+  "stageWriting": {
+    "message": "Altyazılar yazılıyor"
+  },
+  "stageBurning": {
+    "message": "Videoya gömülüyor"
+  },
+  "stageDone": {
+    "message": "Hazır"
+  },
+  "stageFailed": {
+    "message": "Tamamlanmadı"
+  },
+  "openFolder": {
+    "message": "Klasörde göster"
+  },
+  "play": {
+    "message": "Oynat"
+  },
+  "retry": {
+    "message": "Tekrar dene"
+  },
+  "errQuota": {
+    "message": "Ücretsiz Gemini kotası bugünlük doldu. Yarın sabah yenilenir."
+  },
+  "errKey": {
+    "message": "Gemini anahtarı ayarlanmamış. Ayarlar'dan ekle."
+  },
+  "errDownload": {
+    "message": "Video bu bağlantıdan indirilemedi. Bağlantının çalıştığından emin ol."
+  },
+  "errTools": {
+    "message": "Bu bilgisayarda ffmpeg yüklü değil."
+  },
+  "errUnknown": {
+    "message": "Beklenmeyen bir sorun oluştu."
+  },
+  "offlineTitle": {
+    "message": "tarjim bu bilgisayarda çalışmıyor"
+  },
+  "offlineBody": {
+    "message": "Bu komutla başlat, sonra geri gel:"
+  },
+  "tryAgain": {
+    "message": "Tekrar dene"
+  },
+  "pairTitle": {
+    "message": "Eklentiyi tarjim'e bağla"
+  },
+  "pairBody": {
+    "message": "Bu komutla güvenlik kodunu al ve aşağıya yapıştır:"
+  },
+  "tokenLabel": {
+    "message": "Güvenlik kodu"
+  },
+  "pair": {
+    "message": "Bağlan"
+  },
+  "pairWrong": {
+    "message": "Bu kod doğru değil. Kontrol et ve tekrar dene."
+  },
+  "serverLabel": {
+    "message": "Sunucu adresi"
+  },
+  "save": {
+    "message": "Kaydet"
+  },
+  "saved": {
+    "message": "Ayarlar kaydedildi."
+  },
+  "back": {
+    "message": "Geri"
+  },
+  "dropTitle": {
+    "message": "Dosyayı buraya bırak"
+  },
+  "dropHint": {
+    "message": "Bilgisayarındaki herhangi bir video veya ses, herhangi bir dilde."
+  },
+  "chooseFile": {
+    "message": "Dosya seç"
+  },
+  "linkLabel": {
+    "message": "Ya da bir video bağlantısı yapıştır"
+  },
+  "uploading": {
+    "message": "Yükleniyor"
+  },
+  "badFile": {
+    "message": "Bu dosya bir video veya ses dosyası değil."
+  },
+  "notifyDone": {
+    "message": "Altyazılar hazır"
+  },
+  "notifyFailed": {
+    "message": "Çeviri tamamlanmadı"
+  },
+  "voice": {
+    "message": "Ses"
+  },
+  "voiceClone": {
+    "message": "Her konuşanın kendi sesi (bilgisayarında)"
+  },
+  "voiceStudio": {
+    "message": "Stüdyo sesi (yalnızca metni gönderir)"
+  },
+  "errDub": {
+    "message": "Bu dil için henüz dublaj sesi yok. Bunun yerine altyazıyı dene."
+  },
+  "outputDub": {
+    "message": "Dublajlı"
+  },
+  "voiceNarrator": {
+    "message": "Sakin Arapça anlatıcı (Fish)"
+  },
+  "stageDubbing": {
+    "message": "Dublaj yapılıyor"
+  },
+  "voiceFish": {
+    "message": "Fish klonlama (bir ses örneği gönderir)"
+  },
+  "keyGetFree": {
+    "message": "Google AI Studio'dan ücretsiz bir anahtar al"
+  },
+  "keyChecking": {
+    "message": "Anahtar Google ile kontrol ediliyor"
+  },
+  "keyShape": {
+    "message": "Bu bir anahtara benzemiyor. Tamamını kopyaladığından emin ol."
+  },
+  "keyFishLabel": {
+    "message": "Fish anahtarı (isteğe bağlı, bulutta dublaj için)"
+  },
+  "keyRejected": {
+    "message": "Google bu anahtarı reddetti. Tamamını kopyaladığından emin ol."
+  },
+  "keyTitle": {
+    "message": "Gemini anahtarını ekle"
+  },
+  "keyGeminiLabel": {
+    "message": "Gemini anahtarı"
+  },
+  "keySet": {
+    "message": "Ayarlandı. Değiştirmek için yeni bir anahtar yaz."
+  },
+  "keySave": {
+    "message": "Anahtarı kaydet"
+  },
+  "keyBody": {
+    "message": "tarjim, videoyu dinlemek ve çevirmek için Gemini kullanır. Anahtar ücretsizdir ve Google hesabından bir dakikada alınır."
+  },
+  "pairAuto": {
+    "message": "Otomatik bağlan"
+  },
+  "pairDenied": {
+    "message": "Bağlantı isteği reddedildi."
+  },
+  "openTarjim": {
+    "message": "tarjim sayfasını aç"
+  },
+  "pairManual": {
+    "message": "Ya da güvenlik kodunu elle yapıştır:"
+  },
+  "pairWaiting": {
+    "message": "tarjim sayfasını aç ve görünen bağlantı isteğine izin ver."
+  },
+  "menuRootArabic": {
+    "message": "Arapçaya çevir"
+  },
+  "menuDubClone": {
+    "message": "Konuşanın kendi sesiyle dublaj (yerel)"
+  },
+  "menuDubFish": {
+    "message": "Fish klonlamayla dublaj (bulut)"
+  },
+  "menuDubNarrator": {
+    "message": "Arapça anlatıcıyla dublaj (Fish)"
+  },
+  "menuDubStudio": {
+    "message": "Stüdyo sesiyle dublaj"
+  },
+  "menuOther": {
+    "message": "Başka bir dil veya bu bilgisayardaki bir dosya"
+  },
+  "menuNoVideo": {
+    "message": "Bu sayfada video bağlantısı bulunamadı."
+  },
+  "notifyStarted": {
+    "message": "Çeviri başladı. Bittiğinde bildirim alacaksın."
+  },
+  "menuRootTo": {
+    "message": "Çevir: $LANG$",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
+  },
+  "pairedNotice": {
+    "message": "Eklenti bağlandı. Artık çeviri yapabilirsin."
+  },
+  "stageTiming": {
+    "message": "Zamanlama"
+  },
+  "agoNow": {
+    "message": "yeni başladı"
+  },
+  "agoMinutes": {
+    "message": "$N$ dk",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "step_downloading": {
+    "message": "İndir"
+  },
+  "step_hearing": {
+    "message": "Dinle"
+  },
+  "step_timing": {
+    "message": "Zamanla"
+  },
+  "step_translating": {
+    "message": "Çevir"
+  },
+  "step_writing": {
+    "message": "Yaz"
+  },
+  "step_burning": {
+    "message": "Göm"
+  },
+  "step_dubbing": {
+    "message": "Dublaj"
+  },
+  "pause": {
+    "message": "Duraklat"
+  },
+  "resume": {
+    "message": "Devam et"
+  },
+  "cancel": {
+    "message": "İptal"
+  },
+  "stageCancelled": {
+    "message": "İptal edildi"
+  },
+  "stagePaused": {
+    "message": "Duraklatıldı"
+  },
+  "engineLabel": {
+    "message": "Motor"
+  },
+  "engineCloud": {
+    "message": "Bulut (Gemini, en doğru)"
+  },
+  "engineLocal": {
+    "message": "Bu bilgisayarda yerel, çevrimdışı"
+  },
+  "engineAdvanced": {
+    "message": "Başka bir sağlayıcı veya anahtar (tarjim sayfasını açar)"
+  },
+  "localModelLabel": {
+    "message": "Yerel model"
+  },
+  "localModelHint": {
+    "message": "Bu bilgisayarda Ollama'da yüklü modeller."
+  },
+  "localModelNone": {
+    "message": "Yüklü yerel model yok. Ollama'yı yükle ve bir model indir."
+  },
+  "engineSubscription": {
+    "message": "Aboneliğim (Claude veya ChatGPT)"
+  },
+  "subscriptionLabel": {
+    "message": "Abonelik"
+  },
+  "subscriptionNone": {
+    "message": "Claude Code veya Codex'i yükle ve planınla giriş yap."
+  },
+  "providerClaude": {
+    "message": "Claude (Claude Code)"
+  },
+  "providerCodex": {
+    "message": "ChatGPT (Codex)"
+  },
+  "voiceNatural": {
+    "message": "Her konuşan için doğal ses (Gemini)"
+  },
+  "menuDubNatural": {
+    "message": "Doğal bir sesle dublaj"
+  },
+  "providerCopilot": {
+    "message": "GitHub Copilot"
+  },
+  "providerAntigravity": {
+    "message": "Google AI (Antigravity)"
+  }
+}

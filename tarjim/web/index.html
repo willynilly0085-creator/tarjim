@@ -18,10 +18,7 @@
       <span>tarjim</span>
     </p>
     <label class="visually-hidden" for="ui-language">Language</label>
-    <select id="ui-language" class="select compact">
-      <option value="ar">العربية</option>
-      <option value="en">English</option>
-    </select>
+    <select id="ui-language" class="select compact"></select>
     <button class="button-quiet" id="open-settings" type="button" data-t="settings" hidden></button>
   </header>
 
@@ -42,10 +39,7 @@
     <section class="step" data-step="language">
       <h1 data-t="langTitle"></h1>
       <p class="lede" data-t="langHint"></p>
-      <div class="choices" id="language-choices">
-        <label class="choice"><input type="radio" name="ui" value="ar"><span class="choice-name">العربية</span><span class="choice-note">Arabic</span></label>
-        <label class="choice"><input type="radio" name="ui" value="en"><span class="choice-name">English</span><span class="choice-note">الإنجليزية</span></label>
-      </div>
+      <div class="choices languages" id="language-choices"></div>
     </section>
 
     <section class="step" data-step="device">
@@ -72,7 +66,8 @@
       <label class="field" id="connect-model-field"><span class="field-label" data-t="modelLabel"></span>
         <input class="text-input" id="connect-model" list="connect-models" dir="ltr" autocomplete="off" spellcheck="false"></label>
       <datalist id="connect-models"></datalist>
-      <p class="meta" id="connect-listen"></p>
+      <label class="field"><span class="field-label" data-t="listenChoose"></span><select class="select" id="connect-listen"></select>
+        <span class="meta" data-t="listenHint"></span></label>
     </section>
 
     <section class="step" data-step="tools">

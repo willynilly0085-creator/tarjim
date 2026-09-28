@@ -1,15 +1,14 @@
 import { $, api, post } from "./api.js";
 import { load } from "./i18n.js";
+import { fillLanguageMenu, guessLanguage } from "./languages.js";
 import { watchPairing } from "./pairing.js";
 import { repaint, startWizard, wireWizard } from "./wizard.js";
 import { openWorkspace } from "./workspace.js";
 
-const guess = () => (navigator.language || "en").toLowerCase().startsWith("ar") ? "ar" : "en";
-
 async function boot() {
   const setup = await api("/setup");
-  await load(setup.ui_language || guess());
-  $("ui-language").value = document.documentElement.lang;
+  await load(setup.ui_language || guessLanguage(setup.ui_languages));
+  fillLanguageMenu(setup.ui_languages, document.documentElement.lang);
   wireWizard();
   watchPairing();
   $("ui-language").addEventListener("change", async () => {

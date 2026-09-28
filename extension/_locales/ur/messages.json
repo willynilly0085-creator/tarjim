@@ -1,0 +1,381 @@
+{
+  "appName": {
+    "message": "tarjim"
+  },
+  "appDesc": {
+    "message": "کسی بھی ویڈیو کے لیے پیشہ ورانہ سب ٹائٹلز، آپ کی منتخب زبان میں، گفتگو کے ساتھ درست وقت پر۔"
+  },
+  "menuBurn": {
+    "message": "ویڈیو میں سب ٹائٹلز"
+  },
+  "menuSrt": {
+    "message": "سب ٹائٹل فائل (SRT)"
+  },
+  "statusOnline": {
+    "message": "جڑا ہوا"
+  },
+  "statusOffline": {
+    "message": "جڑا ہوا نہیں"
+  },
+  "settings": {
+    "message": "ترتیبات"
+  },
+  "sourceTab": {
+    "message": "یہ ٹیب"
+  },
+  "sourceNone": {
+    "message": "اس صفحے پر کوئی ویڈیو نہیں"
+  },
+  "sourceNoneHint": {
+    "message": "ویڈیو والا صفحہ کھولیں، یا اپنے کمپیوٹر کی فائل کا ترجمہ کریں۔"
+  },
+  "pickFile": {
+    "message": "اپنے کمپیوٹر کی فائل کا ترجمہ کریں"
+  },
+  "language": {
+    "message": "اس زبان میں ترجمہ کریں"
+  },
+  "dialect": {
+    "message": "انداز"
+  },
+  "dialectSaudi": {
+    "message": "سعودی"
+  },
+  "dialectMsa": {
+    "message": "معیاری"
+  },
+  "output": {
+    "message": "آؤٹ پٹ"
+  },
+  "outputBurn": {
+    "message": "ویڈیو میں شامل"
+  },
+  "outputSrt": {
+    "message": "صرف سب ٹائٹل فائل"
+  },
+  "translate": {
+    "message": "ترجمہ کریں"
+  },
+  "sending": {
+    "message": "بھیجا جا رہا ہے"
+  },
+  "started": {
+    "message": "ترجمہ شروع ہو گیا۔ آپ یہ ونڈو بند کر سکتے ہیں۔"
+  },
+  "recent": {
+    "message": "حالیہ"
+  },
+  "empty": {
+    "message": "ابھی تک کچھ ترجمہ نہیں ہوا۔ کوئی بھی ویڈیو کھولیں اور ترجمہ کریں دبائیں، یا کسی ویڈیو لنک پر رائٹ کلک کریں۔"
+  },
+  "stageQueued": {
+    "message": "انتظار میں"
+  },
+  "stageDownloading": {
+    "message": "ڈاؤن لوڈ ہو رہا ہے"
+  },
+  "stageHearing": {
+    "message": "سن رہا ہے"
+  },
+  "stageTranslating": {
+    "message": "ترجمہ ہو رہا ہے"
+  },
+  "stageWriting": {
+    "message": "سب ٹائٹلز لکھے جا رہے ہیں"
+  },
+  "stageBurning": {
+    "message": "ویڈیو میں شامل کیا جا رہا ہے"
+  },
+  "stageDone": {
+    "message": "تیار"
+  },
+  "stageFailed": {
+    "message": "مکمل نہیں ہوا"
+  },
+  "openFolder": {
+    "message": "فولڈر میں دکھائیں"
+  },
+  "play": {
+    "message": "چلائیں"
+  },
+  "retry": {
+    "message": "دوبارہ کوشش کریں"
+  },
+  "errQuota": {
+    "message": "آج کا مفت Gemini کوٹا ختم ہو گیا ہے۔ یہ کل صبح دوبارہ ملے گا۔"
+  },
+  "errKey": {
+    "message": "Gemini کلید سیٹ نہیں ہے۔ اسے ترتیبات میں شامل کریں۔"
+  },
+  "errDownload": {
+    "message": "اس لنک سے ویڈیو ڈاؤن لوڈ نہیں ہو سکی۔ دیکھیں کہ لنک کام کر رہا ہے۔"
+  },
+  "errTools": {
+    "message": "اس کمپیوٹر پر ffmpeg انسٹال نہیں ہے۔"
+  },
+  "errUnknown": {
+    "message": "کوئی غیر متوقع خرابی ہو گئی۔"
+  },
+  "offlineTitle": {
+    "message": "اس کمپیوٹر پر tarjim نہیں چل رہا"
+  },
+  "offlineBody": {
+    "message": "اس کمانڈ سے اسے شروع کریں، پھر واپس آئیں:"
+  },
+  "tryAgain": {
+    "message": "دوبارہ کوشش کریں"
+  },
+  "pairTitle": {
+    "message": "ایکسٹینشن کو tarjim سے جوڑیں"
+  },
+  "pairBody": {
+    "message": "اس کمانڈ سے سیکیورٹی ٹوکن حاصل کریں اور نیچے پیسٹ کریں:"
+  },
+  "tokenLabel": {
+    "message": "سیکیورٹی ٹوکن"
+  },
+  "pair": {
+    "message": "جوڑیں"
+  },
+  "pairWrong": {
+    "message": "یہ ٹوکن درست نہیں۔ اسے جانچیں اور دوبارہ کوشش کریں۔"
+  },
+  "serverLabel": {
+    "message": "سرور کا پتہ"
+  },
+  "save": {
+    "message": "محفوظ کریں"
+  },
+  "saved": {
+    "message": "ترتیبات محفوظ ہو گئیں۔"
+  },
+  "back": {
+    "message": "پیچھے"
+  },
+  "dropTitle": {
+    "message": "فائل یہاں چھوڑیں"
+  },
+  "dropHint": {
+    "message": "آپ کے کمپیوٹر سے کوئی بھی ویڈیو یا آڈیو، کسی بھی زبان میں۔"
+  },
+  "chooseFile": {
+    "message": "فائل منتخب کریں"
+  },
+  "linkLabel": {
+    "message": "یا ویڈیو کا لنک پیسٹ کریں"
+  },
+  "uploading": {
+    "message": "اپ لوڈ ہو رہا ہے"
+  },
+  "badFile": {
+    "message": "یہ فائل ویڈیو یا آڈیو فائل نہیں ہے۔"
+  },
+  "notifyDone": {
+    "message": "سب ٹائٹلز تیار ہیں"
+  },
+  "notifyFailed": {
+    "message": "ترجمہ مکمل نہیں ہوا"
+  },
+  "voice": {
+    "message": "آواز"
+  },
+  "voiceClone": {
+    "message": "ہر بولنے والے کی اپنی آواز (آپ کے کمپیوٹر پر)"
+  },
+  "voiceStudio": {
+    "message": "اسٹوڈیو آواز (صرف متن بھیجتا ہے)"
+  },
+  "errDub": {
+    "message": "اس زبان کے لیے ابھی ڈبنگ کی آواز نہیں ہے۔ اس کی جگہ سب ٹائٹلز آزمائیں۔"
+  },
+  "outputDub": {
+    "message": "ڈب شدہ"
+  },
+  "voiceNarrator": {
+    "message": "پرسکون عربی راوی (Fish)"
+  },
+  "stageDubbing": {
+    "message": "ڈبنگ ہو رہی ہے"
+  },
+  "voiceFish": {
+    "message": "Fish کلوننگ (آواز کا نمونہ بھیجتا ہے)"
+  },
+  "keyGetFree": {
+    "message": "Google AI Studio سے مفت کلید حاصل کریں"
+  },
+  "keyChecking": {
+    "message": "Google سے کلید کی جانچ ہو رہی ہے"
+  },
+  "keyShape": {
+    "message": "یہ کلید جیسی نہیں لگتی۔ دیکھیں کہ آپ نے پوری کلید کاپی کی ہے۔"
+  },
+  "keyFishLabel": {
+    "message": "Fish کلید (اختیاری، کلاؤڈ ڈبنگ کے لیے)"
+  },
+  "keyRejected": {
+    "message": "Google نے یہ کلید مسترد کر دی۔ دیکھیں کہ آپ نے پوری کلید کاپی کی ہے۔"
+  },
+  "keyTitle": {
+    "message": "اپنی Gemini کلید شامل کریں"
+  },
+  "keyGeminiLabel": {
+    "message": "Gemini کلید"
+  },
+  "keySet": {
+    "message": "سیٹ ہے۔ بدلنے کے لیے نئی کلید لکھیں۔"
+  },
+  "keySave": {
+    "message": "کلید محفوظ کریں"
+  },
+  "keyBody": {
+    "message": "tarjim ویڈیو سننے اور اس کا ترجمہ کرنے کے لیے Gemini استعمال کرتا ہے۔ کلید مفت ہے اور آپ کے Google اکاؤنٹ سے حاصل کرنے میں ایک منٹ لگتا ہے۔"
+  },
+  "pairAuto": {
+    "message": "خودکار طور پر جوڑیں"
+  },
+  "pairDenied": {
+    "message": "کنکشن کی درخواست مسترد کر دی گئی۔"
+  },
+  "openTarjim": {
+    "message": "tarjim کا صفحہ کھولیں"
+  },
+  "pairManual": {
+    "message": "یا سیکیورٹی ٹوکن خود پیسٹ کریں:"
+  },
+  "pairWaiting": {
+    "message": "tarjim کا صفحہ کھولیں اور ظاہر ہونے والی کنکشن کی درخواست کی اجازت دیں۔"
+  },
+  "menuRootArabic": {
+    "message": "عربی میں ترجمہ کریں"
+  },
+  "menuDubClone": {
+    "message": "بولنے والے کی اپنی آواز میں ڈب کریں (لوکل)"
+  },
+  "menuDubFish": {
+    "message": "Fish کلوننگ سے ڈب کریں (کلاؤڈ)"
+  },
+  "menuDubNarrator": {
+    "message": "عربی راوی سے ڈب کریں (Fish)"
+  },
+  "menuDubStudio": {
+    "message": "اسٹوڈیو آواز سے ڈب کریں"
+  },
+  "menuOther": {
+    "message": "کوئی دوسری زبان یا اس کمپیوٹر کی فائل"
+  },
+  "menuNoVideo": {
+    "message": "اس صفحے پر ویڈیو کا لنک نہیں ملا۔"
+  },
+  "notifyStarted": {
+    "message": "ترجمہ شروع ہو گیا۔ مکمل ہونے پر آپ کو اطلاع ملے گی۔"
+  },
+  "menuRootTo": {
+    "message": "$LANG$ میں ترجمہ کریں",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
+  },
+  "pairedNotice": {
+    "message": "ایکسٹینشن جڑ گئی ہے۔ اب آپ ترجمہ کر سکتے ہیں۔"
+  },
+  "stageTiming": {
+    "message": "ٹائمنگ"
+  },
+  "agoNow": {
+    "message": "ابھی شروع ہوا"
+  },
+  "agoMinutes": {
+    "message": "$N$ منٹ",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "step_downloading": {
+    "message": "ڈاؤن لوڈ"
+  },
+  "step_hearing": {
+    "message": "سننا"
+  },
+  "step_timing": {
+    "message": "ٹائمنگ"
+  },
+  "step_translating": {
+    "message": "ترجمہ"
+  },
+  "step_writing": {
+    "message": "لکھنا"
+  },
+  "step_burning": {
+    "message": "شامل کرنا"
+  },
+  "step_dubbing": {
+    "message": "ڈبنگ"
+  },
+  "pause": {
+    "message": "روکیں"
+  },
+  "resume": {
+    "message": "جاری رکھیں"
+  },
+  "cancel": {
+    "message": "منسوخ کریں"
+  },
+  "stageCancelled": {
+    "message": "منسوخ"
+  },
+  "stagePaused": {
+    "message": "رکا ہوا"
+  },
+  "engineLabel": {
+    "message": "انجن"
+  },
+  "engineCloud": {
+    "message": "کلاؤڈ (Gemini، سب سے درست)"
+  },
+  "engineLocal": {
+    "message": "اسی کمپیوٹر پر لوکل، آف لائن"
+  },
+  "engineAdvanced": {
+    "message": "کوئی دوسرا فراہم کنندہ یا کلید (tarjim کا صفحہ کھولتا ہے)"
+  },
+  "localModelLabel": {
+    "message": "لوکل ماڈل"
+  },
+  "localModelHint": {
+    "message": "اس کمپیوٹر پر Ollama میں انسٹال ماڈلز۔"
+  },
+  "localModelNone": {
+    "message": "کوئی لوکل ماڈل انسٹال نہیں۔ Ollama انسٹال کریں اور ایک ماڈل ڈاؤن لوڈ کریں۔"
+  },
+  "engineSubscription": {
+    "message": "میری سبسکرپشن (Claude یا ChatGPT)"
+  },
+  "subscriptionLabel": {
+    "message": "سبسکرپشن"
+  },
+  "subscriptionNone": {
+    "message": "Claude Code یا Codex انسٹال کریں اور اپنے پلان سے سائن ان کریں۔"
+  },
+  "providerClaude": {
+    "message": "Claude (Claude Code)"
+  },
+  "providerCodex": {
+    "message": "ChatGPT (Codex)"
+  },
+  "voiceNatural": {
+    "message": "ہر بولنے والے کے لیے قدرتی آواز (Gemini)"
+  },
+  "menuDubNatural": {
+    "message": "قدرتی آواز سے ڈب کریں"
+  },
+  "providerCopilot": {
+    "message": "GitHub Copilot"
+  },
+  "providerAntigravity": {
+    "message": "Google AI (Antigravity)"
+  }
+}

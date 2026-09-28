@@ -9,7 +9,7 @@ const STAGE_KEYS = {
 const ERROR_KEYS = { quota: "errQuota", key: "errKey", download: "errDownload", tools: "errTools", dub: "errDub" };
 
 const RTL = new Set(["ar", "fa", "ur", "he"]);
-const LOCALES = new Set(["ar", "en"]);
+const LOCALES = new Set(["ar", "en", "es", "fr", "pt", "de", "ru", "tr", "hi", "ur", "id", "ja", "zh", "ko"]);
 let words = null;
 let chosen = "";
 

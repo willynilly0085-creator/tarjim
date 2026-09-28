@@ -126,3 +126,10 @@ def test_the_install_lets_uv_pick_the_graphics_card_build() -> None:
     command = install_command("uv", "file:///plugin")
     assert command[command.index("--torch-backend") + 1] == "auto"
     assert command[-1] == "tarjim[dub] @ file:///plugin"
+
+
+def test_listening_can_only_be_a_known_engine_that_is_ready(home: Path) -> None:
+    assert not connections.remember_choice({"provider": "codex", "listen": "evil"})
+    assert not connections.remember_choice({"provider": "codex", "listen": "gemini"})
+    assert connections.remember_choice({"provider": "codex", "listen": "local"})
+    assert config.setting("listen_provider") == "local"

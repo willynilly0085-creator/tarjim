@@ -2,6 +2,7 @@ import { $, post } from "./api.js";
 import { load, t } from "./i18n.js";
 import { renderChat } from "./chat.js";
 import { renderConnect, saveConnect, wireConnect } from "./connect.js";
+import { fillLanguageChoices } from "./languages.js";
 import { renderDevice, renderTools } from "./steps.js";
 
 const STEPS = ["language", "device", "connect", "tools", "extension", "chat", "done"];
@@ -11,10 +12,7 @@ let state;
 let finish;
 
 const ENTER = {
-  language: () => {
-    const input = document.querySelector(`input[name=ui][value=${document.documentElement.lang}]`);
-    if (input) input.checked = true;
-  },
+  language: () => fillLanguageChoices(state.setup.ui_languages, document.documentElement.lang),
   device: () => renderDevice(state),
   connect: () => renderConnect(),
   tools: () => watchTools(),
@@ -36,8 +34,8 @@ const LEAVE = {
 
 async function watchTools() {
   clearInterval(poll);
-  if (await renderTools(state)) poll = setInterval(async () => {
-    if (!(await renderTools(state))) clearInterval(poll);
+  if (await renderTools(state, watchTools)) poll = setInterval(async () => {
+    if (!(await renderTools(state, watchTools))) clearInterval(poll);
   }, 2000);
 }
 

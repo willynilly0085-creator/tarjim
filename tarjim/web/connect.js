@@ -1,5 +1,7 @@
 import { $, api, post } from "./api.js";
 import { t } from "./i18n.js";
+import { localPanel } from "./local.js";
+import { signInPanel } from "./signin.js";
 
 let view = null;
 
@@ -70,9 +72,7 @@ function subscriptionDetail(provider) {
       el("button", { type: "button", className: "button-quiet", textContent: t("checkAgain"),
         onclick: () => refresh(provider.id) })];
   }
-  const signIn = el("button", { type: "button", className: "button-quiet", textContent: t("signIn") });
-  signIn.addEventListener("click", () => post("/connections/sign-in", { provider: provider.id }));
-  return [el("p", { className: "meta", textContent: t("subscriptionReady") }), signIn];
+  return [signInPanel(provider)];
 }
 
 async function detail() {
@@ -80,11 +80,11 @@ async function detail() {
   const box = $("connect-detail");
   $("connect-model-field").hidden = !provider;
   if (!provider) {
-    box.replaceChildren(el("p", { className: "meta", textContent: t(method() === "local" ? "localNone" : "none") }));
+    box.replaceChildren(...(method() === "local" ? localPanel(view.local, refresh) : [el("p", { className: "meta", textContent: t("none") })]));
     return;
   }
   if (method() === "local") {
-    box.replaceChildren(el("p", { className: "meta", dir: "ltr", textContent: provider.url }));
+    box.replaceChildren(el("p", { className: "meta", dir: "ltr", textContent: provider.url }), ...localPanel(view.local, refresh));
     suggest(provider.models, view.local.server === provider.id ? view.local.model : "");
   } else if (method() === "subscription") {
     box.replaceChildren(...subscriptionDetail(provider));
@@ -94,12 +94,15 @@ async function detail() {
     const { models = [] } = provider.has_key ? await post("/connections/models", { provider: provider.id }) : {};
     suggest(models, provider.model);
   }
-  $("connect-listen").textContent = t("listenWith", { name: listenerName(provider) });
+  fillListeners();
 }
 
-function listenerName(provider) {
-  if (method() === "api" && provider.hears && provider.ready) return provider.name;
-  return view.api.find((p) => p.id === "gemini")?.ready ? "Google Gemini" : t("listenLocal");
+function fillListeners() {
+  const hearing = view.api.filter((p) => p.hears);
+  const picked = $("connect-listen").value || view.chosen.listen;
+  $("connect-listen").replaceChildren(new Option(t("listenLocal"), "local", false, picked === "local"),
+    ...hearing.map((p) => Object.assign(new Option(p.ready ? p.name : `${p.name} · ${t("needsKey")}`, p.id, false,
+      p.ready && p.id === picked), { disabled: !p.ready })));
 }
 
 function fillProviders(picked) {
@@ -110,8 +113,8 @@ function fillProviders(picked) {
   return detail();
 }
 
-async function refresh(picked) {
-  view = await api("/connections");
+async function refresh(picked, fresh) {
+  view = fresh || await api("/connections");
   await fillProviders(picked || $("connect-provider").value);
 }
 
@@ -131,7 +134,8 @@ export async function saveConnect() {
   const provider = current();
   if (!provider || provider.ready === false) return "connectNotReady";
   const local = method() === "local";
-  const body = { provider: local ? "local" : provider.id, model: $("connect-model").value.trim(), ...(local ? { server: provider.id } : {}) };
+  const body = { provider: local ? "local" : provider.id, model: $("connect-model").value.trim(),
+    listen: $("connect-listen").value, ...(local ? { server: provider.id } : {}) };
   try {
     await post("/connections/use", body);
   } catch {

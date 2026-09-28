@@ -1,0 +1,381 @@
+{
+  "appName": {
+    "message": "tarjim"
+  },
+  "appDesc": {
+    "message": "どんな動画にも、選んだ言語で、話すタイミングに合わせたプロ品質の字幕を。"
+  },
+  "menuBurn": {
+    "message": "動画に字幕を焼き込み"
+  },
+  "menuSrt": {
+    "message": "字幕ファイル（SRT）"
+  },
+  "statusOnline": {
+    "message": "接続済み"
+  },
+  "statusOffline": {
+    "message": "未接続"
+  },
+  "settings": {
+    "message": "設定"
+  },
+  "sourceTab": {
+    "message": "このタブ"
+  },
+  "sourceNone": {
+    "message": "このページに動画はありません"
+  },
+  "sourceNoneHint": {
+    "message": "動画のあるページを開くか、コンピューター内のファイルを翻訳してください。"
+  },
+  "pickFile": {
+    "message": "コンピューター内のファイルを翻訳"
+  },
+  "language": {
+    "message": "翻訳先"
+  },
+  "dialect": {
+    "message": "スタイル"
+  },
+  "dialectSaudi": {
+    "message": "サウジ方言"
+  },
+  "dialectMsa": {
+    "message": "標準語"
+  },
+  "output": {
+    "message": "出力"
+  },
+  "outputBurn": {
+    "message": "動画に焼き込み"
+  },
+  "outputSrt": {
+    "message": "字幕ファイルのみ"
+  },
+  "translate": {
+    "message": "翻訳"
+  },
+  "sending": {
+    "message": "送信中"
+  },
+  "started": {
+    "message": "翻訳を開始しました。このウィンドウは閉じてかまいません。"
+  },
+  "recent": {
+    "message": "最近"
+  },
+  "empty": {
+    "message": "まだ翻訳したものはありません。動画を開いて「翻訳」を押すか、動画のリンクを右クリックしてください。"
+  },
+  "stageQueued": {
+    "message": "待機中"
+  },
+  "stageDownloading": {
+    "message": "ダウンロード中"
+  },
+  "stageHearing": {
+    "message": "聞き取り中"
+  },
+  "stageTranslating": {
+    "message": "翻訳中"
+  },
+  "stageWriting": {
+    "message": "字幕を作成中"
+  },
+  "stageBurning": {
+    "message": "動画に焼き込み中"
+  },
+  "stageDone": {
+    "message": "完了"
+  },
+  "stageFailed": {
+    "message": "完了しませんでした"
+  },
+  "openFolder": {
+    "message": "フォルダーで表示"
+  },
+  "play": {
+    "message": "再生"
+  },
+  "retry": {
+    "message": "再試行"
+  },
+  "errQuota": {
+    "message": "本日の Gemini 無料枠を使い切りました。明日の朝に回復します。"
+  },
+  "errKey": {
+    "message": "Gemini キーが設定されていません。設定で追加してください。"
+  },
+  "errDownload": {
+    "message": "そのリンクから動画をダウンロードできませんでした。リンクが有効か確認してください。"
+  },
+  "errTools": {
+    "message": "このコンピューターに ffmpeg がインストールされていません。"
+  },
+  "errUnknown": {
+    "message": "予期しない問題が発生しました。"
+  },
+  "offlineTitle": {
+    "message": "このコンピューターで tarjim が起動していません"
+  },
+  "offlineBody": {
+    "message": "このコマンドで起動してから、戻ってきてください："
+  },
+  "tryAgain": {
+    "message": "再試行"
+  },
+  "pairTitle": {
+    "message": "拡張機能を tarjim に接続"
+  },
+  "pairBody": {
+    "message": "このコマンドでセキュリティトークンを取得し、下に貼り付けてください："
+  },
+  "tokenLabel": {
+    "message": "セキュリティトークン"
+  },
+  "pair": {
+    "message": "接続"
+  },
+  "pairWrong": {
+    "message": "トークンが正しくありません。確認してもう一度お試しください。"
+  },
+  "serverLabel": {
+    "message": "サーバーのアドレス"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "saved": {
+    "message": "設定を保存しました。"
+  },
+  "back": {
+    "message": "戻る"
+  },
+  "dropTitle": {
+    "message": "ここにファイルをドロップ"
+  },
+  "dropHint": {
+    "message": "コンピューター内のどんな動画や音声でも、どの言語でも大丈夫です。"
+  },
+  "chooseFile": {
+    "message": "ファイルを選択"
+  },
+  "linkLabel": {
+    "message": "または動画のリンクを貼り付け"
+  },
+  "uploading": {
+    "message": "アップロード中"
+  },
+  "badFile": {
+    "message": "このファイルは動画または音声ファイルではありません。"
+  },
+  "notifyDone": {
+    "message": "字幕の準備ができました"
+  },
+  "notifyFailed": {
+    "message": "翻訳が完了しませんでした"
+  },
+  "voice": {
+    "message": "音声"
+  },
+  "voiceClone": {
+    "message": "話者それぞれの声（お使いのコンピューター上）"
+  },
+  "voiceStudio": {
+    "message": "スタジオ音声（テキストのみ送信）"
+  },
+  "errDub": {
+    "message": "この言語の吹き替え音声はまだありません。代わりに字幕をお試しください。"
+  },
+  "outputDub": {
+    "message": "吹き替え"
+  },
+  "voiceNarrator": {
+    "message": "落ち着いたアラビア語ナレーター（Fish）"
+  },
+  "stageDubbing": {
+    "message": "吹き替え中"
+  },
+  "voiceFish": {
+    "message": "Fish のボイスクローン（音声サンプルを送信）"
+  },
+  "keyGetFree": {
+    "message": "Google AI Studio で無料のキーを取得"
+  },
+  "keyChecking": {
+    "message": "Google にキーを確認しています"
+  },
+  "keyShape": {
+    "message": "キーの形式ではないようです。すべてコピーできているか確認してください。"
+  },
+  "keyFishLabel": {
+    "message": "Fish キー（任意、クラウド吹き替え用）"
+  },
+  "keyRejected": {
+    "message": "Google がこのキーを拒否しました。すべてコピーできているか確認してください。"
+  },
+  "keyTitle": {
+    "message": "Gemini キーを追加"
+  },
+  "keyGeminiLabel": {
+    "message": "Gemini キー"
+  },
+  "keySet": {
+    "message": "設定済みです。置き換えるには新しいキーを入力してください。"
+  },
+  "keySave": {
+    "message": "キーを保存"
+  },
+  "keyBody": {
+    "message": "tarjim は Gemini を使って動画を聞き取り、翻訳します。キーは無料で、Google アカウントから 1 分ほどで取得できます。"
+  },
+  "pairAuto": {
+    "message": "自動で接続"
+  },
+  "pairDenied": {
+    "message": "接続リクエストが拒否されました。"
+  },
+  "openTarjim": {
+    "message": "tarjim のページを開く"
+  },
+  "pairManual": {
+    "message": "または、セキュリティトークンを手動で貼り付け："
+  },
+  "pairWaiting": {
+    "message": "tarjim のページを開き、表示される接続リクエストを許可してください。"
+  },
+  "menuRootArabic": {
+    "message": "アラビア語に翻訳"
+  },
+  "menuDubClone": {
+    "message": "話者本人の声で吹き替え（ローカル）"
+  },
+  "menuDubFish": {
+    "message": "Fish のボイスクローンで吹き替え（クラウド）"
+  },
+  "menuDubNarrator": {
+    "message": "アラビア語ナレーターで吹き替え（Fish）"
+  },
+  "menuDubStudio": {
+    "message": "スタジオ音声で吹き替え"
+  },
+  "menuOther": {
+    "message": "別の言語、またはこのコンピューター内のファイル"
+  },
+  "menuNoVideo": {
+    "message": "このページで動画のリンクが見つかりませんでした。"
+  },
+  "notifyStarted": {
+    "message": "翻訳を開始しました。完了したらお知らせします。"
+  },
+  "menuRootTo": {
+    "message": "$LANG$ に翻訳",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
+  },
+  "pairedNotice": {
+    "message": "拡張機能が接続されました。今すぐ翻訳できます。"
+  },
+  "stageTiming": {
+    "message": "タイミング調整中"
+  },
+  "agoNow": {
+    "message": "開始したところ"
+  },
+  "agoMinutes": {
+    "message": "$N$ 分",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "step_downloading": {
+    "message": "ダウンロード"
+  },
+  "step_hearing": {
+    "message": "聞き取り"
+  },
+  "step_timing": {
+    "message": "タイミング"
+  },
+  "step_translating": {
+    "message": "翻訳"
+  },
+  "step_writing": {
+    "message": "書き出し"
+  },
+  "step_burning": {
+    "message": "焼き込み"
+  },
+  "step_dubbing": {
+    "message": "吹き替え"
+  },
+  "pause": {
+    "message": "一時停止"
+  },
+  "resume": {
+    "message": "再開"
+  },
+  "cancel": {
+    "message": "キャンセル"
+  },
+  "stageCancelled": {
+    "message": "キャンセル済み"
+  },
+  "stagePaused": {
+    "message": "一時停止中"
+  },
+  "engineLabel": {
+    "message": "エンジン"
+  },
+  "engineCloud": {
+    "message": "クラウド（Gemini、最も正確）"
+  },
+  "engineLocal": {
+    "message": "このコンピューターでローカル、オフライン"
+  },
+  "engineAdvanced": {
+    "message": "別のプロバイダーやキー（tarjim のページを開きます）"
+  },
+  "localModelLabel": {
+    "message": "ローカルモデル"
+  },
+  "localModelHint": {
+    "message": "このコンピューターの Ollama にインストールされたモデルです。"
+  },
+  "localModelNone": {
+    "message": "ローカルモデルがインストールされていません。Ollama をインストールして、モデルを取得してください。"
+  },
+  "engineSubscription": {
+    "message": "自分のサブスクリプション（Claude または ChatGPT）"
+  },
+  "subscriptionLabel": {
+    "message": "サブスクリプション"
+  },
+  "subscriptionNone": {
+    "message": "Claude Code または Codex をインストールし、プランでサインインしてください。"
+  },
+  "providerClaude": {
+    "message": "Claude (Claude Code)"
+  },
+  "providerCodex": {
+    "message": "ChatGPT (Codex)"
+  },
+  "voiceNatural": {
+    "message": "話者ごとの自然な音声（Gemini）"
+  },
+  "menuDubNatural": {
+    "message": "自然な音声で吹き替え"
+  },
+  "providerCopilot": {
+    "message": "GitHub Copilot"
+  },
+  "providerAntigravity": {
+    "message": "Google AI (Antigravity)"
+  }
+}

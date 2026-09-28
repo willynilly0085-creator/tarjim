@@ -1,0 +1,381 @@
+{
+  "appName": {
+    "message": "tarjim"
+  },
+  "appDesc": {
+    "message": "为任意视频生成专业字幕，使用你选择的语言，并与语音同步。"
+  },
+  "menuBurn": {
+    "message": "字幕烧录到视频中"
+  },
+  "menuSrt": {
+    "message": "字幕文件（SRT）"
+  },
+  "statusOnline": {
+    "message": "已连接"
+  },
+  "statusOffline": {
+    "message": "未连接"
+  },
+  "settings": {
+    "message": "设置"
+  },
+  "sourceTab": {
+    "message": "当前标签页"
+  },
+  "sourceNone": {
+    "message": "此页面没有视频"
+  },
+  "sourceNoneHint": {
+    "message": "打开一个有视频的页面，或翻译电脑上的文件。"
+  },
+  "pickFile": {
+    "message": "翻译电脑上的文件"
+  },
+  "language": {
+    "message": "翻译成"
+  },
+  "dialect": {
+    "message": "风格"
+  },
+  "dialectSaudi": {
+    "message": "沙特方言"
+  },
+  "dialectMsa": {
+    "message": "标准语"
+  },
+  "output": {
+    "message": "输出"
+  },
+  "outputBurn": {
+    "message": "烧录到视频中"
+  },
+  "outputSrt": {
+    "message": "仅字幕文件"
+  },
+  "translate": {
+    "message": "翻译"
+  },
+  "sending": {
+    "message": "正在发送"
+  },
+  "started": {
+    "message": "翻译已开始。你可以关闭这个窗口。"
+  },
+  "recent": {
+    "message": "最近"
+  },
+  "empty": {
+    "message": "还没有翻译任何内容。打开任意视频并点击“翻译”，或右键点击任意视频链接。"
+  },
+  "stageQueued": {
+    "message": "等待中"
+  },
+  "stageDownloading": {
+    "message": "正在下载"
+  },
+  "stageHearing": {
+    "message": "正在听取"
+  },
+  "stageTranslating": {
+    "message": "正在翻译"
+  },
+  "stageWriting": {
+    "message": "正在生成字幕"
+  },
+  "stageBurning": {
+    "message": "正在烧录到视频"
+  },
+  "stageDone": {
+    "message": "就绪"
+  },
+  "stageFailed": {
+    "message": "未完成"
+  },
+  "openFolder": {
+    "message": "在文件夹中显示"
+  },
+  "play": {
+    "message": "播放"
+  },
+  "retry": {
+    "message": "重试"
+  },
+  "errQuota": {
+    "message": "今天的 Gemini 免费额度已用完。明天早上会恢复。"
+  },
+  "errKey": {
+    "message": "尚未设置 Gemini 密钥。请在设置中添加。"
+  },
+  "errDownload": {
+    "message": "无法从该链接下载视频。请检查链接是否有效。"
+  },
+  "errTools": {
+    "message": "这台电脑上没有安装 ffmpeg。"
+  },
+  "errUnknown": {
+    "message": "出现了意外问题。"
+  },
+  "offlineTitle": {
+    "message": "tarjim 没有在这台电脑上运行"
+  },
+  "offlineBody": {
+    "message": "用这条命令启动它，然后回到这里："
+  },
+  "tryAgain": {
+    "message": "重试"
+  },
+  "pairTitle": {
+    "message": "将扩展连接到 tarjim"
+  },
+  "pairBody": {
+    "message": "用这条命令获取安全令牌，并粘贴到下方："
+  },
+  "tokenLabel": {
+    "message": "安全令牌"
+  },
+  "pair": {
+    "message": "连接"
+  },
+  "pairWrong": {
+    "message": "令牌不正确。请检查后重试。"
+  },
+  "serverLabel": {
+    "message": "服务器地址"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "saved": {
+    "message": "设置已保存。"
+  },
+  "back": {
+    "message": "返回"
+  },
+  "dropTitle": {
+    "message": "把文件拖到这里"
+  },
+  "dropHint": {
+    "message": "电脑上的任意视频或音频，任意语言均可。"
+  },
+  "chooseFile": {
+    "message": "选择文件"
+  },
+  "linkLabel": {
+    "message": "或粘贴视频链接"
+  },
+  "uploading": {
+    "message": "正在上传"
+  },
+  "badFile": {
+    "message": "这个文件不是视频或音频文件。"
+  },
+  "notifyDone": {
+    "message": "字幕已就绪"
+  },
+  "notifyFailed": {
+    "message": "翻译未完成"
+  },
+  "voice": {
+    "message": "声音"
+  },
+  "voiceClone": {
+    "message": "每位说话人自己的声音（在你的电脑上）"
+  },
+  "voiceStudio": {
+    "message": "录音室声音（仅发送文字）"
+  },
+  "errDub": {
+    "message": "这种语言暂时没有配音声音。请改用字幕。"
+  },
+  "outputDub": {
+    "message": "配音"
+  },
+  "voiceNarrator": {
+    "message": "沉稳的阿拉伯语旁白（Fish）"
+  },
+  "stageDubbing": {
+    "message": "正在配音"
+  },
+  "voiceFish": {
+    "message": "Fish 声音克隆（发送声音样本）"
+  },
+  "keyGetFree": {
+    "message": "从 Google AI Studio 获取免费密钥"
+  },
+  "keyChecking": {
+    "message": "正在向 Google 验证密钥"
+  },
+  "keyShape": {
+    "message": "这看起来不像密钥。请检查是否完整复制。"
+  },
+  "keyFishLabel": {
+    "message": "Fish 密钥（可选，用于云端配音）"
+  },
+  "keyRejected": {
+    "message": "Google 拒绝了这个密钥。请检查是否完整复制。"
+  },
+  "keyTitle": {
+    "message": "添加你的 Gemini 密钥"
+  },
+  "keyGeminiLabel": {
+    "message": "Gemini 密钥"
+  },
+  "keySet": {
+    "message": "已设置。输入新密钥即可替换。"
+  },
+  "keySave": {
+    "message": "保存密钥"
+  },
+  "keyBody": {
+    "message": "tarjim 使用 Gemini 听取并翻译视频。密钥是免费的，用你的 Google 账号大约 1 分钟就能获取。"
+  },
+  "pairAuto": {
+    "message": "自动连接"
+  },
+  "pairDenied": {
+    "message": "连接请求已被拒绝。"
+  },
+  "openTarjim": {
+    "message": "打开 tarjim 页面"
+  },
+  "pairManual": {
+    "message": "或者手动粘贴安全令牌："
+  },
+  "pairWaiting": {
+    "message": "打开 tarjim 页面，并允许出现的连接请求。"
+  },
+  "menuRootArabic": {
+    "message": "翻译成阿拉伯语"
+  },
+  "menuDubClone": {
+    "message": "用说话人自己的声音配音（本地）"
+  },
+  "menuDubFish": {
+    "message": "用 Fish 声音克隆配音（云端）"
+  },
+  "menuDubNarrator": {
+    "message": "用阿拉伯语旁白配音（Fish）"
+  },
+  "menuDubStudio": {
+    "message": "用录音室声音配音"
+  },
+  "menuOther": {
+    "message": "其他语言或这台电脑上的文件"
+  },
+  "menuNoVideo": {
+    "message": "在此页面上找不到视频链接。"
+  },
+  "notifyStarted": {
+    "message": "翻译已开始。完成后会通知你。"
+  },
+  "menuRootTo": {
+    "message": "翻译成 $LANG$",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
+  },
+  "pairedNotice": {
+    "message": "扩展已连接。现在可以开始翻译了。"
+  },
+  "stageTiming": {
+    "message": "正在对齐时间轴"
+  },
+  "agoNow": {
+    "message": "刚刚开始"
+  },
+  "agoMinutes": {
+    "message": "$N$ 分钟",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "step_downloading": {
+    "message": "下载"
+  },
+  "step_hearing": {
+    "message": "听取"
+  },
+  "step_timing": {
+    "message": "时间轴"
+  },
+  "step_translating": {
+    "message": "翻译"
+  },
+  "step_writing": {
+    "message": "生成"
+  },
+  "step_burning": {
+    "message": "烧录"
+  },
+  "step_dubbing": {
+    "message": "配音"
+  },
+  "pause": {
+    "message": "暂停"
+  },
+  "resume": {
+    "message": "继续"
+  },
+  "cancel": {
+    "message": "取消"
+  },
+  "stageCancelled": {
+    "message": "已取消"
+  },
+  "stagePaused": {
+    "message": "已暂停"
+  },
+  "engineLabel": {
+    "message": "引擎"
+  },
+  "engineCloud": {
+    "message": "云端（Gemini，最准确）"
+  },
+  "engineLocal": {
+    "message": "在这台电脑上本地运行，可离线"
+  },
+  "engineAdvanced": {
+    "message": "其他服务商或密钥（打开 tarjim 页面）"
+  },
+  "localModelLabel": {
+    "message": "本地模型"
+  },
+  "localModelHint": {
+    "message": "这台电脑上 Ollama 中已安装的模型。"
+  },
+  "localModelNone": {
+    "message": "没有安装本地模型。请安装 Ollama 并拉取一个模型。"
+  },
+  "engineSubscription": {
+    "message": "我的订阅（Claude 或 ChatGPT）"
+  },
+  "subscriptionLabel": {
+    "message": "订阅"
+  },
+  "subscriptionNone": {
+    "message": "请安装 Claude Code 或 Codex，并用你的套餐登录。"
+  },
+  "providerClaude": {
+    "message": "Claude (Claude Code)"
+  },
+  "providerCodex": {
+    "message": "ChatGPT (Codex)"
+  },
+  "voiceNatural": {
+    "message": "每位说话人的自然声音（Gemini）"
+  },
+  "menuDubNatural": {
+    "message": "用自然声音配音"
+  },
+  "providerCopilot": {
+    "message": "GitHub Copilot"
+  },
+  "providerAntigravity": {
+    "message": "Google AI (Antigravity)"
+  }
+}

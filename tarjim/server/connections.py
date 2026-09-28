@@ -1,7 +1,5 @@
 """The connections screen: API keys, subscriptions and AI on this computer, in one view."""
 import re
-import subprocess
-import sys
 from typing import Any
 
 from tarjim.config import save, setting
@@ -30,10 +28,15 @@ def subscription_view(provider: Provider) -> dict[str, Any]:
 
 
 def local_view() -> dict[str, Any]:
+    from tarjim.engines.local_programs import installed
     from tarjim.engines.local_servers import chosen_server, discover
 
-    servers = [{"id": s.id, "name": s.name, "url": s.url, "models": s.models} for s in discover()]
-    return {"servers": servers, "server": chosen_server(), "model": setting("local_model")}
+    running = discover()
+    servers = [{"id": s.id, "name": s.name, "url": s.url, "models": s.models} for s in running]
+    stopped = [{"id": p.id, "name": p.name, "models": p.models, "can_start": p.can_start}
+               for p in installed({s.id for s in running})]
+    return {"servers": servers, "installed": stopped, "server": chosen_server(),
+            "model": setting("local_model")}
 
 
 def overview() -> dict[str, Any]:
@@ -53,11 +56,16 @@ def listener_for(provider: str) -> str:
     return "gemini" if has_key("gemini") else LOCAL
 
 
+def acceptable(provider: str, listen: str, model: str) -> bool:
+    known = provider == LOCAL or provider in BY_ID
+    hears = listen in LISTENERS and (listen == LOCAL or has_key(listen))
+    return known and hears and (not model or bool(MODEL_NAME.match(model)))
+
+
 def remember_choice(data: dict[str, Any]) -> bool:
     provider, model = str(data.get("provider", "")), str(data.get("model", ""))
-    if provider != LOCAL and provider not in BY_ID:
-        return False
-    if model and not MODEL_NAME.match(model):
+    listen = str(data.get("listen") or listener_for(provider))
+    if not acceptable(provider, listen, model):
         return False
     if provider == LOCAL:
         from tarjim.engines.local_servers import BY_ID as SERVERS
@@ -69,7 +77,7 @@ def remember_choice(data: dict[str, Any]) -> bool:
     if model:
         save("local_model" if provider == LOCAL else BY_ID[provider].model_name, model)
     save("translate_provider", provider)
-    save("listen_provider", str(data.get("listen") or listener_for(provider)))
+    save("listen_provider", listen)
     return True
 
 
@@ -80,13 +88,6 @@ def models_for(provider: str) -> list[str]:
     if found is None or not compatible(found) or not setting(found.key_name):
         return []
     return list_models(address(provider), setting(found.key_name))
-
-
-def open_console(command: list[str]) -> bool:
-    if sys.platform != "win32" or not command:
-        return False
-    subprocess.Popen(["cmd", "/k", *command], creationflags=subprocess.CREATE_NEW_CONSOLE)
-    return True
 
 
 class ConnectionRoutes:
@@ -115,14 +116,40 @@ class ConnectionRoutes:
         self.reply(200, {"saved": True})
 
     def sign_in(self, _query: Query) -> None:
-        from tarjim.engines.subscription import launcher
+        from tarjim.engines.sign_in import start
 
-        found = BY_ID.get(str(self.read_json().get("provider", "")))
-        if found is None or found.method != SUBSCRIPTION:
-            self.reply(400, {"error": "provider"})
-            return
-        command = [*launcher(found.program), *found.login[1:]]
-        self.reply(200, {"opened": open_console(command)})
+        mode = start(str(self.read_json().get("provider", "")))
+        self.reply(200 if mode else 400, {"mode": mode})
+
+    def sign_in_code(self, _query: Query) -> None:
+        from tarjim.engines.sign_in import send_code
+
+        data = self.read_json()
+        sent = send_code(str(data.get("provider", "")), str(data.get("code", "")).strip())
+        self.reply(200 if sent else 400, {"sent": sent})
+
+    def start_local(self, _query: Query) -> None:
+        from tarjim.engines.local_programs import start
+
+        started = start(str(self.read_json().get("server", "")))
+        self.reply(200 if started else 400, {"started": started, **overview()})
+
+    def scan_local(self, _query: Query) -> None:
+        from tarjim.engines.local_programs import search
+
+        self.reply(200, {"found": search(), **overview()})
+
+    def local_program(self, _query: Query) -> None:
+        from tarjim.engines.local_programs import remember
+
+        server = remember(str(self.read_json().get("path", "")))
+        self.reply(200 if server else 400, {"server": server, **overview()})
+
+    def signed_in(self, _query: Query) -> None:
+        from tarjim.engines.sign_in import signed_in
+
+        provider = str(self.read_json().get("provider", ""))
+        self.reply(200, {"signed_in": provider in BY_ID and signed_in(provider)})
 
     def link_assistant(self, _query: Query) -> None:
         from tarjim.server.assistant_link import link

@@ -1,0 +1,381 @@
+{
+  "appName": {
+    "message": "tarjim"
+  },
+  "appDesc": {
+    "message": "Professionelle Untertitel für jedes Video, in der Sprache deiner Wahl, passend zum Gesprochenen getimt."
+  },
+  "menuBurn": {
+    "message": "Untertitel im Video"
+  },
+  "menuSrt": {
+    "message": "Untertiteldatei (SRT)"
+  },
+  "statusOnline": {
+    "message": "Verbunden"
+  },
+  "statusOffline": {
+    "message": "Nicht verbunden"
+  },
+  "settings": {
+    "message": "Einstellungen"
+  },
+  "sourceTab": {
+    "message": "Dieser Tab"
+  },
+  "sourceNone": {
+    "message": "Kein Video auf dieser Seite"
+  },
+  "sourceNoneHint": {
+    "message": "Öffne eine Seite mit einem Video oder übersetze eine Datei von deinem Computer."
+  },
+  "pickFile": {
+    "message": "Eine Datei von deinem Computer übersetzen"
+  },
+  "language": {
+    "message": "Übersetzen in"
+  },
+  "dialect": {
+    "message": "Stil"
+  },
+  "dialectSaudi": {
+    "message": "Saudisch"
+  },
+  "dialectMsa": {
+    "message": "Hocharabisch"
+  },
+  "output": {
+    "message": "Ausgabe"
+  },
+  "outputBurn": {
+    "message": "Ins Video eingebrannt"
+  },
+  "outputSrt": {
+    "message": "Nur Untertiteldatei"
+  },
+  "translate": {
+    "message": "Übersetzen"
+  },
+  "sending": {
+    "message": "Wird gesendet"
+  },
+  "started": {
+    "message": "Übersetzung gestartet. Du kannst dieses Fenster schließen."
+  },
+  "recent": {
+    "message": "Zuletzt"
+  },
+  "empty": {
+    "message": "Noch nichts übersetzt. Öffne ein Video und klicke auf Übersetzen, oder klicke mit der rechten Maustaste auf einen Videolink."
+  },
+  "stageQueued": {
+    "message": "Wartet"
+  },
+  "stageDownloading": {
+    "message": "Wird heruntergeladen"
+  },
+  "stageHearing": {
+    "message": "Hört zu"
+  },
+  "stageTranslating": {
+    "message": "Wird übersetzt"
+  },
+  "stageWriting": {
+    "message": "Untertitel werden geschrieben"
+  },
+  "stageBurning": {
+    "message": "Wird ins Video eingebrannt"
+  },
+  "stageDone": {
+    "message": "Fertig"
+  },
+  "stageFailed": {
+    "message": "Nicht abgeschlossen"
+  },
+  "openFolder": {
+    "message": "Im Ordner anzeigen"
+  },
+  "play": {
+    "message": "Abspielen"
+  },
+  "retry": {
+    "message": "Erneut versuchen"
+  },
+  "errQuota": {
+    "message": "Das kostenlose Gemini-Kontingent ist für heute aufgebraucht. Es steht morgen früh wieder bereit."
+  },
+  "errKey": {
+    "message": "Kein Gemini-Schlüssel eingerichtet. Füge ihn in den Einstellungen hinzu."
+  },
+  "errDownload": {
+    "message": "Das Video konnte über diesen Link nicht heruntergeladen werden. Prüfe, ob der Link funktioniert."
+  },
+  "errTools": {
+    "message": "ffmpeg ist auf diesem Computer nicht installiert."
+  },
+  "errUnknown": {
+    "message": "Etwas Unerwartetes ist schiefgelaufen."
+  },
+  "offlineTitle": {
+    "message": "tarjim läuft nicht auf diesem Computer"
+  },
+  "offlineBody": {
+    "message": "Starte es mit diesem Befehl und komm dann zurück:"
+  },
+  "tryAgain": {
+    "message": "Erneut versuchen"
+  },
+  "pairTitle": {
+    "message": "Erweiterung mit tarjim verbinden"
+  },
+  "pairBody": {
+    "message": "Hol dir den Sicherheitstoken mit diesem Befehl und füge ihn unten ein:"
+  },
+  "tokenLabel": {
+    "message": "Sicherheitstoken"
+  },
+  "pair": {
+    "message": "Verbinden"
+  },
+  "pairWrong": {
+    "message": "Dieser Token stimmt nicht. Prüfe ihn und versuch es erneut."
+  },
+  "serverLabel": {
+    "message": "Serveradresse"
+  },
+  "save": {
+    "message": "Speichern"
+  },
+  "saved": {
+    "message": "Einstellungen gespeichert."
+  },
+  "back": {
+    "message": "Zurück"
+  },
+  "dropTitle": {
+    "message": "Datei hierher ziehen"
+  },
+  "dropHint": {
+    "message": "Jedes Video oder Audio von deinem Computer, in jeder Sprache."
+  },
+  "chooseFile": {
+    "message": "Datei auswählen"
+  },
+  "linkLabel": {
+    "message": "Oder füge einen Videolink ein"
+  },
+  "uploading": {
+    "message": "Wird hochgeladen"
+  },
+  "badFile": {
+    "message": "Diese Datei ist keine Video- oder Audiodatei."
+  },
+  "notifyDone": {
+    "message": "Untertitel fertig"
+  },
+  "notifyFailed": {
+    "message": "Übersetzung nicht abgeschlossen"
+  },
+  "voice": {
+    "message": "Stimme"
+  },
+  "voiceClone": {
+    "message": "Die eigene Stimme jeder Person (auf deinem Computer)"
+  },
+  "voiceStudio": {
+    "message": "Studiostimme (sendet nur den Text)"
+  },
+  "errDub": {
+    "message": "Für diese Sprache gibt es noch keine Synchronstimme. Versuch es stattdessen mit Untertiteln."
+  },
+  "outputDub": {
+    "message": "Synchronisiert"
+  },
+  "voiceNarrator": {
+    "message": "Ruhiger arabischer Sprecher (Fish)"
+  },
+  "stageDubbing": {
+    "message": "Wird synchronisiert"
+  },
+  "voiceFish": {
+    "message": "Fish-Klonen (sendet eine Stimmprobe)"
+  },
+  "keyGetFree": {
+    "message": "Hol dir einen kostenlosen Schlüssel bei Google AI Studio"
+  },
+  "keyChecking": {
+    "message": "Schlüssel wird bei Google geprüft"
+  },
+  "keyShape": {
+    "message": "Das sieht nicht wie ein Schlüssel aus. Prüfe, ob du ihn vollständig kopiert hast."
+  },
+  "keyFishLabel": {
+    "message": "Fish-Schlüssel (optional, für Synchronisation in der Cloud)"
+  },
+  "keyRejected": {
+    "message": "Google hat diesen Schlüssel abgelehnt. Prüfe, ob du ihn vollständig kopiert hast."
+  },
+  "keyTitle": {
+    "message": "Füge deinen Gemini-Schlüssel hinzu"
+  },
+  "keyGeminiLabel": {
+    "message": "Gemini-Schlüssel"
+  },
+  "keySet": {
+    "message": "Eingerichtet. Gib einen neuen Schlüssel ein, um ihn zu ersetzen."
+  },
+  "keySave": {
+    "message": "Schlüssel speichern"
+  },
+  "keyBody": {
+    "message": "tarjim nutzt Gemini, um das Video anzuhören und zu übersetzen. Der Schlüssel ist kostenlos und in einer Minute über dein Google-Konto erstellt."
+  },
+  "pairAuto": {
+    "message": "Automatisch verbinden"
+  },
+  "pairDenied": {
+    "message": "Die Verbindungsanfrage wurde abgelehnt."
+  },
+  "openTarjim": {
+    "message": "tarjim-Seite öffnen"
+  },
+  "pairManual": {
+    "message": "Oder füge den Sicherheitstoken von Hand ein:"
+  },
+  "pairWaiting": {
+    "message": "Öffne die tarjim-Seite und erlaube die Verbindungsanfrage, die dort erscheint."
+  },
+  "menuRootArabic": {
+    "message": "Ins Arabische übersetzen"
+  },
+  "menuDubClone": {
+    "message": "Mit der eigenen Stimme der Person synchronisieren (lokal)"
+  },
+  "menuDubFish": {
+    "message": "Mit Fish-Klonen synchronisieren (Cloud)"
+  },
+  "menuDubNarrator": {
+    "message": "Mit dem arabischen Sprecher synchronisieren (Fish)"
+  },
+  "menuDubStudio": {
+    "message": "Mit einer Studiostimme synchronisieren"
+  },
+  "menuOther": {
+    "message": "Eine andere Sprache oder eine Datei auf diesem Computer"
+  },
+  "menuNoVideo": {
+    "message": "Auf dieser Seite wurde kein Videolink gefunden."
+  },
+  "notifyStarted": {
+    "message": "Übersetzung gestartet. Du wirst benachrichtigt, wenn sie fertig ist."
+  },
+  "menuRootTo": {
+    "message": "Übersetzen in: $LANG$",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
+  },
+  "pairedNotice": {
+    "message": "Die Erweiterung ist verbunden. Du kannst jetzt übersetzen."
+  },
+  "stageTiming": {
+    "message": "Timing"
+  },
+  "agoNow": {
+    "message": "gerade gestartet"
+  },
+  "agoMinutes": {
+    "message": "$N$ Min.",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "step_downloading": {
+    "message": "Download"
+  },
+  "step_hearing": {
+    "message": "Zuhören"
+  },
+  "step_timing": {
+    "message": "Timing"
+  },
+  "step_translating": {
+    "message": "Übersetzen"
+  },
+  "step_writing": {
+    "message": "Schreiben"
+  },
+  "step_burning": {
+    "message": "Einbrennen"
+  },
+  "step_dubbing": {
+    "message": "Synchronisieren"
+  },
+  "pause": {
+    "message": "Pausieren"
+  },
+  "resume": {
+    "message": "Fortsetzen"
+  },
+  "cancel": {
+    "message": "Abbrechen"
+  },
+  "stageCancelled": {
+    "message": "Abgebrochen"
+  },
+  "stagePaused": {
+    "message": "Pausiert"
+  },
+  "engineLabel": {
+    "message": "Engine"
+  },
+  "engineCloud": {
+    "message": "Cloud (Gemini, am genauesten)"
+  },
+  "engineLocal": {
+    "message": "Lokal auf diesem Computer, offline"
+  },
+  "engineAdvanced": {
+    "message": "Anderer Anbieter oder Schlüssel (öffnet die tarjim-Seite)"
+  },
+  "localModelLabel": {
+    "message": "Lokales Modell"
+  },
+  "localModelHint": {
+    "message": "In Ollama auf diesem Computer installierte Modelle."
+  },
+  "localModelNone": {
+    "message": "Keine lokalen Modelle installiert. Installiere Ollama und lade ein Modell herunter."
+  },
+  "engineSubscription": {
+    "message": "Mein Abo (Claude oder ChatGPT)"
+  },
+  "subscriptionLabel": {
+    "message": "Abo"
+  },
+  "subscriptionNone": {
+    "message": "Installiere Claude Code oder Codex und melde dich mit deinem Abo an."
+  },
+  "providerClaude": {
+    "message": "Claude (Claude Code)"
+  },
+  "providerCodex": {
+    "message": "ChatGPT (Codex)"
+  },
+  "voiceNatural": {
+    "message": "Natürliche Stimme pro Person (Gemini)"
+  },
+  "menuDubNatural": {
+    "message": "Mit einer natürlichen Stimme synchronisieren"
+  },
+  "providerCopilot": {
+    "message": "GitHub Copilot"
+  },
+  "providerAntigravity": {
+    "message": "Google AI (Antigravity)"
+  }
+}

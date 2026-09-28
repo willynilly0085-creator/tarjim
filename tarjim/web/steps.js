@@ -55,9 +55,8 @@ function licenseLine(tool) {
   return line;
 }
 
-export async function renderTools(state) {
+export async function renderTools(state, refresh = () => renderTools(state)) {
   state.tools = await api("/tools");
-  const refresh = () => renderTools(state);
   $("tool-list").replaceChildren(...state.tools.map((tool) => {
     const row = $("tool-row").content.firstElementChild.cloneNode(true);
     row.querySelector(".tool-name").textContent = `${t(`tool_${tool.id}`)} · ${t(tool.required ? "required" : "optional")}`;

@@ -30,6 +30,9 @@ POST_ROUTES = table([
     (rf"^/jobs/{JOB}/(pause|resume|cancel)$", "steer_job"), (r"^/jobs/local$", "create_local"),
     (r"^/connections/models$", "connection_models"), (r"^/connections/use$", "use_connection"),
     (r"^/connections/address$", "save_address"), (r"^/connections/sign-in$", "sign_in"),
+    (r"^/connections/sign-in/code$", "sign_in_code"), (r"^/connections/signed-in$", "signed_in"),
+    (r"^/connections/start-local$", "start_local"), (r"^/connections/scan-local$", "scan_local"),
+    (r"^/connections/local-program$", "local_program"),
     (r"^/connections/assistant$", "link_assistant")])
 OPEN = [re.compile(p) for p in (r"^/$", r"^/web/", r"^/ping$", r"^/languages$", r"^/pair$",
                                   rf"^/pair/{PAIR}$", r"^/ui-language$")]

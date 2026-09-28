@@ -1,0 +1,381 @@
+{
+  "appName": {
+    "message": "tarjim"
+  },
+  "appDesc": {
+    "message": "Subtitle profesional untuk video apa pun, dalam bahasa pilihanmu, pas dengan ucapan."
+  },
+  "menuBurn": {
+    "message": "Subtitle di dalam video"
+  },
+  "menuSrt": {
+    "message": "File subtitle (SRT)"
+  },
+  "statusOnline": {
+    "message": "Terhubung"
+  },
+  "statusOffline": {
+    "message": "Tidak terhubung"
+  },
+  "settings": {
+    "message": "Pengaturan"
+  },
+  "sourceTab": {
+    "message": "Tab ini"
+  },
+  "sourceNone": {
+    "message": "Tidak ada video di halaman ini"
+  },
+  "sourceNoneHint": {
+    "message": "Buka halaman yang berisi video, atau terjemahkan file dari komputermu."
+  },
+  "pickFile": {
+    "message": "Terjemahkan file dari komputermu"
+  },
+  "language": {
+    "message": "Terjemahkan ke"
+  },
+  "dialect": {
+    "message": "Gaya"
+  },
+  "dialectSaudi": {
+    "message": "Saudi"
+  },
+  "dialectMsa": {
+    "message": "Standar"
+  },
+  "output": {
+    "message": "Hasil"
+  },
+  "outputBurn": {
+    "message": "Menyatu di video"
+  },
+  "outputSrt": {
+    "message": "Hanya file subtitle"
+  },
+  "translate": {
+    "message": "Terjemahkan"
+  },
+  "sending": {
+    "message": "Mengirim"
+  },
+  "started": {
+    "message": "Terjemahan dimulai. Kamu bisa menutup jendela ini."
+  },
+  "recent": {
+    "message": "Terbaru"
+  },
+  "empty": {
+    "message": "Belum ada yang diterjemahkan. Buka video apa pun dan tekan Terjemahkan, atau klik kanan tautan video mana pun."
+  },
+  "stageQueued": {
+    "message": "Menunggu"
+  },
+  "stageDownloading": {
+    "message": "Mengunduh"
+  },
+  "stageHearing": {
+    "message": "Mendengarkan"
+  },
+  "stageTranslating": {
+    "message": "Menerjemahkan"
+  },
+  "stageWriting": {
+    "message": "Menulis subtitle"
+  },
+  "stageBurning": {
+    "message": "Menyatukan ke video"
+  },
+  "stageDone": {
+    "message": "Siap"
+  },
+  "stageFailed": {
+    "message": "Tidak selesai"
+  },
+  "openFolder": {
+    "message": "Tampilkan di folder"
+  },
+  "play": {
+    "message": "Putar"
+  },
+  "retry": {
+    "message": "Coba lagi"
+  },
+  "errQuota": {
+    "message": "Kuota Gemini gratis hari ini sudah habis. Kuota kembali besok pagi."
+  },
+  "errKey": {
+    "message": "Kunci Gemini belum diatur. Tambahkan di Pengaturan."
+  },
+  "errDownload": {
+    "message": "Tidak bisa mengunduh video dari tautan itu. Pastikan tautannya berfungsi."
+  },
+  "errTools": {
+    "message": "ffmpeg belum terpasang di komputer ini."
+  },
+  "errUnknown": {
+    "message": "Terjadi kesalahan yang tidak terduga."
+  },
+  "offlineTitle": {
+    "message": "tarjim tidak berjalan di komputer ini"
+  },
+  "offlineBody": {
+    "message": "Jalankan dengan perintah ini, lalu kembali ke sini:"
+  },
+  "tryAgain": {
+    "message": "Coba lagi"
+  },
+  "pairTitle": {
+    "message": "Hubungkan ekstensi ke tarjim"
+  },
+  "pairBody": {
+    "message": "Dapatkan token keamanan dengan perintah ini dan tempel di bawah:"
+  },
+  "tokenLabel": {
+    "message": "Token keamanan"
+  },
+  "pair": {
+    "message": "Hubungkan"
+  },
+  "pairWrong": {
+    "message": "Token itu tidak benar. Periksa dan coba lagi."
+  },
+  "serverLabel": {
+    "message": "Alamat server"
+  },
+  "save": {
+    "message": "Simpan"
+  },
+  "saved": {
+    "message": "Pengaturan disimpan."
+  },
+  "back": {
+    "message": "Kembali"
+  },
+  "dropTitle": {
+    "message": "Letakkan file di sini"
+  },
+  "dropHint": {
+    "message": "Video atau audio apa pun dari komputermu, dalam bahasa apa pun."
+  },
+  "chooseFile": {
+    "message": "Pilih file"
+  },
+  "linkLabel": {
+    "message": "Atau tempel tautan video"
+  },
+  "uploading": {
+    "message": "Mengunggah"
+  },
+  "badFile": {
+    "message": "File itu bukan file video atau audio."
+  },
+  "notifyDone": {
+    "message": "Subtitle siap"
+  },
+  "notifyFailed": {
+    "message": "Terjemahan tidak selesai"
+  },
+  "voice": {
+    "message": "Suara"
+  },
+  "voiceClone": {
+    "message": "Suara asli setiap pembicara (di komputermu)"
+  },
+  "voiceStudio": {
+    "message": "Suara studio (hanya mengirim teks)"
+  },
+  "errDub": {
+    "message": "Belum ada suara sulih untuk bahasa ini. Coba subtitle saja."
+  },
+  "outputDub": {
+    "message": "Disulihsuarakan"
+  },
+  "voiceNarrator": {
+    "message": "Narator Arab yang tenang (Fish)"
+  },
+  "stageDubbing": {
+    "message": "Menyulihsuarakan"
+  },
+  "voiceFish": {
+    "message": "Kloning Fish (mengirim sampel suara)"
+  },
+  "keyGetFree": {
+    "message": "Dapatkan kunci gratis dari Google AI Studio"
+  },
+  "keyChecking": {
+    "message": "Memeriksa kunci ke Google"
+  },
+  "keyShape": {
+    "message": "Itu tidak terlihat seperti kunci. Pastikan kamu menyalin semuanya."
+  },
+  "keyFishLabel": {
+    "message": "Kunci Fish (opsional, untuk sulih suara cloud)"
+  },
+  "keyRejected": {
+    "message": "Google menolak kunci ini. Pastikan kamu menyalin semuanya."
+  },
+  "keyTitle": {
+    "message": "Tambahkan kunci Gemini kamu"
+  },
+  "keyGeminiLabel": {
+    "message": "Kunci Gemini"
+  },
+  "keySet": {
+    "message": "Sudah diatur. Ketik kunci baru untuk menggantinya."
+  },
+  "keySave": {
+    "message": "Simpan kunci"
+  },
+  "keyBody": {
+    "message": "tarjim memakai Gemini untuk mendengarkan video dan menerjemahkannya. Kuncinya gratis dan hanya butuh semenit untuk didapat dari akun Google kamu."
+  },
+  "pairAuto": {
+    "message": "Hubungkan otomatis"
+  },
+  "pairDenied": {
+    "message": "Permintaan koneksi ditolak."
+  },
+  "openTarjim": {
+    "message": "Buka halaman tarjim"
+  },
+  "pairManual": {
+    "message": "Atau tempel token keamanan secara manual:"
+  },
+  "pairWaiting": {
+    "message": "Buka halaman tarjim dan izinkan permintaan koneksi yang muncul."
+  },
+  "menuRootArabic": {
+    "message": "Terjemahkan ke bahasa Arab"
+  },
+  "menuDubClone": {
+    "message": "Sulih suara dengan suara asli pembicara (lokal)"
+  },
+  "menuDubFish": {
+    "message": "Sulih suara dengan kloning Fish (cloud)"
+  },
+  "menuDubNarrator": {
+    "message": "Sulih suara dengan narator Arab (Fish)"
+  },
+  "menuDubStudio": {
+    "message": "Sulih suara dengan suara studio"
+  },
+  "menuOther": {
+    "message": "Bahasa lain atau file di komputer ini"
+  },
+  "menuNoVideo": {
+    "message": "Tidak menemukan tautan video di halaman ini."
+  },
+  "notifyStarted": {
+    "message": "Terjemahan dimulai. Kamu akan diberi tahu saat selesai."
+  },
+  "menuRootTo": {
+    "message": "Terjemahkan ke $LANG$",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
+  },
+  "pairedNotice": {
+    "message": "Ekstensi sudah terhubung. Kamu bisa menerjemahkan sekarang."
+  },
+  "stageTiming": {
+    "message": "Menyelaraskan waktu"
+  },
+  "agoNow": {
+    "message": "baru dimulai"
+  },
+  "agoMinutes": {
+    "message": "$N$ mnt",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "step_downloading": {
+    "message": "Unduh"
+  },
+  "step_hearing": {
+    "message": "Dengar"
+  },
+  "step_timing": {
+    "message": "Waktu"
+  },
+  "step_translating": {
+    "message": "Terjemah"
+  },
+  "step_writing": {
+    "message": "Tulis"
+  },
+  "step_burning": {
+    "message": "Satukan"
+  },
+  "step_dubbing": {
+    "message": "Sulih suara"
+  },
+  "pause": {
+    "message": "Jeda"
+  },
+  "resume": {
+    "message": "Lanjutkan"
+  },
+  "cancel": {
+    "message": "Batal"
+  },
+  "stageCancelled": {
+    "message": "Dibatalkan"
+  },
+  "stagePaused": {
+    "message": "Dijeda"
+  },
+  "engineLabel": {
+    "message": "Mesin"
+  },
+  "engineCloud": {
+    "message": "Cloud (Gemini, paling akurat)"
+  },
+  "engineLocal": {
+    "message": "Lokal di komputer ini, offline"
+  },
+  "engineAdvanced": {
+    "message": "Penyedia atau kunci lain (membuka halaman tarjim)"
+  },
+  "localModelLabel": {
+    "message": "Model lokal"
+  },
+  "localModelHint": {
+    "message": "Model yang terpasang di Ollama di komputer ini."
+  },
+  "localModelNone": {
+    "message": "Belum ada model lokal yang terpasang. Pasang Ollama dan unduh sebuah model."
+  },
+  "engineSubscription": {
+    "message": "Langgananku (Claude atau ChatGPT)"
+  },
+  "subscriptionLabel": {
+    "message": "Langganan"
+  },
+  "subscriptionNone": {
+    "message": "Pasang Claude Code atau Codex dan masuk dengan paketmu."
+  },
+  "providerClaude": {
+    "message": "Claude (Claude Code)"
+  },
+  "providerCodex": {
+    "message": "ChatGPT (Codex)"
+  },
+  "voiceNatural": {
+    "message": "Suara alami untuk setiap pembicara (Gemini)"
+  },
+  "menuDubNatural": {
+    "message": "Sulih suara dengan suara alami"
+  },
+  "providerCopilot": {
+    "message": "GitHub Copilot"
+  },
+  "providerAntigravity": {
+    "message": "Google AI (Antigravity)"
+  }
+}

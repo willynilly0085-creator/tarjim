@@ -1,0 +1,381 @@
+{
+  "appName": {
+    "message": "tarjim"
+  },
+  "appDesc": {
+    "message": "Профессиональные субтитры для любого видео на выбранном вами языке, точно по речи."
+  },
+  "menuBurn": {
+    "message": "Субтитры в видео"
+  },
+  "menuSrt": {
+    "message": "Файл субтитров (SRT)"
+  },
+  "statusOnline": {
+    "message": "Подключено"
+  },
+  "statusOffline": {
+    "message": "Не подключено"
+  },
+  "settings": {
+    "message": "Настройки"
+  },
+  "sourceTab": {
+    "message": "Эта вкладка"
+  },
+  "sourceNone": {
+    "message": "На этой странице нет видео"
+  },
+  "sourceNoneHint": {
+    "message": "Откройте страницу с видео или переведите файл с вашего компьютера."
+  },
+  "pickFile": {
+    "message": "Перевести файл с компьютера"
+  },
+  "language": {
+    "message": "Перевести на"
+  },
+  "dialect": {
+    "message": "Стиль"
+  },
+  "dialectSaudi": {
+    "message": "Саудовский"
+  },
+  "dialectMsa": {
+    "message": "Литературный"
+  },
+  "output": {
+    "message": "Результат"
+  },
+  "outputBurn": {
+    "message": "Вшиты в видео"
+  },
+  "outputSrt": {
+    "message": "Только файл субтитров"
+  },
+  "translate": {
+    "message": "Перевести"
+  },
+  "sending": {
+    "message": "Отправка"
+  },
+  "started": {
+    "message": "Перевод начался. Это окно можно закрыть."
+  },
+  "recent": {
+    "message": "Недавние"
+  },
+  "empty": {
+    "message": "Пока ничего не переведено. Откройте любое видео и нажмите «Перевести» или щёлкните правой кнопкой по ссылке на видео."
+  },
+  "stageQueued": {
+    "message": "В очереди"
+  },
+  "stageDownloading": {
+    "message": "Скачивание"
+  },
+  "stageHearing": {
+    "message": "Распознавание речи"
+  },
+  "stageTranslating": {
+    "message": "Перевод"
+  },
+  "stageWriting": {
+    "message": "Создание субтитров"
+  },
+  "stageBurning": {
+    "message": "Вшивание в видео"
+  },
+  "stageDone": {
+    "message": "Готово"
+  },
+  "stageFailed": {
+    "message": "Не завершено"
+  },
+  "openFolder": {
+    "message": "Показать в папке"
+  },
+  "play": {
+    "message": "Воспроизвести"
+  },
+  "retry": {
+    "message": "Повторить"
+  },
+  "errQuota": {
+    "message": "Бесплатный лимит Gemini на сегодня исчерпан. Он восстановится завтра утром."
+  },
+  "errKey": {
+    "message": "Ключ Gemini не задан. Добавьте его в настройках."
+  },
+  "errDownload": {
+    "message": "Не удалось скачать видео по этой ссылке. Проверьте, что ссылка работает."
+  },
+  "errTools": {
+    "message": "На этом компьютере не установлен ffmpeg."
+  },
+  "errUnknown": {
+    "message": "Произошла непредвиденная ошибка."
+  },
+  "offlineTitle": {
+    "message": "tarjim не запущен на этом компьютере"
+  },
+  "offlineBody": {
+    "message": "Запустите его этой командой и вернитесь сюда:"
+  },
+  "tryAgain": {
+    "message": "Повторить"
+  },
+  "pairTitle": {
+    "message": "Подключите расширение к tarjim"
+  },
+  "pairBody": {
+    "message": "Получите токен безопасности этой командой и вставьте его ниже:"
+  },
+  "tokenLabel": {
+    "message": "Токен безопасности"
+  },
+  "pair": {
+    "message": "Подключить"
+  },
+  "pairWrong": {
+    "message": "Токен неверный. Проверьте его и попробуйте снова."
+  },
+  "serverLabel": {
+    "message": "Адрес сервера"
+  },
+  "save": {
+    "message": "Сохранить"
+  },
+  "saved": {
+    "message": "Настройки сохранены."
+  },
+  "back": {
+    "message": "Назад"
+  },
+  "dropTitle": {
+    "message": "Перетащите файл сюда"
+  },
+  "dropHint": {
+    "message": "Любое видео или аудио с вашего компьютера, на любом языке."
+  },
+  "chooseFile": {
+    "message": "Выбрать файл"
+  },
+  "linkLabel": {
+    "message": "Или вставьте ссылку на видео"
+  },
+  "uploading": {
+    "message": "Загрузка"
+  },
+  "badFile": {
+    "message": "Этот файл не является видео- или аудиофайлом."
+  },
+  "notifyDone": {
+    "message": "Субтитры готовы"
+  },
+  "notifyFailed": {
+    "message": "Перевод не завершился"
+  },
+  "voice": {
+    "message": "Голос"
+  },
+  "voiceClone": {
+    "message": "Собственный голос каждого говорящего (на вашем компьютере)"
+  },
+  "voiceStudio": {
+    "message": "Студийный голос (отправляется только текст)"
+  },
+  "errDub": {
+    "message": "Для этого языка пока нет голоса озвучки. Попробуйте субтитры."
+  },
+  "outputDub": {
+    "message": "Озвучка"
+  },
+  "voiceNarrator": {
+    "message": "Спокойный арабский диктор (Fish)"
+  },
+  "stageDubbing": {
+    "message": "Озвучка"
+  },
+  "voiceFish": {
+    "message": "Клонирование Fish (отправляется образец голоса)"
+  },
+  "keyGetFree": {
+    "message": "Получите бесплатный ключ в Google AI Studio"
+  },
+  "keyChecking": {
+    "message": "Проверяем ключ в Google"
+  },
+  "keyShape": {
+    "message": "Это не похоже на ключ. Проверьте, что вы скопировали его полностью."
+  },
+  "keyFishLabel": {
+    "message": "Ключ Fish (необязательно, для облачной озвучки)"
+  },
+  "keyRejected": {
+    "message": "Google отклонил этот ключ. Проверьте, что вы скопировали его полностью."
+  },
+  "keyTitle": {
+    "message": "Добавьте ключ Gemini"
+  },
+  "keyGeminiLabel": {
+    "message": "Ключ Gemini"
+  },
+  "keySet": {
+    "message": "Задан. Введите новый ключ, чтобы заменить его."
+  },
+  "keySave": {
+    "message": "Сохранить ключ"
+  },
+  "keyBody": {
+    "message": "tarjim использует Gemini, чтобы прослушать видео и перевести его. Ключ бесплатный, получить его в вашем аккаунте Google можно за минуту."
+  },
+  "pairAuto": {
+    "message": "Подключить автоматически"
+  },
+  "pairDenied": {
+    "message": "Запрос на подключение отклонён."
+  },
+  "openTarjim": {
+    "message": "Открыть страницу tarjim"
+  },
+  "pairManual": {
+    "message": "Или вставьте токен безопасности вручную:"
+  },
+  "pairWaiting": {
+    "message": "Откройте страницу tarjim и разрешите появившийся запрос на подключение."
+  },
+  "menuRootArabic": {
+    "message": "Перевести на арабский"
+  },
+  "menuDubClone": {
+    "message": "Озвучить голосом говорящего (локально)"
+  },
+  "menuDubFish": {
+    "message": "Озвучить с клонированием Fish (облако)"
+  },
+  "menuDubNarrator": {
+    "message": "Озвучить арабским диктором (Fish)"
+  },
+  "menuDubStudio": {
+    "message": "Озвучить студийным голосом"
+  },
+  "menuOther": {
+    "message": "Другой язык или файл на этом компьютере"
+  },
+  "menuNoVideo": {
+    "message": "На этой странице не найдена ссылка на видео."
+  },
+  "notifyStarted": {
+    "message": "Перевод начался. Вы получите уведомление, когда он завершится."
+  },
+  "menuRootTo": {
+    "message": "Перевести: $LANG$",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
+  },
+  "pairedNotice": {
+    "message": "Расширение подключено. Теперь можно переводить."
+  },
+  "stageTiming": {
+    "message": "Тайминг"
+  },
+  "agoNow": {
+    "message": "только что начато"
+  },
+  "agoMinutes": {
+    "message": "$N$ мин",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "step_downloading": {
+    "message": "Скачивание"
+  },
+  "step_hearing": {
+    "message": "Распознавание"
+  },
+  "step_timing": {
+    "message": "Тайминг"
+  },
+  "step_translating": {
+    "message": "Перевод"
+  },
+  "step_writing": {
+    "message": "Субтитры"
+  },
+  "step_burning": {
+    "message": "Вшивание"
+  },
+  "step_dubbing": {
+    "message": "Озвучка"
+  },
+  "pause": {
+    "message": "Пауза"
+  },
+  "resume": {
+    "message": "Продолжить"
+  },
+  "cancel": {
+    "message": "Отмена"
+  },
+  "stageCancelled": {
+    "message": "Отменено"
+  },
+  "stagePaused": {
+    "message": "Приостановлено"
+  },
+  "engineLabel": {
+    "message": "Движок"
+  },
+  "engineCloud": {
+    "message": "Облако (Gemini, точнее всего)"
+  },
+  "engineLocal": {
+    "message": "Локально на этом компьютере, без интернета"
+  },
+  "engineAdvanced": {
+    "message": "Другой провайдер или ключ (откроется страница tarjim)"
+  },
+  "localModelLabel": {
+    "message": "Локальная модель"
+  },
+  "localModelHint": {
+    "message": "Модели, установленные в Ollama на этом компьютере."
+  },
+  "localModelNone": {
+    "message": "Локальные модели не установлены. Установите Ollama и скачайте модель."
+  },
+  "engineSubscription": {
+    "message": "Моя подписка (Claude или ChatGPT)"
+  },
+  "subscriptionLabel": {
+    "message": "Подписка"
+  },
+  "subscriptionNone": {
+    "message": "Установите Claude Code или Codex и войдите со своей подпиской."
+  },
+  "providerClaude": {
+    "message": "Claude (Claude Code)"
+  },
+  "providerCodex": {
+    "message": "ChatGPT (Codex)"
+  },
+  "voiceNatural": {
+    "message": "Естественный голос для каждого говорящего (Gemini)"
+  },
+  "menuDubNatural": {
+    "message": "Озвучить естественным голосом"
+  },
+  "providerCopilot": {
+    "message": "GitHub Copilot"
+  },
+  "providerAntigravity": {
+    "message": "Google AI (Antigravity)"
+  }
+}
