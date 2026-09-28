@@ -1,7 +1,7 @@
 [project]
 name = "tarjim"
 version = "0.1.0"
-description = "Professional, speaker-aware Arabic subtitles for any video"
+description = "Subtitles and dubbing for any video, from any language to any language, on your own computer"
 requires-python = ">=3.11"
 license = { text = "PolyForm-Noncommercial-1.0.0" }
 dependencies = [
@@ -18,6 +18,10 @@ dependencies = [
     "requests",
     "huggingface_hub",
 ]
+
+[project.urls]
+Homepage = "https://github.com/willynilly0085-creator/tarjim"
+Issues = "https://github.com/willynilly0085-creator/tarjim/issues"
 
 [project.optional-dependencies]
 dub = ["coqui-tts==0.27.5", "torchcodec", "demucs", "catt-tashkeel", "edge-tts", "fish-audio-sdk",

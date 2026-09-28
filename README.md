@@ -39,7 +39,7 @@ back to the local engine when one is available.
 In Claude Code:
 
 ```bash
-claude plugin marketplace add <owner>/tarjim
+claude plugin marketplace add willynilly0085-creator/tarjim
 claude plugin install tarjim@tarjim
 ```
 
@@ -65,7 +65,7 @@ only accept remote MCP servers), so use Codex for ChatGPT.
 Needs Python 3.11 and about 10 GB of disk for the local models.
 
 ```powershell
-git clone https://github.com/<owner>/tarjim
+git clone https://github.com/willynilly0085-creator/tarjim
 cd tarjim
 python -m venv .venv
 # NVIDIA graphics card: install the CUDA build of PyTorch first (the default one is CPU only)

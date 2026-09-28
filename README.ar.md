@@ -32,7 +32,7 @@
 في Claude Code:
 
 ```bash
-claude plugin marketplace add <owner>/tarjim
+claude plugin marketplace add willynilly0085-creator/tarjim
 claude plugin install tarjim@tarjim
 ```
 
@@ -47,7 +47,7 @@ claude plugin install tarjim@tarjim
 يحتاج Python 3.11 وحوالي 10 GB للنماذج المحلية.
 
 ```powershell
-git clone https://github.com/<owner>/tarjim
+git clone https://github.com/willynilly0085-creator/tarjim
 cd tarjim
 python -m venv .venv
 # لو عندك كرت NVIDIA: ثبّت نسخة PyTorch للكرت أول (النسخة الافتراضية للمعالج بس)
