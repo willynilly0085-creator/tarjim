@@ -158,11 +158,14 @@ Antigravity abonelikleri.
 
 ## Lisans
 
-tarjim, **ticari kullanım dışında** her amaçla herkesin kullanması, incelemesi, değiştirmesi ve
-paylaşması için ücretsizdir: kimse onu ya da onun üzerine kurulu bir hizmeti satamaz. Bkz.
-[LICENSE.md](LICENSE.md) (PolyForm Noncommercial 1.0.0); bağlayıcı tam metin
-[../../LICENSE.md](../../LICENSE.md) dosyasındadır. Bu, kullandığı modellerin ticari olmayan
-lisanslarıyla uyumludur.
+tarjim, şirketler dahil herkes için ücretsizdir: onu her amaçla kullanabilir, inceleyebilir,
+değiştirebilir ve paylaşabilirsiniz. İzin verilmeyen tek şey **onu satmaktır**: kimse tarjim'i ya
+da değerini tarjim'den alan bir ürünü veya hizmeti (barındırma ve ücretli destek dahil) satamaz.
+Bkz. [LICENSE.md](LICENSE.md) (Apache License 2.0, Commons Clause ile); bağlayıcı tam metin
+[LICENSE](../../LICENSE) dosyasındadır.
+
+tarjim'in indirdiği modellerin kendi lisansları vardır ve bazıları ticari kullanımı yasaklar: bu
+modelleri iş için kullanmadan önce yukarıdaki model lisansları tablosuna bakın.
 
 ## Geliştirme
 

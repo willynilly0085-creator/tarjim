@@ -6,7 +6,7 @@
   "author": { "name": "tarjim", "email": "willy.nilly0085@gmail.com" },
   "homepage": "https://github.com/willynilly0085-creator/tarjim",
   "repository": "https://github.com/willynilly0085-creator/tarjim",
-  "license": "PolyForm-Noncommercial-1.0.0",
+  "license": "Apache-2.0 with Commons Clause 1.0 (no selling)",
   "keywords": ["video", "subtitles", "translation", "dubbing", "arabic"],
   "mcpServers": {
     "tarjim": {

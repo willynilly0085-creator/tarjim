@@ -150,9 +150,13 @@ checks above. Not tested yet: macOS, Linux, GitHub Copilot and Antigravity subsc
 
 ## License
 
-tarjim is free for everyone to use, study, change and share, for any purpose **except commercial
-use**: nobody may sell it or sell a service built on it. See [LICENSE.md](LICENSE.md)
-(PolyForm Noncommercial 1.0.0). This matches the non-commercial licenses of the models it uses.
+tarjim is free for everyone, companies included: use it, study it, change it and share it, for any
+purpose. The one thing not allowed is **selling it**: nobody may sell tarjim, or sell a product or
+service (hosting and paid support included) whose value comes from tarjim. See [LICENSE](LICENSE)
+(Apache License 2.0 with the Commons Clause).
+
+The models tarjim downloads have their own licenses, and some of them forbid commercial use: check
+the model licenses table above before using those models for work.
 
 ## Development
 

@@ -169,11 +169,15 @@ Antigravity.
 
 ## Lizenz
 
-Jeder darf tarjim frei nutzen, untersuchen, verändern und weitergeben, zu jedem Zweck **außer zur
-kommerziellen Nutzung**: Niemand darf es verkaufen oder einen darauf aufbauenden Dienst verkaufen.
-Siehe [LICENSE.md](LICENSE.md) (PolyForm Noncommercial 1.0.0); der vollständige, rechtsverbindliche
-Text steht in [../../LICENSE.md](../../LICENSE.md). Das entspricht den nicht-kommerziellen Lizenzen
-der verwendeten Modelle.
+tarjim ist für alle kostenlos, auch für Unternehmen: Sie dürfen es nutzen, untersuchen, verändern
+und weitergeben, zu jedem Zweck. Nur eines ist nicht erlaubt: **es zu verkaufen**. Niemand darf
+tarjim verkaufen oder ein Produkt oder eine Dienstleistung verkaufen, deren Wert aus tarjim stammt
+(auch Hosting und kostenpflichtiger Support). Siehe [LICENSE.md](LICENSE.md) (Apache License 2.0
+mit Commons Clause); der vollständige, rechtsverbindliche Text steht in [LICENSE](../../LICENSE).
+
+Die Modelle, die tarjim herunterlädt, haben eigene Lizenzen, und einige davon verbieten die
+kommerzielle Nutzung: Prüfen Sie die Tabelle der Modelllizenzen oben, bevor Sie diese Modelle
+beruflich einsetzen.
 
 ## Entwicklung
 

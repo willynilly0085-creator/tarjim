@@ -152,11 +152,14 @@ atas. Belum diuji: macOS, Linux, langganan GitHub Copilot dan Antigravity.
 
 ## Lisensi
 
-tarjim gratis bagi siapa saja untuk digunakan, dipelajari, diubah, dan dibagikan, untuk tujuan apa pun
-**kecuali penggunaan komersial**: tidak seorang pun boleh menjualnya atau menjual layanan yang dibangun di
-atasnya. Lihat [LICENSE.md](LICENSE.md) (PolyForm Noncommercial 1.0.0); teks lengkap yang mengikat (bahasa
-Inggris) ada di [../../LICENSE.md](../../LICENSE.md). Ini sejalan dengan lisensi nonkomersial dari model-model
-yang digunakannya.
+tarjim gratis bagi siapa saja, termasuk perusahaan: gunakan, pelajari, ubah, dan bagikan untuk tujuan apa
+pun. Satu-satunya hal yang tidak diizinkan adalah **menjualnya**: tidak seorang pun boleh menjual tarjim, atau
+menjual produk atau layanan (termasuk hosting dan dukungan berbayar) yang nilainya berasal dari tarjim. Lihat
+[LICENSE.md](LICENSE.md) (Apache License 2.0 dengan Commons Clause); teks lengkap yang mengikat (bahasa
+Inggris) ada di [../../LICENSE](../../LICENSE).
+
+Model yang diunduh tarjim memiliki lisensinya sendiri, dan sebagian di antaranya melarang penggunaan
+komersial: periksa tabel lisensi model di atas sebelum menggunakan model tersebut untuk pekerjaan.
 
 ## Pengembangan
 

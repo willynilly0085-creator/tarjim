@@ -16,7 +16,9 @@ LANGUAGES = {"en": "English", "ar": "العربية", "es": "Español", "fr": "F
 
 
 def location(code: str, document: str) -> Path:
-    return ROOT / document if code == "en" else ROOT / "i18n" / code / document
+    if code == "en":
+        return ROOT / ("LICENSE" if document == "LICENSE.md" else document)
+    return ROOT / "i18n" / code / document
 
 
 def bar(current: str, document: str) -> str:
