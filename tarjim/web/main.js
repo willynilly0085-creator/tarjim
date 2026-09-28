@@ -18,9 +18,9 @@ async function boot() {
   });
   $("open-settings").addEventListener("click", async () => {
     $("open-settings").hidden = true;
-    startWizard(await api("/setup"), openWorkspace, "connect");
+    startWizard(await api("/setup"), openWorkspace, "language");
   });
-  if (setup.setup_done === "yes") await openWorkspace();
+  if (setup.setup_done === "yes" && location.hash !== "#setup") await openWorkspace();
   else startWizard(setup, openWorkspace);
 }
 
