@@ -1,4 +1,6 @@
 # Security
+<!-- languages -->
+**English** · [العربية](i18n/ar/SECURITY.md) · [Español](i18n/es/SECURITY.md) · [Français](i18n/fr/SECURITY.md) · [Português](i18n/pt/SECURITY.md) · [Deutsch](i18n/de/SECURITY.md) · [Русский](i18n/ru/SECURITY.md) · [Türkçe](i18n/tr/SECURITY.md) · [हिन्दी](i18n/hi/SECURITY.md) · [اردو](i18n/ur/SECURITY.md) · [Bahasa Indonesia](i18n/id/SECURITY.md) · [日本語](i18n/ja/SECURITY.md) · [中文](i18n/zh/SECURITY.md) · [한국어](i18n/ko/SECURITY.md)
 
 ## Reporting a problem
 

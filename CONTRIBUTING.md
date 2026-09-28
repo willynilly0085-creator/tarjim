@@ -1,4 +1,6 @@
 # Contributing
+<!-- languages -->
+**English** · [العربية](i18n/ar/CONTRIBUTING.md) · [Español](i18n/es/CONTRIBUTING.md) · [Français](i18n/fr/CONTRIBUTING.md) · [Português](i18n/pt/CONTRIBUTING.md) · [Deutsch](i18n/de/CONTRIBUTING.md) · [Русский](i18n/ru/CONTRIBUTING.md) · [Türkçe](i18n/tr/CONTRIBUTING.md) · [हिन्दी](i18n/hi/CONTRIBUTING.md) · [اردو](i18n/ur/CONTRIBUTING.md) · [Bahasa Indonesia](i18n/id/CONTRIBUTING.md) · [日本語](i18n/ja/CONTRIBUTING.md) · [中文](i18n/zh/CONTRIBUTING.md) · [한국어](i18n/ko/CONTRIBUTING.md)
 
 Thank you for helping. A few rules keep tarjim easy to read and safe to change.
 

@@ -1,7 +1,8 @@
 # tarjim
 
 **Subtitles and dubbing for any video, in your language, on your own computer.**
-[العربية](README.ar.md)
+<!-- languages -->
+**English** · [العربية](i18n/ar/README.md) · [Español](i18n/es/README.md) · [Français](i18n/fr/README.md) · [Português](i18n/pt/README.md) · [Deutsch](i18n/de/README.md) · [Русский](i18n/ru/README.md) · [Türkçe](i18n/tr/README.md) · [हिन्दी](i18n/hi/README.md) · [اردو](i18n/ur/README.md) · [Bahasa Indonesia](i18n/id/README.md) · [日本語](i18n/ja/README.md) · [中文](i18n/zh/README.md) · [한국어](i18n/ko/README.md)
 
 Paste a link or drop a file. tarjim listens, times every line to the moment it is spoken, keeps
 each speaker apart, translates into natural speech, and burns the subtitles into the video, writes
