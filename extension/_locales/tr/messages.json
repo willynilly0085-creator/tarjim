@@ -200,9 +200,6 @@
   "voiceFish": {
     "message": "Fish klonlama (bir ses örneği gönderir)"
   },
-  "keyGetFree": {
-    "message": "Google AI Studio'dan ücretsiz bir anahtar al"
-  },
   "keyChecking": {
     "message": "Anahtar Google ile kontrol ediliyor"
   },
@@ -215,9 +212,6 @@
   "keyRejected": {
     "message": "Google bu anahtarı reddetti. Tamamını kopyaladığından emin ol."
   },
-  "keyTitle": {
-    "message": "Gemini anahtarını ekle"
-  },
   "keyGeminiLabel": {
     "message": "Gemini anahtarı"
   },
@@ -226,9 +220,6 @@
   },
   "keySave": {
     "message": "Anahtarı kaydet"
-  },
-  "keyBody": {
-    "message": "tarjim, videoyu dinlemek ve çevirmek için Gemini kullanır. Anahtar ücretsizdir ve Google hesabından bir dakikada alınır."
   },
   "pairAuto": {
     "message": "Otomatik bağlan"
@@ -377,5 +368,20 @@
   },
   "providerAntigravity": {
     "message": "Google AI (Antigravity)"
+  },
+  "setupTitle": {
+    "message": "tarjim kurulumunu tamamla"
+  },
+  "setupBody": {
+    "message": "Kurulum sayfasını aç ve adım adım ilerle: dil, bilgisayarın, yapay zekâ bağlantısı ve araçlar. Ayarlar'dan istediğin zaman geri dönebilirsin."
+  },
+  "setupOpen": {
+    "message": "Kurulumu aç"
+  },
+  "setupDone": {
+    "message": "Bitirdim, devam et"
+  },
+  "setupFull": {
+    "message": "Adım adım tam kurulum"
   }
 }

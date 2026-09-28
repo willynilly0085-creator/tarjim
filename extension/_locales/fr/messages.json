@@ -200,9 +200,6 @@
   "voiceFish": {
     "message": "Clonage Fish (envoie un échantillon de voix)"
   },
-  "keyGetFree": {
-    "message": "Obtenir une clé gratuite sur Google AI Studio"
-  },
   "keyChecking": {
     "message": "Vérification de la clé auprès de Google"
   },
@@ -215,9 +212,6 @@
   "keyRejected": {
     "message": "Google a refusé cette clé. Vérifiez que vous l'avez copiée en entier."
   },
-  "keyTitle": {
-    "message": "Ajoutez votre clé Gemini"
-  },
   "keyGeminiLabel": {
     "message": "Clé Gemini"
   },
@@ -226,9 +220,6 @@
   },
   "keySave": {
     "message": "Enregistrer la clé"
-  },
-  "keyBody": {
-    "message": "tarjim utilise Gemini pour écouter la vidéo et la traduire. La clé est gratuite et s'obtient en une minute depuis votre compte Google."
   },
   "pairAuto": {
     "message": "Se connecter automatiquement"
@@ -377,5 +368,20 @@
   },
   "providerAntigravity": {
     "message": "Google AI (Antigravity)"
+  },
+  "setupTitle": {
+    "message": "Terminez la configuration de tarjim"
+  },
+  "setupBody": {
+    "message": "Ouvrez la page de configuration et avancez étape par étape : langue, votre appareil, connexion d'une IA et outils. Vous pouvez y revenir à tout moment depuis les Réglages."
+  },
+  "setupOpen": {
+    "message": "Ouvrir la configuration"
+  },
+  "setupDone": {
+    "message": "J'ai terminé, continuer"
+  },
+  "setupFull": {
+    "message": "Configuration complète, étape par étape"
   }
 }

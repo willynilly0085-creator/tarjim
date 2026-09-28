@@ -2,7 +2,13 @@ import { $, show } from "./dom.js";
 import { fillEngine, saveEngine, syncEngine } from "./engine.js";
 import { keyStatus, saveKey } from "./keys.js";
 import { askToPair, claimPending, serverBase } from "./pairing.js";
-import { api, remember, settings, t } from "./shared.js";
+import { ApiError, api, remember, settings, t } from "./shared.js";
+
+window.addEventListener("unhandledrejection", (event) => {
+  if (!(event.reason instanceof ApiError)) return;
+  event.preventDefault();
+  show(event.reason.kind === "token" ? "pair" : "offline");
+});
 
 async function pair(event, ready) {
   event.preventDefault();
@@ -45,17 +51,8 @@ export async function openSettings() {
   show("settings");
 }
 
-async function submitKey(event, ready) {
-  event.preventDefault();
-  const button = event.submitter;
-  button.disabled = true;
-  button.textContent = t("keyChecking");
-  const problem = await saveKey("gemini", $("gemini-key").value);
-  button.disabled = false;
-  button.textContent = t("keySave");
-  $("key-error").hidden = !problem;
-  $("key-error").textContent = problem;
-  if (!problem && $("gemini-key").value.trim()) await ready();
+async function openSetup() {
+  chrome.tabs.create({ url: `${await serverBase()}/#setup` });
 }
 
 async function saveSettings(event) {
@@ -72,7 +69,9 @@ export function wirePanels({ ready, back, leave }) {
   $("pair-form").addEventListener("submit", (event) => pair(event, ready));
   $("pair-auto").addEventListener("click", () => autoPair(ready));
   $("open-tarjim").addEventListener("click", async () => chrome.tabs.create({ url: `${await serverBase()}/` }));
-  $("key-form").addEventListener("submit", (event) => submitKey(event, ready));
+  $("open-setup").addEventListener("click", openSetup);
+  $("open-full-setup").addEventListener("click", openSetup);
+  $("setup-done").addEventListener("click", back);
   $("settings-form").addEventListener("submit", saveSettings);
   $("settings-engine").addEventListener("change", syncEngine);
   $("retry-connect").addEventListener("click", back);

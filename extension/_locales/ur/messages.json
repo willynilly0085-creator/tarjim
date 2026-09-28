@@ -200,9 +200,6 @@
   "voiceFish": {
     "message": "Fish کلوننگ (آواز کا نمونہ بھیجتا ہے)"
   },
-  "keyGetFree": {
-    "message": "Google AI Studio سے مفت کلید حاصل کریں"
-  },
   "keyChecking": {
     "message": "Google سے کلید کی جانچ ہو رہی ہے"
   },
@@ -215,9 +212,6 @@
   "keyRejected": {
     "message": "Google نے یہ کلید مسترد کر دی۔ دیکھیں کہ آپ نے پوری کلید کاپی کی ہے۔"
   },
-  "keyTitle": {
-    "message": "اپنی Gemini کلید شامل کریں"
-  },
   "keyGeminiLabel": {
     "message": "Gemini کلید"
   },
@@ -226,9 +220,6 @@
   },
   "keySave": {
     "message": "کلید محفوظ کریں"
-  },
-  "keyBody": {
-    "message": "tarjim ویڈیو سننے اور اس کا ترجمہ کرنے کے لیے Gemini استعمال کرتا ہے۔ کلید مفت ہے اور آپ کے Google اکاؤنٹ سے حاصل کرنے میں ایک منٹ لگتا ہے۔"
   },
   "pairAuto": {
     "message": "خودکار طور پر جوڑیں"
@@ -377,5 +368,20 @@
   },
   "providerAntigravity": {
     "message": "Google AI (Antigravity)"
+  },
+  "setupTitle": {
+    "message": "tarjim کا سیٹ اپ مکمل کریں"
+  },
+  "setupBody": {
+    "message": "سیٹ اپ صفحہ کھولیں اور قدم بہ قدم آگے بڑھیں: زبان، آپ کا کمپیوٹر، AI جوڑنا اور ٹولز۔ آپ سیٹنگز سے کسی بھی وقت واپس آ سکتے ہیں۔"
+  },
+  "setupOpen": {
+    "message": "سیٹ اپ کھولیں"
+  },
+  "setupDone": {
+    "message": "مکمل ہو گیا، جاری رکھیں"
+  },
+  "setupFull": {
+    "message": "مکمل سیٹ اپ، قدم بہ قدم"
   }
 }

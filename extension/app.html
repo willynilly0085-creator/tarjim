@@ -119,20 +119,16 @@
       </form>
     </section>
 
-    <section class="view panel" id="view-key" hidden>
-      <h2 class="panel-title" data-i18n="keyTitle"></h2>
-      <p data-i18n="keyBody"></p>
-      <a class="text-button" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" data-i18n="keyGetFree"></a>
-      <form id="key-form" class="stack" novalidate>
-        <label class="field-label" for="gemini-key" data-i18n="keyGeminiLabel"></label>
-        <input class="text-input" id="gemini-key" type="password" dir="ltr" autocomplete="off" spellcheck="false" required>
-        <p class="error" id="key-error" role="alert" hidden></p>
-        <button class="primary" type="submit" data-i18n="keySave"></button>
-      </form>
+    <section class="view panel" id="view-setup" hidden>
+      <h2 class="panel-title" data-i18n="setupTitle"></h2>
+      <p data-i18n="setupBody"></p>
+      <button class="primary" id="open-setup" type="button" data-i18n="setupOpen"></button>
+      <button class="text-button" id="setup-done" type="button" data-i18n="setupDone"></button>
     </section>
 
     <section class="view panel" id="view-settings" hidden>
       <h2 class="panel-title" data-i18n="settings"></h2>
+      <button class="button-quiet wide" id="open-full-setup" type="button" data-i18n="setupFull"></button>
       <form id="settings-form" class="stack" novalidate>
         <label class="field-label" for="server" data-i18n="serverLabel"></label>
         <input class="text-input" id="server" dir="ltr" type="url" required>

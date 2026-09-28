@@ -200,9 +200,6 @@
   "voiceFish": {
     "message": "Kloning Fish (mengirim sampel suara)"
   },
-  "keyGetFree": {
-    "message": "Dapatkan kunci gratis dari Google AI Studio"
-  },
   "keyChecking": {
     "message": "Memeriksa kunci ke Google"
   },
@@ -215,9 +212,6 @@
   "keyRejected": {
     "message": "Google menolak kunci ini. Pastikan kamu menyalin semuanya."
   },
-  "keyTitle": {
-    "message": "Tambahkan kunci Gemini kamu"
-  },
   "keyGeminiLabel": {
     "message": "Kunci Gemini"
   },
@@ -226,9 +220,6 @@
   },
   "keySave": {
     "message": "Simpan kunci"
-  },
-  "keyBody": {
-    "message": "tarjim memakai Gemini untuk mendengarkan video dan menerjemahkannya. Kuncinya gratis dan hanya butuh semenit untuk didapat dari akun Google kamu."
   },
   "pairAuto": {
     "message": "Hubungkan otomatis"
@@ -377,5 +368,20 @@
   },
   "providerAntigravity": {
     "message": "Google AI (Antigravity)"
+  },
+  "setupTitle": {
+    "message": "Selesaikan penyiapan tarjim"
+  },
+  "setupBody": {
+    "message": "Buka halaman penyiapan dan ikuti langkah demi langkah: bahasa, komputermu, menghubungkan AI, dan alat. Kamu bisa kembali kapan saja dari Pengaturan."
+  },
+  "setupOpen": {
+    "message": "Buka penyiapan"
+  },
+  "setupDone": {
+    "message": "Sudah selesai, lanjutkan"
+  },
+  "setupFull": {
+    "message": "Penyiapan lengkap, langkah demi langkah"
   }
 }

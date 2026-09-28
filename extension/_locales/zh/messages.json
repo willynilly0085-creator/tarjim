@@ -200,9 +200,6 @@
   "voiceFish": {
     "message": "Fish 声音克隆（发送声音样本）"
   },
-  "keyGetFree": {
-    "message": "从 Google AI Studio 获取免费密钥"
-  },
   "keyChecking": {
     "message": "正在向 Google 验证密钥"
   },
@@ -215,9 +212,6 @@
   "keyRejected": {
     "message": "Google 拒绝了这个密钥。请检查是否完整复制。"
   },
-  "keyTitle": {
-    "message": "添加你的 Gemini 密钥"
-  },
   "keyGeminiLabel": {
     "message": "Gemini 密钥"
   },
@@ -226,9 +220,6 @@
   },
   "keySave": {
     "message": "保存密钥"
-  },
-  "keyBody": {
-    "message": "tarjim 使用 Gemini 听取并翻译视频。密钥是免费的，用你的 Google 账号大约 1 分钟就能获取。"
   },
   "pairAuto": {
     "message": "自动连接"
@@ -377,5 +368,20 @@
   },
   "providerAntigravity": {
     "message": "Google AI (Antigravity)"
+  },
+  "setupTitle": {
+    "message": "完成 tarjim 的设置"
+  },
+  "setupBody": {
+    "message": "打开设置页面，按步骤进行：语言、你的电脑、连接 AI 和工具。你随时可以从设置回到这里。"
+  },
+  "setupOpen": {
+    "message": "打开设置"
+  },
+  "setupDone": {
+    "message": "我完成了，继续"
+  },
+  "setupFull": {
+    "message": "完整设置，逐步进行"
   }
 }

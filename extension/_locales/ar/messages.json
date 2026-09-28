@@ -200,9 +200,6 @@
   "voiceFish": {
     "message": "استنساخ Fish (يرسل عينة الصوت)"
   },
-  "keyGetFree": {
-    "message": "خذ مفتاح مجاني من Google AI Studio"
-  },
   "keyChecking": {
     "message": "جاري التحقق من المفتاح مع Google"
   },
@@ -215,9 +212,6 @@
   "keyRejected": {
     "message": "Google رفض هذا المفتاح، تأكد إنك نسخته كامل."
   },
-  "keyTitle": {
-    "message": "أضف مفتاح Gemini"
-  },
   "keyGeminiLabel": {
     "message": "مفتاح Gemini"
   },
@@ -226,9 +220,6 @@
   },
   "keySave": {
     "message": "احفظ المفتاح"
-  },
-  "keyBody": {
-    "message": "tarjim يستخدم Gemini عشان يسمع المقطع ويترجمه. المفتاح مجاني وتاخذه من حساب Google حقك خلال دقيقة."
   },
   "pairAuto": {
     "message": "اربط تلقائياً"
@@ -377,5 +368,20 @@
   },
   "providerAntigravity": {
     "message": "Google AI (Antigravity)"
+  },
+  "setupTitle": {
+    "message": "كمّل إعداد ترجم"
+  },
+  "setupBody": {
+    "message": "افتح صفحة الإعداد وامش خطوة بخطوة: اللغة، وجهازك، وربط الذكاء الاصطناعي، والأدوات. وتقدر ترجع لها أي وقت من الإعدادات."
+  },
+  "setupOpen": {
+    "message": "افتح الإعداد"
+  },
+  "setupDone": {
+    "message": "خلصت، كمّل"
+  },
+  "setupFull": {
+    "message": "الإعداد الكامل خطوة بخطوة"
   }
 }

@@ -1,8 +1,12 @@
 import { buildMenus, isMode, OTHER } from "./menus.js";
 import { claimPending } from "./pairing.js";
-import { api, errorLabel, loadWords, mediaUrl, post, settings, t } from "./shared.js";
+import { ApiError, api, errorLabel, loadWords, mediaUrl, post, settings, t } from "./shared.js";
 
 const POLL = "poll";
+
+self.addEventListener("unhandledrejection", (event) => {
+  if (event.reason instanceof ApiError) event.preventDefault();
+});
 
 async function start() {
   await loadWords();

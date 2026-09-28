@@ -200,9 +200,6 @@
   "voiceFish": {
     "message": "Fish 음성 복제 (음성 샘플 전송)"
   },
-  "keyGetFree": {
-    "message": "Google AI Studio에서 무료 키 받기"
-  },
   "keyChecking": {
     "message": "Google에 키를 확인하는 중"
   },
@@ -215,9 +212,6 @@
   "keyRejected": {
     "message": "Google이 이 키를 거부했어요. 전부 복사했는지 확인하세요."
   },
-  "keyTitle": {
-    "message": "Gemini 키 추가"
-  },
   "keyGeminiLabel": {
     "message": "Gemini 키"
   },
@@ -226,9 +220,6 @@
   },
   "keySave": {
     "message": "키 저장"
-  },
-  "keyBody": {
-    "message": "tarjim은 Gemini로 동영상을 듣고 번역해요. 키는 무료이고 Google 계정에서 1분이면 받을 수 있어요."
   },
   "pairAuto": {
     "message": "자동으로 연결"
@@ -377,5 +368,20 @@
   },
   "providerAntigravity": {
     "message": "Google AI (Antigravity)"
+  },
+  "setupTitle": {
+    "message": "tarjim 설정을 마무리하세요"
+  },
+  "setupBody": {
+    "message": "설정 페이지를 열고 단계별로 진행하세요: 언어, 내 컴퓨터, AI 연결, 도구. 설정에서 언제든 다시 돌아올 수 있어요."
+  },
+  "setupOpen": {
+    "message": "설정 열기"
+  },
+  "setupDone": {
+    "message": "다 했어요, 계속"
+  },
+  "setupFull": {
+    "message": "단계별 전체 설정"
   }
 }

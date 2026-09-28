@@ -1,7 +1,6 @@
 import { watchJobs } from "./jobs.js";
 import { api, loadWords, mediaUrl, post, remember, settings, t, uiDirection, uiLanguage } from "./shared.js";
 import { $, show } from "./dom.js";
-import { keyStatus } from "./keys.js";
 import { claimPending } from "./pairing.js";
 import { openSettings, wirePanels } from "./panels.js";
 import { isMedia, upload } from "./upload.js";
@@ -41,8 +40,8 @@ async function connect() {
   } catch (error) {
     return show(error.kind === "token" ? "pair" : "offline");
   }
-  const keys = await keyStatus();
-  if (!keys.gemini) return show("key");
+  const setup = await api("/setup").catch(() => ({}));
+  if (setup.setup_done !== "yes") return show("setup");
   await openMain();
 }
 
