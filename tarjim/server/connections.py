@@ -21,16 +21,16 @@ def api_view(provider: Provider) -> dict[str, Any]:
 def subscription_view(provider: Provider) -> dict[str, Any]:
     from tarjim.engines import app_install
     from tarjim.engines.subscription import codex_models, launcher
+    from tarjim.engines.subscription_models import claude_models
 
-    labels: dict[str, str] = {}
-    if provider.id == "claude":
-        from tarjim.engines.subscription_models import claude_models
-
-        labels = dict(claude_models())
-    models = codex_models() if provider.id == "codex" else list(labels or provider.models)
+    catalog = claude_models() if provider.id == "claude" else []
+    listed = [m["id"] for m in catalog] or list(provider.models)
+    models = codex_models() if provider.id == "codex" else listed
+    suggested = next((m["id"] for m in catalog if m["suggested"]), "")
     return {"id": provider.id, "name": provider.name, "ready": bool(launcher(provider.program)),
-            "model_labels": {m: text for m, text in labels.items() if text},
-            "install": provider.install, "model": setting(provider.model_name),
+            "model_labels": {m["id"]: m["name"] for m in catalog},
+            "model_groups": {m["id"]: m["group"] for m in catalog}, "suggested": suggested,
+            "install": provider.install, "model": setting(provider.model_name) or suggested,
             "models": [m for m in models if m], "node": bool(app_install.npm()),
             "can_install": provider.id in app_install.PACKAGES and bool(
                 app_install.npm() or provider.id in app_install.NATIVE),

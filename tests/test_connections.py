@@ -138,16 +138,20 @@ def test_listening_can_only_be_a_known_engine_that_is_ready(home: Path) -> None:
     assert config.setting("listen_provider") == "local"
 
 
-def test_claude_offers_the_models_its_account_has(tmp_path: Path,
-                                                  monkeypatch: pytest.MonkeyPatch) -> None:
+def test_claude_models_are_named_like_the_claude_app_and_the_lightest_is_suggested(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     from tarjim.engines import subscription_models
 
     (tmp_path / ".claude.json").write_text(json.dumps({"additionalModelOptionsCache": [
-        {"value": "claude-fable-5-1[1m]", "label": "Fable",
-         "description": "Fable 5.1, most capable"},
+        {"value": "claude-fable-5[1m]", "label": "Fable"},
+        {"value": "claude-mythos-6", "label": "Mythos"},
         {"value": "cc-update-required-2", "label": "Opus 5.5 (disabled)", "disabled": True}]}))
     monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(tmp_path))
-    assert subscription_models.claude_models() == [
-        ("opus", ""), ("sonnet", ""), ("haiku", ""),
-        ("claude-fable-5-1[1m]", "Fable 5.1, most capable")]
+    models = subscription_models.claude_models()
+    latest = [m["name"] for m in models if m["group"] == "latest"]
+    assert latest == ["Opus 5.5", "Fable 5.1", "Sonnet 5.5", "Haiku 4.5"]
+    assert [m["id"] for m in models if m["suggested"]] == ["claude-haiku-4-5"]
+    ids = [m["id"] for m in models]
+    assert "claude-mythos-6" in ids and "claude-fable-5[1m]" not in ids
+    assert "cc-update-required-2" not in ids
     assert connections.MODEL_NAME.match("claude-fable-5-1[1m]")

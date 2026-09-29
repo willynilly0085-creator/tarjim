@@ -1,6 +1,7 @@
 import { $, api, post } from "./api.js";
 import { t } from "./i18n.js";
 import { localPanel, modelNeeded } from "./local.js";
+import { fillModels, modelOptions } from "./models.js";
 import { signInPanel } from "./signin.js";
 
 let view = null;
@@ -25,15 +26,10 @@ function current() {
 }
 
 const OTHER = "__other";
-let labels = {};
-const modelName = (m) => labels[m] || (t(`model_${m}`) === `model_${m}` ? m : t(`model_${m}`));
-
-function suggest(models, picked, given = {}) {
-  labels = given;
+function suggest(models, picked, source = {}) {
   const list = picked && !models.includes(picked) ? [...models, picked] : models;
-  const chosen = picked || list[0] || "";
-  $("connect-model-pick").replaceChildren(...list.map((m) => new Option(modelName(m), m, false, m === chosen)),
-    new Option(t("modelOther"), OTHER, false, !list.length));
+  const chosen = picked || source.suggested || list[0] || "";
+  fillModels($("connect-model-pick"), modelOptions(source, list), chosen, [new Option(t("modelOther"), OTHER, false, !list.length)]);
   $("connect-model").value = chosen;
   $("connect-model").hidden = list.length > 0;
 }
@@ -107,7 +103,7 @@ async function detail() {
     suggest(provider.models, view.local.server === provider.id ? view.local.model : "");
   } else if (method() === "subscription") {
     box.replaceChildren(...subscriptionDetail(provider));
-    suggest(provider.models, provider.model, provider.model_labels);
+    suggest(provider.models, provider.model, provider);
   } else {
     box.replaceChildren(...(provider.id === "custom" ? [addressForm(provider)] : []), await keyForm(provider));
     const { models = [] } = provider.has_key ? await post("/connections/models", { provider: provider.id }) : {};

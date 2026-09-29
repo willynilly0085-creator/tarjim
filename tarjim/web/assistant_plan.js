@@ -2,6 +2,7 @@ import { post } from "./api.js";
 import { t } from "./i18n.js";
 import { keyNeed } from "./assistant_key.js";
 import { listenOptions, translateOptions } from "./assistant_options.js";
+import { fillModels, modelOptions } from "./models.js";
 import { button, el, status } from "./ui.js";
 
 function downloads(state) {
@@ -25,23 +26,26 @@ function choiceRow(label, options, picked, onPick) {
     el("span", { className: "field-label", textContent: label }), select), reason);
 }
 
-function modelChoices(state) {
+function modelSource(state) {
   const choice = state.plan.translate;
   if (choice.provider === "local") {
-    const models = state.scan.local.programs.find((p) => p.id === choice.server)?.models || [];
-    return models.map((m) => ({ value: m, label: m, why: "" }));
+    return { models: state.scan.local.programs.find((p) => p.id === choice.server)?.models || [] };
   }
-  const sub = state.view.subscription.find((s) => s.id === choice.provider);
-  const named = (m) => sub.model_labels?.[m] || (t(`model_${m}`) === `model_${m}` ? m : t(`model_${m}`));
-  return sub ? sub.models.filter(Boolean).map((m) => ({ value: m, label: named(m), why: "" })) : [];
+  return state.view.subscription.find((s) => s.id === choice.provider) || { models: [] };
 }
 
 function modelRow(state) {
-  const options = modelChoices(state);
+  const source = modelSource(state);
+  const options = modelOptions(source, source.models);
   if (!options.length) return "";
   const choice = state.plan.translate;
-  if (!options.some((o) => o.value === choice.model)) choice.model = options[0].value;
-  return choiceRow(t("modelLabel"), options, choice.model, (o) => { choice.model = o.value; });
+  if (!options.some((o) => o.value === choice.model)) choice.model = source.suggested || options[0].value;
+  const select = el("select", { className: "select" });
+  fillModels(select, options, choice.model);
+  select.addEventListener("change", () => { choice.model = select.value; });
+  return el("div", { className: "plan-row" }, el("label", { className: "field" },
+    el("span", { className: "field-label", textContent: t("modelLabel") }), select),
+    el("p", { className: "meta", textContent: t("modelWhy") }));
 }
 
 function downloadPart(state) {
@@ -51,7 +55,8 @@ function downloadPart(state) {
   return el("div", { className: "plan-row" },
     el("p", { className: "field-label", textContent: t("planDownloads") }),
     ids.length ? el("ul", { className: "plain" }, ...ids.map((id) =>
-      el("li", { textContent: t("planTool", { name: t(`tool_${id}`), gb: state.scan.tools.sizes[id] }) })))
+      el("li", {}, el("span", { textContent: t("planTool", { name: t(`tool_${id}`), gb: state.scan.tools.sizes[id] }) }),
+        el("span", { className: "meta why", textContent: t(`tool_${id}_hint`) }))))
       : el("p", { className: "meta", textContent: t("planNothingToDownload") }),
     ids.length ? el("p", { className: "meta", textContent: t("planTotal", { gb: total, disk: state.scan.device.disk_free_gb }) }) : "",
     low ? el("p", { className: "error", textContent: t("planDiskLow") }) : "");

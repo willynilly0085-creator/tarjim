@@ -24,7 +24,8 @@
 
 .plan-row { display: grid; gap: var(--space-xs); padding-block: var(--space-md); border-bottom: 1px solid var(--line); }
 .plan-row .select { max-width: 32rem; }
-.plain { margin: 0; padding-inline-start: 1.25rem; display: grid; gap: 4px; }
+.plain { margin: 0; padding-inline-start: 1.25rem; display: grid; gap: var(--space-sm); }
+.plain .why { display: block; }
 .need { padding: var(--space-md); border: 1px solid var(--accent-line); border-radius: var(--radius); background: var(--raised); }
 .need .text-input { max-width: 32rem; }
 
