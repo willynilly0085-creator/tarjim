@@ -3,7 +3,7 @@ import re
 from typing import Any
 
 from tarjim.config import save, setting
-from tarjim.engines.catalog import API, BY_ID, LOCAL, SUBSCRIPTION, Provider, compatible, of_method
+from tarjim.engines.catalog import API, BY_ID, LOCAL, SUBSCRIPTION, Provider, of_method
 from tarjim.engines.choice import LISTENERS, chosen, has_key
 
 MODEL_NAME = re.compile(r"^[\w.:/@+\[\]-]{1,120}$")
@@ -18,20 +18,26 @@ def api_view(provider: Provider) -> dict[str, Any]:
     return {**view, "base_url": setting("custom_base_url")} if provider.id == "custom" else view
 
 
+def model_view(provider: str) -> dict[str, Any]:
+    """The provider's models for the page: ids, the names its app uses, groups and a suggestion."""
+    from tarjim.engines.provider_models import models_for
+
+    catalog = models_for(provider)
+    return {"models": [m["id"] for m in catalog],
+            "model_labels": {m["id"]: m["name"] for m in catalog},
+            "model_groups": {m["id"]: m["group"] for m in catalog},
+            "suggested": next((m["id"] for m in catalog if m["suggested"]), "")}
+
+
 def subscription_view(provider: Provider) -> dict[str, Any]:
     from tarjim.engines import app_install
-    from tarjim.engines.subscription import codex_models, launcher
-    from tarjim.engines.subscription_models import claude_models
+    from tarjim.engines.subscription import launcher
 
-    catalog = claude_models() if provider.id == "claude" else []
-    listed = [m["id"] for m in catalog] or list(provider.models)
-    models = codex_models() if provider.id == "codex" else listed
-    suggested = next((m["id"] for m in catalog if m["suggested"]), "")
+    models = model_view(provider.id)
     return {"id": provider.id, "name": provider.name, "ready": bool(launcher(provider.program)),
-            "model_labels": {m["id"]: m["name"] for m in catalog},
-            "model_groups": {m["id"]: m["group"] for m in catalog}, "suggested": suggested,
-            "install": provider.install, "model": setting(provider.model_name) or suggested,
-            "models": [m for m in models if m], "node": bool(app_install.npm()),
+            **models, "install": provider.install,
+            "model": setting(provider.model_name) or models["suggested"],
+            "node": bool(app_install.npm()),
             "can_install": provider.id in app_install.PACKAGES and bool(
                 app_install.npm() or provider.id in app_install.NATIVE),
             "installing": app_install.installing(provider.id),
@@ -94,15 +100,6 @@ def remember_choice(data: dict[str, Any]) -> bool:
     return True
 
 
-def models_for(provider: str) -> list[str]:
-    from tarjim.engines.compatible import address, list_models
-
-    found = BY_ID.get(provider)
-    if found is None or not compatible(found) or not setting(found.key_name):
-        return []
-    return list_models(address(provider), setting(found.key_name))
-
-
 class ConnectionRoutes:
     def reply(self, code: int, payload: Any) -> None:
         raise NotImplementedError
@@ -114,7 +111,8 @@ class ConnectionRoutes:
         self.reply(200, overview())
 
     def connection_models(self, _query: Query) -> None:
-        self.reply(200, {"models": models_for(str(self.read_json().get("provider", "")))})
+        provider = str(self.read_json().get("provider", ""))
+        self.reply(200, model_view(provider) if provider in BY_ID else {"models": []})
 
     def use_connection(self, _query: Query) -> None:
         saved = remember_choice(self.read_json())

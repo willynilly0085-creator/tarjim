@@ -31,7 +31,7 @@ function modelSource(state) {
   if (choice.provider === "local") {
     return { models: state.scan.local.programs.find((p) => p.id === choice.server)?.models || [] };
   }
-  return state.view.subscription.find((s) => s.id === choice.provider) || { models: [] };
+  return state.apiModels?.[choice.provider] || state.view.subscription.find((s) => s.id === choice.provider) || { models: [] };
 }
 
 function modelRow(state) {

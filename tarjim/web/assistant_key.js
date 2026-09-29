@@ -29,6 +29,7 @@ export function keyNeed(state, repaint) {
       return;
     }
     state.scan.keys.saved.push(provider);
+    state.apiModels = { ...state.apiModels, [provider]: await post("/connections/models", { provider }).catch(() => ({ models: [] })) };
     for (const choice of [state.plan.translate, state.plan.listen]) if (choice.provider === provider) choice.ready = true;
     repaint();
   });

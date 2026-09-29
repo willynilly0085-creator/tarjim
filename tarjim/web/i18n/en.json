@@ -307,5 +307,5 @@
   "modelSuggested": "suggested for translation",
   "modelsLatest": "Latest",
   "modelsMore": "More models",
-  "modelWhy": "Translation needs little from a model, so the lightest one is enough and uses less of your plan. Sonnet is a little more accurate."
+  "modelWhy": "Translating subtitles needs little from a model, so the suggested light one is enough and costs less. Pick a bigger model if you want extra accuracy."
 }

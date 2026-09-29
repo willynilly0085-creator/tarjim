@@ -20,5 +20,5 @@ export function fillModels(select, options, picked, extra = []) {
   latest.append(...options.filter((o) => o.group !== "more").map(option));
   const more = group("modelsMore");
   more.append(...options.filter((o) => o.group === "more").map(option));
-  return select.replaceChildren(latest, more, ...extra);
+  return select.replaceChildren(...[latest, more].filter((g) => g.children.length), ...extra);
 }

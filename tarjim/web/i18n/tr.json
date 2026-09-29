@@ -307,5 +307,5 @@
   "modelSuggested": "çeviri için önerilir",
   "modelsLatest": "En yeniler",
   "modelsMore": "Diğer modeller",
-  "modelWhy": "Çeviri, modelden çok şey istemez; en hafifi yeter ve planından daha az harcar. Sonnet biraz daha isabetlidir."
+  "modelWhy": "Altyazı çevirisi modelden çok şey istemez; önerilen hafif model yeterlidir ve daha ucuzdur. Daha yüksek doğruluk istersen daha büyük bir model seç."
 }

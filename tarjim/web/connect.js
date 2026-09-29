@@ -106,8 +106,8 @@ async function detail() {
     suggest(provider.models, provider.model, provider);
   } else {
     box.replaceChildren(...(provider.id === "custom" ? [addressForm(provider)] : []), await keyForm(provider));
-    const { models = [] } = provider.has_key ? await post("/connections/models", { provider: provider.id }) : {};
-    suggest(models, provider.model);
+    const listed = provider.has_key ? await post("/connections/models", { provider: provider.id }).catch(() => ({})) : {};
+    suggest(listed.models || [], provider.model, listed);
   }
 }
 

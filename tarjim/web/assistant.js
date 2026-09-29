@@ -1,4 +1,4 @@
-import { api } from "./api.js";
+import { api, post } from "./api.js";
 import { t } from "./i18n.js";
 import { aiScreen } from "./assistant_ai.js";
 import { planScreen } from "./assistant_plan.js";
@@ -35,7 +35,9 @@ function welcome() {
 async function scan() {
   await scanScreen(screen);
   const [{ plan, scan: found }, view] = await Promise.all([api("/setup/plan"), api("/connections")]);
-  planScreen(screen, { plan, scan: found, view }, { back: welcome, apply: progress, manual: flow.manual });
+  const apiModels = Object.fromEntries(await Promise.all(found.keys.saved.map(async (provider) =>
+    [provider, await post("/connections/models", { provider }).catch(() => ({ models: [] }))])));
+  planScreen(screen, { plan, scan: found, view, apiModels }, { back: welcome, apply: progress, manual: flow.manual });
 }
 
 function ai() {
