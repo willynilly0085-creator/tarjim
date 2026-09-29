@@ -307,7 +307,7 @@
   "modelSuggested": "recomendado para tradução",
   "modelsLatest": "Mais recentes",
   "modelsMore": "Mais modelos",
-  "modelWhy": "Traduzir legendas exige pouco de um modelo: o leve recomendado basta e custa menos. Escolha um maior se quiser mais precisão.",
+  "modelWhy": "O modelo recomendado equilibra precisão e custo para legendas. Escolha um maior para mais precisão ou um mais leve para economizar o plano.",
   "aiPlanKey": "Plano mensal: conecte colando a chave do plano.",
   "planTerms_opencode_go": "Atenção: a OpenCode diz que o Go foi feito para agentes de programação. Usá-lo para traduzir pode ficar fora dos termos; leia-os antes de conectar."
 }

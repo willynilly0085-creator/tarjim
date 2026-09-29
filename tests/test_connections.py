@@ -150,7 +150,7 @@ def test_claude_models_are_named_like_the_claude_app_and_the_lightest_is_suggest
     models = subscription_models.claude_models()
     latest = [m["name"] for m in models if m["group"] == "latest"]
     assert latest == ["Opus 5.5", "Fable 5.1", "Sonnet 5.5", "Haiku 4.5"]
-    assert [m["id"] for m in models if m["suggested"]] == ["claude-haiku-4-5"]
+    assert [m["id"] for m in models if m["suggested"]] == ["claude-sonnet-5-5"]
     ids = [m["id"] for m in models]
     assert "claude-mythos-6" in ids and "claude-fable-5[1m]" not in ids
     assert "cc-update-required-2" not in ids

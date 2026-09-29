@@ -3,7 +3,8 @@
 Claude lists the newest model of each family first and the older ones under "more models", like
 the model picker in the Claude app. Claude Code accepts these full ids with --model. Extra models
 an account has (Claude Code keeps them in ~/.claude.json) are added when they are not listed yet.
-Translation needs little of a model, so the lightest one is suggested.
+Sonnet is suggested: in a side-by-side Arabic test (2026-09-29) it kept the meaning across
+subtitle lines where Haiku broke it.
 """
 import json
 import os
@@ -13,7 +14,7 @@ from pathlib import Path
 CLAUDE_LATEST = ("claude-opus-5-5", "claude-fable-5-1", "claude-sonnet-5-5", "claude-haiku-4-5")
 CLAUDE_MORE = ("claude-sonnet-5", "claude-opus-5", "claude-fable-5", "claude-opus-4-8",
                "claude-opus-4-7", "claude-opus-4-6", "claude-sonnet-4-6")
-CLAUDE_SUGGESTED = "claude-haiku-4-5"
+CLAUDE_SUGGESTED = "claude-sonnet-5-5"
 MODEL_ID = re.compile(r"^claude-([a-z]+)-(\d+)(?:-(\d+))?")
 Model = dict[str, str]
 
