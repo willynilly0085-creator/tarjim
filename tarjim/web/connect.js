@@ -23,7 +23,8 @@ function listed() {
 
 function options() {
   if (!view) return [];
-  return listed().map((p) => ({ id: p.id, name: p.name, ready: method() === "local" || p.ready, keyed: "has_key" in p }));
+  return listed().map((p) => ({ id: p.id, name: p.name, ready: method() === "local" || p.ready, keyed: "has_key" in p,
+    signedOut: p.signed_in === false && p.ready }));
 }
 
 function current() {
@@ -133,7 +134,8 @@ function fillListeners() {
 function fillProviders(picked) {
   const list = options();
   $("connect-provider").replaceChildren(...list.map((p) =>
-    new Option(p.ready ? p.name : `${p.name} · ${t(p.keyed ? "needsKey" : "notInstalled")}`, p.id, false, p.id === picked)));
+    new Option(p.signedOut ? `${p.name} · ${t("needsSignIn")}` : p.ready ? p.name : `${p.name} · ${t(p.keyed ? "needsKey" : "notInstalled")}`,
+      p.id, false, p.id === picked)));
   $("connect-provider").closest(".field").hidden = list.length === 0;
   return detail();
 }

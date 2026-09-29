@@ -120,9 +120,9 @@ def set_glossary(terms: str) -> Any:
 
 @tarjim.tool()
 def list_connections() -> Any:
-    """Every way to connect an AI and whether it is ready: API providers (key saved or not),
-    subscriptions (app installed or not), and AI programs running on this computer with their
-    models. Also shows which engine listens and which translates now."""
+    """Every way to connect an AI: API providers (key saved or not), subscriptions ("ready" means
+    the app is installed, "signed_in" that it can be used now), plans, and AI programs on this
+    computer with their models. Also shows which engine listens and which translates now."""
     return call("/connections")
 
 

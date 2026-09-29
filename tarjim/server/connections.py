@@ -59,9 +59,13 @@ def local_view() -> dict[str, Any]:
 
 def overview() -> dict[str, Any]:
     from tarjim.engines.listening import listening_overview
+    from tarjim.onboarding.scan import section
 
+    signed = {a["id"]: a["signed_in"] for a in section("subscriptions")["apps"]}
+    subscriptions = [{**subscription_view(p), "signed_in": signed.get(p.id, False)}
+                     for p in of_method(SUBSCRIPTION)]
     return {"api": [api_view(p) for p in of_method(API)], "listening": listening_overview(),
-            "subscription": [subscription_view(p) for p in of_method(SUBSCRIPTION)],
+            "subscription": subscriptions,
             "local": local_view(),
             "chosen": {"listen": chosen("listen"), "translate": chosen("translate")}}
 
