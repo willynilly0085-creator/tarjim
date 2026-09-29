@@ -128,9 +128,6 @@
   "pairTitle": {
     "message": "확장 프로그램을 tarjim에 연결"
   },
-  "pairBody": {
-    "message": "이 명령으로 보안 토큰을 받아 아래에 붙여 넣으세요:"
-  },
   "tokenLabel": {
     "message": "보안 토큰"
   },
@@ -212,14 +209,8 @@
   "keyRejected": {
     "message": "Google이 이 키를 거부했어요. 전부 복사했는지 확인하세요."
   },
-  "keyGeminiLabel": {
-    "message": "Gemini 키"
-  },
   "keySet": {
     "message": "설정됨. 바꾸려면 새 키를 입력하세요."
-  },
-  "keySave": {
-    "message": "키 저장"
   },
   "pairAuto": {
     "message": "자동으로 연결"
@@ -321,53 +312,11 @@
   "stagePaused": {
     "message": "일시 정지됨"
   },
-  "engineLabel": {
-    "message": "엔진"
-  },
-  "engineCloud": {
-    "message": "클라우드 (Gemini, 가장 정확)"
-  },
-  "engineLocal": {
-    "message": "이 컴퓨터에서 로컬, 오프라인"
-  },
-  "engineAdvanced": {
-    "message": "다른 제공업체 또는 키 (tarjim 페이지 열림)"
-  },
-  "localModelLabel": {
-    "message": "로컬 모델"
-  },
-  "localModelHint": {
-    "message": "이 컴퓨터의 Ollama에 설치된 모델이에요."
-  },
-  "localModelNone": {
-    "message": "설치된 로컬 모델이 없어요. Ollama를 설치하고 모델을 받으세요."
-  },
-  "engineSubscription": {
-    "message": "내 구독 (Claude 또는 ChatGPT)"
-  },
-  "subscriptionLabel": {
-    "message": "구독"
-  },
-  "subscriptionNone": {
-    "message": "Claude Code나 Codex를 설치하고 요금제 계정으로 로그인하세요."
-  },
-  "providerClaude": {
-    "message": "Claude (Claude Code)"
-  },
-  "providerCodex": {
-    "message": "ChatGPT (Codex)"
-  },
   "voiceNatural": {
     "message": "화자별 자연스러운 음성 (Gemini)"
   },
   "menuDubNatural": {
     "message": "자연스러운 음성으로 더빙"
-  },
-  "providerCopilot": {
-    "message": "GitHub Copilot"
-  },
-  "providerAntigravity": {
-    "message": "Google AI (Antigravity)"
   },
   "setupTitle": {
     "message": "tarjim 설정을 마무리하세요"
@@ -383,5 +332,20 @@
   },
   "setupFull": {
     "message": "단계별 전체 설정"
+  },
+  "advanced": {
+    "message": "고급"
+  },
+  "summaryTranslate": {
+    "message": "번역"
+  },
+  "summaryListen": {
+    "message": "듣기"
+  },
+  "onDevice": {
+    "message": "이 컴퓨터"
+  },
+  "loading": {
+    "message": "불러오는 중…"
   }
 }

@@ -128,9 +128,6 @@
   "pairTitle": {
     "message": "拡張機能を tarjim に接続"
   },
-  "pairBody": {
-    "message": "このコマンドでセキュリティトークンを取得し、下に貼り付けてください："
-  },
   "tokenLabel": {
     "message": "セキュリティトークン"
   },
@@ -212,14 +209,8 @@
   "keyRejected": {
     "message": "Google がこのキーを拒否しました。すべてコピーできているか確認してください。"
   },
-  "keyGeminiLabel": {
-    "message": "Gemini キー"
-  },
   "keySet": {
     "message": "設定済みです。置き換えるには新しいキーを入力してください。"
-  },
-  "keySave": {
-    "message": "キーを保存"
   },
   "pairAuto": {
     "message": "自動で接続"
@@ -321,53 +312,11 @@
   "stagePaused": {
     "message": "一時停止中"
   },
-  "engineLabel": {
-    "message": "エンジン"
-  },
-  "engineCloud": {
-    "message": "クラウド（Gemini、最も正確）"
-  },
-  "engineLocal": {
-    "message": "このコンピューターでローカル、オフライン"
-  },
-  "engineAdvanced": {
-    "message": "別のプロバイダーやキー（tarjim のページを開きます）"
-  },
-  "localModelLabel": {
-    "message": "ローカルモデル"
-  },
-  "localModelHint": {
-    "message": "このコンピューターの Ollama にインストールされたモデルです。"
-  },
-  "localModelNone": {
-    "message": "ローカルモデルがインストールされていません。Ollama をインストールして、モデルを取得してください。"
-  },
-  "engineSubscription": {
-    "message": "自分のサブスクリプション（Claude または ChatGPT）"
-  },
-  "subscriptionLabel": {
-    "message": "サブスクリプション"
-  },
-  "subscriptionNone": {
-    "message": "Claude Code または Codex をインストールし、プランでサインインしてください。"
-  },
-  "providerClaude": {
-    "message": "Claude (Claude Code)"
-  },
-  "providerCodex": {
-    "message": "ChatGPT (Codex)"
-  },
   "voiceNatural": {
     "message": "話者ごとの自然な音声（Gemini）"
   },
   "menuDubNatural": {
     "message": "自然な音声で吹き替え"
-  },
-  "providerCopilot": {
-    "message": "GitHub Copilot"
-  },
-  "providerAntigravity": {
-    "message": "Google AI (Antigravity)"
   },
   "setupTitle": {
     "message": "tarjim の設定を完了しましょう"
@@ -383,5 +332,20 @@
   },
   "setupFull": {
     "message": "ステップごとの完全な設定"
+  },
+  "advanced": {
+    "message": "詳細設定"
+  },
+  "summaryTranslate": {
+    "message": "翻訳"
+  },
+  "summaryListen": {
+    "message": "聞き取り"
+  },
+  "onDevice": {
+    "message": "このコンピューター"
+  },
+  "loading": {
+    "message": "読み込み中…"
   }
 }

@@ -21,7 +21,8 @@ GET_ROUTES = table([
     (r"^/setup$", "setup_state"), (r"^/tools$", "list_tools"),
     (rf"^/pair/{PAIR}$", "pair_state"), (r"^/pairs$", "list_pairs"),
     (r"^/ui-language$", "ui_language"), (r"^/local-models$", "local_models"),
-    (r"^/connections$", "connections"), (r"^/setup/plan$", "setup_plan"),
+    (r"^/connections$", "connections"), (r"^/connections/current$", "current_connection"),
+    (r"^/setup/plan$", "setup_plan"),
     (r"^/setup/scan/(device|tools|local|subscriptions|keys)$", "scan_part")])
 POST_ROUTES = table([
     (r"^/jobs$", "create_json"), (r"^/upload$", "upload"), (rf"^/reveal/{JOB}$", "reveal"),

@@ -307,5 +307,7 @@
   "modelSuggested": "suggested for translation",
   "modelsLatest": "Latest",
   "modelsMore": "More models",
-  "modelWhy": "Translating subtitles needs little from a model, so the suggested light one is enough and costs less. Pick a bigger model if you want extra accuracy."
+  "modelWhy": "Translating subtitles needs little from a model, so the suggested light one is enough and costs less. Pick a bigger model if you want extra accuracy.",
+  "aiPlanKey": "Monthly plan: connect it by pasting the plan's key.",
+  "planTerms_opencode_go": "Note: OpenCode says Go is designed for coding agents. Using it for translation may be outside its terms; read them before you connect it."
 }

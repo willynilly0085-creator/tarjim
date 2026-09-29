@@ -128,9 +128,6 @@
   "pairTitle": {
     "message": "Erweiterung mit tarjim verbinden"
   },
-  "pairBody": {
-    "message": "Hol dir den Sicherheitstoken mit diesem Befehl und füge ihn unten ein:"
-  },
   "tokenLabel": {
     "message": "Sicherheitstoken"
   },
@@ -212,14 +209,8 @@
   "keyRejected": {
     "message": "Google hat diesen Schlüssel abgelehnt. Prüfe, ob du ihn vollständig kopiert hast."
   },
-  "keyGeminiLabel": {
-    "message": "Gemini-Schlüssel"
-  },
   "keySet": {
     "message": "Eingerichtet. Gib einen neuen Schlüssel ein, um ihn zu ersetzen."
-  },
-  "keySave": {
-    "message": "Schlüssel speichern"
   },
   "pairAuto": {
     "message": "Automatisch verbinden"
@@ -321,53 +312,11 @@
   "stagePaused": {
     "message": "Pausiert"
   },
-  "engineLabel": {
-    "message": "Engine"
-  },
-  "engineCloud": {
-    "message": "Cloud (Gemini, am genauesten)"
-  },
-  "engineLocal": {
-    "message": "Lokal auf diesem Computer, offline"
-  },
-  "engineAdvanced": {
-    "message": "Anderer Anbieter oder Schlüssel (öffnet die tarjim-Seite)"
-  },
-  "localModelLabel": {
-    "message": "Lokales Modell"
-  },
-  "localModelHint": {
-    "message": "In Ollama auf diesem Computer installierte Modelle."
-  },
-  "localModelNone": {
-    "message": "Keine lokalen Modelle installiert. Installiere Ollama und lade ein Modell herunter."
-  },
-  "engineSubscription": {
-    "message": "Mein Abo (Claude oder ChatGPT)"
-  },
-  "subscriptionLabel": {
-    "message": "Abo"
-  },
-  "subscriptionNone": {
-    "message": "Installiere Claude Code oder Codex und melde dich mit deinem Abo an."
-  },
-  "providerClaude": {
-    "message": "Claude (Claude Code)"
-  },
-  "providerCodex": {
-    "message": "ChatGPT (Codex)"
-  },
   "voiceNatural": {
     "message": "Natürliche Stimme pro Person (Gemini)"
   },
   "menuDubNatural": {
     "message": "Mit einer natürlichen Stimme synchronisieren"
-  },
-  "providerCopilot": {
-    "message": "GitHub Copilot"
-  },
-  "providerAntigravity": {
-    "message": "Google AI (Antigravity)"
   },
   "setupTitle": {
     "message": "tarjim fertig einrichten"
@@ -383,5 +332,20 @@
   },
   "setupFull": {
     "message": "Komplette Einrichtung, Schritt für Schritt"
+  },
+  "advanced": {
+    "message": "Erweitert"
+  },
+  "summaryTranslate": {
+    "message": "Übersetzung"
+  },
+  "summaryListen": {
+    "message": "Zuhören"
+  },
+  "onDevice": {
+    "message": "Auf diesem Computer"
+  },
+  "loading": {
+    "message": "Wird geladen…"
   }
 }

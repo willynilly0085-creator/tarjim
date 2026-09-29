@@ -128,9 +128,6 @@
   "pairTitle": {
     "message": "Conecta la extensión a tarjim"
   },
-  "pairBody": {
-    "message": "Obtén el token de seguridad con este comando y pégalo abajo:"
-  },
   "tokenLabel": {
     "message": "Token de seguridad"
   },
@@ -212,14 +209,8 @@
   "keyRejected": {
     "message": "Google rechazó esta clave. Comprueba que la copiaste completa."
   },
-  "keyGeminiLabel": {
-    "message": "Clave de Gemini"
-  },
   "keySet": {
     "message": "Lista. Escribe una clave nueva para reemplazarla."
-  },
-  "keySave": {
-    "message": "Guardar clave"
   },
   "pairAuto": {
     "message": "Conectar automáticamente"
@@ -321,53 +312,11 @@
   "stagePaused": {
     "message": "En pausa"
   },
-  "engineLabel": {
-    "message": "Motor"
-  },
-  "engineCloud": {
-    "message": "Nube (Gemini, el más preciso)"
-  },
-  "engineLocal": {
-    "message": "Local en esta computadora, sin conexión"
-  },
-  "engineAdvanced": {
-    "message": "Otro proveedor o clave (abre la página de tarjim)"
-  },
-  "localModelLabel": {
-    "message": "Modelo local"
-  },
-  "localModelHint": {
-    "message": "Modelos instalados en Ollama en esta computadora."
-  },
-  "localModelNone": {
-    "message": "No hay modelos locales instalados. Instala Ollama y descarga un modelo."
-  },
-  "engineSubscription": {
-    "message": "Mi suscripción (Claude o ChatGPT)"
-  },
-  "subscriptionLabel": {
-    "message": "Suscripción"
-  },
-  "subscriptionNone": {
-    "message": "Instala Claude Code o Codex e inicia sesión con tu plan."
-  },
-  "providerClaude": {
-    "message": "Claude (Claude Code)"
-  },
-  "providerCodex": {
-    "message": "ChatGPT (Codex)"
-  },
   "voiceNatural": {
     "message": "Voz natural para cada hablante (Gemini)"
   },
   "menuDubNatural": {
     "message": "Doblar con una voz natural"
-  },
-  "providerCopilot": {
-    "message": "GitHub Copilot"
-  },
-  "providerAntigravity": {
-    "message": "Google AI (Antigravity)"
   },
   "setupTitle": {
     "message": "Termina de configurar tarjim"
@@ -383,5 +332,20 @@
   },
   "setupFull": {
     "message": "Configuración completa, paso a paso"
+  },
+  "advanced": {
+    "message": "Avanzado"
+  },
+  "summaryTranslate": {
+    "message": "Traducción"
+  },
+  "summaryListen": {
+    "message": "Escucha"
+  },
+  "onDevice": {
+    "message": "En este equipo"
+  },
+  "loading": {
+    "message": "Cargando…"
   }
 }

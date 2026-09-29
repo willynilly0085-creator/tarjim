@@ -13,16 +13,21 @@ function el(tag, props = {}, ...children) {
   return node;
 }
 
+const keyed = (p) => "has_key" in p;
+
+function listed() {
+  if (method() === "local") return view.local.servers;
+  if (method() === "subscription") return [...view.subscription, ...view.api.filter((p) => p.plan)];
+  return view.api.filter((p) => !p.plan);
+}
+
 function options() {
   if (!view) return [];
-  if (method() === "local") return view.local.servers.map((s) => ({ id: s.id, name: s.name, ready: true }));
-  return view[method()].map((p) => ({ id: p.id, name: p.name, ready: p.ready }));
+  return listed().map((p) => ({ id: p.id, name: p.name, ready: method() === "local" || p.ready, keyed: "has_key" in p }));
 }
 
 function current() {
-  const id = $("connect-provider").value;
-  if (method() === "local") return view.local.servers.find((s) => s.id === id);
-  return view[method()].find((p) => p.id === id);
+  return listed().find((p) => p.id === $("connect-provider").value);
 }
 
 const OTHER = "__other";
@@ -101,11 +106,12 @@ async function detail() {
     box.replaceChildren(el("p", { className: "meta", dir: "ltr", textContent: provider.url }),
       ...(provider.models.length ? [] : [modelNeeded(provider)]), ...localPanel(view.local, refresh));
     suggest(provider.models, view.local.server === provider.id ? view.local.model : "");
-  } else if (method() === "subscription") {
+  } else if (method() === "subscription" && !keyed(provider)) {
     box.replaceChildren(...subscriptionDetail(provider));
     suggest(provider.models, provider.model, provider);
   } else {
-    box.replaceChildren(...(provider.id === "custom" ? [addressForm(provider)] : []), await keyForm(provider));
+    const terms = provider.plan ? [el("p", { className: "meta", textContent: t(`planTerms_${provider.id}`) })] : [];
+    box.replaceChildren(...(provider.id === "custom" ? [addressForm(provider)] : []), await keyForm(provider), ...terms);
     const listed = provider.has_key ? await post("/connections/models", { provider: provider.id }).catch(() => ({})) : {};
     suggest(listed.models || [], provider.model, listed);
   }
@@ -127,7 +133,7 @@ function fillListeners() {
 function fillProviders(picked) {
   const list = options();
   $("connect-provider").replaceChildren(...list.map((p) =>
-    new Option(p.ready ? p.name : `${p.name} · ${t(method() === "api" ? "needsKey" : "notInstalled")}`, p.id, false, p.id === picked)));
+    new Option(p.ready ? p.name : `${p.name} · ${t(p.keyed ? "needsKey" : "notInstalled")}`, p.id, false, p.id === picked)));
   $("connect-provider").closest(".field").hidden = list.length === 0;
   return detail();
 }
@@ -139,7 +145,8 @@ async function refresh(picked, fresh) {
 
 function methodOf(provider) {
   if (provider === "local") return "local";
-  return view.subscription.some((p) => p.id === provider) ? "subscription" : "api";
+  const plan = view.api.some((p) => p.id === provider && p.plan);
+  return plan || view.subscription.some((p) => p.id === provider) ? "subscription" : "api";
 }
 
 export async function renderConnect() {

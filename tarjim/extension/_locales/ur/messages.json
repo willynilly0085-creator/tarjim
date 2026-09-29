@@ -128,9 +128,6 @@
   "pairTitle": {
     "message": "ایکسٹینشن کو tarjim سے جوڑیں"
   },
-  "pairBody": {
-    "message": "اس کمانڈ سے سیکیورٹی ٹوکن حاصل کریں اور نیچے پیسٹ کریں:"
-  },
   "tokenLabel": {
     "message": "سیکیورٹی ٹوکن"
   },
@@ -212,14 +209,8 @@
   "keyRejected": {
     "message": "Google نے یہ کلید مسترد کر دی۔ دیکھیں کہ آپ نے پوری کلید کاپی کی ہے۔"
   },
-  "keyGeminiLabel": {
-    "message": "Gemini کلید"
-  },
   "keySet": {
     "message": "سیٹ ہے۔ بدلنے کے لیے نئی کلید لکھیں۔"
-  },
-  "keySave": {
-    "message": "کلید محفوظ کریں"
   },
   "pairAuto": {
     "message": "خودکار طور پر جوڑیں"
@@ -321,53 +312,11 @@
   "stagePaused": {
     "message": "رکا ہوا"
   },
-  "engineLabel": {
-    "message": "انجن"
-  },
-  "engineCloud": {
-    "message": "کلاؤڈ (Gemini، سب سے درست)"
-  },
-  "engineLocal": {
-    "message": "اسی کمپیوٹر پر لوکل، آف لائن"
-  },
-  "engineAdvanced": {
-    "message": "کوئی دوسرا فراہم کنندہ یا کلید (tarjim کا صفحہ کھولتا ہے)"
-  },
-  "localModelLabel": {
-    "message": "لوکل ماڈل"
-  },
-  "localModelHint": {
-    "message": "اس کمپیوٹر پر Ollama میں انسٹال ماڈلز۔"
-  },
-  "localModelNone": {
-    "message": "کوئی لوکل ماڈل انسٹال نہیں۔ Ollama انسٹال کریں اور ایک ماڈل ڈاؤن لوڈ کریں۔"
-  },
-  "engineSubscription": {
-    "message": "میری سبسکرپشن (Claude یا ChatGPT)"
-  },
-  "subscriptionLabel": {
-    "message": "سبسکرپشن"
-  },
-  "subscriptionNone": {
-    "message": "Claude Code یا Codex انسٹال کریں اور اپنے پلان سے سائن ان کریں۔"
-  },
-  "providerClaude": {
-    "message": "Claude (Claude Code)"
-  },
-  "providerCodex": {
-    "message": "ChatGPT (Codex)"
-  },
   "voiceNatural": {
     "message": "ہر بولنے والے کے لیے قدرتی آواز (Gemini)"
   },
   "menuDubNatural": {
     "message": "قدرتی آواز سے ڈب کریں"
-  },
-  "providerCopilot": {
-    "message": "GitHub Copilot"
-  },
-  "providerAntigravity": {
-    "message": "Google AI (Antigravity)"
   },
   "setupTitle": {
     "message": "tarjim کا سیٹ اپ مکمل کریں"
@@ -383,5 +332,20 @@
   },
   "setupFull": {
     "message": "مکمل سیٹ اپ، قدم بہ قدم"
+  },
+  "advanced": {
+    "message": "مزید ترتیبات"
+  },
+  "summaryTranslate": {
+    "message": "ترجمہ"
+  },
+  "summaryListen": {
+    "message": "سننا"
+  },
+  "onDevice": {
+    "message": "اسی کمپیوٹر پر"
+  },
+  "loading": {
+    "message": "لوڈ ہو رہا ہے…"
   }
 }

@@ -128,9 +128,6 @@
   "pairTitle": {
     "message": "Connect the extension to tarjim"
   },
-  "pairBody": {
-    "message": "Get the security token with this command and paste it below:"
-  },
   "tokenLabel": {
     "message": "Security token"
   },
@@ -212,14 +209,8 @@
   "keyRejected": {
     "message": "Google refused this key. Check that you copied all of it."
   },
-  "keyGeminiLabel": {
-    "message": "Gemini key"
-  },
   "keySet": {
     "message": "Set. Type a new key to replace it."
-  },
-  "keySave": {
-    "message": "Save key"
   },
   "pairAuto": {
     "message": "Connect automatically"
@@ -321,53 +312,11 @@
   "stagePaused": {
     "message": "Paused"
   },
-  "engineLabel": {
-    "message": "Engine"
-  },
-  "engineCloud": {
-    "message": "Cloud (Gemini, most accurate)"
-  },
-  "engineLocal": {
-    "message": "Local on this computer, offline"
-  },
-  "engineAdvanced": {
-    "message": "Another provider or key (opens the tarjim page)"
-  },
-  "localModelLabel": {
-    "message": "Local model"
-  },
-  "localModelHint": {
-    "message": "Models installed in Ollama on this computer."
-  },
-  "localModelNone": {
-    "message": "No local models installed. Install Ollama and pull a model."
-  },
-  "engineSubscription": {
-    "message": "My subscription (Claude or ChatGPT)"
-  },
-  "subscriptionLabel": {
-    "message": "Subscription"
-  },
-  "subscriptionNone": {
-    "message": "Install Claude Code or Codex and sign in with your plan."
-  },
-  "providerClaude": {
-    "message": "Claude (Claude Code)"
-  },
-  "providerCodex": {
-    "message": "ChatGPT (Codex)"
-  },
   "voiceNatural": {
     "message": "Natural voice per speaker (Gemini)"
   },
   "menuDubNatural": {
     "message": "Dub with a natural voice"
-  },
-  "providerCopilot": {
-    "message": "GitHub Copilot"
-  },
-  "providerAntigravity": {
-    "message": "Google AI (Antigravity)"
   },
   "setupTitle": {
     "message": "Finish setting up tarjim"
@@ -383,5 +332,20 @@
   },
   "setupFull": {
     "message": "Full setup, step by step"
+  },
+  "advanced": {
+    "message": "Advanced"
+  },
+  "summaryTranslate": {
+    "message": "Translation"
+  },
+  "summaryListen": {
+    "message": "Listening"
+  },
+  "onDevice": {
+    "message": "On this computer"
+  },
+  "loading": {
+    "message": "Loading…"
   }
 }

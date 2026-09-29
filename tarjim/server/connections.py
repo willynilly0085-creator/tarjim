@@ -14,7 +14,8 @@ Query = dict[str, list[str]]
 def api_view(provider: Provider) -> dict[str, Any]:
     view = {"id": provider.id, "name": provider.name, "hears": provider.hears,
             "key_url": provider.key_url, "has_key": bool(setting(provider.key_name)),
-            "ready": has_key(provider.id), "model": setting(provider.model_name)}
+            "ready": has_key(provider.id), "model": setting(provider.model_name),
+            "plan": provider.plan}
     return {**view, "base_url": setting("custom_base_url")} if provider.id == "custom" else view
 
 
@@ -65,6 +66,22 @@ def overview() -> dict[str, Any]:
             "chosen": {"listen": chosen("listen"), "translate": chosen("translate")}}
 
 
+def current_view() -> dict[str, Any]:
+    """What tarjim uses right now, from the saved settings only, so it answers at once."""
+    from tarjim.engines.local_servers import BY_ID as SERVERS
+    from tarjim.engines.local_servers import chosen_server
+    from tarjim.engines.model_catalog import pretty
+
+    translate, listen = chosen("translate"), chosen("listen")
+    if translate == LOCAL:
+        name, model = SERVERS[chosen_server()][0], setting("local_model")
+    else:
+        name, model = BY_ID[translate].name, setting(BY_ID[translate].model_name)
+    listener = "" if listen == LOCAL else BY_ID[listen].name
+    return {"translate": translate, "name": name, "model": pretty(model) if model else "",
+            "listen": listen, "listen_name": listener}
+
+
 def method_of(provider: str) -> str:
     return BY_ID[provider].method if provider in BY_ID else LOCAL
 
@@ -109,6 +126,9 @@ class ConnectionRoutes:
 
     def connections(self, _query: Query) -> None:
         self.reply(200, overview())
+
+    def current_connection(self, _query: Query) -> None:
+        self.reply(200, current_view())
 
     def connection_models(self, _query: Query) -> None:
         provider = str(self.read_json().get("provider", ""))

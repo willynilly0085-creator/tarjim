@@ -128,9 +128,6 @@
   "pairTitle": {
     "message": "Hubungkan ekstensi ke tarjim"
   },
-  "pairBody": {
-    "message": "Dapatkan token keamanan dengan perintah ini dan tempel di bawah:"
-  },
   "tokenLabel": {
     "message": "Token keamanan"
   },
@@ -212,14 +209,8 @@
   "keyRejected": {
     "message": "Google menolak kunci ini. Pastikan kamu menyalin semuanya."
   },
-  "keyGeminiLabel": {
-    "message": "Kunci Gemini"
-  },
   "keySet": {
     "message": "Sudah diatur. Ketik kunci baru untuk menggantinya."
-  },
-  "keySave": {
-    "message": "Simpan kunci"
   },
   "pairAuto": {
     "message": "Hubungkan otomatis"
@@ -321,53 +312,11 @@
   "stagePaused": {
     "message": "Dijeda"
   },
-  "engineLabel": {
-    "message": "Mesin"
-  },
-  "engineCloud": {
-    "message": "Cloud (Gemini, paling akurat)"
-  },
-  "engineLocal": {
-    "message": "Lokal di komputer ini, offline"
-  },
-  "engineAdvanced": {
-    "message": "Penyedia atau kunci lain (membuka halaman tarjim)"
-  },
-  "localModelLabel": {
-    "message": "Model lokal"
-  },
-  "localModelHint": {
-    "message": "Model yang terpasang di Ollama di komputer ini."
-  },
-  "localModelNone": {
-    "message": "Belum ada model lokal yang terpasang. Pasang Ollama dan unduh sebuah model."
-  },
-  "engineSubscription": {
-    "message": "Langgananku (Claude atau ChatGPT)"
-  },
-  "subscriptionLabel": {
-    "message": "Langganan"
-  },
-  "subscriptionNone": {
-    "message": "Pasang Claude Code atau Codex dan masuk dengan paketmu."
-  },
-  "providerClaude": {
-    "message": "Claude (Claude Code)"
-  },
-  "providerCodex": {
-    "message": "ChatGPT (Codex)"
-  },
   "voiceNatural": {
     "message": "Suara alami untuk setiap pembicara (Gemini)"
   },
   "menuDubNatural": {
     "message": "Sulih suara dengan suara alami"
-  },
-  "providerCopilot": {
-    "message": "GitHub Copilot"
-  },
-  "providerAntigravity": {
-    "message": "Google AI (Antigravity)"
   },
   "setupTitle": {
     "message": "Selesaikan penyiapan tarjim"
@@ -383,5 +332,20 @@
   },
   "setupFull": {
     "message": "Penyiapan lengkap, langkah demi langkah"
+  },
+  "advanced": {
+    "message": "Lanjutan"
+  },
+  "summaryTranslate": {
+    "message": "Terjemahan"
+  },
+  "summaryListen": {
+    "message": "Mendengar"
+  },
+  "onDevice": {
+    "message": "Di komputer ini"
+  },
+  "loading": {
+    "message": "Memuat…"
   }
 }

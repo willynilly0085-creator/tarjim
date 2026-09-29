@@ -128,9 +128,6 @@
   "pairTitle": {
     "message": "एक्सटेंशन को tarjim से कनेक्ट करें"
   },
-  "pairBody": {
-    "message": "इस कमांड से सुरक्षा टोकन लें और नीचे पेस्ट करें:"
-  },
   "tokenLabel": {
     "message": "सुरक्षा टोकन"
   },
@@ -212,14 +209,8 @@
   "keyRejected": {
     "message": "Google ने यह कुंजी अस्वीकार कर दी। देखें कि आपने पूरी कुंजी कॉपी की है।"
   },
-  "keyGeminiLabel": {
-    "message": "Gemini कुंजी"
-  },
   "keySet": {
     "message": "सेट है। बदलने के लिए नई कुंजी लिखें।"
-  },
-  "keySave": {
-    "message": "कुंजी सेव करें"
   },
   "pairAuto": {
     "message": "अपने-आप कनेक्ट करें"
@@ -321,53 +312,11 @@
   "stagePaused": {
     "message": "रुका हुआ"
   },
-  "engineLabel": {
-    "message": "इंजन"
-  },
-  "engineCloud": {
-    "message": "क्लाउड (Gemini, सबसे सटीक)"
-  },
-  "engineLocal": {
-    "message": "इसी कंप्यूटर पर लोकल, ऑफ़लाइन"
-  },
-  "engineAdvanced": {
-    "message": "कोई दूसरा प्रोवाइडर या कुंजी (tarjim पेज खोलता है)"
-  },
-  "localModelLabel": {
-    "message": "लोकल मॉडल"
-  },
-  "localModelHint": {
-    "message": "इस कंप्यूटर पर Ollama में इंस्टॉल मॉडल।"
-  },
-  "localModelNone": {
-    "message": "कोई लोकल मॉडल इंस्टॉल नहीं है। Ollama इंस्टॉल करें और एक मॉडल डाउनलोड करें।"
-  },
-  "engineSubscription": {
-    "message": "मेरी सदस्यता (Claude या ChatGPT)"
-  },
-  "subscriptionLabel": {
-    "message": "सदस्यता"
-  },
-  "subscriptionNone": {
-    "message": "Claude Code या Codex इंस्टॉल करें और अपने प्लान से साइन इन करें।"
-  },
-  "providerClaude": {
-    "message": "Claude (Claude Code)"
-  },
-  "providerCodex": {
-    "message": "ChatGPT (Codex)"
-  },
   "voiceNatural": {
     "message": "हर बोलने वाले के लिए स्वाभाविक आवाज़ (Gemini)"
   },
   "menuDubNatural": {
     "message": "स्वाभाविक आवाज़ से डब करें"
-  },
-  "providerCopilot": {
-    "message": "GitHub Copilot"
-  },
-  "providerAntigravity": {
-    "message": "Google AI (Antigravity)"
   },
   "setupTitle": {
     "message": "tarjim की सेटअप पूरी करें"
@@ -383,5 +332,20 @@
   },
   "setupFull": {
     "message": "पूरी सेटअप, कदम दर कदम"
+  },
+  "advanced": {
+    "message": "उन्नत"
+  },
+  "summaryTranslate": {
+    "message": "अनुवाद"
+  },
+  "summaryListen": {
+    "message": "सुनना"
+  },
+  "onDevice": {
+    "message": "इसी कंप्यूटर पर"
+  },
+  "loading": {
+    "message": "लोड हो रहा है…"
   }
 }

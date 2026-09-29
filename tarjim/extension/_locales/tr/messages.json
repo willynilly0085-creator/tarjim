@@ -128,9 +128,6 @@
   "pairTitle": {
     "message": "Eklentiyi tarjim'e bağla"
   },
-  "pairBody": {
-    "message": "Bu komutla güvenlik kodunu al ve aşağıya yapıştır:"
-  },
   "tokenLabel": {
     "message": "Güvenlik kodu"
   },
@@ -212,14 +209,8 @@
   "keyRejected": {
     "message": "Google bu anahtarı reddetti. Tamamını kopyaladığından emin ol."
   },
-  "keyGeminiLabel": {
-    "message": "Gemini anahtarı"
-  },
   "keySet": {
     "message": "Ayarlandı. Değiştirmek için yeni bir anahtar yaz."
-  },
-  "keySave": {
-    "message": "Anahtarı kaydet"
   },
   "pairAuto": {
     "message": "Otomatik bağlan"
@@ -321,53 +312,11 @@
   "stagePaused": {
     "message": "Duraklatıldı"
   },
-  "engineLabel": {
-    "message": "Motor"
-  },
-  "engineCloud": {
-    "message": "Bulut (Gemini, en doğru)"
-  },
-  "engineLocal": {
-    "message": "Bu bilgisayarda yerel, çevrimdışı"
-  },
-  "engineAdvanced": {
-    "message": "Başka bir sağlayıcı veya anahtar (tarjim sayfasını açar)"
-  },
-  "localModelLabel": {
-    "message": "Yerel model"
-  },
-  "localModelHint": {
-    "message": "Bu bilgisayarda Ollama'da yüklü modeller."
-  },
-  "localModelNone": {
-    "message": "Yüklü yerel model yok. Ollama'yı yükle ve bir model indir."
-  },
-  "engineSubscription": {
-    "message": "Aboneliğim (Claude veya ChatGPT)"
-  },
-  "subscriptionLabel": {
-    "message": "Abonelik"
-  },
-  "subscriptionNone": {
-    "message": "Claude Code veya Codex'i yükle ve planınla giriş yap."
-  },
-  "providerClaude": {
-    "message": "Claude (Claude Code)"
-  },
-  "providerCodex": {
-    "message": "ChatGPT (Codex)"
-  },
   "voiceNatural": {
     "message": "Her konuşan için doğal ses (Gemini)"
   },
   "menuDubNatural": {
     "message": "Doğal bir sesle dublaj"
-  },
-  "providerCopilot": {
-    "message": "GitHub Copilot"
-  },
-  "providerAntigravity": {
-    "message": "Google AI (Antigravity)"
   },
   "setupTitle": {
     "message": "tarjim kurulumunu tamamla"
@@ -383,5 +332,20 @@
   },
   "setupFull": {
     "message": "Adım adım tam kurulum"
+  },
+  "advanced": {
+    "message": "Gelişmiş"
+  },
+  "summaryTranslate": {
+    "message": "Çeviri"
+  },
+  "summaryListen": {
+    "message": "Dinleme"
+  },
+  "onDevice": {
+    "message": "Bu bilgisayarda"
+  },
+  "loading": {
+    "message": "Yükleniyor…"
   }
 }

@@ -1,7 +1,8 @@
 import { t } from "./i18n.js";
 
 const NAMES = { gemini: "Google Gemini", openai: "OpenAI", anthropic: "Anthropic Claude", openrouter: "OpenRouter",
-  deepseek: "DeepSeek", qwen: "Qwen", mistral: "Mistral", groq: "Groq", xai: "xAI Grok", opencode: "OpenCode Zen", custom: "OpenAI-compatible" };
+  deepseek: "DeepSeek", qwen: "Qwen", mistral: "Mistral", groq: "Groq", xai: "xAI Grok", opencode: "OpenCode Zen", opencode_go: "OpenCode Go", kimi: "Kimi", glm: "GLM", minimax: "MiniMax",
+  custom: "OpenAI-compatible" };
 const PREFERENCE = ["aya", "qwen", "gemma", "llama", "mistral"];
 const TOO_BIG = /[:-](\d{2,3})b\b/;
 

@@ -307,5 +307,7 @@
   "modelSuggested": "empfohlen zum Übersetzen",
   "modelsLatest": "Neueste",
   "modelsMore": "Weitere Modelle",
-  "modelWhy": "Untertitel übersetzen verlangt wenig von einem Modell: Das empfohlene leichte reicht und kostet weniger. Nimm ein größeres, wenn du mehr Genauigkeit willst."
+  "modelWhy": "Untertitel übersetzen verlangt wenig von einem Modell: Das empfohlene leichte reicht und kostet weniger. Nimm ein größeres, wenn du mehr Genauigkeit willst.",
+  "aiPlanKey": "Monatsabo: Verbinde es, indem du den Schlüssel des Abos einfügst.",
+  "planTerms_opencode_go": "Hinweis: Laut OpenCode ist Go für Coding-Agenten gedacht. Die Nutzung zum Übersetzen kann außerhalb der Bedingungen liegen; lies sie, bevor du es verbindest."
 }

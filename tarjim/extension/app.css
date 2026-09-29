@@ -425,3 +425,10 @@ form { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-md
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+.summary { display: grid; grid-template-columns: max-content 1fr; gap: 6px var(--space-sm, 12px); margin: 0; }
+.summary dt { color: var(--muted); }
+.summary dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.advanced { border-top: 1px solid var(--line); padding-top: var(--space-xs, 8px); }
+.advanced summary { cursor: pointer; color: var(--muted); padding-block: var(--space-xs, 8px); }
+.advanced summary:focus-visible { outline: 2px solid var(--focus, currentColor); outline-offset: 2px; }

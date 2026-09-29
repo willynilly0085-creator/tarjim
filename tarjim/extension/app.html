@@ -128,39 +128,22 @@
 
     <section class="view panel" id="view-settings" hidden>
       <h2 class="panel-title" data-i18n="settings"></h2>
-      <button class="button-quiet wide" id="open-full-setup" type="button" data-i18n="setupFull"></button>
-      <form id="settings-form" class="stack" novalidate>
-        <label class="field-label" for="server" data-i18n="serverLabel"></label>
-        <input class="text-input" id="server" dir="ltr" type="url" required>
-        <label class="field-label" for="settings-token" data-i18n="tokenLabel"></label>
-        <input class="text-input" id="settings-token" type="password" dir="ltr" autocomplete="off" spellcheck="false">
-        <label class="field-label" for="settings-gemini" data-i18n="keyGeminiLabel"></label>
-        <input class="text-input" id="settings-gemini" type="password" dir="ltr" autocomplete="off" spellcheck="false">
-        <label class="field-label" for="settings-fish" data-i18n="keyFishLabel"></label>
-        <input class="text-input" id="settings-fish" type="password" dir="ltr" autocomplete="off" spellcheck="false">
-        <label class="field-label" for="settings-engine" data-i18n="engineLabel"></label>
-        <select class="select" id="settings-engine">
-          <option value="cloud" data-i18n="engineCloud"></option>
-          <option value="local" data-i18n="engineLocal"></option>
-          <option value="subscription" data-i18n="engineSubscription"></option>
-          <option value="advanced" data-i18n="engineAdvanced"></option>
-        </select>
-        <div class="stack" id="local-model-field" hidden>
-          <label class="field-label" for="settings-local-model" data-i18n="localModelLabel"></label>
-          <select class="select" id="settings-local-model"></select>
-          <p class="meta" id="local-model-hint" data-i18n="localModelHint"></p>
-        </div>
-        <div class="stack" id="subscription-field" hidden>
-          <label class="field-label" for="settings-subscription" data-i18n="subscriptionLabel"></label>
-          <select class="select" id="settings-subscription"></select>
-          <p class="meta" id="subscription-none" data-i18n="subscriptionNone" hidden></p>
-        </div>
-        <p class="notice" id="settings-notice" role="status" aria-live="polite"></p>
-        <div class="row">
-          <button class="primary" type="submit" data-i18n="save"></button>
-          <button class="button-quiet" id="close-settings" type="button" data-i18n="back"></button>
-        </div>
-      </form>
+      <dl class="summary" id="connection-summary"></dl>
+      <button class="primary wide" id="open-full-setup" type="button" data-i18n="setupFull"></button>
+      <details class="advanced">
+        <summary data-i18n="advanced"></summary>
+        <form id="settings-form" class="stack" novalidate>
+          <label class="field-label" for="server" data-i18n="serverLabel"></label>
+          <input class="text-input" id="server" dir="ltr" type="url" required>
+          <label class="field-label" for="settings-token" data-i18n="tokenLabel"></label>
+          <input class="text-input" id="settings-token" type="password" dir="ltr" autocomplete="off" spellcheck="false">
+          <label class="field-label" for="settings-fish" data-i18n="keyFishLabel"></label>
+          <input class="text-input" id="settings-fish" type="password" dir="ltr" autocomplete="off" spellcheck="false">
+          <p class="notice" id="settings-notice" role="status" aria-live="polite"></p>
+          <button class="button-quiet" type="submit" data-i18n="save"></button>
+        </form>
+      </details>
+      <button class="button-quiet" id="close-settings" type="button" data-i18n="back"></button>
     </section>
   </main>
 

@@ -128,9 +128,6 @@
   "pairTitle": {
     "message": "اربط الإضافة بـ tarjim"
   },
-  "pairBody": {
-    "message": "خذ رمز الأمان من جهازك بهذا الأمر، والصقه تحت:"
-  },
   "tokenLabel": {
     "message": "رمز الأمان"
   },
@@ -212,14 +209,8 @@
   "keyRejected": {
     "message": "Google رفض هذا المفتاح، تأكد إنك نسخته كامل."
   },
-  "keyGeminiLabel": {
-    "message": "مفتاح Gemini"
-  },
   "keySet": {
     "message": "مضبوط، اكتب مفتاح جديد لو تبي تغيّره"
-  },
-  "keySave": {
-    "message": "احفظ المفتاح"
   },
   "pairAuto": {
     "message": "اربط تلقائياً"
@@ -321,53 +312,11 @@
   "stagePaused": {
     "message": "موقفة مؤقتاً"
   },
-  "engineLabel": {
-    "message": "المحرك"
-  },
-  "engineCloud": {
-    "message": "سحابي (Gemini، الأدق)"
-  },
-  "engineLocal": {
-    "message": "محلي على جهازي، بدون إنترنت"
-  },
-  "engineAdvanced": {
-    "message": "مزوّد آخر أو مفتاح (يفتح صفحة ترجم)"
-  },
-  "localModelLabel": {
-    "message": "النموذج المحلي"
-  },
-  "localModelHint": {
-    "message": "النماذج المركّبة في Ollama على جهازك."
-  },
-  "localModelNone": {
-    "message": "ما فيه نماذج محلية مركّبة. ركّب Ollama وحمّل نموذج."
-  },
-  "engineSubscription": {
-    "message": "اشتراكي (Claude أو ChatGPT)"
-  },
-  "subscriptionLabel": {
-    "message": "الاشتراك"
-  },
-  "subscriptionNone": {
-    "message": "ركّب Claude Code أو Codex وسجّل دخول باشتراكك."
-  },
-  "providerClaude": {
-    "message": "Claude (Claude Code)"
-  },
-  "providerCodex": {
-    "message": "ChatGPT (Codex)"
-  },
   "voiceNatural": {
     "message": "صوت طبيعي لكل متكلم (Gemini)"
   },
   "menuDubNatural": {
     "message": "دبلجة بصوت طبيعي"
-  },
-  "providerCopilot": {
-    "message": "GitHub Copilot"
-  },
-  "providerAntigravity": {
-    "message": "Google AI (Antigravity)"
   },
   "setupTitle": {
     "message": "كمّل إعداد ترجم"
@@ -383,5 +332,20 @@
   },
   "setupFull": {
     "message": "الإعداد الكامل خطوة بخطوة"
+  },
+  "advanced": {
+    "message": "متقدم"
+  },
+  "summaryTranslate": {
+    "message": "الترجمة"
+  },
+  "summaryListen": {
+    "message": "السماع"
+  },
+  "onDevice": {
+    "message": "على جهازك"
+  },
+  "loading": {
+    "message": "لحظة…"
   }
 }

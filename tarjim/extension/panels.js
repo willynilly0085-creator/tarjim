@@ -1,5 +1,4 @@
 import { $, show } from "./dom.js";
-import { fillEngine, saveEngine, syncEngine } from "./engine.js";
 import { keyStatus, saveKey } from "./keys.js";
 import { askToPair, claimPending, serverBase } from "./pairing.js";
 import { ApiError, api, remember, settings, t } from "./shared.js";
@@ -40,15 +39,25 @@ async function autoPair(ready) {
   }
   $("pair-waiting").textContent = t("pairDenied");
 }
+async function fillSummary() {
+  const box = $("connection-summary");
+  box.textContent = t("loading");
+  const now = await api("/connections/current").catch(() => null);
+  if (!now) return;
+  const row = (label, value) => [Object.assign(document.createElement("dt"), { textContent: label }),
+    Object.assign(document.createElement("dd"), { textContent: value })];
+  box.replaceChildren(...row(t("summaryTranslate"), now.model ? `${now.name} · ${now.model}` : now.name),
+    ...row(t("summaryListen"), now.listen === "local" ? t("onDevice") : now.listen_name));
+}
+
 export async function openSettings() {
   const saved = await settings();
   $("server").value = saved.server;
   $("settings-token").value = saved.token;
   const keys = await keyStatus().catch(() => ({}));
-  $("settings-gemini").placeholder = keys.gemini ? t("keySet") : "";
   $("settings-fish").placeholder = keys.fish ? t("keySet") : "";
-  await fillEngine();
   show("settings");
+  await fillSummary();
 }
 
 async function openSetup() {
@@ -59,10 +68,8 @@ async function saveSettings(event) {
   event.preventDefault();
   await remember({ server: $("server").value.trim(), token: $("settings-token").value.trim() });
   $("settings-notice").textContent = t("keyChecking");
-  const problems = [await saveKey("gemini", $("settings-gemini").value),
-    await saveKey("fish", $("settings-fish").value)].filter(Boolean);
-  await saveEngine().catch(() => problems.push(t("errUnknown")));
-  $("settings-notice").textContent = problems[0] || t("saved");
+  const problem = await saveKey("fish", $("settings-fish").value);
+  $("settings-notice").textContent = problem || t("saved");
 }
 
 export function wirePanels({ ready, back, leave }) {
@@ -73,7 +80,6 @@ export function wirePanels({ ready, back, leave }) {
   $("open-full-setup").addEventListener("click", openSetup);
   $("setup-done").addEventListener("click", back);
   $("settings-form").addEventListener("submit", saveSettings);
-  $("settings-engine").addEventListener("change", syncEngine);
   $("retry-connect").addEventListener("click", back);
   $("close-settings").addEventListener("click", back);
   $("open-settings").addEventListener("click", () => { leave(); openSettings(); });

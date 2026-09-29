@@ -13,6 +13,7 @@ from tarjim.engines.catalog import BY_ID, SUBSCRIPTION, compatible
 from tarjim.engines.model_catalog import Model, Row, describe
 
 TIMEOUT = 10
+CHAT_COMPLETIONS_FAMILIES = ("deepseek", "glm", "kimi", "longcat", "hy")
 CODEX_CACHE = Path.home() / ".codex" / "models_cache.json"
 
 
@@ -62,7 +63,10 @@ def api_rows(provider: str) -> list[Row]:
         return []
     from tarjim.engines.compatible import address, headers
 
-    return web_rows(f"{address(provider)}/models", headers(key))
+    rows = web_rows(f"{address(provider)}/models", headers(key, provider))
+    if provider == "opencode_go":
+        rows = [row for row in rows if row[0].startswith(CHAT_COMPLETIONS_FAMILIES)]
+    return rows
 
 
 def models_for(provider: str) -> list[Model]:

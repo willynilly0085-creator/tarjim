@@ -307,5 +307,7 @@
   "modelSuggested": "disarankan untuk terjemahan",
   "modelsLatest": "Terbaru",
   "modelsMore": "Model lainnya",
-  "modelWhy": "Menerjemahkan subtitle tidak butuh model berat; model ringan yang disarankan sudah cukup dan lebih murah. Pilih model yang lebih besar kalau mau lebih akurat."
+  "modelWhy": "Menerjemahkan subtitle tidak butuh model berat; model ringan yang disarankan sudah cukup dan lebih murah. Pilih model yang lebih besar kalau mau lebih akurat.",
+  "aiPlanKey": "Paket bulanan: hubungkan dengan menempel kunci paketnya.",
+  "planTerms_opencode_go": "Catatan: OpenCode menyebut Go dirancang untuk agen pemrograman. Memakainya untuk terjemahan bisa di luar ketentuannya; baca dulu sebelum menghubungkan."
 }

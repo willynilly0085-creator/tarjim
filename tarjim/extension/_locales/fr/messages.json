@@ -128,9 +128,6 @@
   "pairTitle": {
     "message": "Connecter l'extension à tarjim"
   },
-  "pairBody": {
-    "message": "Obtenez le jeton de sécurité avec cette commande et collez-le ci-dessous :"
-  },
   "tokenLabel": {
     "message": "Jeton de sécurité"
   },
@@ -212,14 +209,8 @@
   "keyRejected": {
     "message": "Google a refusé cette clé. Vérifiez que vous l'avez copiée en entier."
   },
-  "keyGeminiLabel": {
-    "message": "Clé Gemini"
-  },
   "keySet": {
     "message": "Configurée. Saisissez une nouvelle clé pour la remplacer."
-  },
-  "keySave": {
-    "message": "Enregistrer la clé"
   },
   "pairAuto": {
     "message": "Se connecter automatiquement"
@@ -321,53 +312,11 @@
   "stagePaused": {
     "message": "En pause"
   },
-  "engineLabel": {
-    "message": "Moteur"
-  },
-  "engineCloud": {
-    "message": "Cloud (Gemini, le plus précis)"
-  },
-  "engineLocal": {
-    "message": "En local sur cet ordinateur, hors ligne"
-  },
-  "engineAdvanced": {
-    "message": "Un autre fournisseur ou une autre clé (ouvre la page tarjim)"
-  },
-  "localModelLabel": {
-    "message": "Modèle local"
-  },
-  "localModelHint": {
-    "message": "Modèles installés dans Ollama sur cet ordinateur."
-  },
-  "localModelNone": {
-    "message": "Aucun modèle local installé. Installez Ollama et téléchargez un modèle."
-  },
-  "engineSubscription": {
-    "message": "Mon abonnement (Claude ou ChatGPT)"
-  },
-  "subscriptionLabel": {
-    "message": "Abonnement"
-  },
-  "subscriptionNone": {
-    "message": "Installez Claude Code ou Codex et connectez-vous avec votre abonnement."
-  },
-  "providerClaude": {
-    "message": "Claude (Claude Code)"
-  },
-  "providerCodex": {
-    "message": "ChatGPT (Codex)"
-  },
   "voiceNatural": {
     "message": "Voix naturelle pour chaque intervenant (Gemini)"
   },
   "menuDubNatural": {
     "message": "Doubler avec une voix naturelle"
-  },
-  "providerCopilot": {
-    "message": "GitHub Copilot"
-  },
-  "providerAntigravity": {
-    "message": "Google AI (Antigravity)"
   },
   "setupTitle": {
     "message": "Terminez la configuration de tarjim"
@@ -383,5 +332,20 @@
   },
   "setupFull": {
     "message": "Configuration complète, étape par étape"
+  },
+  "advanced": {
+    "message": "Avancé"
+  },
+  "summaryTranslate": {
+    "message": "Traduction"
+  },
+  "summaryListen": {
+    "message": "Écoute"
+  },
+  "onDevice": {
+    "message": "Sur cet ordinateur"
+  },
+  "loading": {
+    "message": "Chargement…"
   }
 }

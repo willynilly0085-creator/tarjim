@@ -1,6 +1,7 @@
 """Any service that speaks the OpenAI chat format: OpenRouter, DeepSeek, Qwen, Mistral, Groq,
 xAI, a custom address, or a local server such as LM Studio, Jan or llama.cpp."""
 import json
+import uuid
 from typing import Any
 
 from tarjim.config import setting
@@ -17,8 +18,29 @@ def address(provider: str) -> str:
     return BY_ID[provider].base_url if provider in BY_ID else ""
 
 
-def headers(key: str) -> dict[str, str]:
-    return {"Authorization": f"Bearer {key}"} if key else {}
+IDENTIFIED = ("opencode_go",)
+
+
+def identity() -> dict[str, str]:
+    """OpenCode Go asks every client to name itself and keep one session id."""
+    from importlib.metadata import PackageNotFoundError, version
+
+    from tarjim.config import save
+
+    session = setting("client_session")
+    if not session:
+        session = uuid.uuid4().hex
+        save("client_session", session)
+    try:
+        release = version("tarjim")
+    except PackageNotFoundError:
+        release = "dev"
+    return {"User-Agent": f"tarjim/{release}", "x-opencode-session": session}
+
+
+def headers(key: str, provider: str = "") -> dict[str, str]:
+    found = {"Authorization": f"Bearer {key}"} if key else {}
+    return {**found, **identity()} if provider in IDENTIFIED else found
 
 
 def list_models(base_url: str, key: str = "") -> list[str]:
@@ -44,7 +66,8 @@ class CompatibleAsker:
                 "response_format": {"type": "json_object"},
                 "messages": [{"role": "system", "content": f"{ANSWER_SHAPE} {shape}"},
                              {"role": "user", "content": prompt}]}
-        answer = post(self.name, f"{self.base_url}/chat/completions", headers(self.key), json=body)
+        answer = post(self.name, f"{self.base_url}/chat/completions", headers(self.key, self.name),
+                      json=body)
         return unwrap(parse_json(answer["choices"][0]["message"]["content"] or ""))
 
 

@@ -128,9 +128,6 @@
   "pairTitle": {
     "message": "Conecte a extensão ao tarjim"
   },
-  "pairBody": {
-    "message": "Pegue o token de segurança com este comando e cole abaixo:"
-  },
   "tokenLabel": {
     "message": "Token de segurança"
   },
@@ -212,14 +209,8 @@
   "keyRejected": {
     "message": "O Google recusou esta chave. Confira se você copiou a chave inteira."
   },
-  "keyGeminiLabel": {
-    "message": "Chave do Gemini"
-  },
   "keySet": {
     "message": "Definida. Digite uma nova chave para substituir."
-  },
-  "keySave": {
-    "message": "Salvar chave"
   },
   "pairAuto": {
     "message": "Conectar automaticamente"
@@ -321,53 +312,11 @@
   "stagePaused": {
     "message": "Pausado"
   },
-  "engineLabel": {
-    "message": "Motor"
-  },
-  "engineCloud": {
-    "message": "Nuvem (Gemini, o mais preciso)"
-  },
-  "engineLocal": {
-    "message": "Local neste computador, offline"
-  },
-  "engineAdvanced": {
-    "message": "Outro provedor ou chave (abre a página do tarjim)"
-  },
-  "localModelLabel": {
-    "message": "Modelo local"
-  },
-  "localModelHint": {
-    "message": "Modelos instalados no Ollama neste computador."
-  },
-  "localModelNone": {
-    "message": "Nenhum modelo local instalado. Instale o Ollama e baixe um modelo."
-  },
-  "engineSubscription": {
-    "message": "Minha assinatura (Claude ou ChatGPT)"
-  },
-  "subscriptionLabel": {
-    "message": "Assinatura"
-  },
-  "subscriptionNone": {
-    "message": "Instale o Claude Code ou o Codex e entre com seu plano."
-  },
-  "providerClaude": {
-    "message": "Claude (Claude Code)"
-  },
-  "providerCodex": {
-    "message": "ChatGPT (Codex)"
-  },
   "voiceNatural": {
     "message": "Voz natural para cada pessoa que fala (Gemini)"
   },
   "menuDubNatural": {
     "message": "Dublar com uma voz natural"
-  },
-  "providerCopilot": {
-    "message": "GitHub Copilot"
-  },
-  "providerAntigravity": {
-    "message": "Google AI (Antigravity)"
   },
   "setupTitle": {
     "message": "Termine de configurar o tarjim"
@@ -383,5 +332,20 @@
   },
   "setupFull": {
     "message": "Configuração completa, passo a passo"
+  },
+  "advanced": {
+    "message": "Avançado"
+  },
+  "summaryTranslate": {
+    "message": "Tradução"
+  },
+  "summaryListen": {
+    "message": "Escuta"
+  },
+  "onDevice": {
+    "message": "Neste computador"
+  },
+  "loading": {
+    "message": "Carregando…"
   }
 }

@@ -307,5 +307,7 @@
   "modelSuggested": "çeviri için önerilir",
   "modelsLatest": "En yeniler",
   "modelsMore": "Diğer modeller",
-  "modelWhy": "Altyazı çevirisi modelden çok şey istemez; önerilen hafif model yeterlidir ve daha ucuzdur. Daha yüksek doğruluk istersen daha büyük bir model seç."
+  "modelWhy": "Altyazı çevirisi modelden çok şey istemez; önerilen hafif model yeterlidir ve daha ucuzdur. Daha yüksek doğruluk istersen daha büyük bir model seç.",
+  "aiPlanKey": "Aylık paket: paketin anahtarını yapıştırarak bağlanır.",
+  "planTerms_opencode_go": "Not: OpenCode, Go'nun kodlama ajanları için tasarlandığını söylüyor. Çeviri için kullanmak şartlarının dışında kalabilir; bağlamadan önce şartları oku."
 }

@@ -128,9 +128,6 @@
   "pairTitle": {
     "message": "Подключите расширение к tarjim"
   },
-  "pairBody": {
-    "message": "Получите токен безопасности этой командой и вставьте его ниже:"
-  },
   "tokenLabel": {
     "message": "Токен безопасности"
   },
@@ -212,14 +209,8 @@
   "keyRejected": {
     "message": "Google отклонил этот ключ. Проверьте, что вы скопировали его полностью."
   },
-  "keyGeminiLabel": {
-    "message": "Ключ Gemini"
-  },
   "keySet": {
     "message": "Задан. Введите новый ключ, чтобы заменить его."
-  },
-  "keySave": {
-    "message": "Сохранить ключ"
   },
   "pairAuto": {
     "message": "Подключить автоматически"
@@ -321,53 +312,11 @@
   "stagePaused": {
     "message": "Приостановлено"
   },
-  "engineLabel": {
-    "message": "Движок"
-  },
-  "engineCloud": {
-    "message": "Облако (Gemini, точнее всего)"
-  },
-  "engineLocal": {
-    "message": "Локально на этом компьютере, без интернета"
-  },
-  "engineAdvanced": {
-    "message": "Другой провайдер или ключ (откроется страница tarjim)"
-  },
-  "localModelLabel": {
-    "message": "Локальная модель"
-  },
-  "localModelHint": {
-    "message": "Модели, установленные в Ollama на этом компьютере."
-  },
-  "localModelNone": {
-    "message": "Локальные модели не установлены. Установите Ollama и скачайте модель."
-  },
-  "engineSubscription": {
-    "message": "Моя подписка (Claude или ChatGPT)"
-  },
-  "subscriptionLabel": {
-    "message": "Подписка"
-  },
-  "subscriptionNone": {
-    "message": "Установите Claude Code или Codex и войдите со своей подпиской."
-  },
-  "providerClaude": {
-    "message": "Claude (Claude Code)"
-  },
-  "providerCodex": {
-    "message": "ChatGPT (Codex)"
-  },
   "voiceNatural": {
     "message": "Естественный голос для каждого говорящего (Gemini)"
   },
   "menuDubNatural": {
     "message": "Озвучить естественным голосом"
-  },
-  "providerCopilot": {
-    "message": "GitHub Copilot"
-  },
-  "providerAntigravity": {
-    "message": "Google AI (Antigravity)"
   },
   "setupTitle": {
     "message": "Завершите настройку tarjim"
@@ -383,5 +332,20 @@
   },
   "setupFull": {
     "message": "Полная настройка по шагам"
+  },
+  "advanced": {
+    "message": "Дополнительно"
+  },
+  "summaryTranslate": {
+    "message": "Перевод"
+  },
+  "summaryListen": {
+    "message": "Распознавание"
+  },
+  "onDevice": {
+    "message": "На этом компьютере"
+  },
+  "loading": {
+    "message": "Загрузка…"
   }
 }

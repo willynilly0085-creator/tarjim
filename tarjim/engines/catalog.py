@@ -19,6 +19,7 @@ class Provider:
     login: tuple[str, ...] = ()
     install: str = ""
     models: tuple[str, ...] = ()
+    plan: bool = False
 
     @property
     def key_name(self) -> str:
@@ -51,6 +52,14 @@ PROVIDERS = (
              key_url="https://console.x.ai/"),
     Provider("opencode", "OpenCode Zen", API, base_url="https://opencode.ai/zen/v1",
              key_url="https://opencode.ai/auth"),
+    Provider("kimi", "Kimi (Moonshot)", API, base_url="https://api.moonshot.ai/v1",
+             key_url="https://platform.kimi.ai/console/api-keys"),
+    Provider("glm", "GLM (Z.ai)", API, base_url="https://api.z.ai/api/paas/v4",
+             key_url="https://z.ai/manage-apikey/apikey-list"),
+    Provider("minimax", "MiniMax", API, base_url="https://api.minimax.io/v1",
+             key_url="https://platform.minimax.io"),
+    Provider("opencode_go", "OpenCode Go", API, base_url="https://opencode.ai/zen/go/v1",
+             key_url="https://opencode.ai/auth", plan=True),
     Provider("custom", "OpenAI-compatible", API),
     Provider("claude", "Claude", SUBSCRIPTION, program="claude", login=("claude",),
              install="npm install -g @anthropic-ai/claude-code",

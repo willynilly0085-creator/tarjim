@@ -155,3 +155,24 @@ def test_claude_models_are_named_like_the_claude_app_and_the_lightest_is_suggest
     assert "claude-mythos-6" in ids and "claude-fable-5[1m]" not in ids
     assert "cc-update-required-2" not in ids
     assert connections.MODEL_NAME.match("claude-fable-5-1[1m]")
+
+
+def test_opencode_go_is_told_who_is_asking_and_other_providers_are_not(home: Path) -> None:
+    from tarjim.engines.compatible import headers
+
+    go = headers("sk-go", "opencode_go")
+    assert go["Authorization"] == "Bearer sk-go" and go["User-Agent"].startswith("tarjim/")
+    assert headers("sk-go", "opencode_go")["x-opencode-session"] == go["x-opencode-session"]
+    assert headers("sk-x", "deepseek") == {"Authorization": "Bearer sk-x"}
+
+
+def test_only_opencode_go_models_that_speak_chat_completions_are_offered(
+        home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from tarjim.engines import provider_models
+
+    config.save("opencode_go_api_key", "sk-go-1234567890abcdef")
+    monkeypatch.setattr(provider_models, "web_rows", lambda _url, _headers: [
+        ("deepseek-v4.1-flash", "", ""), ("minimax-m3", "", ""), ("glm-5.3", "", ""),
+        ("gpt-6-luna", "", "")])
+    ids = [m["id"] for m in provider_models.models_for("opencode_go")]
+    assert sorted(ids) == ["deepseek-v4.1-flash", "glm-5.3"]
