@@ -19,12 +19,16 @@ def api_view(provider: Provider) -> dict[str, Any]:
 
 
 def subscription_view(provider: Provider) -> dict[str, Any]:
+    from tarjim.engines import app_install
     from tarjim.engines.subscription import codex_models, launcher
 
     models = codex_models() if provider.id == "codex" else list(provider.models)
     return {"id": provider.id, "name": provider.name, "ready": bool(launcher(provider.program)),
             "install": provider.install, "model": setting(provider.model_name),
-            "models": [m for m in models if m]}
+            "models": [m for m in models if m], "node": bool(app_install.npm()),
+            "can_install": provider.id in app_install.PACKAGES,
+            "installing": app_install.installing(provider.id),
+            "install_failed": app_install.failed(provider.id)}
 
 
 def local_view() -> dict[str, Any]:
@@ -40,7 +44,9 @@ def local_view() -> dict[str, Any]:
 
 
 def overview() -> dict[str, Any]:
-    return {"api": [api_view(p) for p in of_method(API)],
+    from tarjim.engines.listening import listening_overview
+
+    return {"api": [api_view(p) for p in of_method(API)], "listening": listening_overview(),
             "subscription": [subscription_view(p) for p in of_method(SUBSCRIPTION)],
             "local": local_view(),
             "chosen": {"listen": chosen("listen"), "translate": chosen("translate")}}
@@ -133,6 +139,12 @@ class ConnectionRoutes:
 
         started = start(str(self.read_json().get("server", "")))
         self.reply(200 if started else 400, {"started": started, **overview()})
+
+    def install_app(self, _query: Query) -> None:
+        from tarjim.engines.app_install import start
+
+        result = start(str(self.read_json().get("provider", "")))
+        self.reply(200 if result == "started" else 400, {"result": result, **overview()})
 
     def scan_local(self, _query: Query) -> None:
         from tarjim.engines.local_programs import search

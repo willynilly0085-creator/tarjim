@@ -21,7 +21,8 @@ GET_ROUTES = table([
     (r"^/setup$", "setup_state"), (r"^/tools$", "list_tools"),
     (rf"^/pair/{PAIR}$", "pair_state"), (r"^/pairs$", "list_pairs"),
     (r"^/ui-language$", "ui_language"), (r"^/local-models$", "local_models"),
-    (r"^/connections$", "connections")])
+    (r"^/connections$", "connections"), (r"^/setup/plan$", "setup_plan"),
+    (r"^/setup/scan/(device|tools|local|subscriptions|keys)$", "scan_part")])
 POST_ROUTES = table([
     (r"^/jobs$", "create_json"), (r"^/upload$", "upload"), (rf"^/reveal/{JOB}$", "reveal"),
     (rf"^/open/{JOB}$", "play"), (rf"^/retry/{JOB}$", "retry"), (r"^/keys$", "save_key"),
@@ -33,6 +34,7 @@ POST_ROUTES = table([
     (r"^/connections/sign-in/code$", "sign_in_code"), (r"^/connections/signed-in$", "signed_in"),
     (r"^/connections/start-local$", "start_local"), (r"^/connections/scan-local$", "scan_local"),
     (r"^/connections/local-program$", "local_program"),
+    (r"^/connections/install-app$", "install_app"), (r"^/setup/apply$", "setup_apply"),
     (r"^/connections/assistant$", "link_assistant")])
 OPEN = [re.compile(p) for p in (r"^/$", r"^/web/", r"^/ping$", r"^/languages$", r"^/pair$",
                                   rf"^/pair/{PAIR}$", r"^/ui-language$")]

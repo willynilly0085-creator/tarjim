@@ -7,6 +7,7 @@ from tarjim.engines.choice import LISTENERS, TRANSLATORS, chosen
 from tarjim.engines.subscription import installed
 from tarjim.keys import status
 from tarjim.server.guard import extension_origin
+from tarjim.server.onboard_routes import OnboardRoutes
 from tarjim.server.pairing import Pairing
 from tarjim.tools import Shelf
 from tarjim.ui_languages import available, codes
@@ -19,7 +20,7 @@ FIELDS: dict[str, tuple[str, ...]] = {"ui_language": codes(), "listen_provider":
 Query = dict[str, list[str]]
 
 
-class SetupRoutes:
+class SetupRoutes(OnboardRoutes):
     shelf: ClassVar[Shelf]
     pairing: ClassVar[Pairing]
     token: ClassVar[str]
