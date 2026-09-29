@@ -309,5 +309,6 @@
   "modelsMore": "Más modelos",
   "modelWhy": "El modelo recomendado equilibra precisión y coste para subtítulos. Elige uno más grande para más precisión o uno más ligero para ahorrar tu plan.",
   "aiPlanKey": "Plan mensual: se conecta pegando la clave del plan.",
-  "planTerms_opencode_go": "Aviso: OpenCode dice que Go está pensado para agentes de programación. Usarlo para traducir podría quedar fuera de sus condiciones; léelas antes de conectarlo."
+  "planTerms_opencode_go": "Aviso: OpenCode dice que Go está pensado para agentes de programación. Usarlo para traducir podría quedar fuera de sus condiciones; léelas antes de conectarlo.",
+  "autostart": "Iniciar tarjim al encender este equipo (recomendado, sin ventana)"
 }

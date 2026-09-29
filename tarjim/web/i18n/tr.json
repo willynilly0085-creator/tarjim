@@ -309,5 +309,6 @@
   "modelsMore": "Diğer modeller",
   "modelWhy": "Önerilen model altyazılar için doğruluk ile maliyeti dengeler. Daha fazla doğruluk için büyüğünü, planından tasarruf için daha hafifini seç.",
   "aiPlanKey": "Aylık paket: paketin anahtarını yapıştırarak bağlanır.",
-  "planTerms_opencode_go": "Not: OpenCode, Go'nun kodlama ajanları için tasarlandığını söylüyor. Çeviri için kullanmak şartlarının dışında kalabilir; bağlamadan önce şartları oku."
+  "planTerms_opencode_go": "Not: OpenCode, Go'nun kodlama ajanları için tasarlandığını söylüyor. Çeviri için kullanmak şartlarının dışında kalabilir; bağlamadan önce şartları oku.",
+  "autostart": "Bilgisayar açılınca tarjim'i başlat (önerilir, pencere olmadan)"
 }

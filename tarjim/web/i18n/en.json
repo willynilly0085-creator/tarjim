@@ -309,5 +309,6 @@
   "modelsMore": "More models",
   "modelWhy": "The suggested model balances accuracy and cost for subtitles. Pick a bigger one for extra accuracy, or a lighter one to save your plan.",
   "aiPlanKey": "Monthly plan: connect it by pasting the plan's key.",
-  "planTerms_opencode_go": "Note: OpenCode says Go is designed for coding agents. Using it for translation may be outside its terms; read them before you connect it."
+  "planTerms_opencode_go": "Note: OpenCode says Go is designed for coding agents. Using it for translation may be outside its terms; read them before you connect it.",
+  "autostart": "Start tarjim when this computer starts (recommended, runs without a window)"
 }

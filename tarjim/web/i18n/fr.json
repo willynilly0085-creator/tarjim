@@ -309,5 +309,6 @@
   "modelsMore": "Autres modèles",
   "modelWhy": "Le modèle conseillé équilibre précision et coût pour les sous-titres. Choisissez-en un plus grand pour plus de précision, ou un plus léger pour économiser votre forfait.",
   "aiPlanKey": "Forfait mensuel : il se connecte en collant la clé du forfait.",
-  "planTerms_opencode_go": "À noter : OpenCode indique que Go est conçu pour les agents de programmation. L'utiliser pour traduire peut sortir de ses conditions ; lisez-les avant de le connecter."
+  "planTerms_opencode_go": "À noter : OpenCode indique que Go est conçu pour les agents de programmation. L'utiliser pour traduire peut sortir de ses conditions ; lisez-les avant de le connecter.",
+  "autostart": "Lancer tarjim au démarrage de l'ordinateur (conseillé, sans fenêtre)"
 }

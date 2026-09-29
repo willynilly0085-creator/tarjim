@@ -37,9 +37,14 @@ export async function progressScreen(screen, started, onDone) {
 
 export async function readyScreen(screen, finish, extras) {
   const test = status(t("selfTestRunning"));
-  const go = button(t("readyStart"), async () => { await post("/setup", { setup_done: "yes" }); finish(); }, "primary");
+  const start = el("input", { type: "checkbox", checked: true });
+  const go = button(t("readyStart"), async () => {
+    await post("/setup", { setup_done: "yes", autostart: start.checked });
+    finish();
+  }, "primary");
   screen(el("h1", { tabIndex: -1, textContent: t("readyTitle") }),
     el("p", { className: "lede", textContent: t("readyHint") }), test,
+    el("label", { className: "check-option" }, start, el("span", { textContent: t("autostart") })),
     el("nav", { className: "step-nav" }, button(t("readyExtras"), extras), go));
   const reply = await post("/setup/selftest", { language: document.documentElement.lang }).catch(() => null);
   test.textContent = reply?.ok ? t("selfTestPassed", { text: reply.text }) : t("selfTestFailed");

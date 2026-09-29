@@ -309,5 +309,6 @@
   "modelsMore": "更多模型",
   "modelWhy": "推荐的模型在字幕翻译的准确度和成本之间取得平衡。想更准确就选更大的模型，想省套餐额度就选更轻的。",
   "aiPlanKey": "月度套餐：粘贴套餐密钥即可连接。",
-  "planTerms_opencode_go": "注意：OpenCode 表示 Go 是为编程代理设计的，用于翻译可能超出其条款范围，连接前请先阅读条款。"
+  "planTerms_opencode_go": "注意：OpenCode 表示 Go 是为编程代理设计的，用于翻译可能超出其条款范围，连接前请先阅读条款。",
+  "autostart": "电脑启动时运行 tarjim（推荐，无窗口）"
 }

@@ -42,3 +42,6 @@
   .ai-app { grid-template-columns: 1fr; }
   .ai-body { justify-items: start; }
 }
+
+.check-option { display: flex; align-items: center; gap: var(--space-sm); cursor: pointer; }
+.check-option input { width: 18px; height: 18px; accent-color: var(--accent); }

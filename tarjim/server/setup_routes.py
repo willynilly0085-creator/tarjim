@@ -2,6 +2,7 @@ import re
 from pathlib import Path
 from typing import Any, ClassVar
 
+from tarjim import autostart
 from tarjim.config import save, setting
 from tarjim.engines.choice import LISTENERS, TRANSLATORS, chosen
 from tarjim.engines.subscription import installed
@@ -57,6 +58,7 @@ class SetupRoutes(OnboardRoutes):
         state["glossary"] = setting("glossary")
         state["subscriptions"] = installed()
         state["ui_languages"] = list(available())
+        state["autostart"] = autostart.enabled()
         self.reply(200, state)
 
     def save_setup(self, query: Query) -> None:
@@ -66,6 +68,8 @@ class SetupRoutes(OnboardRoutes):
                 save(name, str(data[name]))
         if isinstance(data.get("glossary"), str) and len(data["glossary"]) <= GLOSSARY_CHARS:
             save("glossary", data["glossary"])
+        if isinstance(data.get("autostart"), bool):
+            (autostart.enable if data["autostart"] else autostart.disable)()
         if MODEL_TAG.match(str(data.get("local_model", ""))):
             save("local_model", str(data["local_model"]))
         self.setup_state(query)

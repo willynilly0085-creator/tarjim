@@ -309,5 +309,6 @@
   "modelsMore": "Model lainnya",
   "modelWhy": "Model yang disarankan menyeimbangkan akurasi dan biaya untuk subtitle. Pilih yang lebih besar untuk akurasi, atau yang lebih ringan untuk menghemat paket.",
   "aiPlanKey": "Paket bulanan: hubungkan dengan menempel kunci paketnya.",
-  "planTerms_opencode_go": "Catatan: OpenCode menyebut Go dirancang untuk agen pemrograman. Memakainya untuk terjemahan bisa di luar ketentuannya; baca dulu sebelum menghubungkan."
+  "planTerms_opencode_go": "Catatan: OpenCode menyebut Go dirancang untuk agen pemrograman. Memakainya untuk terjemahan bisa di luar ketentuannya; baca dulu sebelum menghubungkan.",
+  "autostart": "Jalankan tarjim saat komputer menyala (disarankan, tanpa jendela)"
 }
