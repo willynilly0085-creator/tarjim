@@ -35,6 +35,7 @@ POST_ROUTES = table([
     (r"^/connections/start-local$", "start_local"), (r"^/connections/scan-local$", "scan_local"),
     (r"^/connections/local-program$", "local_program"),
     (r"^/connections/install-app$", "install_app"), (r"^/setup/apply$", "setup_apply"),
+    (r"^/setup/selftest$", "setup_selftest"),
     (r"^/connections/assistant$", "link_assistant")])
 OPEN = [re.compile(p) for p in (r"^/$", r"^/web/", r"^/ping$", r"^/languages$", r"^/pair$",
                                   rf"^/pair/{PAIR}$", r"^/ui-language$")]

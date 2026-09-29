@@ -78,6 +78,7 @@ function wire() {
 
 export async function openWorkspace() {
   $("wizard").hidden = true;
+  $("assistant").hidden = true;
   $("workspace").hidden = false;
   $("open-settings").hidden = false;
   if (!state.wired) wire();

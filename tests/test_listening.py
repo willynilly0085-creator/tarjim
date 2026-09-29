@@ -32,9 +32,11 @@ def test_a_subscription_program_is_installed_hidden_only_when_node_is_there(
     monkeypatch.setattr(app_install.subprocess, "Popen", Process)
     app_install.running.clear()
     monkeypatch.setattr(app_install, "npm", lambda: "")
-    assert app_install.start("claude") == "no_node" and started == []
+    assert app_install.start("codex") == "no_node" and started == []
+    assert app_install.start("claude") == "started" and started[0] == app_install.NATIVE["claude"]
+    app_install.running.clear()
     monkeypatch.setattr(app_install, "npm", lambda: "npm.cmd")
-    assert app_install.start("claude") == "started"
-    assert started == [["npm.cmd", "install", "-g", "@anthropic-ai/claude-code"]]
-    assert app_install.installing("claude")
+    assert app_install.start("codex") == "started"
+    assert started[-1] == ["npm.cmd", "install", "-g", "@openai/codex"]
+    assert app_install.installing("codex")
     assert app_install.start("gemini") == "unknown"

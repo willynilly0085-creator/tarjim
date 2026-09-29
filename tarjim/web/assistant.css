@@ -1,0 +1,43 @@
+.assistant .screen { display: grid; gap: var(--space-lg); padding-bottom: var(--space-xl); }
+.assistant h1:focus { outline: none; }
+
+.paths { display: grid; gap: var(--space-sm); }
+.path { display: grid; gap: 4px; padding: var(--space-md) var(--space-lg); border: 1px solid var(--line); border-radius: var(--radius);
+  background: transparent; color: inherit; font: inherit; text-align: start; cursor: pointer;
+  transition: border-color 160ms var(--ease), background-color 160ms var(--ease); }
+.path:hover { border-color: var(--muted); }
+.path:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.path.recommended { border-color: var(--accent-line); background: var(--raised); }
+.path-title { font-size: 1.0625rem; font-weight: 650; }
+.path-hint { color: var(--muted); font-size: var(--text-meta); line-height: 1.5; }
+.privacy { max-width: 60ch; }
+
+.checks { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.check { display: grid; grid-template-columns: 20px minmax(8rem, max-content) 1fr; align-items: baseline;
+  gap: var(--space-sm); padding-block: var(--space-sm); border-bottom: 1px solid var(--line); }
+.check-mark { width: 10px; height: 10px; border-radius: 999px; background: var(--track); align-self: center; }
+.check.busy .check-mark { background: var(--accent); animation: pulse 1.1s var(--ease) infinite alternate; }
+.check.done .check-mark { background: var(--ok); }
+.check.failed .check-mark { background: var(--danger); }
+.check-name { font-weight: 600; }
+.check-value { color: var(--muted); font-size: var(--text-meta); line-height: 1.5; }
+
+.plan-row { display: grid; gap: var(--space-xs); padding-block: var(--space-md); border-bottom: 1px solid var(--line); }
+.plan-row .select { max-width: 32rem; }
+.plain { margin: 0; padding-inline-start: 1.25rem; display: grid; gap: 4px; }
+.need { padding: var(--space-md); border: 1px solid var(--accent-line); border-radius: var(--radius); background: var(--raised); }
+.need .text-input { max-width: 32rem; }
+
+.ai-apps { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.ai-app { display: grid; grid-template-columns: 1fr auto; gap: var(--space-md); align-items: center;
+  padding-block: var(--space-md); border-bottom: 1px solid var(--line); }
+.ai-body { display: grid; gap: var(--space-xs); justify-items: end; }
+
+@keyframes pulse { from { opacity: 0.35; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .check.busy .check-mark { animation: none; } }
+@media (max-width: 560px) {
+  .check { grid-template-columns: 20px 1fr; }
+  .check-value { grid-column: 2; }
+  .ai-app { grid-template-columns: 1fr; }
+  .ai-body { justify-items: start; }
+}

@@ -64,9 +64,12 @@ async function next() {
 
 export function startWizard(setup, onFinish, from = "language") {
   state = { setup };
+  $("wizard").classList.remove("settings");
+  $("settings-bar").hidden = true;
   finish = onFinish;
   at = Math.max(0, STEPS.indexOf(from));
   $("workspace").hidden = true;
+  $("assistant").hidden = true;
   $("wizard").hidden = false;
   paint();
 }
@@ -81,4 +84,33 @@ export function wireWizard() {
   });
 }
 
-export const repaint = () => { if (!$("wizard").hidden) paint(); };
+export const repaint = () => {
+  if ($("wizard").hidden) return;
+  if ($("wizard").classList.contains("settings")) showAll();
+  else paint();
+};
+
+function showAll() {
+  document.querySelectorAll(".step").forEach((el) => el.classList.toggle("current", el.dataset.step !== "done"));
+  STEPS.filter((step) => step !== "done").forEach((step) => ENTER[step]?.());
+}
+
+async function saveAll() {
+  $("settings-note").textContent = "";
+  await LEAVE.language();
+  const problem = await saveConnect();
+  $("settings-note").textContent = t(problem || "saved");
+}
+
+export function startSettings(setup, onClose, onRescan) {
+  state = { setup };
+  $("workspace").hidden = true;
+  $("assistant").hidden = true;
+  $("wizard").hidden = false;
+  $("wizard").classList.add("settings");
+  $("settings-bar").hidden = false;
+  $("settings-save").onclick = saveAll;
+  $("settings-close").onclick = () => { $("wizard").classList.remove("settings"); $("settings-bar").hidden = true; onClose(); };
+  $("settings-rescan").onclick = () => { $("wizard").classList.remove("settings"); $("settings-bar").hidden = true; onRescan(); };
+  showAll();
+}

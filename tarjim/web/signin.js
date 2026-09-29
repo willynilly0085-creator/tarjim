@@ -43,11 +43,14 @@ function watch(provider, note, done) {
   }, WATCH_MS);
 }
 
-export function signInPanel(provider) {
+export function signInPanel(provider, onSigned = () => {}) {
   const note = el("p", { className: "meta", role: "status", textContent: t("subscriptionReady") });
   const button = el("button", { type: "button", className: "button-quiet", textContent: t("signIn") });
   const box = el("div", { className: "sign-in" }, note, button);
-  const signedIn = () => box.replaceChildren(el("p", { className: "meta ok", role: "status", textContent: t("signedIn") }));
+  const signedIn = () => {
+    box.replaceChildren(el("p", { className: "meta ok", role: "status", textContent: t("signedIn") }));
+    onSigned();
+  };
   isSignedIn(provider.id).then((yes) => { if (yes) signedIn(); });
   button.addEventListener("click", async () => {
     const { mode } = await post("/connections/sign-in", { provider: provider.id }).catch(() => ({}));

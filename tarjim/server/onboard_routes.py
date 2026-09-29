@@ -27,6 +27,11 @@ class OnboardRoutes:
         found = everything(fresh=query.get("fresh") == ["1"])
         self.reply(200, {"scan": found, "plan": make_plan(found)})
 
+    def setup_selftest(self, _query: Query) -> None:
+        from tarjim.onboarding.selftest import selftest
+
+        self.reply(200, selftest(str(self.read_json().get("language", "ar"))))
+
     def setup_apply(self, _query: Query) -> None:
         from tarjim.onboarding.apply import apply
         from tarjim.onboarding.scan import cache

@@ -191,3 +191,10 @@ h1 { margin: 0; font-size: var(--text-title); font-weight: 650; line-height: 1.2
 .local-program { display: grid; gap: var(--space-xs); justify-self: stretch; padding-block: var(--space-md); border-bottom: 1px solid var(--line); }
 .consent { display: flex; gap: var(--space-xs); align-items: flex-start; font-size: var(--text-meta); color: var(--muted); max-width: 32ch; }
 .stack { display: grid; gap: var(--space-xs); justify-items: start; }
+
+#wizard.settings .progress, #wizard.settings .step-nav { display: none; }
+#wizard.settings .step { padding-bottom: var(--space-xl); border-bottom: 1px solid var(--line); }
+.settings-bar { position: sticky; bottom: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm);
+  padding-block: var(--space-md); border-top: 1px solid var(--line); background: var(--bg); }
+.settings-bar .primary { margin-inline-start: auto; }
+.settings-bar .meta { flex-basis: 100%; }

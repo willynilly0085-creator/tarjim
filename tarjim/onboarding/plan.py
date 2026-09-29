@@ -10,7 +10,7 @@ from typing import Any
 
 SUBSCRIPTION_ORDER = ("claude", "codex", "copilot", "antigravity")
 KEY_ORDER = ("gemini", "openai", "anthropic", "openrouter", "deepseek", "qwen", "mistral", "groq",
-             "xai")
+             "xai", "opencode")
 HEARS = ("gemini", "openai")
 MODEL_PREFERENCE = ("aya", "qwen", "gemma", "llama", "mistral")
 TOO_BIG = re.compile(r"[:-](\d{2,3})b\b")

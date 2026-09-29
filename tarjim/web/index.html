@@ -7,6 +7,7 @@
   <title>tarjim</title>
   <link rel="icon" href="/web/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/web/web.css">
+  <link rel="stylesheet" href="/web/assistant.css">
 </head>
 <body>
   <header class="bar">
@@ -29,6 +30,8 @@
       <button class="button-quiet" id="pair-deny" type="button" data-t="deny"></button>
     </div>
   </aside>
+
+  <main id="assistant" class="assistant" hidden></main>
 
   <main id="wizard" hidden>
     <div class="progress">
@@ -63,11 +66,11 @@
       </div>
       <label class="field"><span class="field-label" data-t="providerLabel"></span><select class="select" id="connect-provider"></select></label>
       <div class="connect-detail" id="connect-detail"></div>
-      <label class="field" id="connect-model-field"><span class="field-label" data-t="modelLabel"></span>
-        <input class="text-input" id="connect-model" list="connect-models" dir="ltr" autocomplete="off" spellcheck="false"></label>
-      <datalist id="connect-models"></datalist>
+      <div class="field" id="connect-model-field"><label class="field-label" for="connect-model-pick" data-t="modelLabel"></label>
+        <select class="select" id="connect-model-pick"></select>
+        <input class="text-input" id="connect-model" dir="ltr" autocomplete="off" spellcheck="false" hidden></div>
       <label class="field"><span class="field-label" data-t="listenChoose"></span><select class="select" id="connect-listen"></select>
-        <span class="meta" data-t="listenHint"></span></label>
+        <span class="meta" id="listen-hint"></span></label>
     </section>
 
     <section class="step" data-step="tools">
@@ -99,6 +102,12 @@
       <p class="lede" data-t="doneHint"></p>
     </section>
 
+    <nav class="settings-bar" id="settings-bar" hidden>
+      <button class="button-quiet" id="settings-close" type="button" data-t="back"></button>
+      <button class="button-quiet" id="settings-rescan" type="button" data-t="settingsRescan"></button>
+      <button class="primary" id="settings-save" type="button" data-t="settingsSave"></button>
+      <p class="meta" id="settings-note" role="status"></p>
+    </nav>
     <p class="error" id="step-error" role="alert" hidden></p>
     <nav class="step-nav">
       <button class="button-quiet" id="step-back" type="button" data-t="back"></button>

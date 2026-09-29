@@ -6,7 +6,7 @@ from tarjim.config import save, setting
 from tarjim.engines.catalog import API, BY_ID, LOCAL, SUBSCRIPTION, Provider, compatible, of_method
 from tarjim.engines.choice import LISTENERS, chosen, has_key
 
-MODEL_NAME = re.compile(r"^[\w.:/@+-]{1,120}$")
+MODEL_NAME = re.compile(r"^[\w.:/@+\[\]-]{1,120}$")
 ADDRESS = re.compile(r"^https?://[\w.-]+(:\d{1,5})?(/[\w./-]*)?$")
 Query = dict[str, list[str]]
 
@@ -22,11 +22,18 @@ def subscription_view(provider: Provider) -> dict[str, Any]:
     from tarjim.engines import app_install
     from tarjim.engines.subscription import codex_models, launcher
 
-    models = codex_models() if provider.id == "codex" else list(provider.models)
+    labels: dict[str, str] = {}
+    if provider.id == "claude":
+        from tarjim.engines.subscription_models import claude_models
+
+        labels = dict(claude_models())
+    models = codex_models() if provider.id == "codex" else list(labels or provider.models)
     return {"id": provider.id, "name": provider.name, "ready": bool(launcher(provider.program)),
+            "model_labels": {m: text for m, text in labels.items() if text},
             "install": provider.install, "model": setting(provider.model_name),
             "models": [m for m in models if m], "node": bool(app_install.npm()),
-            "can_install": provider.id in app_install.PACKAGES,
+            "can_install": provider.id in app_install.PACKAGES and bool(
+                app_install.npm() or provider.id in app_install.NATIVE),
             "installing": app_install.installing(provider.id),
             "install_failed": app_install.failed(provider.id)}
 

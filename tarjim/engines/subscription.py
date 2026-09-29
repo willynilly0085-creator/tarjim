@@ -20,8 +20,13 @@ REFUSED = "not supported"
 HIDDEN = 0x08000000 if sys.platform == "win32" else 0
 
 
+def own_folder(name: str) -> str | None:
+    folder = Path.home() / ".local" / "bin"
+    return next((str(p) for p in (folder / f"{name}.exe", folder / name) if p.is_file()), None)
+
+
 def launcher(name: str) -> list[str]:
-    found = shutil.which(f"{name}.cmd") or shutil.which(name)
+    found = shutil.which(f"{name}.cmd") or shutil.which(name) or own_folder(name)
     if not found or Path(found).suffix.lower() != ".cmd":
         return [found] if found else []
     targets = SHIM_TARGET.findall(Path(found).read_text(encoding="utf-8", errors="ignore"))

@@ -65,3 +65,22 @@ export function localPanel(local, refresh) {
   if (!local.servers.length) parts.unshift(el("p", { className: "meta", textContent: t("localNone") }));
   return [...parts, searchPart(refresh)];
 }
+
+export function modelNeeded(program) {
+  const row = el("div", { className: "local-program" },
+    el("p", { className: "choice-name", textContent: t("localNoModel", { name: program.name }) }));
+  if (program.id !== "ollama") {
+    row.append(el("p", { className: "meta", textContent: t("localNoModelOther", { name: program.name }) }));
+    return row;
+  }
+  const note = el("span", { className: "meta", role: "status" });
+  const get = el("button", { type: "button", className: "primary compact", textContent: t("localGetModel") });
+  get.addEventListener("click", async () => {
+    get.disabled = true;
+    const reply = await post("/tools/local_translation", {}).catch(() => null);
+    note.textContent = t(reply ? "localModelDownloading" : "localStartFailed");
+    if (!reply) get.disabled = false;
+  });
+  row.append(el("p", { className: "meta", textContent: t("localModelHint") }), el("div", { className: "row" }, get, note));
+  return row;
+}

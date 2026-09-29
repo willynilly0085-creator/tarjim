@@ -1,14 +1,20 @@
 """Install a subscription's program (Claude Code, Codex, Copilot) for the person, hidden, with npm.
 
-Without Node.js there is no npm; the page then links to the Node.js download instead.
+Without Node.js there is no npm: Claude Code then uses its own installer, and the page links the
+other programs to the Node.js download.
 """
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 HIDDEN = 0x08000000 if sys.platform == "win32" else 0
 PACKAGES = {"claude": "@anthropic-ai/claude-code", "codex": "@openai/codex",
             "copilot": "@github/copilot"}
+NATIVE = {"claude": (["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+                      "irm https://claude.ai/install.ps1 | iex"] if sys.platform == "win32" else
+                     ["bash", "-c", "curl -fsSL https://claude.ai/install.sh | bash"])}
+NATIVE_BIN = Path.home() / ".local" / "bin"
 running: dict[str, subprocess.Popen[bytes]] = {}
 
 
@@ -20,12 +26,13 @@ def start(provider: str) -> str:
     if provider not in PACKAGES:
         return "unknown"
     program = npm()
-    if not program:
+    if not program and provider not in NATIVE:
         return "no_node"
     if installing(provider):
         return "started"
+    command = [program, "install", "-g", PACKAGES[provider]] if program else NATIVE[provider]
     running[provider] = subprocess.Popen(
-        [program, "install", "-g", PACKAGES[provider]], stdin=subprocess.DEVNULL,
+        command, stdin=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=HIDDEN)
     return "started"
 

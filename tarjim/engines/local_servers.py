@@ -31,13 +31,22 @@ def models_of(server: str, url: str) -> list[str]:
     return list_models(f"{url}/v1")
 
 
+def alive(server: str, url: str) -> bool:
+    from tarjim.engines.web import reachable
+
+    return reachable(f"{url}/api/tags" if server == OLLAMA else f"{url}/v1/models", {})
+
+
 def discover() -> list[LocalServer]:
-    def probe(row: tuple[str, str, str]) -> LocalServer:
+    """Every AI program answering on this computer, even one that has no model yet."""
+    def probe(row: tuple[str, str, str]) -> LocalServer | None:
         server, name, url = row
+        if not alive(server, url):
+            return None
         return LocalServer(server, name, url, models_of(server, url))
 
     with ThreadPoolExecutor(max_workers=len(KNOWN)) as pool:
-        return [found for found in pool.map(probe, KNOWN) if found.models]
+        return [found for found in pool.map(probe, KNOWN) if found]
 
 
 def chosen_server() -> str:

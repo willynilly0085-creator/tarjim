@@ -1,6 +1,6 @@
 import { $, api, post } from "./api.js";
 import { t } from "./i18n.js";
-import { localPanel } from "./local.js";
+import { localPanel, modelNeeded } from "./local.js";
 import { signInPanel } from "./signin.js";
 
 let view = null;
@@ -13,6 +13,7 @@ function el(tag, props = {}, ...children) {
 }
 
 function options() {
+  if (!view) return [];
   if (method() === "local") return view.local.servers.map((s) => ({ id: s.id, name: s.name, ready: true }));
   return view[method()].map((p) => ({ id: p.id, name: p.name, ready: p.ready }));
 }
@@ -23,9 +24,25 @@ function current() {
   return view[method()].find((p) => p.id === id);
 }
 
-function suggest(models, picked) {
-  $("connect-models").replaceChildren(...models.map((m) => new Option(m, m)));
-  $("connect-model").value = picked || models[0] || "";
+const OTHER = "__other";
+let labels = {};
+const modelName = (m) => labels[m] || (t(`model_${m}`) === `model_${m}` ? m : t(`model_${m}`));
+
+function suggest(models, picked, given = {}) {
+  labels = given;
+  const list = picked && !models.includes(picked) ? [...models, picked] : models;
+  const chosen = picked || list[0] || "";
+  $("connect-model-pick").replaceChildren(...list.map((m) => new Option(modelName(m), m, false, m === chosen)),
+    new Option(t("modelOther"), OTHER, false, !list.length));
+  $("connect-model").value = chosen;
+  $("connect-model").hidden = list.length > 0;
+}
+
+function pickModel() {
+  const other = $("connect-model-pick").value === OTHER;
+  $("connect-model").hidden = !other;
+  $("connect-model").value = other ? "" : $("connect-model-pick").value;
+  if (other) $("connect-model").focus();
 }
 
 async function keyForm(provider) {
@@ -76,6 +93,7 @@ function subscriptionDetail(provider) {
 }
 
 async function detail() {
+  fillListeners();
   const provider = current();
   const box = $("connect-detail");
   $("connect-model-field").hidden = !provider;
@@ -84,25 +102,30 @@ async function detail() {
     return;
   }
   if (method() === "local") {
-    box.replaceChildren(el("p", { className: "meta", dir: "ltr", textContent: provider.url }), ...localPanel(view.local, refresh));
+    box.replaceChildren(el("p", { className: "meta", dir: "ltr", textContent: provider.url }),
+      ...(provider.models.length ? [] : [modelNeeded(provider)]), ...localPanel(view.local, refresh));
     suggest(provider.models, view.local.server === provider.id ? view.local.model : "");
   } else if (method() === "subscription") {
     box.replaceChildren(...subscriptionDetail(provider));
-    suggest(provider.models, provider.model);
+    suggest(provider.models, provider.model, provider.model_labels);
   } else {
     box.replaceChildren(...(provider.id === "custom" ? [addressForm(provider)] : []), await keyForm(provider));
     const { models = [] } = provider.has_key ? await post("/connections/models", { provider: provider.id }) : {};
     suggest(models, provider.model);
   }
-  fillListeners();
+}
+
+function listenLabel(way) {
+  if (way.id !== "local") return way.ready ? way.name : `${way.name} · ${t("needsKey")}`;
+  return way.ready ? t("listenLocalName") : `${t("listenLocalName")} · ${t("needsDownload", { gb: way.download_gb })}`;
 }
 
 function fillListeners() {
-  const hearing = view.api.filter((p) => p.hears);
   const picked = $("connect-listen").value || view.chosen.listen;
-  $("connect-listen").replaceChildren(new Option(t("listenLocal"), "local", false, picked === "local"),
-    ...hearing.map((p) => Object.assign(new Option(p.ready ? p.name : `${p.name} · ${t("needsKey")}`, p.id, false,
-      p.ready && p.id === picked), { disabled: !p.ready })));
+  $("connect-listen").replaceChildren(...view.listening.map((way) => Object.assign(
+    new Option(listenLabel(way), way.id, false, way.id === picked), { disabled: way.id !== "local" && !way.ready })));
+  const local = view.listening.find((way) => way.id === "local");
+  $("listen-hint").textContent = t(local.gpu ? "reason_gpu" : "reason_cpu_slow");
 }
 
 function fillProviders(picked) {
@@ -147,4 +170,5 @@ export async function saveConnect() {
 export function wireConnect() {
   document.querySelectorAll("input[name=method]").forEach((input) => input.addEventListener("change", () => fillProviders("")));
   $("connect-provider").addEventListener("change", detail);
+  $("connect-model-pick").addEventListener("change", pickModel);
 }

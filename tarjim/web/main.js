@@ -2,7 +2,8 @@ import { $, api, post } from "./api.js";
 import { load } from "./i18n.js";
 import { fillLanguageMenu, guessLanguage } from "./languages.js";
 import { watchPairing } from "./pairing.js";
-import { repaint, startWizard, wireWizard } from "./wizard.js";
+import { repaint, startSettings, startWizard, wireWizard } from "./wizard.js";
+import { repaintAssistant, startAssistant } from "./assistant.js";
 import { openWorkspace } from "./workspace.js";
 
 async function boot() {
@@ -15,13 +16,15 @@ async function boot() {
     await post("/setup", { ui_language: $("ui-language").value });
     await load($("ui-language").value);
     repaint();
+    repaintAssistant();
   });
+  const manual = (from) => startWizard(setup, openWorkspace, from);
   $("open-settings").addEventListener("click", async () => {
     $("open-settings").hidden = true;
-    startWizard(await api("/setup"), openWorkspace, "language");
+    startSettings(await api("/setup"), openWorkspace, () => startAssistant(openWorkspace, manual));
   });
   if (setup.setup_done === "yes" && location.hash !== "#setup") await openWorkspace();
-  else startWizard(setup, openWorkspace);
+  else startAssistant(openWorkspace, manual);
 }
 
 boot();

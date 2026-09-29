@@ -60,10 +60,13 @@ def test_api_providers_send_the_schema_and_read_json_back(home: Path,
     assert sent["headers"] == {"Authorization": "Bearer sk-1234567890abcdefgh"}
 
 
-def test_only_running_local_programs_are_listed(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_only_running_local_programs_are_listed_even_without_a_model(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(local_servers, "alive", lambda server, _url: server in ("ollama", "jan"))
     monkeypatch.setattr(local_servers, "models_of",
-                        lambda server, _url: ["m1"] if server in ("ollama", "jan") else [])
-    assert [s.id for s in local_servers.discover()] == ["ollama", "jan"]
+                        lambda server, _url: ["m1"] if server == "ollama" else [])
+    found = {s.id: s.models for s in local_servers.discover()}
+    assert found == {"ollama": ["m1"], "jan": []}
 
 
 def test_adding_to_the_claude_app_keeps_other_servers(tmp_path: Path,
@@ -133,3 +136,17 @@ def test_listening_can_only_be_a_known_engine_that_is_ready(home: Path) -> None:
     assert not connections.remember_choice({"provider": "codex", "listen": "gemini"})
     assert connections.remember_choice({"provider": "codex", "listen": "local"})
     assert config.setting("listen_provider") == "local"
+
+
+def test_claude_offers_the_models_its_account_has(tmp_path: Path,
+                                                  monkeypatch: pytest.MonkeyPatch) -> None:
+    from tarjim.engines import subscription_models
+
+    (tmp_path / ".claude.json").write_text(json.dumps({"additionalModelOptionsCache": [
+        {"value": "claude-fable-5-1[1m]", "label": "Fable",
+         "description": "Fable 5.1, most capable"}]}))
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(tmp_path))
+    assert subscription_models.claude_models() == [
+        ("opus", ""), ("sonnet", ""), ("haiku", ""),
+        ("claude-fable-5-1[1m]", "Fable 5.1, most capable")]
+    assert connections.MODEL_NAME.match("claude-fable-5-1[1m]")

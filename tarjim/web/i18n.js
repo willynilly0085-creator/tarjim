@@ -1,7 +1,10 @@
 let words = {};
 
+const LTR_RUN = /\d[\d.,]*\s?GB/g;
+const keepLeftToRight = (text) => text.replace(LTR_RUN, (run) => `\u2066${run}\u2069`);
+
 export const t = (key, values = {}) =>
-  String(words[key] ?? key).replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
+  keepLeftToRight(String(words[key] ?? key).replace(/\{(\w+)\}/g, (_, name) => values[name] ?? ""));
 
 export function apply(root = document) {
   root.querySelectorAll("[data-t]").forEach((el) => { el.textContent = t(el.dataset.t); });
