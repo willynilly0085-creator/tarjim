@@ -144,7 +144,8 @@ def test_claude_offers_the_models_its_account_has(tmp_path: Path,
 
     (tmp_path / ".claude.json").write_text(json.dumps({"additionalModelOptionsCache": [
         {"value": "claude-fable-5-1[1m]", "label": "Fable",
-         "description": "Fable 5.1, most capable"}]}))
+         "description": "Fable 5.1, most capable"},
+        {"value": "cc-update-required-2", "label": "Opus 5.5 (disabled)", "disabled": True}]}))
     monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(tmp_path))
     assert subscription_models.claude_models() == [
         ("opus", ""), ("sonnet", ""), ("haiku", ""),

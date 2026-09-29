@@ -23,5 +23,5 @@ def claude_models() -> list[tuple[str, str]]:
     except (OSError, ValueError, AttributeError):
         extra = []
     offered = [(str(m["value"]), str(m.get("description") or m.get("label") or ""))
-               for m in extra if isinstance(m, dict) and m.get("value")]
+               for m in extra if isinstance(m, dict) and m.get("value") and not m.get("disabled")]
     return [(alias, "") for alias in CLAUDE_ALIASES] + offered
