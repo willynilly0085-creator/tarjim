@@ -25,6 +25,6 @@ complexité de 6 au plus, 4 arguments au maximum, lignes de moins de 100 caract�
   `docs/decisions.md` (ajout uniquement).
 - Les noms portent le sens ; les commentaires n'expliquent que ce que le code ne peut pas dire.
 - Les textes de l'interface se trouvent dans les fichiers de langue (`tarjim/web/i18n`,
-  `extension/_locales`), en arabe saoudien simple et en anglais. Pas d'emoji dans l'interface.
+  `tarjim/extension/_locales`), en arabe saoudien simple et en anglais. Pas d'emoji dans l'interface.
 - Rien ne doit envoyer les médias ou les clés d'une personne vers une destination qu'elle n'a pas
   choisie. Le mode local doit rester à zéro connexion externe.

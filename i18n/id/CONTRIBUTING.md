@@ -23,7 +23,7 @@ fungsi di bawah 20 pernyataan dengan kompleksitas 6 atau kurang, paling banyak 4
 - Ukur sebelum mengklaim: perubahan waktu, kualitas, dan kecepatan disertai angka yang membuktikannya,
   dicatat sebagai satu baris bertanggal di `docs/decisions.md` (hanya ditambahkan, tidak diubah).
 - Nama membawa makna; komentar hanya menjelaskan apa yang tidak bisa disampaikan kode.
-- Teks antarmuka berada di berkas bahasa (`tarjim/web/i18n`, `extension/_locales`), dalam bahasa Arab Saudi
+- Teks antarmuka berada di berkas bahasa (`tarjim/web/i18n`, `tarjim/extension/_locales`), dalam bahasa Arab Saudi
   yang sederhana dan bahasa Inggris. Tidak ada emoji di antarmuka.
 - Tidak ada yang boleh mengirim media atau kunci seseorang ke tempat yang tidak ia pilih. Mode lokal harus
   tetap pada nol koneksi eksternal.

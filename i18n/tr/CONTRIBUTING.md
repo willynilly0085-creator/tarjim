@@ -25,7 +25,7 @@ dosyalar 200 satırın altında, fonksiyonlar 20 ifadenin altında ve karmaşık
   birlikte gelir ve `docs/decisions.md` dosyasına tarihli bir satır olarak kaydedilir (yalnızca
   ekleme yapılır).
 - Anlamı adlar taşır; yorumlar yalnızca kodun anlatamadığını açıklar.
-- Arayüz metinleri dil dosyalarında (`tarjim/web/i18n`, `extension/_locales`), sade Suudi Arapçası
+- Arayüz metinleri dil dosyalarında (`tarjim/web/i18n`, `tarjim/extension/_locales`), sade Suudi Arapçası
   ve İngilizce olarak bulunur. Arayüzde emoji kullanılmaz.
 - Hiçbir şey bir kişinin medyasını veya anahtarlarını onun seçmediği bir yere gönderemez. Yerel mod
   sıfır dış bağlantıda kalmalıdır.

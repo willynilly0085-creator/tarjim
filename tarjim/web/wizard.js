@@ -3,6 +3,7 @@ import { load, t } from "./i18n.js";
 import { renderChat } from "./chat.js";
 import { renderConnect, saveConnect, wireConnect } from "./connect.js";
 import { fillLanguageChoices } from "./languages.js";
+import { copyText, selectText } from "./ui.js";
 import { renderDevice, renderTools } from "./steps.js";
 
 const STEPS = ["language", "device", "connect", "tools", "extension", "chat", "done"];
@@ -16,7 +17,10 @@ const ENTER = {
   device: () => renderDevice(state),
   connect: () => renderConnect(),
   tools: () => watchTools(),
-  extension: () => { $("extension-path").textContent = state.setup.extension_path; },
+  extension: () => {
+    $("extension-path").textContent = state.setup.extension_path;
+    $("copy-path").textContent = t("copy");
+  },
   chat: () => renderChat(),
 };
 
@@ -79,8 +83,9 @@ export function wireWizard() {
   $("step-back").addEventListener("click", () => { at = Math.max(0, at - 1); clearInterval(poll); paint(); });
   wireConnect();
   $("copy-path").addEventListener("click", async () => {
-    await navigator.clipboard.writeText($("extension-path").textContent);
-    $("copy-path").textContent = t("copied");
+    const path = $("extension-path");
+    if (await copyText(path.textContent)) $("copy-path").textContent = t("copied");
+    else selectText(path);
   });
 }
 

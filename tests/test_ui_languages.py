@@ -5,7 +5,7 @@ from pathlib import Path
 from tarjim.ui_languages import FOLDER, available, codes
 
 PLACEHOLDER = re.compile(r"\{\w+\}")
-EXTENSION = Path(__file__).resolve().parents[1] / "extension" / "_locales"
+EXTENSION = Path(__file__).resolve().parents[1] / "tarjim" / "extension" / "_locales"
 
 
 def test_every_interface_language_names_itself_and_arabic_and_urdu_read_right_to_left() -> None:

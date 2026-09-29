@@ -14,7 +14,7 @@ from tarjim.ui_languages import available, codes
 
 GLOSSARY_CHARS = 5000
 MODEL_TAG = re.compile(r"^[\w.:/-]{2,80}$")
-EXTENSION = Path(__file__).resolve().parents[2] / "extension"
+EXTENSION = Path(__file__).resolve().parents[1] / "extension"
 FIELDS: dict[str, tuple[str, ...]] = {"ui_language": codes(), "listen_provider": LISTENERS,
                                       "translate_provider": TRANSLATORS, "setup_done": ("yes",)}
 Query = dict[str, list[str]]

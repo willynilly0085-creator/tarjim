@@ -24,7 +24,7 @@ complexidade 6 ou menor, no máximo 4 argumentos, linhas com menos de 100 caract
   números que as comprovam, registrados como uma linha datada em `docs/decisions.md` (só se
   acrescentam linhas).
 - Os nomes carregam o significado; os comentários explicam apenas o que o código não consegue.
-- Os textos da interface ficam nos arquivos de idioma (`tarjim/web/i18n`, `extension/_locales`), em
+- Os textos da interface ficam nos arquivos de idioma (`tarjim/web/i18n`, `tarjim/extension/_locales`), em
   árabe saudita simples e em inglês. Nada de emoji na interface.
 - Nada pode enviar a mídia ou as chaves de uma pessoa para qualquer lugar que ela não tenha
   escolhido. O modo local deve continuar com zero conexões externas.

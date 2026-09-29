@@ -23,7 +23,7 @@ All four must pass. The limits are enforced by the configuration in `pyproject.t
 - Measure before you claim: timing, quality and speed changes come with the numbers that show them,
   recorded as a dated line in `docs/decisions.md` (append only).
 - Names carry the meaning; comments explain only what the code cannot.
-- Interface text lives in the language files (`tarjim/web/i18n`, `extension/_locales`), in simple
+- Interface text lives in the language files (`tarjim/web/i18n`, `tarjim/extension/_locales`), in simple
   Saudi Arabic and English. No emoji in the interface.
 - Nothing may send a person's media or keys anywhere they did not choose. Local mode must stay at
   zero external connections.
