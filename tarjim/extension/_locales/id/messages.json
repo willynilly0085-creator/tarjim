@@ -350,5 +350,20 @@
   },
   "loading": {
     "message": "Memuat…"
+  },
+  "summaryPhone": {
+    "message": "Ponsel"
+  },
+  "phoneLinked": {
+    "message": "Terhubung dengan"
+  },
+  "phoneNotLinked": {
+    "message": "Belum terhubung"
+  },
+  "phoneLinkButton": {
+    "message": "Pasangkan ponsel"
+  },
+  "phoneSettingsButton": {
+    "message": "Pengaturan ponsel"
   }
 }

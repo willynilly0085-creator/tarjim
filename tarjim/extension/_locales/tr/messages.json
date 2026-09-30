@@ -350,5 +350,20 @@
   },
   "loading": {
     "message": "Yükleniyor…"
+  },
+  "summaryPhone": {
+    "message": "Telefon"
+  },
+  "phoneLinked": {
+    "message": "Eşleşti:"
+  },
+  "phoneNotLinked": {
+    "message": "Eşleşmedi"
+  },
+  "phoneLinkButton": {
+    "message": "Telefonu eşleştir"
+  },
+  "phoneSettingsButton": {
+    "message": "Telefon ayarları"
   }
 }

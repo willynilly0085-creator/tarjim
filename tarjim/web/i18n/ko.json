@@ -344,5 +344,7 @@
   "phone_mode_title": "무엇을 돌려 드릴까요?",
   "phone_mode_saved": "지금부터 이걸 돌려 드려요: {mode}",
   "phone_cmd_mode": "돌려받을 것 고르기",
-  "phone_cmd_help": "사용 방법"
+  "phone_cmd_help": "사용 방법",
+  "phoneReadyHint": "휴대폰에서 링크를 보내고 싶으세요? 나만의 Telegram 봇과 연결하면 어디서든 번역을 받을 수 있어요.",
+  "phoneReadyButton": "휴대폰 연결"
 }

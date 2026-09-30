@@ -95,3 +95,10 @@ async function watch() {
 export async function renderPhone() {
   paint(await api("/phone").catch(() => ({ bot: "" })));
 }
+
+export function showPhone() {
+  const section = document.querySelector('[data-step="phone"]');
+  section.scrollIntoView({ block: "start" });
+  section.querySelector("h1").tabIndex = -1;
+  section.querySelector("h1").focus({ preventScroll: true });
+}

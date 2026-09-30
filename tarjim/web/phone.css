@@ -6,3 +6,4 @@
 .phone-paired { gap: var(--space-md); justify-items: stretch; }
 .phone-paired > .button-quiet { justify-self: start; }
 .phone-paired > p:empty { display: none; }
+[data-step="phone"] h1:focus { outline: none; }

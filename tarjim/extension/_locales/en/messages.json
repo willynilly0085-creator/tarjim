@@ -350,5 +350,20 @@
   },
   "loading": {
     "message": "Loading…"
+  },
+  "summaryPhone": {
+    "message": "Phone"
+  },
+  "phoneLinked": {
+    "message": "Paired with"
+  },
+  "phoneNotLinked": {
+    "message": "Not paired"
+  },
+  "phoneLinkButton": {
+    "message": "Pair your phone"
+  },
+  "phoneSettingsButton": {
+    "message": "Phone settings"
   }
 }

@@ -350,5 +350,20 @@
   },
   "loading": {
     "message": "加载中…"
+  },
+  "summaryPhone": {
+    "message": "手机"
+  },
+  "phoneLinked": {
+    "message": "已配对"
+  },
+  "phoneNotLinked": {
+    "message": "未配对"
+  },
+  "phoneLinkButton": {
+    "message": "配对手机"
+  },
+  "phoneSettingsButton": {
+    "message": "手机设置"
   }
 }

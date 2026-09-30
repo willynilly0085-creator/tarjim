@@ -344,5 +344,7 @@
   "phone_mode_title": "وش أرجّع لك؟",
   "phone_mode_saved": "من الحين أرجّع لك: {mode}",
   "phone_cmd_mode": "اختر وش أرجّع لك",
-  "phone_cmd_help": "طريقة الاستخدام"
+  "phone_cmd_help": "طريقة الاستخدام",
+  "phoneReadyHint": "تبغى ترسل روابط من جوالك؟ اربطه ببوت تلقرام خاص فيك، ويرجّع لك الترجمة وين ما كنت.",
+  "phoneReadyButton": "اربط جوالك"
 }

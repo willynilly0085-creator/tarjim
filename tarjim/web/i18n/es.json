@@ -344,5 +344,7 @@
   "phone_mode_title": "¿Qué te devuelvo?",
   "phone_mode_saved": "Desde ahora te devuelvo: {mode}",
   "phone_cmd_mode": "Elegir qué te devuelvo",
-  "phone_cmd_help": "Cómo usarme"
+  "phone_cmd_help": "Cómo usarme",
+  "phoneReadyHint": "¿Quieres enviar enlaces desde tu teléfono? Vincúlalo con tu propio bot de Telegram y recibe las traducciones donde estés.",
+  "phoneReadyButton": "Vincular tu teléfono"
 }

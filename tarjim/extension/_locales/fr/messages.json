@@ -350,5 +350,20 @@
   },
   "loading": {
     "message": "Chargement…"
+  },
+  "summaryPhone": {
+    "message": "Téléphone"
+  },
+  "phoneLinked": {
+    "message": "Associé à"
+  },
+  "phoneNotLinked": {
+    "message": "Non associé"
+  },
+  "phoneLinkButton": {
+    "message": "Associer votre téléphone"
+  },
+  "phoneSettingsButton": {
+    "message": "Réglages du téléphone"
   }
 }

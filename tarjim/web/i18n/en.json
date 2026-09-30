@@ -344,5 +344,7 @@
   "phone_mode_title": "What should I send back?",
   "phone_mode_saved": "From now on I send back: {mode}",
   "phone_cmd_mode": "Choose what I send back",
-  "phone_cmd_help": "How to use me"
+  "phone_cmd_help": "How to use me",
+  "phoneReadyHint": "Want to send links from your phone? Pair it with your own Telegram bot and get translations back anywhere.",
+  "phoneReadyButton": "Pair your phone"
 }

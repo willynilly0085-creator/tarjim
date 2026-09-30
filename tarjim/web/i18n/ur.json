@@ -344,5 +344,7 @@
   "phone_mode_title": "میں کیا واپس بھیجوں؟",
   "phone_mode_saved": "اب سے میں یہ واپس بھیجوں گا: {mode}",
   "phone_cmd_mode": "چنیں کہ میں کیا واپس بھیجوں",
-  "phone_cmd_help": "میرا استعمال کیسے کریں"
+  "phone_cmd_help": "میرا استعمال کیسے کریں",
+  "phoneReadyHint": "فون سے لنک بھیجنا چاہتے ہیں؟ اسے اپنے ⁦Telegram⁩ بوٹ سے جوڑیں اور کہیں بھی ترجمہ پائیں۔",
+  "phoneReadyButton": "فون جوڑیں"
 }

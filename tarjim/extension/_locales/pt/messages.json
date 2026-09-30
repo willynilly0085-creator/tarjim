@@ -350,5 +350,20 @@
   },
   "loading": {
     "message": "Carregando…"
+  },
+  "summaryPhone": {
+    "message": "Celular"
+  },
+  "phoneLinked": {
+    "message": "Conectado a"
+  },
+  "phoneNotLinked": {
+    "message": "Não conectado"
+  },
+  "phoneLinkButton": {
+    "message": "Conectar o celular"
+  },
+  "phoneSettingsButton": {
+    "message": "Configurações do celular"
   }
 }

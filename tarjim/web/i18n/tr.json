@@ -344,5 +344,7 @@
   "phone_mode_title": "Sana ne göndereyim?",
   "phone_mode_saved": "Bundan sonra şunu göndereceğim: {mode}",
   "phone_cmd_mode": "Ne göndereceğimi seç",
-  "phone_cmd_help": "Nasıl kullanılır"
+  "phone_cmd_help": "Nasıl kullanılır",
+  "phoneReadyHint": "Telefondan bağlantı mı göndermek istiyorsun? Kendi Telegram botunla eşleştir, çevirileri her yerde al.",
+  "phoneReadyButton": "Telefonu eşleştir"
 }

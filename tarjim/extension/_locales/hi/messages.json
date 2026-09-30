@@ -350,5 +350,20 @@
   },
   "loading": {
     "message": "लोड हो रहा है…"
+  },
+  "summaryPhone": {
+    "message": "फ़ोन"
+  },
+  "phoneLinked": {
+    "message": "जुड़ा है"
+  },
+  "phoneNotLinked": {
+    "message": "जुड़ा नहीं है"
+  },
+  "phoneLinkButton": {
+    "message": "फ़ोन जोड़ें"
+  },
+  "phoneSettingsButton": {
+    "message": "फ़ोन सेटिंग्स"
   }
 }

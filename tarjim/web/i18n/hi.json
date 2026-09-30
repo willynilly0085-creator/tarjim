@@ -344,5 +344,7 @@
   "phone_mode_title": "मैं क्या वापस भेजूँ?",
   "phone_mode_saved": "अब से मैं यह वापस भेजूँगा: {mode}",
   "phone_cmd_mode": "चुनें कि मैं क्या वापस भेजूँ",
-  "phone_cmd_help": "मेरा इस्तेमाल कैसे करें"
+  "phone_cmd_help": "मेरा इस्तेमाल कैसे करें",
+  "phoneReadyHint": "फ़ोन से लिंक भेजना चाहते हैं? उसे अपने Telegram बॉट से जोड़ें और कहीं भी अनुवाद पाएँ।",
+  "phoneReadyButton": "फ़ोन जोड़ें"
 }

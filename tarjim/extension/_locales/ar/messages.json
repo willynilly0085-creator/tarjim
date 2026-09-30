@@ -350,5 +350,20 @@
   },
   "loading": {
     "message": "لحظة…"
+  },
+  "summaryPhone": {
+    "message": "الجوال"
+  },
+  "phoneLinked": {
+    "message": "مربوط بـ"
+  },
+  "phoneNotLinked": {
+    "message": "مو مربوط"
+  },
+  "phoneLinkButton": {
+    "message": "اربط جوالك"
+  },
+  "phoneSettingsButton": {
+    "message": "إعدادات الجوال"
   }
 }

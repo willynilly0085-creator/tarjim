@@ -344,5 +344,7 @@
   "phone_mode_title": "要我发回什么？",
   "phone_mode_saved": "从现在起我发回：{mode}",
   "phone_cmd_mode": "选择我发回什么",
-  "phone_cmd_help": "使用方法"
+  "phone_cmd_help": "使用方法",
+  "phoneReadyHint": "想从手机发送链接？把它和你自己的 Telegram 机器人配对，随时随地收到翻译。",
+  "phoneReadyButton": "配对手机"
 }

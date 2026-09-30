@@ -344,5 +344,7 @@
   "phone_mode_title": "Was soll ich zurückschicken?",
   "phone_mode_saved": "Ab jetzt schicke ich dir zurück: {mode}",
   "phone_cmd_mode": "Wählen, was ich zurückschicke",
-  "phone_cmd_help": "So benutzt du mich"
+  "phone_cmd_help": "So benutzt du mich",
+  "phoneReadyHint": "Möchten Sie Links vom Handy senden? Verbinden Sie es mit Ihrem eigenen Telegram-Bot und erhalten Sie Übersetzungen überall.",
+  "phoneReadyButton": "Handy verbinden"
 }

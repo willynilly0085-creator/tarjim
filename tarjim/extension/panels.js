@@ -46,12 +46,15 @@ export async function autoPair(ready) {
 async function fillSummary() {
   const box = $("connection-summary");
   box.textContent = t("loading");
-  const now = await api("/connections/current").catch(() => null);
+  const [now, phone] = await Promise.all([api("/connections/current").catch(() => null),
+    api("/phone").catch(() => null)]);
   if (!now) return;
   const row = (label, value) => [Object.assign(document.createElement("dt"), { textContent: label }),
     Object.assign(document.createElement("dd"), { textContent: value })];
   box.replaceChildren(...row(t("summaryTranslate"), now.model ? `${now.name} · ${now.model}` : now.name),
-    ...row(t("summaryListen"), now.listen === "local" ? t("onDevice") : now.listen_name));
+    ...row(t("summaryListen"), now.listen === "local" ? t("onDevice") : now.listen_name),
+    ...(phone ? row(t("summaryPhone"), phone.paired ? `${t("phoneLinked")} \u2066@${phone.bot}\u2069` : t("phoneNotLinked")) : []));
+  $("open-phone").textContent = t(phone?.paired ? "phoneSettingsButton" : "phoneLinkButton");
 }
 
 export async function openSettings() {
@@ -81,6 +84,7 @@ export function wirePanels({ ready, back, leave }) {
   $("pair-auto").addEventListener("click", () => autoPair(ready));
   $("open-tarjim").addEventListener("click", async () => chrome.tabs.create({ url: `${await serverBase()}/` }));
   $("open-setup").addEventListener("click", openSetup);
+  $("open-phone").addEventListener("click", async () => chrome.tabs.create({ url: `${await serverBase()}/#phone` }));
   $("open-full-setup").addEventListener("click", openSetup);
   $("setup-done").addEventListener("click", back);
   $("settings-form").addEventListener("submit", saveSettings);

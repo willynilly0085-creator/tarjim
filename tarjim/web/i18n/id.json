@@ -344,5 +344,7 @@
   "phone_mode_title": "Mau kukirim balik apa?",
   "phone_mode_saved": "Mulai sekarang aku kirim balik: {mode}",
   "phone_cmd_mode": "Pilih yang kukirim balik",
-  "phone_cmd_help": "Cara memakaiku"
+  "phone_cmd_help": "Cara memakaiku",
+  "phoneReadyHint": "Ingin mengirim tautan dari ponsel? Pasangkan dengan bot Telegram milikmu sendiri dan terima terjemahan di mana saja.",
+  "phoneReadyButton": "Pasangkan ponsel"
 }

@@ -350,5 +350,20 @@
   },
   "loading": {
     "message": "불러오는 중…"
+  },
+  "summaryPhone": {
+    "message": "휴대폰"
+  },
+  "phoneLinked": {
+    "message": "연결됨"
+  },
+  "phoneNotLinked": {
+    "message": "연결 안 됨"
+  },
+  "phoneLinkButton": {
+    "message": "휴대폰 연결"
+  },
+  "phoneSettingsButton": {
+    "message": "휴대폰 설정"
   }
 }

@@ -350,5 +350,20 @@
   },
   "loading": {
     "message": "Загрузка…"
+  },
+  "summaryPhone": {
+    "message": "Телефон"
+  },
+  "phoneLinked": {
+    "message": "Связан с"
+  },
+  "phoneNotLinked": {
+    "message": "Не связан"
+  },
+  "phoneLinkButton": {
+    "message": "Связать телефон"
+  },
+  "phoneSettingsButton": {
+    "message": "Настройки телефона"
   }
 }

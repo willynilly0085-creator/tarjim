@@ -2,6 +2,7 @@ import { $, api, post } from "./api.js";
 import { load } from "./i18n.js";
 import { fillLanguageMenu, guessLanguage } from "./languages.js";
 import { watchPairing } from "./pairing.js";
+import { showPhone } from "./phone.js";
 import { repaint, startSettings, startWizard, wireWizard } from "./wizard.js";
 import { repaintAssistant, startAssistant } from "./assistant.js";
 import { openWorkspace } from "./workspace.js";
@@ -19,12 +20,15 @@ async function boot() {
     repaintAssistant();
   });
   const manual = (from) => startWizard(setup, openWorkspace, from);
-  $("open-settings").addEventListener("click", async () => {
+  const settings = async () => {
     $("open-settings").hidden = true;
     startSettings(await api("/setup"), openWorkspace, () => startAssistant(openWorkspace, manual));
-  });
-  if (setup.setup_done === "yes" && location.hash !== "#setup") await openWorkspace();
-  else startAssistant(openWorkspace, manual);
+  };
+  $("open-settings").addEventListener("click", settings);
+  if (setup.setup_done !== "yes" || location.hash === "#setup") return startAssistant(openWorkspace, manual);
+  if (location.hash !== "#phone") return openWorkspace();
+  await settings();
+  showPhone();
 }
 
 boot();

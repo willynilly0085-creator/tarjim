@@ -344,5 +344,7 @@
   "phone_mode_title": "何を送り返しましょうか？",
   "phone_mode_saved": "これからは次を送り返します：{mode}",
   "phone_cmd_mode": "送り返すものを選ぶ",
-  "phone_cmd_help": "使い方"
+  "phone_cmd_help": "使い方",
+  "phoneReadyHint": "スマートフォンからリンクを送りたいですか？自分専用の Telegram ボットとペアリングすれば、どこにいても翻訳が届きます。",
+  "phoneReadyButton": "スマートフォンをペアリング"
 }
