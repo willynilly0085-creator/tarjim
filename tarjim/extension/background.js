@@ -1,7 +1,7 @@
 import { buildMenus, isMode, OTHER } from "./menus.js";
 import { claimPending } from "./pairing.js";
 import { clickedPost, downloadable } from "./posts.js";
-import { ApiError, api, errorLabel, loadWords, post, settings, t } from "./shared.js";
+import { ApiError, api, errorLabel, loadWords, post, remember, settings, t } from "./shared.js";
 
 const POLL = "poll";
 
@@ -17,7 +17,7 @@ async function start() {
 
 chrome.runtime.onInstalled.addListener(start);
 chrome.runtime.onStartup.addListener(start);
-chrome.storage.onChanged.addListener((changes) => { if (changes.target) buildMenus(); });
+chrome.storage.onChanged.addListener((changes) => { if (changes.target || changes.mode) buildMenus(); });
 
 async function pickUrl(info, tab) {
   const direct = [info.linkUrl, info.srcUrl].find(downloadable);
@@ -41,8 +41,10 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     return;
   }
   const { target, dialect } = await settings();
+  const mode = info.menuItemId;
   try {
-    await post("/jobs", { url, target, dialect, mode: info.menuItemId });
+    await post("/jobs", { url, target, dialect, mode });
+    await remember(mode.startsWith("dub-") ? { mode, voice: mode.slice(4) } : { mode });
     refresh();
     await chrome.action.openPopup().catch(() => notify(`start-${Date.now()}`, t("appName"), t("notifyStarted")));
   } catch (error) {

@@ -242,6 +242,9 @@
   "menuDubStudio": {
     "message": "Stüdyo sesiyle dublaj"
   },
+  "menuMore": {
+    "message": "Diğer seçenekler"
+  },
   "menuOther": {
     "message": "Başka bir dil veya bu bilgisayardaki bir dosya"
   },

@@ -242,6 +242,9 @@
   "menuDubStudio": {
     "message": "Sulih suara dengan suara studio"
   },
+  "menuMore": {
+    "message": "Pilihan lain"
+  },
   "menuOther": {
     "message": "Bahasa lain atau file di komputer ini"
   },

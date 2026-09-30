@@ -242,6 +242,9 @@
   "menuDubStudio": {
     "message": "دبلجة بصوت استوديو"
   },
+  "menuMore": {
+    "message": "خيارات ثانية"
+  },
   "menuOther": {
     "message": "لغة ثانية أو ملف من جهازك"
   },

@@ -242,6 +242,9 @@
   "menuDubStudio": {
     "message": "Mit einer Studiostimme synchronisieren"
   },
+  "menuMore": {
+    "message": "Weitere Optionen"
+  },
   "menuOther": {
     "message": "Eine andere Sprache oder eine Datei auf diesem Computer"
   },

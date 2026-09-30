@@ -242,6 +242,9 @@
   "menuDubStudio": {
     "message": "用录音室声音配音"
   },
+  "menuMore": {
+    "message": "其他选项"
+  },
   "menuOther": {
     "message": "其他语言或这台电脑上的文件"
   },

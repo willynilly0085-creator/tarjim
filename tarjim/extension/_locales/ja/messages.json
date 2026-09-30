@@ -242,6 +242,9 @@
   "menuDubStudio": {
     "message": "スタジオ音声で吹き替え"
   },
+  "menuMore": {
+    "message": "ほかの選択肢"
+  },
   "menuOther": {
     "message": "別の言語、またはこのコンピューター内のファイル"
   },

@@ -242,6 +242,9 @@
   "menuDubStudio": {
     "message": "Doblar con una voz de estudio"
   },
+  "menuMore": {
+    "message": "Otras opciones"
+  },
   "menuOther": {
     "message": "Otro idioma o un archivo de esta computadora"
   },

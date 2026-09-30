@@ -242,6 +242,9 @@
   "menuDubStudio": {
     "message": "स्टूडियो आवाज़ से डब करें"
   },
+  "menuMore": {
+    "message": "दूसरे विकल्प"
+  },
   "menuOther": {
     "message": "कोई दूसरी भाषा या इस कंप्यूटर की फ़ाइल"
   },

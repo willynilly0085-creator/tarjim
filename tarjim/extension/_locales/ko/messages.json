@@ -242,6 +242,9 @@
   "menuDubStudio": {
     "message": "스튜디오 음성으로 더빙"
   },
+  "menuMore": {
+    "message": "다른 옵션"
+  },
   "menuOther": {
     "message": "다른 언어 또는 이 컴퓨터의 파일"
   },
