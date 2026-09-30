@@ -20,7 +20,7 @@ untuk setiap pembicara.
   voice-activity detection). Subtitle tidak pernah melewati pergantian adegan hingga masuk ke adegan orang berikutnya.
 - **Mengenali pembicara:** baris dialog dengan tanda pisah, satu baris per pembicara.
 - **Sulih suara:** suara Gemini yang alami untuk setiap pembicara (dicocokkan menurut tinggi nada), kloning
-  suara lokal tiap pembicara (XTTS-v2), suara studio, atau Fish Audio. Naskah suara terpisah menuliskan
+  suara lokal tiap pembicara (VoxCPM2), suara studio, atau Fish Audio. Naskah suara terpisah menuliskan
   nama sebagaimana diucapkan dan angka sebagai kata, sehingga suara mengucapkannya dengan benar.
 - **Tiga cara memakainya:** menu klik kanan di peramban ("ترجم للعربية"), halaman web lokal,
   atau obrolan: tambahkan tarjim ke aplikasi Claude, Claude Code, atau Codex lalu minta ia menerjemahkan sebuah tautan.
@@ -136,7 +136,7 @@ Kode tarjim tidak menyertakan bobot model; Anda mengunduhnya dari pemiliknya. Se
 | Alat | Lisensi | Penggunaan komersial |
 |---|---|---|
 | Penyelaras waktu `MahmoudAshraf/mms-300m-1130-forced-aligner` (wajib) | CC-BY-NC-4.0 | Tidak |
-| Kloning suara XTTS-v2 (opsional, meminta persetujuan) | Coqui Public Model License | Tidak |
+| Kloning suara VoxCPM2 (opsional) | Apache-2.0 | Ya |
 | Terjemahan lokal `aya-expanse:8b` (opsional) | CC-BY-NC-4.0 | Tidak |
 | Pendengaran lokal Qwen3-ASR-1.7B dan Qwen3-ForcedAligner | Apache-2.0 | Ya |
 | ffmpeg (versi LGPL) | LGPL-2.1 | Ya |

@@ -24,8 +24,8 @@ Homepage = "https://github.com/willynilly0085-creator/tarjim"
 Issues = "https://github.com/willynilly0085-creator/tarjim/issues"
 
 [project.optional-dependencies]
-dub = ["coqui-tts==0.27.5", "torchcodec", "demucs", "catt-tashkeel", "edge-tts", "fish-audio-sdk",
-       "num2words", "librosa"]
+dub = ["torchcodec", "demucs", "catt-tashkeel", "edge-tts", "fish-audio-sdk", "num2words", "librosa",
+       "einops", "soundfile"]
 dev = ["pytest", "pytest-cov", "ruff", "mypy"]
 
 [project.scripts]

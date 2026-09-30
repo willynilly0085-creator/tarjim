@@ -19,7 +19,7 @@ an `.srt`, or dubs it with a voice for every speaker.
   voice-activity detection). Subtitles never run across a shot cut into the next person's shot.
 - **Speaker aware:** dialogue lines with dashes, one line per speaker.
 - **Dubbing:** a natural Gemini voice per speaker (matched by pitch), a local voice clone of each
-  speaker (XTTS-v2), studio voices, or Fish Audio. A separate voice script writes names as they
+  speaker (VoxCPM2), studio voices, or Fish Audio. A separate voice script writes names as they
   are pronounced and numbers as words, so the voice says them correctly.
 - **Three ways to use it:** a right-click menu in the browser ("ترجم للعربية"), a local web page,
   or a chat: add tarjim to the Claude app, Claude Code or Codex and ask it to translate a link.
@@ -134,7 +134,7 @@ are **not licensed for commercial use**:
 | Tool | License | Commercial use |
 |---|---|---|
 | Timing aligner `MahmoudAshraf/mms-300m-1130-forced-aligner` (required) | CC-BY-NC-4.0 | No |
-| Voice clone XTTS-v2 (optional, asks for consent) | Coqui Public Model License | No |
+| Voice clone VoxCPM2 (optional) | Apache-2.0 | Yes |
 | Local translation `aya-expanse:8b` (optional) | CC-BY-NC-4.0 | No |
 | Local listening Qwen3-ASR-1.7B and Qwen3-ForcedAligner | Apache-2.0 | Yes |
 | ffmpeg (LGPL build) | LGPL-2.1 | Yes |

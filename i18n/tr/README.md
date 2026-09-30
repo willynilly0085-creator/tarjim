@@ -21,7 +21,7 @@ gömer, bir `.srt` dosyası yazar ya da videoyu her konuşmacı için ayrı bir 
   taşmaz.
 - **Konuşmacıyı tanır:** tireli diyalog satırları, her konuşmacı için bir satır.
 - **Seslendirme:** her konuşmacı için doğal bir Gemini sesi (ses perdesine göre eşleştirilir), her
-  konuşmacının yerel bir ses klonu (XTTS-v2), stüdyo sesleri ya da Fish Audio. Ayrı bir seslendirme
+  konuşmacının yerel bir ses klonu (VoxCPM2), stüdyo sesleri ya da Fish Audio. Ayrı bir seslendirme
   metni adları okunduğu gibi, sayıları da yazıyla yazar; böylece ses bunları doğru söyler.
 - **Üç kullanım yolu:** tarayıcıda sağ tık menüsü ("ترجم للعربية"), yerel bir web sayfası ya da bir
   sohbet: tarjim'i Claude uygulamasına, Claude Code'a veya Codex'e ekleyin ve bir bağlantıyı
@@ -141,7 +141,7 @@ kullanım için lisanslı değildir**:
 | Araç | Lisans | Ticari kullanım |
 |---|---|---|
 | Zamanlama hizalayıcı `MahmoudAshraf/mms-300m-1130-forced-aligner` (zorunlu) | CC-BY-NC-4.0 | Hayır |
-| Ses klonu XTTS-v2 (isteğe bağlı, onay ister) | Coqui Public Model License | Hayır |
+| Ses klonu VoxCPM2 (isteğe bağlı) | Apache-2.0 | Evet |
 | Yerel çeviri `aya-expanse:8b` (isteğe bağlı) | CC-BY-NC-4.0 | Hayır |
 | Yerel dinleme Qwen3-ASR-1.7B ve Qwen3-ForcedAligner | Apache-2.0 | Evet |
 | ffmpeg (LGPL derlemesi) | LGPL-2.1 | Evet |

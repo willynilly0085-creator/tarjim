@@ -22,7 +22,7 @@ Stimme für jeden Sprecher.
   der nächsten Person.
 - **Sprecherbewusst:** Dialogzeilen mit Gedankenstrichen, eine Zeile pro Sprecher.
 - **Synchronisation:** eine natürliche Gemini-Stimme pro Sprecher (nach Tonhöhe zugeordnet), ein
-  lokaler Stimmklon jedes Sprechers (XTTS-v2), Studiostimmen oder Fish Audio. Ein separates
+  lokaler Stimmklon jedes Sprechers (VoxCPM2), Studiostimmen oder Fish Audio. Ein separates
   Sprechskript schreibt Namen so, wie sie ausgesprochen werden, und Zahlen als Wörter, damit die
   Stimme sie richtig ausspricht.
 - **Drei Nutzungswege:** ein Rechtsklick-Menü im Browser („ترجم للعربية“), eine lokale Webseite oder
@@ -151,7 +151,7 @@ Einige davon sind **nicht für die kommerzielle Nutzung lizenziert**:
 | Werkzeug | Lizenz | Kommerzielle Nutzung |
 |---|---|---|
 | Timing-Aligner `MahmoudAshraf/mms-300m-1130-forced-aligner` (erforderlich) | CC-BY-NC-4.0 | Nein |
-| Stimmklon XTTS-v2 (optional, fragt nach Einwilligung) | Coqui Public Model License | Nein |
+| Stimmklon VoxCPM2 (optional) | Apache-2.0 | Ja |
 | Lokale Übersetzung `aya-expanse:8b` (optional) | CC-BY-NC-4.0 | Nein |
 | Lokale Spracherkennung Qwen3-ASR-1.7B und Qwen3-ForcedAligner | Apache-2.0 | Ja |
 | ffmpeg (LGPL-Build) | LGPL-2.1 | Ja |

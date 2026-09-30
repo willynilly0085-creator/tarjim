@@ -20,7 +20,7 @@ vídeo, genera un `.srt` o lo dobla con una voz distinta para cada hablante.
   cambio de plano hasta el plano de la siguiente persona.
 - **Atento a los hablantes:** líneas de diálogo con guiones, una línea por hablante.
 - **Doblaje:** una voz natural de Gemini por hablante (elegida según el tono), un clon de voz local
-  de cada hablante (XTTS-v2), voces de estudio o Fish Audio. Un guion de voz aparte escribe los
+  de cada hablante (VoxCPM2), voces de estudio o Fish Audio. Un guion de voz aparte escribe los
   nombres tal como se pronuncian y los números en letras, para que la voz los diga correctamente.
 - **Tres formas de usarlo:** un menú contextual en el navegador ("ترجم للعربية"), una página web
   local o un chat: añade tarjim a la app de Claude, a Claude Code o a Codex y pídele que traduzca un enlace.
@@ -141,7 +141,7 @@ El código de tarjim no incluye los pesos de los modelos; los descargas de sus p
 | Herramienta | Licencia | Uso comercial |
 |---|---|---|
 | Alineador de sincronización `MahmoudAshraf/mms-300m-1130-forced-aligner` (obligatorio) | CC-BY-NC-4.0 | No |
-| Clon de voz XTTS-v2 (opcional, pide consentimiento) | Coqui Public Model License | No |
+| Clon de voz VoxCPM2 (opcional) | Apache-2.0 | Sí |
 | Traducción local `aya-expanse:8b` (opcional) | CC-BY-NC-4.0 | No |
 | Escucha local Qwen3-ASR-1.7B y Qwen3-ForcedAligner | Apache-2.0 | Sí |
 | ffmpeg (compilación LGPL) | LGPL-2.1 | Sí |

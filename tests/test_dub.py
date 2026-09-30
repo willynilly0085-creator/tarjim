@@ -39,8 +39,9 @@ def test_engine_falls_back_when_a_language_or_key_is_missing(monkeypatch) -> Non
     assert make.choose("fish", "ar") == "clone"
     assert make.choose("studio", "nl") == "clone"
     assert make.choose("clone", "ur") == "studio"
+    assert make.choose("clone", "sw") == "clone"
     with pytest.raises(make.DubUnavailable):
-        make.choose("clone", "sw")
+        make.choose("clone", "am")
 
 
 def test_vowels_are_added_without_changing_letters_digits_or_latin() -> None:
@@ -73,3 +74,18 @@ def test_numbers_are_spelled_out_for_the_voice_but_not_for_the_subtitle() -> Non
     assert spell_numbers("18 مرة في الشهر", "ar") == "ثمانية عشر مرة في الشهر"
     assert spell_numbers("every 3 months", "en") == "every three months"
     assert spell_numbers("كل 3 شهور", "xx") == "كل 3 شهور"
+
+
+def test_the_speaker_voice_gets_plain_text_so_it_speaks_without_a_foreign_accent() -> None:
+    from tarjim.dub import make
+    from tarjim.dub.lines import Line
+
+    lines = [Line(0.0, 2.0, "S1", "عندي 3 أفكار", "")]
+    assert make.fallback_spoken(lines, "clone", "ar")[0].text == "عندي ثلاثة أفكار"
+
+
+def test_long_lines_are_split_at_sentence_ends_for_the_voice_engine() -> None:
+    from tarjim.dub.clone import split_for_tts
+
+    parts = split_for_tts("جملة أولى طويلة. " * 30)
+    assert len(parts) > 1 and all(len(part) <= 220 for part in parts)

@@ -84,7 +84,6 @@ def prepare_environment() -> None:
     if models:
         os.environ.setdefault("HF_HOME", models)
         os.environ.setdefault("TORCH_HOME", str(Path(models) / "torch"))
-        os.environ.setdefault("TTS_HOME", models)
     tools = Path(setting("ffmpeg")).parent if setting("ffmpeg") else None
     if tools and tools.is_dir() and hasattr(os, "add_dll_directory"):
         os.add_dll_directory(str(tools))

@@ -20,7 +20,7 @@ gera um `.srt` ou faz a dublagem com uma voz para cada locutor.
   cena da próxima pessoa.
 - **Atento aos locutores:** falas de diálogo com travessões, uma linha por locutor.
 - **Dublagem:** uma voz natural do Gemini para cada locutor (escolhida pelo tom), um clone de voz
-  local de cada locutor (XTTS-v2), vozes de estúdio ou Fish Audio. Um roteiro de voz separado
+  local de cada locutor (VoxCPM2), vozes de estúdio ou Fish Audio. Um roteiro de voz separado
   escreve os nomes como são pronunciados e os números por extenso, para que a voz os diga
   corretamente.
 - **Três formas de usar:** um menu de clique com o botão direito no navegador ("ترجم للعربية"), uma
@@ -143,7 +143,7 @@ deles **não são licenciados para uso comercial**:
 | Ferramenta | Licença | Uso comercial |
 |---|---|---|
 | Alinhador de sincronização `MahmoudAshraf/mms-300m-1130-forced-aligner` (obrigatório) | CC-BY-NC-4.0 | Não |
-| Clone de voz XTTS-v2 (opcional, pede consentimento) | Coqui Public Model License | Não |
+| Clone de voz VoxCPM2 (opcional) | Apache-2.0 | Sim |
 | Tradução local `aya-expanse:8b` (opcional) | CC-BY-NC-4.0 | Não |
 | Escuta local Qwen3-ASR-1.7B e Qwen3-ForcedAligner | Apache-2.0 | Sim |
 | ffmpeg (build LGPL) | LGPL-2.1 | Sim |

@@ -1,4 +1,3 @@
-import os
 import sys
 import threading
 from collections.abc import Iterator
@@ -8,8 +7,7 @@ from pathlib import Path
 
 from tarjim.config import setting
 
-XTTS_REPO = "coqui/XTTS-v2"
-XTTS_FOLDER = "tts/tts_models--multilingual--multi-dataset--xtts_v2"
+VOICE_REPO = "openbmb/VoxCPM2"
 
 
 @dataclass(frozen=True)
@@ -33,8 +31,7 @@ class Tool:
 MMS = License("CC-BY-NC-4.0", "https://huggingface.co/MahmoudAshraf/mms-300m-1130-forced-aligner",
               commercial=False)
 QWEN = License("Apache-2.0", "https://huggingface.co/Qwen/Qwen3-ASR-1.7B", commercial=True)
-CPML = License("Coqui Public Model License", "https://coqui.ai/cpml", commercial=False,
-               consent=True)
+APACHE = License("Apache-2.0", "https://huggingface.co/openbmb/VoxCPM2", commercial=True)
 AYA = License("CC-BY-NC-4.0", "https://ollama.com/library/aya-expanse", commercial=False)
 LGPL = License("LGPL-2.1", "https://ffmpeg.org/legal.html", commercial=True)
 TOOLS = [
@@ -42,7 +39,7 @@ TOOLS = [
     Tool("timing", ("MahmoudAshraf/mms-300m-1130-forced-aligner",), 1.3, True, "hub", MMS),
     Tool("accuracy", ("Qwen/Qwen3-ASR-1.7B", "Qwen/Qwen3-ForcedAligner-0.6B"), 5.9, False, "hub",
          QWEN),
-    Tool("dubbing", (XTTS_REPO,), 1.9, False, "voice", CPML),
+    Tool("dubbing", (VOICE_REPO,), 4.7, False, "voice", APACHE),
     Tool("local_translation", ("aya-expanse:8b",), 5.1, False, "ollama", AYA),
 ]
 BY_ID = {tool.id: tool for tool in TOOLS}
@@ -53,11 +50,6 @@ class Progress:
     state: str = "idle"
     detail: str = ""
     started: list[str] = field(default_factory=list)
-
-
-def voice_folder() -> Path:
-    home = Path(os.environ.get("TTS_HOME") or setting("models") or Path.home() / ".tarjim")
-    return home / XTTS_FOLDER
 
 
 def hub_ready(repo: str) -> bool:
@@ -107,7 +99,9 @@ def installed(tool: Tool) -> bool:
     if tool.kind == "ffmpeg":
         return ffmpeg_ready()
     if tool.kind == "voice":
-        return (voice_folder() / "model.pth").exists()
+        from tarjim.dub.voice_setup import ready
+
+        return ready() and hub_ready(VOICE_REPO)
     if tool.kind == "ollama":
         return all(ollama_ready(model) for model in tool.sources)
     return all(hub_ready(repo) for repo in tool.sources)
@@ -138,10 +132,10 @@ def download(tool: Tool) -> None:
 
         install_ffmpeg()
     elif tool.kind == "voice":
-        folder = voice_folder()
-        snapshot_download(XTTS_REPO, local_dir=str(folder))
-        (folder / "tos_agreed.txt").write_text("Accepted by the user in tarjim (CPML).",
-                                               encoding="utf-8")
+        from tarjim.dub.voice_setup import install
+
+        install()
+        snapshot_download(VOICE_REPO)
     elif tool.kind == "ollama":
         from tarjim.engines.ollama import base_url
         from tarjim.engines.web import post

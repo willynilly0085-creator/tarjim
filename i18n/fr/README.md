@@ -20,7 +20,7 @@ sous-titres dans la vidéo, produit un fichier `.srt` ou la double avec une voix
   changement de plan sur le plan de la personne suivante.
 - **Attentif aux locuteurs :** répliques de dialogue avec tirets, une ligne par locuteur.
 - **Doublage :** une voix Gemini naturelle par locuteur (choisie selon la hauteur de voix), un clone
-  vocal local de chaque locuteur (XTTS-v2), des voix de studio ou Fish Audio. Un script vocal
+  vocal local de chaque locuteur (VoxCPM2), des voix de studio ou Fish Audio. Un script vocal
   distinct écrit les noms tels qu'ils se prononcent et les nombres en toutes lettres, pour que la
   voix les dise correctement.
 - **Trois façons de l'utiliser :** un menu clic droit dans le navigateur (« ترجم للعربية »), une
@@ -144,7 +144,7 @@ propriétaires. Certains **ne sont pas autorisés pour un usage commercial** :
 | Outil | Licence | Usage commercial |
 |---|---|---|
 | Aligneur de synchronisation `MahmoudAshraf/mms-300m-1130-forced-aligner` (obligatoire) | CC-BY-NC-4.0 | Non |
-| Clonage vocal XTTS-v2 (facultatif, demande votre consentement) | Coqui Public Model License | Non |
+| Clonage vocal VoxCPM2 (facultatif) | Apache-2.0 | Oui |
 | Traduction locale `aya-expanse:8b` (facultatif) | CC-BY-NC-4.0 | Non |
 | Écoute locale Qwen3-ASR-1.7B et Qwen3-ForcedAligner | Apache-2.0 | Oui |
 | ffmpeg (version LGPL) | LGPL-2.1 | Oui |

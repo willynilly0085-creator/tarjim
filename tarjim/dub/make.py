@@ -20,6 +20,7 @@ SAVED_VOICE = "fish:saved"
 FIRST_SECONDS = 10.0
 SAFE = re.compile(r"[^\w.-]")
 NUMBER = re.compile(r"\d+")
+PLAIN_TEXT = ("gemini", "clone")
 
 
 class DubUnavailable(RuntimeError):
@@ -87,7 +88,8 @@ def spell_numbers(text: str, language: str) -> str:
 def spoken(lines: list[Line], engine: str, job: Job) -> list[Line]:
     from tarjim.dub.script import spoken_lines
 
-    written = spoken_lines(lines, job.language.name, job.dialect, full_vowels=engine != "gemini")
+    vowels = engine not in PLAIN_TEXT
+    written = spoken_lines(lines, job.language.name, job.dialect, full_vowels=vowels)
     if written is not None:
         return written
     return fallback_spoken(lines, engine, job.target)
@@ -97,7 +99,7 @@ def fallback_spoken(lines: list[Line], engine: str, language: str) -> list[Line]
     if engine in ("studio", "gemini"):
         return lines
     texts = [spell_numbers(line.text, language) for line in lines]
-    if language == "ar":
+    if language == "ar" and engine not in PLAIN_TEXT:
         from tarjim.dub.tashkeel import add_vowels
 
         texts = add_vowels(texts)
