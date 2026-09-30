@@ -89,3 +89,16 @@ def test_long_lines_are_split_at_sentence_ends_for_the_voice_engine() -> None:
 
     parts = split_for_tts("جملة أولى طويلة. " * 30)
     assert len(parts) > 1 and all(len(part) <= 220 for part in parts)
+
+
+def test_the_card_is_freed_before_the_voice_loads(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    from tarjim import memory
+    from tarjim.dub import clone
+
+    order: list[str] = []
+    monkeypatch.setattr(memory, "free_for_voice", lambda: order.append("freed"))
+    monkeypatch.setattr(clone, "load", lambda optimize: order.append("loaded") or object())
+    clone.voice_model.cache_clear()
+    clone.voice_model()
+    clone.voice_model.cache_clear()
+    assert order == ["freed", "loaded"]

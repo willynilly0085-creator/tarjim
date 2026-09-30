@@ -8,6 +8,7 @@ from pathlib import Path
 from tarjim.config import setting
 
 VOICE_REPO = "openbmb/VoxCPM2"
+DUPLICATE_WEIGHTS = ["*.bin"]
 
 
 @dataclass(frozen=True)
@@ -36,8 +37,8 @@ AYA = License("CC-BY-NC-4.0", "https://ollama.com/library/aya-expanse", commerci
 LGPL = License("LGPL-2.1", "https://ffmpeg.org/legal.html", commercial=True)
 TOOLS = [
     Tool("ffmpeg", ("BtbN/FFmpeg-Builds",), 0.08, True, "ffmpeg", LGPL),
-    Tool("timing", ("MahmoudAshraf/mms-300m-1130-forced-aligner",), 1.3, True, "hub", MMS),
-    Tool("accuracy", ("Qwen/Qwen3-ASR-1.7B", "Qwen/Qwen3-ForcedAligner-0.6B"), 5.9, False, "hub",
+    Tool("timing", ("MahmoudAshraf/mms-300m-1130-forced-aligner",), 1.2, True, "hub", MMS),
+    Tool("accuracy", ("Qwen/Qwen3-ASR-1.7B", "Qwen/Qwen3-ForcedAligner-0.6B"), 6.3, False, "hub",
          QWEN),
     Tool("dubbing", (VOICE_REPO,), 4.7, False, "voice", APACHE),
     Tool("local_translation", ("aya-expanse:8b",), 5.1, False, "ollama", AYA),
@@ -144,7 +145,7 @@ def download(tool: Tool) -> None:
             post("local", f"{base_url()}/api/pull", {}, json={"name": model, "stream": False})
     else:
         for repo in tool.sources:
-            snapshot_download(repo)
+            snapshot_download(repo, ignore_patterns=DUPLICATE_WEIGHTS)
 
 
 class Shelf:

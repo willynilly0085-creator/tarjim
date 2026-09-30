@@ -35,6 +35,33 @@ an `.srt`, or dubs it with a voice for every speaker.
 Pick any model a provider offers. If the chosen engine fails or runs out of quota, tarjim falls
 back to the local engine when one is available.
 
+## What your computer needs
+
+The heavy parts are optional. What you need depends on which parts run on your own computer:
+
+| What you use | Graphics card | Memory (RAM) | Free disk |
+|---|---|---|---|
+| Subtitles with an AI you connect (a Gemini key, a Claude or ChatGPT subscription, any API key) | Not needed | 8 GB | about 6 GB |
+| Dubbing with natural or studio voices | Not needed | 8 GB | nothing extra |
+| Listening on this computer (the audio never leaves it) | NVIDIA, 8 GB | 16 GB | 6.3 GB more |
+| Translating on this computer (Ollama with aya-expanse 8B) | 8 GB | 16 GB | 5.1 GB more |
+| Dubbing in each speaker's own voice | NVIDIA, 8 GB | 16 GB | 4.7 GB more |
+
+- **System:** Windows 10 or 11, 64-bit. macOS and Linux run the same code but have not been tested yet.
+- **Internet:** for the downloads and for the AI you connect. With listening and translating on
+  this computer, jobs run offline once everything is downloaded.
+- **Without an NVIDIA card** everything still works on the processor, only much slower; dubbing in
+  the speaker's own voice is not practical there.
+- **One model at a time:** tarjim frees each model before the next one loads, so the graphics card
+  needs room for the largest one (about 6 GB), not for all of them together.
+- **Everything on this computer:** about 22 GB of disk.
+
+Measured on Windows 11 with an RTX 5080 (16 GB) and 32 GB of RAM: listening on the card peaked at
+5.9 GB of graphics memory, translating with aya-expanse 8B at 5.7 GB and the speaker's own voice at
+6.1 GB, about 3 seconds per sentence. Loading the speaker-voice model briefly takes about 11 GB of
+RAM before settling at 2.5 GB, which is why it asks for 16 GB. The engine itself (Python with the
+graphics-card build of PyTorch) takes about 4 GB of the disk figures above.
+
 ## Install with your AI (one step)
 
 In Claude Code:
@@ -63,7 +90,8 @@ only accept remote MCP servers), so use Codex for ChatGPT.
 
 ## Install by hand (Windows)
 
-Needs Python 3.11 and about 10 GB of disk for the local models.
+Needs Python 3.11. Disk, memory and graphics card: see
+[What your computer needs](#what-your-computer-needs).
 
 ```powershell
 git clone https://github.com/willynilly0085-creator/tarjim
@@ -102,6 +130,18 @@ or Codex. Your AI can then run the whole tool for you:
 - read the finished subtitles back to you, retry a failed job, or download a missing tool.
 
 Keys are never entered through chat; the AI opens the tarjim page for that.
+
+### Phone
+
+Send a video link to your own Telegram bot from any phone, iPhone or Android, at home or away, and
+the translated video comes back in the same chat. In Settings, open **Phone**: make a bot in
+BotFather (`/newbot`), paste its token (it stays in your computer's vault), then scan the QR code
+with your phone and press Start. The bot answers your account only, and your computer asks
+Telegram for new messages, so no port is opened to the internet. The language, result and style
+come from Settings; `/mode` in the bot changes the result. Telegram lets bots download videos up to
+20 MB and send files up to 50 MB: a larger result is re-encoded to fit, or you get the subtitle
+file and the full video stays on your computer. The bot answers while your computer and tarjim are
+running.
 
 ### Command line
 
@@ -145,8 +185,10 @@ The setup page shows each license next to its download.
 
 Tested on Windows 11 with an RTX 5080, and from a clean install with no graphics support: links and
 files, burned subtitles and `.srt`, French and Arabic, pause, resume, cancel and retry, the three
-ways to connect (Claude and ChatGPT subscriptions, local Ollama), the chat tools, and the security
-checks above. Not tested yet: macOS, Linux, GitHub Copilot and Antigravity subscriptions.
+ways to connect (Claude and ChatGPT subscriptions, local Ollama), the chat tools, dubbing in the
+speaker's own voice (English into Saudi Arabic) and the security checks above. Not tested yet:
+macOS, Linux, GitHub Copilot and Antigravity subscriptions, and the phone bot against the live
+Telegram service (its code is covered by tests with a simulated Telegram).
 
 ## License
 

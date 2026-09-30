@@ -55,6 +55,9 @@ def load(optimize: bool) -> Any:
 
 @lru_cache(maxsize=1)
 def voice_model() -> Any:
+    from tarjim.memory import free_for_voice
+
+    free_for_voice()
     try:
         return load(optimize=True)
     except RuntimeError:

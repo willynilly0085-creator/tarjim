@@ -11,7 +11,7 @@ def test_local_listening_reports_what_is_left_to_download(monkeypatch: pytest.Mo
 
     monkeypatch.setattr(tarjim.tools, "installed", lambda tool: False)
     monkeypatch.setattr(tarjim.system, "graphics", lambda: None)
-    assert listening.local_status() == {"id": "local", "ready": False, "download_gb": 5.9,
+    assert listening.local_status() == {"id": "local", "ready": False, "download_gb": 6.3,
                                         "gpu": False}
     monkeypatch.setattr(tarjim.tools, "installed", lambda tool: True)
     monkeypatch.setattr(tarjim.system, "graphics", lambda: {"usable": True})
