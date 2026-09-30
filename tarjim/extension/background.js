@@ -43,11 +43,12 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   const { target, dialect } = await settings();
   try {
     await post("/jobs", { url, target, dialect, mode: info.menuItemId });
-    notify(`start-${Date.now()}`, t("appName"), t("notifyStarted"));
     refresh();
+    await chrome.action.openPopup().catch(() => notify(`start-${Date.now()}`, t("appName"), t("notifyStarted")));
   } catch (error) {
     const body = error.kind === "offline" ? t("offlineTitle") : t("pairTitle");
     notify(`fail-${Date.now()}`, t("notifyFailed"), body);
+    chrome.tabs.create({ url: chrome.runtime.getURL("app.html") });
   }
 });
 
