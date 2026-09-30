@@ -1,12 +1,14 @@
-"""Keep one message per job up to date with its stage, and send the result when it is ready."""
+"""Keep one message per job up to date as a checklist of its steps, and send the result when it
+is ready."""
 import json
 import threading
 from dataclasses import dataclass
 from typing import Any, Protocol
 
+from tarjim.phone.checklist import ENDED, checklist
 from tarjim.phone.sender import Sender
 from tarjim.phone.telegram import Bot, TelegramError
-from tarjim.phone.words import result_name, say
+from tarjim.phone.words import say
 
 TICK = 3.0
 
@@ -22,6 +24,7 @@ class Watch:
     chat: int
     message: int
     shown: str = ""
+    step: str = ""
 
 
 def cancel_button(task_id: str) -> str:
@@ -29,10 +32,10 @@ def cancel_button(task_id: str) -> str:
                                              "callback_data": f"cancel:{task_id}"}]]})
 
 
-def status_text(task: Any) -> str:
-    view = task.view()
-    stage = "paused" if view["paused"] else view["stage"]
-    return f"{view['title']}\n{result_name(str(view['mode']))} · {say(f'stage_{stage}')}"
+def status_text(task: Any, watch: Watch) -> str:
+    if task.stage not in ENDED:
+        watch.step = task.stage
+    return checklist(task, watch.step)
 
 
 class Follower:
@@ -43,10 +46,11 @@ class Follower:
 
     def adopt(self, bot: Bot, chat: int, message: int, task: Any) -> None:
         """Turn the question message into this job's status message."""
-        text = status_text(task)
-        bot.edit(chat, message, text, reply_markup=cancel_button(task.id))
+        watch = Watch(chat, message)
+        watch.shown = status_text(task, watch)
+        bot.edit(chat, message, watch.shown, reply_markup=cancel_button(task.id))
         with self.lock:
-            self.watching[task.id] = Watch(chat, message, text)
+            self.watching[task.id] = watch
 
     def run(self, bot_now: Any, stop: threading.Event) -> None:
         while not stop.wait(TICK):
@@ -68,7 +72,9 @@ class Follower:
                 threading.Thread(target=deliver, args=(bot, watch, task), daemon=True).start()
 
     def refresh(self, bot: Bot, task: Any, watch: Watch) -> None:
-        text = status_text(task)
+        if task.stage == "done":
+            return
+        text = status_text(task, watch)
         if text == watch.shown:
             return
         extra = {} if task.finished else {"reply_markup": cancel_button(task.id)}

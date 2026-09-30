@@ -349,8 +349,10 @@
   "phoneReadyButton": "Vincular tu teléfono",
   "phone_choose": "¿Qué hago con este video?",
   "phone_choice_expired": "Esta opción caducó. Envía el enlace otra vez.",
-  "phone_preparing": "Preparando una copia para tu teléfono…",
-  "phone_sending": "Enviando a tu teléfono ({mb} MB)…",
   "phone_sent": "Enviado a tu teléfono",
-  "phone_send_failed": "No pude enviar el video, así que aquí tienes el archivo de subtítulos. El video completo está en la carpeta Descargas de tu ordenador."
+  "phone_send_failed": "No pude enviar el video, así que aquí tienes el archivo de subtítulos. El video completo está en la carpeta Descargas de tu ordenador.",
+  "phone_step_prepare": "Preparar copia para el teléfono",
+  "phone_step_send": "Enviar a tu teléfono",
+  "phone_elapsed": "{min} min hasta ahora",
+  "phone_size": "{mb} MB"
 }

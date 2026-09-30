@@ -349,8 +349,10 @@
   "phoneReadyButton": "Conectar o celular",
   "phone_choose": "O que faço com este vídeo?",
   "phone_choice_expired": "Esta escolha expirou. Envie o link de novo.",
-  "phone_preparing": "Preparando uma cópia para o celular…",
-  "phone_sending": "Enviando para o celular ({mb} MB)…",
   "phone_sent": "Enviado para o celular",
-  "phone_send_failed": "Não consegui enviar o vídeo, então aqui está o arquivo de legendas. O vídeo completo está na pasta Downloads do computador."
+  "phone_send_failed": "Não consegui enviar o vídeo, então aqui está o arquivo de legendas. O vídeo completo está na pasta Downloads do computador.",
+  "phone_step_prepare": "Preparar cópia para o celular",
+  "phone_step_send": "Enviar para o celular",
+  "phone_elapsed": "{min} min até agora",
+  "phone_size": "{mb} MB"
 }

@@ -349,8 +349,10 @@
   "phoneReadyButton": "فون جوڑیں",
   "phone_choose": "اس ویڈیو کا کیا بناؤں؟",
   "phone_choice_expired": "یہ انتخاب ختم ہو گیا۔ لنک دوبارہ بھیجیں۔",
-  "phone_preparing": "آپ کے فون کے لیے کاپی تیار ہو رہی ہے…",
-  "phone_sending": "آپ کے فون پر بھیجا جا رہا ہے ({mb} MB)…",
   "phone_sent": "آپ کے فون پر بھیج دیا",
-  "phone_send_failed": "ویڈیو نہیں بھیج سکا، اس لیے سب ٹائٹل فائل بھیجی ہے۔ پوری ویڈیو آپ کے کمپیوٹر کے Downloads فولڈر میں ہے۔"
+  "phone_send_failed": "ویڈیو نہیں بھیج سکا، اس لیے سب ٹائٹل فائل بھیجی ہے۔ پوری ویڈیو آپ کے کمپیوٹر کے Downloads فولڈر میں ہے۔",
+  "phone_step_prepare": "فون کے لیے کاپی کی تیاری",
+  "phone_step_send": "آپ کے فون پر بھیجنا",
+  "phone_elapsed": "{min} منٹ گزر گئے",
+  "phone_size": "{mb} MB"
 }

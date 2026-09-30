@@ -349,8 +349,10 @@
   "phoneReadyButton": "Handy verbinden",
   "phone_choose": "Was soll ich aus diesem Video machen?",
   "phone_choice_expired": "Diese Auswahl ist abgelaufen. Senden Sie den Link erneut.",
-  "phone_preparing": "Kopie für Ihr Handy wird vorbereitet…",
-  "phone_sending": "Wird an Ihr Handy gesendet ({mb} MB)…",
   "phone_sent": "An Ihr Handy gesendet",
-  "phone_send_failed": "Das Video konnte nicht gesendet werden, hier ist die Untertiteldatei. Das vollständige Video liegt im Download-Ordner Ihres Computers."
+  "phone_send_failed": "Das Video konnte nicht gesendet werden, hier ist die Untertiteldatei. Das vollständige Video liegt im Download-Ordner Ihres Computers.",
+  "phone_step_prepare": "Kopie fürs Handy vorbereiten",
+  "phone_step_send": "An Ihr Handy senden",
+  "phone_elapsed": "Bisher {min} Min.",
+  "phone_size": "{mb} MB"
 }

@@ -349,8 +349,10 @@
   "phoneReadyButton": "Associer votre téléphone",
   "phone_choose": "Que dois-je faire de cette vidéo ?",
   "phone_choice_expired": "Ce choix a expiré. Renvoyez le lien.",
-  "phone_preparing": "Préparation d'une copie pour votre téléphone…",
-  "phone_sending": "Envoi vers votre téléphone ({mb} Mo)…",
   "phone_sent": "Envoyé sur votre téléphone",
-  "phone_send_failed": "Impossible d'envoyer la vidéo, voici le fichier de sous-titres. La vidéo complète est dans le dossier Téléchargements de votre ordinateur."
+  "phone_send_failed": "Impossible d'envoyer la vidéo, voici le fichier de sous-titres. La vidéo complète est dans le dossier Téléchargements de votre ordinateur.",
+  "phone_step_prepare": "Préparer une copie pour le téléphone",
+  "phone_step_send": "Envoyer sur votre téléphone",
+  "phone_elapsed": "{min} min écoulées",
+  "phone_size": "{mb} Mo"
 }

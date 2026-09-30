@@ -349,8 +349,10 @@
   "phoneReadyButton": "Telefonu eşleştir",
   "phone_choose": "Bu videoyla ne yapayım?",
   "phone_choice_expired": "Bu seçimin süresi doldu. Bağlantıyı yeniden gönder.",
-  "phone_preparing": "Telefonun için bir kopya hazırlanıyor…",
-  "phone_sending": "Telefonuna gönderiliyor ({mb} MB)…",
   "phone_sent": "Telefonuna gönderildi",
-  "phone_send_failed": "Video gönderilemedi, altyazı dosyasını gönderdim. Videonun tamamı bilgisayarındaki İndirilenler klasöründe."
+  "phone_send_failed": "Video gönderilemedi, altyazı dosyasını gönderdim. Videonun tamamı bilgisayarındaki İndirilenler klasöründe.",
+  "phone_step_prepare": "Telefon için kopya hazırlama",
+  "phone_step_send": "Telefonuna gönderme",
+  "phone_elapsed": "{min} dk geçti",
+  "phone_size": "{mb} MB"
 }

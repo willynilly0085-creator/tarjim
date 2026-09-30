@@ -349,8 +349,10 @@
   "phoneReadyButton": "Pair your phone",
   "phone_choose": "What should I make of this video?",
   "phone_choice_expired": "This choice has expired. Send the link again.",
-  "phone_preparing": "Preparing a copy for your phone…",
-  "phone_sending": "Sending to your phone ({mb} MB)…",
   "phone_sent": "Sent to your phone",
-  "phone_send_failed": "I could not send the video, so here is the subtitle file. The full video is in your computer's Downloads folder."
+  "phone_send_failed": "I could not send the video, so here is the subtitle file. The full video is in your computer's Downloads folder.",
+  "phone_step_prepare": "Preparing a phone copy",
+  "phone_step_send": "Sending to your phone",
+  "phone_elapsed": "{min} min so far",
+  "phone_size": "{mb} MB"
 }

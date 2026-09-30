@@ -45,8 +45,9 @@ class FakeJobs:
 
     def submit(self, order: Any) -> Any:
         self.orders.append(order)
-        view = {"title": order.source, "mode": order.mode, "stage": "queued", "paused": False}
-        return SimpleNamespace(id="a" * 12, finished=False, view=lambda: view)
+        view = {"title": order.source, "mode": order.mode, "stage": "queued", "paused": False,
+                "link": True, "created": 0.0}
+        return SimpleNamespace(id="a" * 12, stage="queued", finished=False, view=lambda: view)
 
     def get(self, _task_id: str) -> None:
         return None
@@ -207,9 +208,10 @@ class Uploads(FakeBot):
         self.sent.append(path.name)
 
 
-def finished(outputs: list[Path], mode: str) -> Any:
-    view = {"title": "clip", "mode": mode, "stage": "done", "paused": False}
-    return SimpleNamespace(stage="done", error_code="", outputs=outputs, view=lambda: view,
+def job(stage: str, mode: str, outputs: list[Path] | None = None, link: bool = True) -> Any:
+    view = {"title": "clip", "mode": mode, "stage": stage, "paused": False, "link": link,
+            "created": 0.0}
+    return SimpleNamespace(stage=stage, error_code="", outputs=outputs or [], view=lambda: view,
                            order=SimpleNamespace(mode=mode))
 
 
@@ -225,7 +227,24 @@ def test_each_sending_step_shows_and_a_failed_upload_is_retried_then_reported(
     video.write_bytes(b"x" * 1000)
     subtitles.write_text("1", encoding="utf-8")
     bot = Uploads(failures)
-    sender.Sender(bot, OWNER, 7, finished([video, subtitles], "burn")).deliver()  # type: ignore[arg-type]
+    sender.Sender(bot, OWNER, 7, job("done", "burn", [video, subtitles])).deliver()  # type: ignore[arg-type]
     shown = [text for _chat, text in bot.said]
-    assert bot.sent == sent and shown[-1].endswith(say(last))
-    assert any(say("phone_sending", mb=1) in text for text in shown)
+    assert bot.sent == sent and say(last) in shown[-1]
+    assert any(f"● {say('phone_step_send')} ({say('phone_size', mb=1)})" in text for text in shown)
+
+
+def marks(text: str) -> list[str]:
+    return [line[0] for line in text.splitlines() if line[:1] in "✓●○✕"]
+
+
+def test_the_message_lists_every_step_with_what_is_done_now_and_left() -> None:
+    from tarjim.phone.checklist import checklist
+
+    dub = checklist(job("translating", "dub-clone"), "translating")
+    assert marks(dub) == ["✓", "✓", "✓", "●", "○", "○", "○", "○", "○"]
+    assert dub.splitlines()[-1] == say("phone_elapsed", min=int(__import__("time").time() // 60))
+    assert marks(checklist(job("hearing", "srt", link=False), "hearing")) == ["●", "○", "○", "○",
+                                                                                "○"]
+    stopped = checklist(job("failed", "burn"), "translating").splitlines()
+    assert f"✕ {say('stage_translating')}" in stopped and stopped[-1] == say("stage_failed")
+    assert marks(checklist(job("done", "burn"), "sent")) == ["✓"] * 8

@@ -349,8 +349,10 @@
   "phoneReadyButton": "配对手机",
   "phone_choose": "这个视频要怎么处理？",
   "phone_choice_expired": "这个选择已过期。请重新发送链接。",
-  "phone_preparing": "正在为手机准备副本…",
-  "phone_sending": "正在发送到手机（{mb} MB）…",
   "phone_sent": "已发送到手机",
-  "phone_send_failed": "视频没能发送，先发给你字幕文件。完整视频在电脑的“下载”文件夹里。"
+  "phone_send_failed": "视频没能发送，先发给你字幕文件。完整视频在电脑的“下载”文件夹里。",
+  "phone_step_prepare": "为手机准备副本",
+  "phone_step_send": "发送到手机",
+  "phone_elapsed": "已用 {min} 分钟",
+  "phone_size": "{mb} MB"
 }
