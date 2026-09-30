@@ -346,5 +346,11 @@
   "phone_cmd_mode": "选择我发回什么",
   "phone_cmd_help": "使用方法",
   "phoneReadyHint": "想从手机发送链接？把它和你自己的 Telegram 机器人配对，随时随地收到翻译。",
-  "phoneReadyButton": "配对手机"
+  "phoneReadyButton": "配对手机",
+  "phone_choose": "这个视频要怎么处理？",
+  "phone_choice_expired": "这个选择已过期。请重新发送链接。",
+  "phone_preparing": "正在为手机准备副本…",
+  "phone_sending": "正在发送到手机（{mb} MB）…",
+  "phone_sent": "已发送到手机",
+  "phone_send_failed": "视频没能发送，先发给你字幕文件。完整视频在电脑的“下载”文件夹里。"
 }

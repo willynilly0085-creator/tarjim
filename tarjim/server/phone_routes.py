@@ -3,7 +3,7 @@ from typing import Any
 
 from tarjim.config import save
 from tarjim.languages import LANGUAGES
-from tarjim.phone.bot import MODES
+from tarjim.phone.choice import MODES
 from tarjim.phone.service import service
 from tarjim.translate.prompt import DIALECTS
 

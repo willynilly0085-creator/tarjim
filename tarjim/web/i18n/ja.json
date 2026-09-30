@@ -346,5 +346,11 @@
   "phone_cmd_mode": "送り返すものを選ぶ",
   "phone_cmd_help": "使い方",
   "phoneReadyHint": "スマートフォンからリンクを送りたいですか？自分専用の Telegram ボットとペアリングすれば、どこにいても翻訳が届きます。",
-  "phoneReadyButton": "スマートフォンをペアリング"
+  "phoneReadyButton": "スマートフォンをペアリング",
+  "phone_choose": "この動画をどうしますか？",
+  "phone_choice_expired": "この選択は期限切れです。リンクをもう一度送ってください。",
+  "phone_preparing": "スマートフォン用のコピーを準備中…",
+  "phone_sending": "スマートフォンに送信中（{mb} MB）…",
+  "phone_sent": "スマートフォンに送信しました",
+  "phone_send_failed": "動画を送信できなかったため、字幕ファイルを送りました。動画はコンピューターのダウンロードフォルダーにあります。"
 }

@@ -346,5 +346,11 @@
   "phone_cmd_mode": "Pilih yang kukirim balik",
   "phone_cmd_help": "Cara memakaiku",
   "phoneReadyHint": "Ingin mengirim tautan dari ponsel? Pasangkan dengan bot Telegram milikmu sendiri dan terima terjemahan di mana saja.",
-  "phoneReadyButton": "Pasangkan ponsel"
+  "phoneReadyButton": "Pasangkan ponsel",
+  "phone_choose": "Mau dibuat apa video ini?",
+  "phone_choice_expired": "Pilihan ini sudah kedaluwarsa. Kirim tautannya lagi.",
+  "phone_preparing": "Menyiapkan salinan untuk ponselmu…",
+  "phone_sending": "Mengirim ke ponselmu ({mb} MB)…",
+  "phone_sent": "Terkirim ke ponselmu",
+  "phone_send_failed": "Video tidak bisa dikirim, jadi ini file subtitelnya. Video lengkap ada di folder Unduhan komputermu."
 }

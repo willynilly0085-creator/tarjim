@@ -9,6 +9,8 @@ TOKEN_SHAPE = re.compile(r"^\d{5,12}:[\w-]{30,50}$")
 WAIT_SECONDS = 50
 SEND_LIMIT = 50 * 1024 * 1024
 FETCH_LIMIT = 20 * 1024 * 1024
+UPLOAD_SECONDS = 600
+SLOWEST_UPLOAD = 30_000
 
 
 class TelegramError(RuntimeError):
@@ -60,8 +62,9 @@ class Bot:
 
     def send_file(self, chat: int, path: Path, video: bool) -> None:
         method, field = ("sendVideo", "video") if video else ("sendDocument", "document")
+        wait = max(UPLOAD_SECONDS, path.stat().st_size / SLOWEST_UPLOAD)
         with path.open("rb") as handle:
-            self.call(method, files={field: (path.name, handle)}, wait=600, chat_id=chat,
+            self.call(method, files={field: (path.name, handle)}, wait=wait, chat_id=chat,
                       supports_streaming="true" if video else "false")
 
     def fetch(self, file_id: str, target: Path) -> None:

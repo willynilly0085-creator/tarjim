@@ -1,4 +1,5 @@
 """The Telegram bot: who it answers, what it accepts, what it sends back."""
+import json
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -10,6 +11,7 @@ from tarjim.phone import bot as inbox_module
 from tarjim.phone import delivery, links, telegram
 from tarjim.phone.bot import Inbox, Pairing
 from tarjim.phone.progress import Follower
+from tarjim.phone.words import say
 
 OWNER, STRANGER = 111, 222
 
@@ -18,9 +20,12 @@ class FakeBot:
     def __init__(self) -> None:
         self.said: list[tuple[int, str]] = []
         self.calls: list[str] = []
+        self.keyboards: list[dict[str, Any]] = []
 
-    def say(self, chat: int, text: str, **_extra: Any) -> int:
+    def say(self, chat: int, text: str, **extra: Any) -> int:
         self.said.append((chat, text))
+        if "reply_markup" in extra:
+            self.keyboards.append(json.loads(extra["reply_markup"]))
         return len(self.said)
 
     def edit(self, chat: int, _message: int, text: str, **_extra: Any) -> None:
@@ -86,16 +91,32 @@ def test_an_expired_code_does_not_pair(home: Path, monkeypatch: pytest.MonkeyPat
     assert not config.setting("phone_chat")
 
 
-def test_links_from_the_owner_start_jobs_with_the_phone_choices(home: Path) -> None:
+def tap(inbox: Inbox, bot: FakeBot, mode: str, chat: int = OWNER) -> None:
+    buttons = [b for row in bot.keyboards[-1]["inline_keyboard"] for b in row]
+    data = next(b["callback_data"] for b in buttons if b["callback_data"].startswith(f"go:{mode}:"))
+    inbox.handle(bot, {"callback_query": {"id": "q", "data": data,
+                                          "message": {"chat": {"id": chat}, "message_id": 9}}})
+
+
+def test_a_link_asks_what_to_make_and_starts_on_the_tap(home: Path) -> None:
     inbox, bot, jobs, _pairing = setup_inbox(home)
     config.save("phone_chat", str(OWNER))
-    config.save("phone_mode", "dub-clone")
+    config.save("phone_mode", "srt")
     config.save("phone_target", "fr")
     inbox.handle(bot, message(STRANGER, "https://youtu.be/abc"))
     inbox.handle(bot, message(OWNER, "https://youtu.be/abc", kind="group"))
     inbox.handle(bot, message(OWNER, "look (https://youtu.be/abc)."))
+    assert jobs.orders == [] and len(bot.keyboards) == 1
+    first = bot.keyboards[0]["inline_keyboard"][0][0]
+    assert first["callback_data"].startswith("go:srt:") and first["text"].startswith("✓")
+    tap(inbox, bot, "dub-clone", chat=STRANGER)
+    assert jobs.orders == []
+    tap(inbox, bot, "dub-clone")
     assert [(o.source, o.mode, o.target) for o in jobs.orders] == [
         ("https://youtu.be/abc", "dub-clone", "fr")]
+    assert config.setting("phone_mode") == "dub-clone"
+    tap(inbox, bot, "burn")
+    assert len(jobs.orders) == 1 and bot.said[-1][1] == say("phone_choice_expired")
 
 
 def test_a_small_video_is_taken_and_a_large_one_is_refused(home: Path) -> None:
@@ -104,7 +125,9 @@ def test_a_small_video_is_taken_and_a_large_one_is_refused(home: Path) -> None:
     small = {"file_id": "f1", "file_size": 1000, "mime_type": "video/mp4", "file_name": "a b.mp4"}
     big = {**small, "file_size": telegram.FETCH_LIMIT + 1}
     inbox.handle(bot, message(OWNER, video=big))
+    assert bot.keyboards == []
     inbox.handle(bot, message(OWNER, video=small))
+    tap(inbox, bot, "burn")
     assert len(jobs.orders) == 1 and Path(jobs.orders[0].source).read_bytes() == b"video"
     assert Path(jobs.orders[0].source).name == "a_b.mp4"
 
@@ -170,3 +193,39 @@ def test_the_file_sent_back_matches_what_was_asked() -> None:
     assert delivery.chosen_output(outputs, "burn") == Path("v.ar.mp4")
     assert delivery.chosen_output(outputs, "srt") == Path("v.ar.srt")
     assert delivery.video_kbps(60) > 5000 and delivery.video_kbps(3 * 3600) < 250
+
+
+class Uploads(FakeBot):
+    def __init__(self, failures: int) -> None:
+        super().__init__()
+        self.failures, self.sent = failures, []
+
+    def send_file(self, _chat: int, path: Path, video: bool) -> None:
+        if self.failures:
+            self.failures -= 1
+            raise telegram.TelegramError("Request Entity Too Large", 413)
+        self.sent.append(path.name)
+
+
+def finished(outputs: list[Path], mode: str) -> Any:
+    view = {"title": "clip", "mode": mode, "stage": "done", "paused": False}
+    return SimpleNamespace(stage="done", error_code="", outputs=outputs, view=lambda: view,
+                           order=SimpleNamespace(mode=mode))
+
+
+@pytest.mark.parametrize("case", [(2, ["v.ar.mp4"], "phone_sent"),
+                                  (3, ["v.ar.srt"], "phone_send_failed")])
+def test_each_sending_step_shows_and_a_failed_upload_is_retried_then_reported(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: tuple[int, list[str], str]) -> None:
+    from tarjim.phone import sender
+
+    failures, sent, last = case
+    monkeypatch.setattr(sender.time, "sleep", lambda _s: None)
+    video, subtitles = tmp_path / "v.ar.mp4", tmp_path / "v.ar.srt"
+    video.write_bytes(b"x" * 1000)
+    subtitles.write_text("1", encoding="utf-8")
+    bot = Uploads(failures)
+    sender.Sender(bot, OWNER, 7, finished([video, subtitles], "burn")).deliver()  # type: ignore[arg-type]
+    shown = [text for _chat, text in bot.said]
+    assert bot.sent == sent and shown[-1].endswith(say(last))
+    assert any(say("phone_sending", mb=1) in text for text in shown)

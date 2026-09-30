@@ -346,5 +346,11 @@
   "phone_cmd_mode": "돌려받을 것 고르기",
   "phone_cmd_help": "사용 방법",
   "phoneReadyHint": "휴대폰에서 링크를 보내고 싶으세요? 나만의 Telegram 봇과 연결하면 어디서든 번역을 받을 수 있어요.",
-  "phoneReadyButton": "휴대폰 연결"
+  "phoneReadyButton": "휴대폰 연결",
+  "phone_choose": "이 영상을 어떻게 할까요?",
+  "phone_choice_expired": "이 선택은 만료되었어요. 링크를 다시 보내 주세요.",
+  "phone_preparing": "휴대폰용 사본을 준비하는 중…",
+  "phone_sending": "휴대폰으로 보내는 중 ({mb} MB)…",
+  "phone_sent": "휴대폰으로 보냈어요",
+  "phone_send_failed": "영상을 보내지 못해 자막 파일을 보냈어요. 전체 영상은 컴퓨터의 다운로드 폴더에 있어요."
 }

@@ -1,12 +1,10 @@
 """Keep one message per job up to date with its stage, and send the result when it is ready."""
 import json
 import threading
-import time
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Protocol
 
-from tarjim.phone.delivery import chosen_output, fitting
+from tarjim.phone.sender import Sender
 from tarjim.phone.telegram import Bot, TelegramError
 from tarjim.phone.words import result_name, say
 
@@ -43,9 +41,10 @@ class Follower:
         self.watching: dict[str, Watch] = {}
         self.lock = threading.Lock()
 
-    def watch(self, bot: Bot, chat: int, task: Any) -> None:
+    def adopt(self, bot: Bot, chat: int, message: int, task: Any) -> None:
+        """Turn the question message into this job's status message."""
         text = status_text(task)
-        message = bot.say(chat, text, reply_markup=cancel_button(task.id))
+        bot.edit(chat, message, text, reply_markup=cancel_button(task.id))
         with self.lock:
             self.watching[task.id] = Watch(chat, message, text)
 
@@ -66,7 +65,7 @@ class Follower:
             self.refresh(bot, task, watch)
             if task.finished:
                 self.forget(task_id)
-                threading.Thread(target=deliver, args=(bot, watch.chat, task), daemon=True).start()
+                threading.Thread(target=deliver, args=(bot, watch, task), daemon=True).start()
 
     def refresh(self, bot: Bot, task: Any, watch: Watch) -> None:
         text = status_text(task)
@@ -84,28 +83,5 @@ class Follower:
             self.watching.pop(task_id, None)
 
 
-def deliver(bot: Bot, chat: int, task: Any) -> None:
-    try:
-        if task.stage == "failed":
-            bot.say(chat, say(f"err_{task.error_code or 'unknown'}"))
-        elif task.stage == "done":
-            send_result(bot, chat, list(task.outputs), task.order.mode)
-    except TelegramError:
-        time.sleep(TICK)
-
-
-def send_result(bot: Bot, chat: int, outputs: list[Path], mode: str) -> None:
-    wanted = chosen_output(outputs, mode)
-    if wanted is None:
-        bot.say(chat, say("err_unknown"))
-        return
-    ready, changed = fitting(wanted)
-    if ready is not None:
-        bot.send_file(chat, ready, video=ready.suffix == ".mp4")
-        if changed and ready != wanted:
-            ready.unlink(missing_ok=True)
-        return
-    subtitles = chosen_output(outputs, "srt")
-    if subtitles is not None:
-        bot.send_file(chat, subtitles, video=False)
-    bot.say(chat, say("phone_too_big"))
+def deliver(bot: Bot, watch: Watch, task: Any) -> None:
+    Sender(bot, watch.chat, watch.message, task).deliver()

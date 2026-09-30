@@ -346,5 +346,11 @@
   "phone_cmd_mode": "Elegir qué te devuelvo",
   "phone_cmd_help": "Cómo usarme",
   "phoneReadyHint": "¿Quieres enviar enlaces desde tu teléfono? Vincúlalo con tu propio bot de Telegram y recibe las traducciones donde estés.",
-  "phoneReadyButton": "Vincular tu teléfono"
+  "phoneReadyButton": "Vincular tu teléfono",
+  "phone_choose": "¿Qué hago con este video?",
+  "phone_choice_expired": "Esta opción caducó. Envía el enlace otra vez.",
+  "phone_preparing": "Preparando una copia para tu teléfono…",
+  "phone_sending": "Enviando a tu teléfono ({mb} MB)…",
+  "phone_sent": "Enviado a tu teléfono",
+  "phone_send_failed": "No pude enviar el video, así que aquí tienes el archivo de subtítulos. El video completo está en la carpeta Descargas de tu ordenador."
 }
