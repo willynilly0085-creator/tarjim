@@ -38,6 +38,36 @@ gömer, bir `.srt` dosyası yazar ya da videoyu her konuşmacı için ayrı bir 
 Bir sağlayıcının sunduğu herhangi bir modeli seçin. Seçilen motor başarısız olursa ya da kotası
 biterse, tarjim varsa yerel motora geçer.
 
+## Bilgisayarınızın neye ihtiyacı var
+
+Ağır işler isteğe bağlıdır. Neye ihtiyacınız olduğu, hangi parçaların kendi bilgisayarınızda
+çalıştığına bağlıdır:
+
+| Ne kullandığınız | Ekran kartı | Bellek (RAM) | Boş disk alanı |
+|---|---|---|---|
+| Bağladığınız bir yapay zekâyla altyazı (bir Gemini anahtarı, bir Claude veya ChatGPT aboneliği, herhangi bir API anahtarı) | Gerekmez | 8 GB | yaklaşık 6 GB |
+| Doğal veya stüdyo seslerle seslendirme | Gerekmez | 8 GB | ek alan gerekmez |
+| Bu bilgisayarda dinleme (ses bilgisayardan asla çıkmaz) | NVIDIA, 8 GB | 16 GB | 6.3 GB daha |
+| Bu bilgisayarda çeviri (Ollama ile aya-expanse 8B) | 8 GB | 16 GB | 5.1 GB daha |
+| Her konuşmacının kendi sesiyle seslendirme | NVIDIA, 8 GB | 16 GB | 4.7 GB daha |
+
+- **Sistem:** Windows 10 veya 11, 64 bit. macOS ve Linux aynı kodu çalıştırır ama henüz test
+  edilmedi.
+- **İnternet:** indirmeler ve bağladığınız yapay zekâ için. Dinleme ve çeviri bu bilgisayarda
+  yapılıyorsa, her şey indirildikten sonra işler çevrimdışı çalışır.
+- **NVIDIA kartı yoksa** her şey yine de işlemci üzerinde çalışır, yalnızca çok daha yavaş;
+  konuşmacının kendi sesiyle seslendirme orada pratik değildir.
+- **Aynı anda tek model:** tarjim, bir sonraki model yüklenmeden önce her modeli boşaltır; bu yüzden
+  ekran kartında tüm modellere birlikte değil, yalnızca en büyüğüne (yaklaşık 6 GB) yetecek yer
+  olması gerekir.
+- **Her şey bu bilgisayarda:** yaklaşık 22 GB disk.
+
+Windows 11 üzerinde, RTX 5080 (16 GB) ve 32 GB RAM ile ölçüldü: kartta dinleme en fazla 5.9 GB ekran
+belleği kullandı, aya-expanse 8B ile çeviri 5.7 GB, konuşmacının kendi sesi ise 6.1 GB; cümle başına
+yaklaşık 3 saniye sürdü. Konuşmacı sesi modelini yüklemek, 2.5 GB düzeyine inmeden önce kısa
+süreliğine yaklaşık 11 GB RAM kullanır; 16 GB istenmesinin nedeni budur. Motorun kendisi (Python ile
+PyTorch'un ekran kartı sürümü) yukarıdaki disk rakamlarının içinde yaklaşık 4 GB yer tutar.
+
 ## Yapay zekânızla kurun (tek adım)
 
 Claude Code'da:
@@ -67,7 +97,7 @@ kullanın.
 
 ## Elle kurulum (Windows)
 
-Python 3.11 ve yerel modeller için yaklaşık 10 GB disk alanı gerekir.
+Python 3.11 gerekir. Disk, bellek ve ekran kartı için bkz. [Bilgisayarınızın neye ihtiyacı var](#bilgisayarınızın-neye-ihtiyacı-var).
 
 ```powershell
 git clone https://github.com/willynilly0085-creator/tarjim
@@ -109,6 +139,19 @@ zekânız tüm aracı sizin için çalıştırabilir:
 - bitmiş altyazıları size okumak, başarısız bir işi yeniden denemek ya da eksik bir aracı indirmek.
 
 Anahtarlar hiçbir zaman sohbet üzerinden girilmez; bunun için yapay zekâ tarjim sayfasını açar.
+
+### Telefon
+
+Kendi Telegram botunuza herhangi bir telefondan, iPhone ya da Android, evde veya dışarıda bir
+video bağlantısı gönderin; çevrilmiş video aynı sohbette size geri gelir. Ayarlar'da **Telefon**
+bölümünü açın: BotFather'da bir bot oluşturun (`/newbot`), belirtecini (token) yapıştırın
+(bilgisayarınızın kasasında kalır), ardından QR kodunu telefonunuzla tarayın ve **Başlat**
+düğmesine basın. Bot yalnızca sizin hesabınıza yanıt verir ve yeni mesajları Telegram'dan
+bilgisayarınız kendisi sorar; bu yüzden internete hiçbir port açılmaz. Dil, sonuç ve stil
+Ayarlar'dan gelir; bottaki `/mode` sonucu değiştirir. Telegram, botların 20 MB'a kadar video
+indirmesine ve 50 MB'a kadar dosya göndermesine izin verir: daha büyük bir sonuç sığması için
+yeniden kodlanır ya da altyazı dosyasını alırsınız ve videonun tamamı bilgisayarınızda kalır.
+Bot, bilgisayarınız ve tarjim çalıştığı sürece yanıt verir.
 
 ### Komut satırı
 
@@ -153,8 +196,10 @@ Kurulum sayfası her lisansı ilgili indirmenin yanında gösterir.
 Windows 11'de bir RTX 5080 ile ve ekran kartı desteği olmayan temiz bir kurulumda test edildi:
 bağlantılar ve dosyalar, gömülü altyazılar ve `.srt`, Fransızca ve Arapça, duraklatma, sürdürme,
 iptal ve yeniden deneme, üç bağlanma yolu (Claude ve ChatGPT abonelikleri, yerel Ollama), sohbet
-araçları ve yukarıdaki güvenlik denetimleri. Henüz test edilmedi: macOS, Linux, GitHub Copilot ve
-Antigravity abonelikleri.
+araçları, konuşmacının kendi sesiyle seslendirme (İngilizceden Suudi Arapçasına) ve yukarıdaki
+güvenlik denetimleri. Henüz test edilmedi: macOS, Linux, GitHub Copilot ve Antigravity
+abonelikleri ile telefon botunun gerçek Telegram hizmetiyle çalışması (kodu, simüle edilmiş bir
+Telegram ile yapılan testlerle kapsanıyor).
 
 ## Lisans
 

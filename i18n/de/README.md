@@ -41,6 +41,36 @@ Wählen Sie ein beliebiges Modell, das ein Anbieter bereitstellt. Wenn die gewä
 oder ihr Kontingent aufgebraucht ist, weicht tarjim auf die lokale Engine aus, sofern eine
 verfügbar ist.
 
+## Was Ihr Computer braucht
+
+Die aufwendigen Teile sind optional. Was Sie brauchen, hängt davon ab, welche Teile auf Ihrem
+eigenen Computer laufen:
+
+| Was Sie nutzen | Grafikkarte | Arbeitsspeicher (RAM) | Freier Speicherplatz |
+|---|---|---|---|
+| Untertitel mit einer KI, die Sie anbinden (ein Gemini-Schlüssel, ein Claude- oder ChatGPT-Abonnement, jeder API-Schlüssel) | Nicht nötig | 8 GB | etwa 6 GB |
+| Synchronisation mit natürlichen oder Studiostimmen | Nicht nötig | 8 GB | nichts zusätzlich |
+| Zuhören auf diesem Computer (der Ton verlässt ihn nie) | NVIDIA, 8 GB | 16 GB | 6.3 GB mehr |
+| Übersetzen auf diesem Computer (Ollama mit aya-expanse 8B) | 8 GB | 16 GB | 5.1 GB mehr |
+| Synchronisation mit der eigenen Stimme jedes Sprechers | NVIDIA, 8 GB | 16 GB | 4.7 GB mehr |
+
+- **System:** Windows 10 oder 11, 64 Bit. macOS und Linux führen denselben Code aus, wurden aber
+  noch nicht getestet.
+- **Internet:** für die Downloads und für die KI, die Sie anbinden. Wenn Zuhören und Übersetzen auf
+  diesem Computer laufen, arbeiten die Aufträge offline, sobald alles heruntergeladen ist.
+- **Ohne NVIDIA-Karte** funktioniert trotzdem alles auf dem Prozessor, nur deutlich langsamer; die
+  Synchronisation mit der eigenen Stimme des Sprechers ist dort nicht praktikabel.
+- **Ein Modell nach dem anderen:** tarjim gibt jedes Modell frei, bevor das nächste geladen wird.
+  Die Grafikkarte braucht daher Platz für das größte (etwa 6 GB), nicht für alle zusammen.
+- **Alles auf diesem Computer:** etwa 22 GB Speicherplatz.
+
+Gemessen unter Windows 11 mit einer RTX 5080 (16 GB) und 32 GB RAM: Das Zuhören auf der Karte
+erreichte höchstens 5.9 GB Grafikspeicher, das Übersetzen mit aya-expanse 8B 5.7 GB und die eigene
+Stimme des Sprechers 6.1 GB, bei etwa 3 Sekunden pro Satz. Beim Laden des Modells für die
+Sprecherstimme werden kurzzeitig etwa 11 GB RAM belegt, bevor es sich bei 2.5 GB einpendelt; deshalb
+werden 16 GB verlangt. Die Engine selbst (Python mit der Grafikkarten-Variante von PyTorch) belegt
+etwa 4 GB der oben genannten Speicherplatzwerte.
+
 ## Installation mit Ihrer KI (ein Schritt)
 
 In Claude Code:
@@ -72,7 +102,7 @@ verwenden Sie für ChatGPT daher Codex.
 
 ## Manuelle Installation (Windows)
 
-Benötigt Python 3.11 und etwa 10 GB Speicherplatz für die lokalen Modelle.
+Benötigt Python 3.11. Speicherplatz, Arbeitsspeicher und Grafikkarte: siehe [Was Ihr Computer braucht](#was-ihr-computer-braucht).
 
 ```powershell
 git clone https://github.com/willynilly0085-creator/tarjim
@@ -117,6 +147,20 @@ das gesamte Werkzeug für Sie bedienen:
   fehlendes Werkzeug herunterladen.
 
 Schlüssel werden nie über den Chat eingegeben; die KI öffnet dafür die tarjim-Seite.
+
+### Handy
+
+Schicken Sie von einem beliebigen Handy, iPhone oder Android, zu Hause oder unterwegs, einen
+Videolink an Ihren eigenen Telegram-Bot, und das übersetzte Video kommt im selben Chat zurück.
+Öffnen Sie in den Einstellungen **Handy**: Erstellen Sie in BotFather einen Bot (`/newbot`),
+fügen Sie dessen Token ein (es bleibt im Tresor Ihres Computers), scannen Sie dann den QR-Code
+mit Ihrem Handy und tippen Sie auf **Starten**. Der Bot antwortet nur Ihrem Konto, und Ihr
+Computer fragt bei Telegram selbst nach neuen Nachrichten, sodass kein Port zum Internet
+geöffnet wird. Sprache, Ergebnis und Stil kommen aus den Einstellungen; mit `/mode` im Bot
+ändern Sie das Ergebnis. Telegram erlaubt Bots, Videos bis 20 MB herunterzuladen und Dateien bis
+50 MB zu senden: Ein größeres Ergebnis wird passend neu kodiert, oder Sie erhalten die
+Untertiteldatei, und das vollständige Video bleibt auf Ihrem Computer. Der Bot antwortet,
+solange Ihr Computer und tarjim laufen.
 
 ### Kommandozeile
 
@@ -163,9 +207,11 @@ Die Einrichtungsseite zeigt jede Lizenz neben dem zugehörigen Download an.
 Getestet unter Windows 11 mit einer RTX 5080 sowie mit einer Neuinstallation ohne
 Grafikunterstützung: Links und Dateien, eingebrannte Untertitel und `.srt`, Französisch und
 Arabisch, Pausieren, Fortsetzen, Abbrechen und Wiederholen, die drei Anbindungswege (Claude- und
-ChatGPT-Abonnements, lokales Ollama), die Chat-Werkzeuge und die oben genannten
-Sicherheitsprüfungen. Noch nicht getestet: macOS, Linux sowie Abonnements von GitHub Copilot und
-Antigravity.
+ChatGPT-Abonnements, lokales Ollama), die Chat-Werkzeuge, die Synchronisation mit der eigenen
+Stimme des Sprechers (Englisch in saudisches Arabisch) und die oben genannten
+Sicherheitsprüfungen. Noch nicht getestet: macOS, Linux, Abonnements von GitHub Copilot und
+Antigravity sowie der Handy-Bot mit dem echten Telegram-Dienst (sein Code ist durch Tests mit
+einem simulierten Telegram abgedeckt).
 
 ## Lizenz
 

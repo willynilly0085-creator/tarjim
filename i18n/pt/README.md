@@ -38,6 +38,36 @@ gera um `.srt` ou faz a dublagem com uma voz para cada locutor.
 Escolha qualquer modelo que um provedor ofereça. Se o mecanismo escolhido falhar ou esgotar a
 cota, o tarjim recorre ao mecanismo local quando houver um disponível.
 
+## O que o seu computador precisa
+
+As partes pesadas são opcionais. O que você precisa depende de quais partes são executadas no seu
+próprio computador:
+
+| O que você usa | Placa de vídeo | Memória (RAM) | Disco livre |
+|---|---|---|---|
+| Legendas com uma IA que você conecta (uma chave do Gemini, uma assinatura do Claude ou do ChatGPT, qualquer chave de API) | Não é necessária | 8 GB | cerca de 6 GB |
+| Dublagem com vozes naturais ou de estúdio | Não é necessária | 8 GB | nada extra |
+| Escuta neste computador (o áudio nunca sai dele) | NVIDIA, 8 GB | 16 GB | 6.3 GB a mais |
+| Tradução neste computador (Ollama com aya-expanse 8B) | 8 GB | 16 GB | 5.1 GB a mais |
+| Dublagem com a voz própria de cada locutor | NVIDIA, 8 GB | 16 GB | 4.7 GB a mais |
+
+- **Sistema:** Windows 10 ou 11, 64 bits. macOS e Linux executam o mesmo código, mas ainda não foram
+  testados.
+- **Internet:** para os downloads e para a IA que você conecta. Com a escuta e a tradução neste
+  computador, os trabalhos rodam offline depois que tudo foi baixado.
+- **Sem uma placa NVIDIA**, tudo continua funcionando no processador, só que bem mais devagar; a
+  dublagem com a voz própria do locutor não é prática nesse caso.
+- **Um modelo por vez:** o tarjim libera cada modelo antes de carregar o próximo, então a placa de
+  vídeo precisa de espaço para o maior (cerca de 6 GB), não para todos juntos.
+- **Tudo neste computador:** cerca de 22 GB de disco.
+
+Medido no Windows 11 com uma RTX 5080 (16 GB) e 32 GB de RAM: a escuta na placa chegou ao pico de
+5.9 GB de memória de vídeo, a tradução com aya-expanse 8B a 5.7 GB e a voz própria do locutor a 6.1
+GB, com cerca de 3 segundos por frase. Carregar o modelo da voz do locutor ocupa por pouco tempo
+cerca de 11 GB de RAM antes de se estabilizar em 2.5 GB, e é por isso que ele pede 16 GB. O motor em
+si (Python com a versão do PyTorch para placa de vídeo) ocupa cerca de 4 GB dos valores de disco
+acima.
+
 ## Instalação com a sua IA (um passo)
 
 No Claude Code:
@@ -68,7 +98,7 @@ ChatGPT.
 
 ## Instalação manual (Windows)
 
-Requer Python 3.11 e cerca de 10 GB de disco para os modelos locais.
+Requer Python 3.11. Disco, memória e placa de vídeo: veja [O que o seu computador precisa](#o-que-o-seu-computador-precisa).
 
 ```powershell
 git clone https://github.com/willynilly0085-creator/tarjim
@@ -110,6 +140,19 @@ operar a ferramenta inteira por você:
 - ler para você as legendas prontas, tentar de novo uma tarefa que falhou ou baixar uma ferramenta que esteja faltando.
 
 As chaves nunca são digitadas pelo chat; para isso, a IA abre a página do tarjim.
+
+### Celular
+
+Envie um link de vídeo para o seu próprio bot do Telegram de qualquer celular, iPhone ou Android,
+em casa ou fora, e o vídeo traduzido volta no mesmo chat. Em Configurações, abra **Celular**:
+crie um bot no BotFather (`/newbot`), cole o token dele (que fica no cofre do seu computador),
+depois escaneie o código QR com o celular e toque em **Iniciar**. O bot responde apenas à sua
+conta, e é o seu computador que pergunta ao Telegram por novas mensagens, então nenhuma porta é
+aberta para a internet. O idioma, o resultado e o estilo vêm de Configurações; `/mode` no bot
+muda o resultado. O Telegram permite que bots baixem vídeos de até 20 MB e enviem arquivos de até
+50 MB: um resultado maior é recodificado para caber, ou você recebe o arquivo de legendas e o
+vídeo completo continua no seu computador. O bot responde enquanto o seu computador e o tarjim
+estiverem em execução.
 
 ### Linha de comando
 
@@ -155,8 +198,10 @@ A página de configuração mostra cada licença ao lado do respectivo download.
 Testado no Windows 11 com uma RTX 5080 e a partir de uma instalação limpa sem suporte gráfico:
 links e arquivos, legendas gravadas e `.srt`, francês e árabe, pausar, retomar, cancelar e tentar
 de novo, as três formas de conexão (assinaturas do Claude e do ChatGPT, Ollama local), as
-ferramentas de chat e as verificações de segurança acima. Ainda não testado: macOS, Linux e as
-assinaturas do GitHub Copilot e do Antigravity.
+ferramentas de chat, a dublagem com a voz própria do locutor (do inglês para o árabe saudita) e
+as verificações de segurança acima. Ainda não testado: macOS, Linux, as assinaturas do GitHub
+Copilot e do Antigravity e o bot do celular com o serviço real do Telegram (o código dele é
+coberto por testes com um Telegram simulado).
 
 ## Licença
 

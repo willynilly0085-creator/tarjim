@@ -36,6 +36,36 @@ untuk setiap pembicara.
 Pilih model apa pun yang ditawarkan penyedia. Jika mesin yang dipilih gagal atau kuotanya habis, tarjim
 beralih ke mesin lokal bila tersedia.
 
+## Kebutuhan komputer Anda
+
+Bagian yang berat bersifat opsional. Kebutuhan Anda bergantung pada bagian mana yang berjalan di
+komputer Anda sendiri:
+
+| Yang Anda gunakan | Kartu grafis | Memori (RAM) | Disk kosong |
+|---|---|---|---|
+| Subtitle dengan AI yang Anda hubungkan (kunci Gemini, langganan Claude atau ChatGPT, kunci API apa pun) | Tidak perlu | 8 GB | sekitar 6 GB |
+| Sulih suara dengan suara alami atau suara studio | Tidak perlu | 8 GB | tidak ada tambahan |
+| Mendengarkan di komputer ini (audio tidak pernah keluar dari komputer) | NVIDIA, 8 GB | 16 GB | 6.3 GB tambahan |
+| Menerjemahkan di komputer ini (Ollama dengan aya-expanse 8B) | 8 GB | 16 GB | 5.1 GB tambahan |
+| Sulih suara dengan suara asli tiap pembicara | NVIDIA, 8 GB | 16 GB | 4.7 GB tambahan |
+
+- **Sistem:** Windows 10 atau 11, 64-bit. macOS dan Linux menjalankan kode yang sama tetapi belum
+  diuji.
+- **Internet:** untuk unduhan dan untuk AI yang Anda hubungkan. Jika mendengarkan dan menerjemahkan
+  dijalankan di komputer ini, pekerjaan berjalan secara offline setelah semuanya diunduh.
+- **Tanpa kartu NVIDIA** semuanya tetap berfungsi di prosesor, hanya jauh lebih lambat; sulih suara
+  dengan suara asli pembicara tidak praktis di sana.
+- **Satu model dalam satu waktu:** tarjim membebaskan setiap model sebelum model berikutnya dimuat,
+  sehingga kartu grafis hanya perlu ruang untuk model terbesar (sekitar 6 GB), bukan untuk semuanya
+  sekaligus.
+- **Semuanya di komputer ini:** sekitar 22 GB disk.
+
+Diukur di Windows 11 dengan RTX 5080 (16 GB) dan RAM 32 GB: mendengarkan di kartu mencapai puncak
+5.9 GB memori grafis, menerjemahkan dengan aya-expanse 8B 5.7 GB, dan suara asli pembicara 6.1 GB,
+sekitar 3 detik per kalimat. Memuat model suara pembicara sesaat memakai sekitar 11 GB RAM sebelum
+turun ke 2.5 GB, itulah sebabnya diminta 16 GB. Mesinnya sendiri (Python dengan PyTorch versi kartu
+grafis) memakai sekitar 4 GB dari angka disk di atas.
+
 ## Pasang dengan AI Anda (satu langkah)
 
 Di Claude Code:
@@ -64,7 +94,7 @@ dan menetapkan glosarium. Situs web dan aplikasi desktop ChatGPT belum bisa menj
 
 ## Pasang secara manual (Windows)
 
-Memerlukan Python 3.11 dan sekitar 10 GB ruang disk untuk model lokal.
+Memerlukan Python 3.11. Disk, memori, dan kartu grafis: lihat [Kebutuhan komputer Anda](#kebutuhan-komputer-anda).
 
 ```powershell
 git clone https://github.com/willynilly0085-creator/tarjim
@@ -104,6 +134,18 @@ Claude, Claude Code, atau Codex. Setelah itu AI Anda dapat menjalankan seluruh a
 - membacakan kembali subtitle yang sudah jadi, mengulang pekerjaan yang gagal, atau mengunduh alat yang belum ada.
 
 Kunci tidak pernah dimasukkan melalui obrolan; untuk itu AI akan membuka halaman tarjim.
+
+### Ponsel
+
+Kirim tautan video ke bot Telegram Anda sendiri dari ponsel mana pun, iPhone atau Android, di rumah maupun
+saat bepergian, dan video terjemahannya kembali di obrolan yang sama. Di Pengaturan, buka **Ponsel**: buat
+bot di BotFather (`/newbot`), tempel token-nya (tetap tersimpan di brankas komputer Anda), lalu pindai
+kode QR dengan ponsel Anda dan tekan **Mulai**. Bot hanya menjawab akun Anda, dan komputer Anda sendiri
+yang menanyakan pesan baru ke Telegram, sehingga tidak ada port yang dibuka ke internet. Bahasa, hasil,
+dan gaya diambil dari Pengaturan; `/mode` di bot mengubah hasilnya. Telegram mengizinkan bot mengunduh
+video hingga 20 MB dan mengirim berkas hingga 50 MB: hasil yang lebih besar dikodekan ulang agar muat,
+atau Anda menerima berkas subtitle dan video lengkapnya tetap ada di komputer Anda. Bot menjawab selama
+komputer Anda dan tarjim sedang berjalan.
 
 ### Baris perintah
 
@@ -147,8 +189,10 @@ Halaman penyiapan menampilkan setiap lisensi di samping unduhannya.
 
 Diuji di Windows 11 dengan RTX 5080, dan dari pemasangan bersih tanpa dukungan grafis: tautan dan berkas,
 subtitle yang ditanamkan dan `.srt`, bahasa Prancis dan Arab, jeda, lanjutkan, batalkan dan ulangi, ketiga
-cara menghubungkan (langganan Claude dan ChatGPT, Ollama lokal), alat obrolan, dan pemeriksaan keamanan di
-atas. Belum diuji: macOS, Linux, langganan GitHub Copilot dan Antigravity.
+cara menghubungkan (langganan Claude dan ChatGPT, Ollama lokal), alat obrolan, sulih suara dengan suara
+asli pembicara (bahasa Inggris ke bahasa Arab Saudi), dan pemeriksaan keamanan di atas. Belum diuji:
+macOS, Linux, langganan GitHub Copilot dan Antigravity, serta bot ponsel dengan layanan Telegram yang
+sebenarnya (kodenya tercakup oleh pengujian dengan Telegram simulasi).
 
 ## Lisensi
 

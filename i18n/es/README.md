@@ -36,6 +36,36 @@ vídeo, genera un `.srt` o lo dobla con una voz distinta para cada hablante.
 Elige cualquier modelo que ofrezca un proveedor. Si el motor elegido falla o agota su cuota, tarjim
 recurre al motor local cuando hay uno disponible.
 
+## Qué necesita tu ordenador
+
+Las partes pesadas son opcionales. Lo que necesitas depende de qué partes se ejecuten en tu propio
+ordenador:
+
+| Qué usas | Tarjeta gráfica | Memoria (RAM) | Disco libre |
+|---|---|---|---|
+| Subtítulos con una IA que conectas (una clave de Gemini, una suscripción de Claude o ChatGPT, cualquier clave de API) | No hace falta | 8 GB | unos 6 GB |
+| Doblaje con voces naturales o de estudio | No hace falta | 8 GB | nada adicional |
+| Escucha en este ordenador (el audio nunca sale de él) | NVIDIA, 8 GB | 16 GB | 6.3 GB más |
+| Traducción en este ordenador (Ollama con aya-expanse 8B) | 8 GB | 16 GB | 5.1 GB más |
+| Doblaje con la voz propia de cada hablante | NVIDIA, 8 GB | 16 GB | 4.7 GB más |
+
+- **Sistema:** Windows 10 u 11, de 64 bits. macOS y Linux ejecutan el mismo código, pero todavía no
+  se han probado.
+- **Internet:** para las descargas y para la IA que conectas. Con la escucha y la traducción en este
+  ordenador, los trabajos se ejecutan sin conexión una vez descargado todo.
+- **Sin una tarjeta NVIDIA** todo sigue funcionando en el procesador, solo que mucho más despacio;
+  el doblaje con la voz propia del hablante no es práctico ahí.
+- **Un modelo a la vez:** tarjim libera cada modelo antes de cargar el siguiente, así que la tarjeta
+  gráfica necesita espacio para el más grande (unos 6 GB), no para todos juntos.
+- **Todo en este ordenador:** unos 22 GB de disco.
+
+Medido en Windows 11 con una RTX 5080 (16 GB) y 32 GB de RAM: la escucha en la tarjeta alcanzó un
+máximo de 5.9 GB de memoria gráfica, la traducción con aya-expanse 8B 5.7 GB y la voz propia del
+hablante 6.1 GB, con unos 3 segundos por frase. Al cargar el modelo de la voz del hablante se ocupan
+brevemente unos 11 GB de RAM antes de estabilizarse en 2.5 GB, y por eso pide 16 GB. El motor en sí
+(Python con la versión de PyTorch para tarjeta gráfica) ocupa unos 4 GB de las cifras de disco
+anteriores.
+
 ## Instalación con tu IA (un solo paso)
 
 En Claude Code:
@@ -66,7 +96,7 @@ Codex para ChatGPT.
 
 ## Instalación manual (Windows)
 
-Requiere Python 3.11 y unos 10 GB de disco para los modelos locales.
+Requiere Python 3.11. Disco, memoria y tarjeta gráfica: consulta [Qué necesita tu ordenador](#qué-necesita-tu-ordenador).
 
 ```powershell
 git clone https://github.com/willynilly0085-creator/tarjim
@@ -108,6 +138,19 @@ puede manejar toda la herramienta por ti:
 - leerte los subtítulos terminados, reintentar un trabajo fallido o descargar una herramienta que falte.
 
 Las claves nunca se introducen por el chat; para eso la IA abre la página de tarjim.
+
+### Teléfono
+
+Envía un enlace de vídeo a tu propio bot de Telegram desde cualquier teléfono, iPhone o Android, en
+casa o fuera, y el vídeo traducido vuelve en el mismo chat. En Ajustes, abre **Teléfono**: crea un
+bot en BotFather (`/newbot`), pega su token (se queda en el almacén cifrado de tu ordenador), luego
+escanea el código QR con tu teléfono y pulsa **Iniciar**. El bot responde solo a tu cuenta, y tu
+ordenador es quien le pide a Telegram los mensajes nuevos, así que no se abre ningún puerto a
+internet. El idioma, el resultado y el estilo salen de Ajustes; `/mode` en el bot cambia el
+resultado. Telegram permite que los bots descarguen vídeos de hasta 20 MB y envíen archivos de
+hasta 50 MB: un resultado mayor se recodifica para que quepa, o recibes el archivo de subtítulos y
+el vídeo completo se queda en tu ordenador. El bot responde mientras tu ordenador y tarjim estén en
+marcha.
 
 ### Línea de comandos
 
@@ -153,8 +196,10 @@ La página de configuración muestra cada licencia junto a su descarga.
 Probado en Windows 11 con una RTX 5080, y desde una instalación limpia sin soporte gráfico: enlaces
 y archivos, subtítulos grabados y `.srt`, francés y árabe, pausar, reanudar, cancelar y reintentar,
 las tres formas de conexión (suscripciones de Claude y ChatGPT, Ollama local), las herramientas de
-chat y las comprobaciones de seguridad anteriores. Aún sin probar: macOS, Linux y las suscripciones
-de GitHub Copilot y Antigravity.
+chat, el doblaje con la voz propia del hablante (del inglés al árabe saudí) y las comprobaciones de
+seguridad anteriores. Aún sin probar: macOS, Linux, las suscripciones de GitHub Copilot y
+Antigravity, y el bot del teléfono con el servicio real de Telegram (su código está cubierto por
+pruebas con un Telegram simulado).
 
 ## Licencia
 

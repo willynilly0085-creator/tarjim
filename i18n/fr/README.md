@@ -38,6 +38,36 @@ sous-titres dans la vidéo, produit un fichier `.srt` ou la double avec une voix
 Choisissez n'importe quel modèle proposé par un fournisseur. Si le moteur choisi échoue ou épuise
 son quota, tarjim se rabat sur le moteur local lorsqu'il y en a un.
 
+## Ce dont votre ordinateur a besoin
+
+Les parties lourdes sont facultatives. Ce qu'il vous faut dépend des parties qui tournent sur votre
+propre ordinateur :
+
+| Ce que vous utilisez | Carte graphique | Mémoire (RAM) | Disque libre |
+|---|---|---|---|
+| Sous-titres avec une IA que vous connectez (une clé Gemini, un abonnement Claude ou ChatGPT, n'importe quelle clé d'API) | Inutile | 8 Go | environ 6 Go |
+| Doublage avec des voix naturelles ou de studio | Inutile | 8 Go | rien de plus |
+| Écoute sur cet ordinateur (l'audio ne le quitte jamais) | NVIDIA, 8 Go | 16 Go | 6.3 Go de plus |
+| Traduction sur cet ordinateur (Ollama avec aya-expanse 8B) | 8 Go | 16 Go | 5.1 Go de plus |
+| Doublage avec la voix propre de chaque locuteur | NVIDIA, 8 Go | 16 Go | 4.7 Go de plus |
+
+- **Système :** Windows 10 ou 11, 64 bits. macOS et Linux exécutent le même code, mais n'ont pas
+  encore été testés.
+- **Internet :** pour les téléchargements et pour l'IA que vous connectez. Avec l'écoute et la
+  traduction sur cet ordinateur, les tâches s'exécutent hors ligne une fois tout téléchargé.
+- **Sans carte NVIDIA**, tout fonctionne quand même sur le processeur, mais beaucoup plus lentement
+  ; le doublage avec la voix propre du locuteur n'y est pas praticable.
+- **Un modèle à la fois :** tarjim libère chaque modèle avant de charger le suivant, si bien que la
+  carte graphique doit avoir de la place pour le plus gros (environ 6 Go), pas pour tous ensemble.
+- **Tout sur cet ordinateur :** environ 22 Go de disque.
+
+Mesuré sous Windows 11 avec une RTX 5080 (16 Go) et 32 Go de RAM : l'écoute sur la carte a atteint
+au plus 5.9 Go de mémoire graphique, la traduction avec aya-expanse 8B 5.7 Go et la voix propre du
+locuteur 6.1 Go, à raison d'environ 3 secondes par phrase. Le chargement du modèle de voix du
+locuteur occupe brièvement environ 11 Go de RAM avant de se stabiliser à 2.5 Go, ce qui explique les
+16 Go demandés. Le moteur lui-même (Python avec la version de PyTorch pour carte graphique) occupe
+environ 4 Go des chiffres de disque ci-dessus.
+
 ## Installer avec votre IA (une seule étape)
 
 Dans Claude Code :
@@ -67,7 +97,7 @@ Codex pour ChatGPT.
 
 ## Installation manuelle (Windows)
 
-Nécessite Python 3.11 et environ 10 Go d'espace disque pour les modèles locaux.
+Nécessite Python 3.11. Disque, mémoire et carte graphique : voir [Ce dont votre ordinateur a besoin](#ce-dont-votre-ordinateur-a-besoin).
 
 ```powershell
 git clone https://github.com/willynilly0085-creator/tarjim
@@ -110,6 +140,19 @@ Codex. Votre IA peut alors piloter tout l'outil pour vous :
 - vous relire les sous-titres terminés, relancer une tâche qui a échoué ou télécharger un outil manquant.
 
 Les clés ne sont jamais saisies dans la conversation ; pour cela, l'IA ouvre la page de tarjim.
+
+### Téléphone
+
+Envoyez un lien vidéo à votre propre bot Telegram depuis n'importe quel téléphone, iPhone ou
+Android, chez vous ou en déplacement, et la vidéo traduite revient dans la même conversation. Dans
+les Réglages, ouvrez **Téléphone** : créez un bot dans BotFather (`/newbot`), collez son jeton (il
+reste dans le coffre de votre ordinateur), puis scannez le code QR avec votre téléphone et appuyez
+sur **Démarrer**. Le bot ne répond qu'à votre compte, et c'est votre ordinateur qui demande à
+Telegram les nouveaux messages : aucun port n'est donc ouvert sur internet. La langue, le résultat
+et le style viennent des Réglages ; `/mode` dans le bot change le résultat. Telegram autorise les
+bots à télécharger des vidéos jusqu'à 20 Mo et à envoyer des fichiers jusqu'à 50 Mo : un résultat
+plus gros est réencodé pour tenir, ou vous recevez le fichier de sous-titres et la vidéo complète
+reste sur votre ordinateur. Le bot répond tant que votre ordinateur et tarjim fonctionnent.
 
 ### Ligne de commande
 
@@ -156,8 +199,10 @@ La page de configuration affiche chaque licence à côté du téléchargement co
 Testé sous Windows 11 avec une RTX 5080, ainsi qu'à partir d'une installation vierge sans prise en
 charge graphique : liens et fichiers, sous-titres incrustés et `.srt`, français et arabe, pause,
 reprise, annulation et relance, les trois façons de se connecter (abonnements Claude et ChatGPT,
-Ollama en local), les outils de conversation et les contrôles de sécurité ci-dessus. Pas encore
-testé : macOS, Linux, les abonnements GitHub Copilot et Antigravity.
+Ollama en local), les outils de conversation, le doublage avec la voix propre du locuteur (de
+l'anglais vers l'arabe saoudien) et les contrôles de sécurité ci-dessus. Pas encore testé : macOS,
+Linux, les abonnements GitHub Copilot et Antigravity, et le bot du téléphone avec le service
+Telegram réel (son code est couvert par des tests avec un Telegram simulé).
 
 ## Licence
 
