@@ -1,5 +1,5 @@
 import { buildMenus, isMode, OTHER } from "./menus.js";
-import { claimPending } from "./pairing.js";
+import { claimPending, sendWaitingJob } from "./pairing.js";
 import { clickedPost, downloadable } from "./posts.js";
 import { ApiError, api, errorLabel, loadWords, post, remember, settings, t } from "./shared.js";
 
@@ -48,16 +48,19 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     refresh();
     await chrome.action.openPopup().catch(() => notify(`start-${Date.now()}`, t("appName"), t("notifyStarted")));
   } catch (error) {
-    const body = error.kind === "offline" ? t("offlineTitle") : t("pairTitle");
-    notify(`fail-${Date.now()}`, t("notifyFailed"), body);
-    chrome.tabs.create({ url: chrome.runtime.getURL("app.html") });
+    const unpaired = error.kind !== "offline";
+    if (unpaired) await remember({ waitingJob: { url, target, dialect, mode } });
+    chrome.tabs.create({ url: chrome.runtime.getURL(unpaired ? "app.html?pair=auto" : "app.html") });
   }
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name !== POLL) return;
   if (await loadWords()) buildMenus();
-  if ((await claimPending()) === "paired") notify(`paired-${Date.now()}`, t("appName"), t("pairedNotice"));
+  if ((await claimPending()) === "paired") {
+    notify(`paired-${Date.now()}`, t("appName"), t("pairedNotice"));
+    await sendWaitingJob();
+  }
   refresh();
 });
 

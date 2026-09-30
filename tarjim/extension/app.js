@@ -3,7 +3,7 @@ import { api, loadWords, post, remember, settings, t, uiDirection, uiLanguage } 
 import { downloadable } from "./posts.js";
 import { $, show } from "./dom.js";
 import { claimPending } from "./pairing.js";
-import { openSettings, wirePanels } from "./panels.js";
+import { autoPair, openSettings, wirePanels } from "./panels.js";
 import { isMedia, upload } from "./upload.js";
 
 const params = new URLSearchParams(location.search);
@@ -196,4 +196,5 @@ await loadWords();
 applyText();
 wire();
 if (params.get("view") === "settings") openSettings();
+else if (params.get("pair") === "auto") autoPair(openMain);
 else connect();

@@ -1,6 +1,6 @@
 import { $, show } from "./dom.js";
 import { keyStatus, saveKey } from "./keys.js";
-import { askToPair, claimPending, serverBase } from "./pairing.js";
+import { askToPair, claimPending, sendWaitingJob, serverBase } from "./pairing.js";
 import { ApiError, api, remember, settings, t } from "./shared.js";
 
 window.addEventListener("unhandledrejection", (event) => {
@@ -24,7 +24,8 @@ async function pair(event, ready) {
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const ATTEMPTS = 400;
 
-async function autoPair(ready) {
+export async function autoPair(ready) {
+  show("pair");
   const id = await askToPair();
   if (!id) return show("offline");
   $("pair-waiting").hidden = false;
@@ -34,7 +35,10 @@ async function autoPair(ready) {
   for (let i = 0; i < ATTEMPTS; i += 1) {
     await wait(1500);
     const result = await claimPending();
-    if (result === "paired") return ready();
+    if (result === "paired") {
+      await sendWaitingJob();
+      return ready();
+    }
     if (result !== "waiting") break;
   }
   $("pair-waiting").textContent = t("pairDenied");

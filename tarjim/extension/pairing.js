@@ -1,4 +1,4 @@
-import { remember, settings } from "./shared.js";
+import { post, remember, settings } from "./shared.js";
 
 export async function serverBase() {
   return (await settings()).server.replace(/\/+$/, "");
@@ -24,4 +24,13 @@ export async function claimPending() {
   if (state.state === "pending") return "waiting";
   await remember({ pairId: "" });
   return state.state === "denied" ? "denied" : "none";
+}
+
+// A right-click made before the extension was paired is kept and sent the moment pairing succeeds.
+export async function sendWaitingJob() {
+  const { waitingJob } = await chrome.storage.local.get("waitingJob");
+  if (!waitingJob) return false;
+  await remember({ waitingJob: null });
+  await post("/jobs", waitingJob).catch(() => null);
+  return true;
 }
