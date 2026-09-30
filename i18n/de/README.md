@@ -100,7 +100,7 @@ Synchronisation. Das Popup zeigt den Stand jedes Auftrags und lässt Sie ihn pau
 oder das Ergebnis öffnen.
 
 Öffnen Sie in Chrome `chrome://extensions`, schalten Sie Developer mode (Entwicklermodus) ein,
-wählen Sie **Load unpacked** (Entpackte Erweiterung laden) und dann den Ordner `extension`. Die
+wählen Sie **Load unpacked** (Entpackte Erweiterung laden) und dann den Ordner `~/.tarjim/extension`. Die
 Erweiterung koppelt sich selbst: Drücken Sie auf der tarjim-Seite **Allow** (Zulassen).
 
 ### Chat

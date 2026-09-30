@@ -93,7 +93,7 @@ tarjim vive en tu navegador: haz clic derecho en cualquier vídeo o enlace y eli
 la etapa de cada trabajo y te permite pausarlo, cancelarlo o abrir el resultado.
 
 En Chrome abre `chrome://extensions`, activa **Developer mode** (modo de desarrollador), elige
-**Load unpacked** (cargar descomprimida) y selecciona la carpeta `extension`. La extensión se
+**Load unpacked** (cargar descomprimida) y selecciona la carpeta `~/.tarjim/extension`. La extensión se
 empareja sola: pulsa **Allow** (permitir) en la página de tarjim.
 
 ### Chat

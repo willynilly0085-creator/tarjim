@@ -95,7 +95,7 @@ O tarjim fica no seu navegador: clique com o botão direito em qualquer vídeo o
 mostra a etapa de cada tarefa e permite pausar, cancelar ou abrir o resultado.
 
 No Chrome, abra `chrome://extensions`, ative o **Developer mode** (modo do desenvolvedor), escolha
-**Load unpacked** (carregar sem compactação) e selecione a pasta `extension`. A extensão faz o
+**Load unpacked** (carregar sem compactação) e selecione a pasta `~/.tarjim/extension`. A extensão faz o
 pareamento sozinha: clique em **Allow** (permitir) na página do tarjim.
 
 ### Chat

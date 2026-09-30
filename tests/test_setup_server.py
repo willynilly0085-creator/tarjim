@@ -79,3 +79,11 @@ def test_setup_only_accepts_known_values(port: int) -> None:
     state = json.loads(call(port, "POST /setup", body.encode(), owner).read())
     assert state["ui_language"] == "en" and state["listen_provider"] == "local"
     assert state["translate_provider"] == ""
+
+
+def test_someone_who_already_chose_a_translator_is_not_sent_through_setup_again(port: int) -> None:
+    owner = {"X-Tarjim-Token": TOKEN, "Content-Type": "application/json"}
+    fresh = json.loads(call(port, "GET /setup", headers=owner).read())
+    assert fresh["setup_done"] == ""
+    body = json.dumps({"translate_provider": "claude"}).encode()
+    assert json.loads(call(port, "POST /setup", body, owner).read())["setup_done"] == "yes"

@@ -1,6 +1,7 @@
 import { buildMenus, isMode, OTHER } from "./menus.js";
 import { claimPending } from "./pairing.js";
-import { ApiError, api, errorLabel, loadWords, mediaUrl, post, settings, t } from "./shared.js";
+import { clickedPost, downloadable } from "./posts.js";
+import { ApiError, api, errorLabel, loadWords, post, settings, t } from "./shared.js";
 
 const POLL = "poll";
 
@@ -18,9 +19,9 @@ chrome.runtime.onInstalled.addListener(start);
 chrome.runtime.onStartup.addListener(start);
 chrome.storage.onChanged.addListener((changes) => { if (changes.target) buildMenus(); });
 
-function pickUrl(info, tab) {
-  const candidates = [info.linkUrl, info.srcUrl, info.pageUrl, tab?.url];
-  return candidates.find(mediaUrl);
+async function pickUrl(info, tab) {
+  const direct = [info.linkUrl, info.srcUrl].find(downloadable);
+  return direct || (await clickedPost(info, tab)) || [info.pageUrl, tab?.url].find(downloadable) || "";
 }
 
 function notify(id, title, message) {
@@ -34,7 +35,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     return;
   }
   if (!isMode(info.menuItemId)) return;
-  const url = pickUrl(info, tab);
+  const url = await pickUrl(info, tab);
   if (!url) {
     notify(`nourl-${Date.now()}`, t("appName"), t("menuNoVideo"));
     return;

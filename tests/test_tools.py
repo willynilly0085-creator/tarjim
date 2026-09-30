@@ -36,3 +36,17 @@ def test_every_tool_says_its_license_and_non_commercial_ones_are_marked() -> Non
     assert views["dubbing"].consent and not views["dubbing"].commercial
     assert not views["timing"].commercial and not views["local_translation"].commercial
     assert views["accuracy"].commercial
+
+
+SYSTEMS = [("win32", False), ("darwin", True), ("linux", True)]
+
+
+@pytest.mark.parametrize(("system", "manual"), SYSTEMS)
+def test_ffmpeg_is_downloaded_on_windows_and_installed_by_the_person_elsewhere(
+        system: str, manual: bool, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(tools.sys, "platform", system)
+    monkeypatch.setattr(tools, "installed", lambda _tool: False)
+    monkeypatch.setattr(tools, "fetch", lambda _tool: None)
+    shelf = tools.Shelf()
+    assert {row["id"]: row["manual"] for row in shelf.view()}["ffmpeg"] is manual
+    assert (shelf.start("ffmpeg") == "manual") is manual

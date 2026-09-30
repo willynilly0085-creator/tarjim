@@ -89,7 +89,7 @@ language), then pick subtitles, burned-in subtitles or dubbing. The popup shows 
 and lets you pause, cancel or open the result.
 
 In Chrome open `chrome://extensions`, turn on Developer mode, choose **Load unpacked** and pick the
-`extension` folder. The extension pairs itself: press **Allow** on the tarjim page.
+`~/.tarjim/extension` folder. The extension pairs itself: press **Allow** on the tarjim page.
 
 ### Chat
 

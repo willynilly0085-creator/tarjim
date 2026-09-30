@@ -91,10 +91,6 @@ export function stepsFor(job) {
   return STAGES.filter((stage) => wanted[stage] ?? true);
 }
 
-export function mediaUrl(url) {
-  return typeof url === "string" && /^https?:\/\//i.test(url) && !/^https?:\/\/(127\.0\.0\.1|localhost)/i.test(url);
-}
-
 export function modeLabel(mode) {
   if (mode.startsWith("dub")) return t("outputDub");
   return t(mode === "srt" ? "outputSrt" : "outputBurn");

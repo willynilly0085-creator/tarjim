@@ -77,3 +77,11 @@ def test_an_installed_but_signed_out_subscription_is_offered_not_chosen() -> Non
     plan = make_plan(computer(apps=[app("claude", False)]))
     assert plan["translate"]["provider"] == "gemini"
     assert {"provider": "claude", "kind": "sign_in"} in plan["options"]
+
+
+def test_on_a_mac_ffmpeg_is_listed_to_install_by_hand_instead_of_downloaded() -> None:
+    scan = computer()
+    scan["tools"]["manual"] = ["ffmpeg"]
+    plan = make_plan(scan)
+    assert plan["downloads"] == ["timing"] and plan["download_gb"] == 1.3
+    assert plan["install_yourself"] == ["ffmpeg"]

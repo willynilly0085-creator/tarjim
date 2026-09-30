@@ -90,7 +90,7 @@ Anda), kemudian pilih subtitle, subtitle yang ditanamkan, atau sulih suara. Jend
 setiap pekerjaan dan memungkinkan Anda menjeda, membatalkan, atau membuka hasilnya.
 
 Di Chrome buka `chrome://extensions`, aktifkan Developer mode (mode pengembang), pilih **Load unpacked**
-(muat ekstensi yang belum dikemas), lalu pilih folder `extension`. Ekstensi memasangkan dirinya sendiri: tekan
+(muat ekstensi yang belum dikemas), lalu pilih folder `~/.tarjim/extension`. Ekstensi memasangkan dirinya sendiri: tekan
 **Allow** (izinkan) di halaman tarjim.
 
 ### Obrolan

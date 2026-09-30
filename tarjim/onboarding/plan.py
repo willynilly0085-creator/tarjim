@@ -78,9 +78,17 @@ def needs(translate: Plan, listen: Plan) -> list[Plan]:
     return wanted
 
 
-def downloads(scan: Plan, listen: Plan) -> list[str]:
+def missing(scan: Plan, listen: Plan) -> list[str]:
     wanted = ["ffmpeg", "timing"] + (["accuracy"] if listen["provider"] == "local" else [])
     return [tool for tool in wanted if not scan["tools"]["installed"][tool]]
+
+
+def downloads(scan: Plan, listen: Plan) -> list[str]:
+    return [tool for tool in missing(scan, listen) if tool not in scan["tools"].get("manual", [])]
+
+
+def by_hand(scan: Plan, listen: Plan) -> list[str]:
+    return [tool for tool in missing(scan, listen) if tool in scan["tools"].get("manual", [])]
 
 
 def options(scan: Plan) -> list[Plan]:
@@ -96,4 +104,4 @@ def make_plan(scan: Plan) -> Plan:
     low = scan["device"]["disk_free_gb"] < size + SPARE_GB
     return {"translate": translate, "listen": listen, "needs": needs(translate, listen),
             "downloads": tools, "download_gb": size, "warnings": ["disk"] if low else [],
-            "options": options(scan)}
+            "install_yourself": by_hand(scan, listen), "options": options(scan)}

@@ -21,10 +21,11 @@ def device() -> dict[str, Any]:
 
 
 def tools() -> dict[str, Any]:
-    from tarjim.tools import TOOLS, installed
+    from tarjim.tools import TOOLS, installed, self_installs
 
     return {"installed": {tool.id: installed(tool) for tool in TOOLS},
-            "sizes": {tool.id: tool.size_gb for tool in TOOLS}}
+            "sizes": {tool.id: tool.size_gb for tool in TOOLS},
+            "manual": [tool.id for tool in TOOLS if not self_installs(tool)]}
 
 
 def local() -> dict[str, Any]:

@@ -1,5 +1,6 @@
 import { watchJobs } from "./jobs.js";
-import { api, loadWords, mediaUrl, post, remember, settings, t, uiDirection, uiLanguage } from "./shared.js";
+import { api, loadWords, post, remember, settings, t, uiDirection, uiLanguage } from "./shared.js";
+import { downloadable } from "./posts.js";
 import { $, show } from "./dom.js";
 import { claimPending } from "./pairing.js";
 import { openSettings, wirePanels } from "./panels.js";
@@ -71,7 +72,7 @@ async function describeSource() {
     return;
   }
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  const usable = mediaUrl(tab?.url);
+  const usable = downloadable(tab?.url);
   state.url = usable ? tab.url : "";
   $("source-tab").hidden = !usable;
   $("source-none").hidden = usable;
@@ -106,7 +107,7 @@ function syncVoice() {
 }
 
 function sourceReady() {
-  return pageMode ? Boolean(state.file) || mediaUrl($("link").value.trim()) : Boolean(state.url);
+  return pageMode ? Boolean(state.file) || downloadable($("link").value.trim()) : Boolean(state.url);
 }
 
 function refreshButton() {

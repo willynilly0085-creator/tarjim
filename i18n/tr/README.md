@@ -94,7 +94,7 @@ kendi dilinizi) seçin, ardından altyazı, gömülü altyazı veya seslendirmey
 işin aşamasını gösterir ve işi duraklatmanıza, iptal etmenize ya da sonucu açmanıza olanak tanır.
 
 Chrome'da `chrome://extensions` sayfasını açın, Developer mode (geliştirici modu) seçeneğini açın,
-**Load unpacked** (paketlenmemiş öğe yükle) seçeneğini seçin ve `extension` klasörünü gösterin.
+**Load unpacked** (paketlenmemiş öğe yükle) seçeneğini seçin ve `~/.tarjim/extension` klasörünü gösterin.
 Eklenti kendiliğinden eşleşir: tarjim sayfasında **Allow** (izin ver) düğmesine basın.
 
 ### Sohbet

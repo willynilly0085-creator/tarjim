@@ -1,4 +1,5 @@
 import os
+import sys
 import threading
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -91,6 +92,11 @@ def ffmpeg_ready() -> bool:
     return bool(chosen and Path(chosen).exists()) or bool(shutil.which("ffmpeg"))
 
 
+def self_installs(tool: Tool) -> bool:
+    """tarjim fetches ffmpeg on Windows only; elsewhere the package manager provides it."""
+    return tool.kind != "ffmpeg" or sys.platform == "win32"
+
+
 def listening_locally() -> bool:
     from tarjim.engines.choice import chosen
 
@@ -159,12 +165,14 @@ class Shelf:
                  "installed": installed(t), "state": self.progress[t.id].state,
                  "detail": self.progress[t.id].detail, "license": t.license.name,
                  "license_url": t.license.url, "commercial": t.license.commercial,
-                 "consent": t.license.consent} for t in TOOLS]
+                 "consent": t.license.consent, "manual": not self_installs(t)} for t in TOOLS]
 
     def start(self, tool_id: str, accepted: bool = False) -> str:
         tool = BY_ID.get(tool_id)
         if tool is None:
             return "unknown"
+        if not self_installs(tool):
+            return "manual"
         if tool.license.consent and not accepted:
             return "license"
         with self.lock:

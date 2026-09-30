@@ -95,7 +95,7 @@ sous-titres incrustés ou doublage. La fenêtre contextuelle affiche l'étape de
 permet de la mettre en pause, de l'annuler ou d'ouvrir le résultat.
 
 Dans Chrome, ouvrez `chrome://extensions`, activez **Developer mode** (mode développeur), choisissez
-**Load unpacked** (charger l'extension non empaquetée) et sélectionnez le dossier `extension`.
+**Load unpacked** (charger l'extension non empaquetée) et sélectionnez le dossier `~/.tarjim/extension`.
 L'extension s'appaire toute seule : cliquez sur **Allow** (autoriser) sur la page de tarjim.
 
 ### Conversation

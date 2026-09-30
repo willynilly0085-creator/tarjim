@@ -5,11 +5,14 @@ import { listenOptions, translateOptions } from "./assistant_options.js";
 import { fillModels, modelOptions } from "./models.js";
 import { button, el, status } from "./ui.js";
 
-function downloads(state) {
+function missing(state) {
   const installed = state.scan.tools.installed;
   const wanted = ["ffmpeg", "timing", ...(state.plan.listen.provider === "local" ? ["accuracy"] : [])];
   return wanted.filter((id) => !installed[id]);
 }
+
+const byHand = (state) => missing(state).filter((id) => (state.scan.tools.manual || []).includes(id));
+const downloads = (state) => missing(state).filter((id) => !byHand(state).includes(id));
 
 function sizeOf(state, ids) {
   return Math.round(ids.reduce((sum, id) => sum + state.scan.tools.sizes[id], 0) * 10) / 10;
@@ -62,6 +65,14 @@ function downloadPart(state) {
     low ? el("p", { className: "error", textContent: t("planDiskLow") }) : "");
 }
 
+function handPart(state) {
+  const ids = byHand(state);
+  return ids.length ? el("div", { className: "plan-row" },
+    el("p", { className: "field-label", textContent: t("planInstallYourself") }),
+    el("ul", { className: "plain" }, ...ids.map((id) => el("li", {}, el("span", { textContent: t(`tool_${id}`) }),
+      el("span", { className: "meta why", textContent: t(`tool_${id}_manual`) }))))) : "";
+}
+
 function needsKey(state) {
   const plan = state.plan;
   return [plan.translate, plan.listen].some((c) => ["gemini", "openai"].includes(c.provider) && !c.ready);
@@ -87,7 +98,7 @@ export function planScreen(screen, state, { back, apply, manual }) {
       modelRow(state),
       choiceRow(t("planListen"), listenOptions(state.scan), state.plan.listen.provider,
         (o) => { state.plan.listen = o.choice; paint(); }),
-      downloadPart(state), keyPart,
+      downloadPart(state), handPart(state), keyPart,
       el("nav", { className: "step-nav" }, button(t("back"), back), start), note);
   };
   state.plan.translate.value = translateOptions(state.scan).find((o) => o.matches(state.plan.translate))?.value;

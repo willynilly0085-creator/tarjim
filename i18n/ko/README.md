@@ -63,7 +63,7 @@ python -m venv .venv
 
 tarjim은 브라우저 안에 있습니다. 동영상이나 링크를 마우스 오른쪽 버튼으로 클릭하고 **ترجم للعربية**(또는 여러분의 언어)를 선택한 다음, 자막, 입힌 자막, 더빙 중 하나를 고르세요. 팝업에는 각 작업의 진행 단계가 표시되며, 일시 중지, 취소, 결과 열기를 할 수 있습니다.
 
-Chrome에서 `chrome://extensions`를 열고 **Developer mode**(개발자 모드)를 켠 뒤, **Load unpacked**(압축해제된 확장 프로그램을 로드합니다)를 선택하고 `extension` 폴더를 지정하세요. 확장 프로그램은 스스로 페어링됩니다. tarjim 페이지에서 **Allow**(허용)를 누르세요.
+Chrome에서 `chrome://extensions`를 열고 **Developer mode**(개발자 모드)를 켠 뒤, **Load unpacked**(압축해제된 확장 프로그램을 로드합니다)를 선택하고 `~/.tarjim/extension` 폴더를 지정하세요. 확장 프로그램은 스스로 페어링됩니다. tarjim 페이지에서 **Allow**(허용)를 누르세요.
 
 ### 채팅
 

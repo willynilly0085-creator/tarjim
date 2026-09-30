@@ -1,11 +1,11 @@
 import re
-from pathlib import Path
 from typing import Any, ClassVar
 
 from tarjim import autostart
 from tarjim.config import save, setting
 from tarjim.engines.choice import LISTENERS, TRANSLATORS, chosen
 from tarjim.engines.subscription import installed
+from tarjim.extension_home import extension_folder
 from tarjim.keys import status
 from tarjim.server.guard import extension_origin
 from tarjim.server.onboard_routes import OnboardRoutes
@@ -15,10 +15,15 @@ from tarjim.ui_languages import available, codes
 
 GLOSSARY_CHARS = 5000
 MODEL_TAG = re.compile(r"^[\w.:/-]{2,80}$")
-EXTENSION = Path(__file__).resolve().parents[1] / "extension"
 FIELDS: dict[str, tuple[str, ...]] = {"ui_language": codes(), "listen_provider": LISTENERS,
                                       "translate_provider": TRANSLATORS, "setup_done": ("yes",)}
 Query = dict[str, list[str]]
+
+
+def setup_finished() -> bool:
+    """Someone who set tarjim up before the setup assistant existed has already picked a translator,
+    so an update does not send them through setup again."""
+    return setting("setup_done") == "yes" or setting("translate_provider") in TRANSLATORS
 
 
 class SetupRoutes(OnboardRoutes):
@@ -52,8 +57,8 @@ class SetupRoutes(OnboardRoutes):
         state: dict[str, Any] = {name: setting(name) for name in FIELDS}
         state["keys"] = status()
         state["chosen"] = {"listen": chosen("listen"), "translate": chosen("translate")}
-        folder = EXTENSION if EXTENSION.is_dir() else None
-        state["extension_path"] = str(folder) if folder else ""
+        state["setup_done"] = "yes" if setup_finished() else ""
+        state["extension_path"] = extension_folder()
         state["local_model"] = setting("local_model")
         state["glossary"] = setting("glossary")
         state["subscriptions"] = installed()

@@ -63,7 +63,7 @@ python -m venv .venv
 
 tarjim 就在你的浏览器里：右键点击任意视频或链接，选择 **ترجم للعربية**（或你的语言），然后选择字幕、烧录字幕或配音。弹出窗口会显示每个任务所处的阶段，并可以暂停、取消或打开结果。
 
-在 Chrome 中打开 `chrome://extensions`，开启 **Developer mode**（开发者模式），选择 **Load unpacked**（加载已解压的扩展程序），然后选中 `extension` 文件夹。扩展会自动完成配对：在 tarjim 页面上点击 **Allow**（允许）即可。
+在 Chrome 中打开 `chrome://extensions`，开启 **Developer mode**（开发者模式），选择 **Load unpacked**（加载已解压的扩展程序），然后选中 `~/.tarjim/extension` 文件夹。扩展会自动完成配对：在 tarjim 页面上点击 **Allow**（允许）即可。
 
 ### 聊天
 

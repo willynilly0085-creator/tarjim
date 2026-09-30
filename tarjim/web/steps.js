@@ -35,6 +35,7 @@ function consentBox(tool, button) {
 }
 
 function toolAction(tool, refresh) {
+  if (tool.manual && !tool.installed) return "";
   if (tool.installed) return Object.assign(document.createElement("span"), { className: "ready", textContent: t("installed") });
   if (tool.state === "downloading") return Object.assign(document.createElement("span"), { className: "meta", textContent: t("downloading") });
   const button = Object.assign(document.createElement("button"), {
@@ -62,7 +63,8 @@ export async function renderTools(state, refresh = () => renderTools(state)) {
   $("tool-list").replaceChildren(...state.tools.map((tool) => {
     const row = $("tool-row").content.firstElementChild.cloneNode(true);
     row.querySelector(".tool-name").textContent = `${t(`tool_${tool.id}`)} · ${t(tool.required ? "required" : "optional")}`;
-    row.querySelector(".tool-hint").textContent = tool.state === "failed" ? t("failed") : t(`tool_${tool.id}_hint`);
+    row.querySelector(".tool-hint").textContent = tool.state === "failed" ? t("failed")
+      : t(`tool_${tool.id}_${tool.manual && !tool.installed ? "manual" : "hint"}`);
     row.querySelector(".tool-hint").after(licenseLine(tool));
     row.querySelector(".tool-size").textContent = t("sizeGb", { n: tool.size_gb });
     row.querySelector(".tool-action").replaceChildren(toolAction(tool, refresh));
