@@ -1,0 +1,8 @@
+.phone-pair { display: flex; flex-wrap: wrap; gap: var(--space-lg); align-items: flex-start; }
+.phone-pair .stack { flex: 1 1 260px; min-width: 0; }
+.phone-pair .path-row { width: 100%; }
+.qr { flex: none; width: 180px; height: 180px; border-radius: var(--radius); border: 1px solid var(--line); background: oklch(0.97 0.006 var(--hue)); }
+.phone-token .row .text-input { flex: 1 1 240px; min-width: 0; }
+.phone-paired { gap: var(--space-md); justify-items: stretch; }
+.phone-paired > .button-quiet { justify-self: start; }
+.phone-paired > p:empty { display: none; }

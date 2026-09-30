@@ -10,6 +10,7 @@ from tarjim.keys import status
 from tarjim.server.guard import extension_origin
 from tarjim.server.onboard_routes import OnboardRoutes
 from tarjim.server.pairing import Pairing
+from tarjim.server.phone_routes import PhoneRoutes
 from tarjim.tools import Shelf
 from tarjim.ui_languages import available, codes
 
@@ -26,7 +27,7 @@ def setup_finished() -> bool:
     return setting("setup_done") == "yes" or setting("translate_provider") in TRANSLATORS
 
 
-class SetupRoutes(OnboardRoutes):
+class SetupRoutes(OnboardRoutes, PhoneRoutes):
     shelf: ClassVar[Shelf]
     pairing: ClassVar[Pairing]
     token: ClassVar[str]

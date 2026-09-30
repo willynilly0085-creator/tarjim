@@ -3,6 +3,7 @@ import json
 import os
 import secrets
 import tempfile
+import threading
 from pathlib import Path
 
 from tarjim import vault
@@ -12,6 +13,7 @@ CONFIG = HOME / "config.json"
 TOKEN_BYTES = 16
 OWNER_DIR = 0o700
 OWNER_FILE = 0o600
+SAVING = threading.Lock()
 
 
 def settings() -> dict[str, str]:
@@ -38,12 +40,13 @@ def private_home() -> None:
 
 
 def save(name: str, value: str) -> None:
-    data = settings()
-    if name in vault.SECRETS and vault.write(name, value):
-        data.pop(name, None)
-    else:
-        data[name] = value
-    write_settings(data)
+    with SAVING:
+        data = settings()
+        if name in vault.SECRETS and vault.write(name, value):
+            data.pop(name, None)
+        else:
+            data[name] = value
+        write_settings(data)
 
 
 def write_settings(data: dict[str, str]) -> None:

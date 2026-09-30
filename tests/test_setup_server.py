@@ -87,3 +87,14 @@ def test_someone_who_already_chose_a_translator_is_not_sent_through_setup_again(
     assert fresh["setup_done"] == ""
     body = json.dumps({"translate_provider": "claude"}).encode()
     assert json.loads(call(port, "POST /setup", body, owner).read())["setup_done"] == "yes"
+
+
+def test_the_phone_section_refuses_a_bad_token_and_only_known_choices(port: int) -> None:
+    owner = {"X-Tarjim-Token": TOKEN, "Content-Type": "application/json"}
+    assert call(port, "GET /phone").status == 403
+    assert json.loads(call(port, "GET /phone", headers=owner).read())["bot"] == ""
+    bad = json.dumps({"token": "not-a-token"}).encode()
+    assert call(port, "POST /phone/connect", bad, owner).status == 400
+    body = json.dumps({"mode": "dub-clone", "target": "zz", "dialect": "msa"}).encode()
+    view = json.loads(call(port, "POST /phone/choices", body, owner).read())
+    assert (view["mode"], view["target"], view["dialect"]) == ("dub-clone", "ar", "msa")

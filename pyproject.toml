@@ -16,6 +16,7 @@ dependencies = [
     "keyring",
     "mcp>=2.2",
     "requests",
+    "segno",
     "huggingface_hub",
 ]
 

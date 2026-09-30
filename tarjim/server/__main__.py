@@ -69,6 +69,9 @@ def main(argv: list[str] | None = None) -> int:
     from tarjim.memory import release_models
 
     board = Board(lambda task: perform(task, downloads), idle=release_models)
+    from tarjim.phone.service import service
+
+    service.begin(board, HOME / "uploads")
     print(f"tarjim server on http://127.0.0.1:{args.port}", flush=True)
     serve(board, secret, HOME / "uploads", args.port)
     return 0

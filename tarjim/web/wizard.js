@@ -4,6 +4,7 @@ import { renderChat } from "./chat.js";
 import { renderConnect, saveConnect, wireConnect } from "./connect.js";
 import { fillLanguageChoices } from "./languages.js";
 import { copyText, selectText } from "./ui.js";
+import { renderPhone } from "./phone.js";
 import { renderDevice, renderTools } from "./steps.js";
 
 const STEPS = ["language", "device", "connect", "tools", "extension", "chat", "done"];
@@ -98,6 +99,7 @@ export const repaint = () => {
 function showAll() {
   document.querySelectorAll(".step").forEach((el) => el.classList.toggle("current", el.dataset.step !== "done"));
   STEPS.filter((step) => step !== "done").forEach((step) => ENTER[step]?.());
+  renderPhone();
 }
 
 async function saveAll() {
