@@ -23,7 +23,7 @@
 | 方式 | 可选项 | 说明 |
 |---|---|---|
 | API 密钥 | Gemini、OpenAI、Anthropic、OpenRouter、DeepSeek、Qwen、Mistral、Groq、xAI，或任何兼容 OpenAI 的地址 | Gemini 和 OpenAI 还可以用于聆听（语音转文字）。 |
-| 你的订阅 | Claude（通过 Claude Code）、ChatGPT（通过 Codex）、GitHub Copilot、Google AI（通过 Antigravity） | tarjim 使用你的登录信息运行厂商自己的程序。用量计入你的套餐，并适用各厂商的条款。 |
+| 你的订阅 | Claude（通过 Claude Code）、ChatGPT（通过 Codex）、Grok（通过 Grok Build）、GitHub Copilot、Google AI（通过 Antigravity） | tarjim 使用你的登录信息运行厂商自己的程序。用量计入你的套餐，并适用各厂商的条款。 |
 | 在你的电脑上 | Ollama、LM Studio、Jan、llama.cpp、vLLM、KoboldCpp | 连同其模型一起自动发现。任何数据都不会离开你的设备。 |
 
 你可以选择服务商提供的任意模型。如果所选引擎出错或配额用尽，而本地引擎可用，tarjim 会自动回退到本地引擎。

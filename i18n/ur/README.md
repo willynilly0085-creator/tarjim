@@ -31,7 +31,7 @@
 | طریقہ | انتخاب | نوٹ |
 |---|---|---|
 | API کلید | Gemini، OpenAI، Anthropic، OpenRouter، DeepSeek، Qwen، Mistral، Groq، xAI، یا کوئی بھی OpenAI سے مطابقت رکھنے والا پتہ | Gemini اور OpenAI سن بھی سکتے ہیں (بولی سے متن)۔ |
-| آپ کی رکنیت | Claude (Claude Code کے ذریعے)، ChatGPT (Codex کے ذریعے)، GitHub Copilot، Google AI (Antigravity کے ذریعے) | tarjim آپ کے سائن اِن کے ساتھ فراہم کنندہ کا اپنا پروگرام چلاتا ہے۔ استعمال آپ کے پلان میں شمار ہوتا ہے اور ہر فراہم کنندہ کی شرائط لاگو ہوتی ہیں۔ |
+| آپ کی رکنیت | Claude (Claude Code کے ذریعے)، ChatGPT (Codex کے ذریعے)، Grok (Grok Build کے ذریعے)، GitHub Copilot، Google AI (Antigravity کے ذریعے) | tarjim آپ کے سائن اِن کے ساتھ فراہم کنندہ کا اپنا پروگرام چلاتا ہے۔ استعمال آپ کے پلان میں شمار ہوتا ہے اور ہر فراہم کنندہ کی شرائط لاگو ہوتی ہیں۔ |
 | آپ کے کمپیوٹر پر | Ollama، LM Studio، Jan، llama.cpp، vLLM، KoboldCpp | اپنے ماڈلز سمیت خود بخود مل جاتے ہیں۔ کچھ بھی آپ کے آلے سے باہر نہیں جاتا۔ |
 
 کسی فراہم کنندہ کا کوئی بھی ماڈل منتخب کیجیے۔ اگر منتخب انجن ناکام ہو جائے یا اس کا کوٹہ ختم ہو جائے، تو

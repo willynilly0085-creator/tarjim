@@ -34,7 +34,7 @@ gera um `.srt` ou faz a dublagem com uma voz para cada locutor.
 | Forma | Opções | Observações |
 |---|---|---|
 | Chave de API | Gemini, OpenAI, Anthropic, OpenRouter, DeepSeek, Qwen, Mistral, Groq, xAI ou qualquer endereço compatível com OpenAI | Gemini e OpenAI também podem escutar (fala para texto). |
-| Sua assinatura | Claude (pelo Claude Code), ChatGPT (pelo Codex), GitHub Copilot, Google AI (pelo Antigravity) | O tarjim executa o próprio programa do fornecedor com o seu login. O uso é descontado do seu plano e valem os termos de cada fornecedor. |
+| Sua assinatura | Claude (pelo Claude Code), ChatGPT (pelo Codex), Grok (pelo Grok Build), GitHub Copilot, Google AI (pelo Antigravity) | O tarjim executa o próprio programa do fornecedor com o seu login. O uso é descontado do seu plano e valem os termos de cada fornecedor. |
 | No seu computador | Ollama, LM Studio, Jan, llama.cpp, vLLM, KoboldCpp | Detectados automaticamente com seus modelos. Nada sai do seu dispositivo. |
 
 Escolha qualquer modelo que um provedor ofereça. Se o mecanismo escolhido falhar ou esgotar a

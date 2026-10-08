@@ -34,7 +34,7 @@ sous-titres dans la vidéo, produit un fichier `.srt` ou la double avec une voix
 | Façon | Choix | Remarques |
 |---|---|---|
 | Clé d'API | Gemini, OpenAI, Anthropic, OpenRouter, DeepSeek, Qwen, Mistral, Groq, xAI ou toute adresse compatible OpenAI | Gemini et OpenAI peuvent aussi écouter (reconnaissance vocale). |
-| Votre abonnement | Claude (via Claude Code), ChatGPT (via Codex), GitHub Copilot, Google AI (via Antigravity) | tarjim lance le programme du fournisseur lui-même avec votre connexion. L'utilisation est décomptée de votre forfait et les conditions de chaque fournisseur s'appliquent. |
+| Votre abonnement | Claude (via Claude Code), ChatGPT (via Codex), Grok (via Grok Build), GitHub Copilot, Google AI (via Antigravity) | tarjim lance le programme du fournisseur lui-même avec votre connexion. L'utilisation est décomptée de votre forfait et les conditions de chaque fournisseur s'appliquent. |
 | Sur votre ordinateur | Ollama, LM Studio, Jan, llama.cpp, vLLM, KoboldCpp | Détectés automatiquement avec leurs modèles. Rien ne quitte votre appareil. |
 
 Choisissez n'importe quel modèle proposé par un fournisseur. Si le moteur choisi échoue ou épuise

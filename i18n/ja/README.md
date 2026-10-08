@@ -23,7 +23,7 @@
 | 方法 | 選択肢 | 補足 |
 |---|---|---|
 | API キー | Gemini、OpenAI、Anthropic、OpenRouter、DeepSeek、Qwen、Mistral、Groq、xAI、または任意の OpenAI 互換アドレス | Gemini と OpenAI は聞き取り（音声からテキスト）にも使えます。 |
-| お使いのサブスクリプション | Claude（Claude Code 経由）、ChatGPT（Codex 経由）、GitHub Copilot、Google AI（Antigravity 経由） | tarjim は各ベンダー純正のプログラムを、あなたのサインイン情報で実行します。使用量はあなたのプランに計上され、各ベンダーの規約が適用されます。 |
+| お使いのサブスクリプション | Claude（Claude Code 経由）、ChatGPT（Codex 経由）、Grok（Grok Build 経由）、GitHub Copilot、Google AI（Antigravity 経由） | tarjim は各ベンダー純正のプログラムを、あなたのサインイン情報で実行します。使用量はあなたのプランに計上され、各ベンダーの規約が適用されます。 |
 | あなたのコンピューター上 | Ollama、LM Studio、Jan、llama.cpp、vLLM、KoboldCpp | モデルとともに自動で検出されます。データはデバイスの外に一切出ません。 |
 
 各プロバイダーが提供する任意のモデルを選べます。選んだエンジンが失敗したり利用枠を使い切ったりした場合、ローカルエンジンがあれば tarjim は自動でそちらに切り替えます。

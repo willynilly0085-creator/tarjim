@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3 (2026-10-08)
+
+- A Grok subscription (SuperGrok, X Premium+) translates through xAI's own program, Grok Build:
+  found on the computer, signed in through the browser, with the account's real model list.
+
 ## 1.0.2 (2026-10-08)
 
 - A subscription that is installed but signed out can be chosen in the setup plan, and signing in

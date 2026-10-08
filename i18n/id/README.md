@@ -32,7 +32,7 @@ untuk setiap pembicara.
 | Cara | Pilihan | Catatan |
 |---|---|---|
 | Kunci API | Gemini, OpenAI, Anthropic, OpenRouter, DeepSeek, Qwen, Mistral, Groq, xAI, atau alamat apa pun yang kompatibel dengan OpenAI | Gemini dan OpenAI juga bisa mendengarkan (ucapan ke teks). |
-| Langganan Anda | Claude (melalui Claude Code), ChatGPT (melalui Codex), GitHub Copilot, Google AI (melalui Antigravity) | tarjim menjalankan program milik vendor itu sendiri dengan akun Anda. Pemakaian dihitung dari paket Anda dan ketentuan setiap vendor berlaku. |
+| Langganan Anda | Claude (melalui Claude Code), ChatGPT (melalui Codex), Grok (melalui Grok Build), GitHub Copilot, Google AI (melalui Antigravity) | tarjim menjalankan program milik vendor itu sendiri dengan akun Anda. Pemakaian dihitung dari paket Anda dan ketentuan setiap vendor berlaku. |
 | Di komputer Anda | Ollama, LM Studio, Jan, llama.cpp, vLLM, KoboldCpp | Terdeteksi otomatis beserta modelnya. Tidak ada yang keluar dari perangkat Anda. |
 
 Pilih model apa pun yang ditawarkan penyedia. Jika mesin yang dipilih gagal atau kuotanya habis, tarjim

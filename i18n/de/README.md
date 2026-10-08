@@ -36,7 +36,7 @@ Stimme für jeden Sprecher.
 | Weg | Optionen | Hinweise |
 |---|---|---|
 | API-Schlüssel | Gemini, OpenAI, Anthropic, OpenRouter, DeepSeek, Qwen, Mistral, Groq, xAI oder jede OpenAI-kompatible Adresse | Gemini und OpenAI können auch zuhören (Sprache zu Text). |
-| Ihr Abonnement | Claude (über Claude Code), ChatGPT (über Codex), GitHub Copilot, Google AI (über Antigravity) | tarjim startet das Programm des Anbieters selbst mit Ihrer Anmeldung. Die Nutzung wird auf Ihren Tarif angerechnet, und es gelten die Bedingungen des jeweiligen Anbieters. |
+| Ihr Abonnement | Claude (über Claude Code), ChatGPT (über Codex), Grok (über Grok Build), GitHub Copilot, Google AI (über Antigravity) | tarjim startet das Programm des Anbieters selbst mit Ihrer Anmeldung. Die Nutzung wird auf Ihren Tarif angerechnet, und es gelten die Bedingungen des jeweiligen Anbieters. |
 | Auf Ihrem Computer | Ollama, LM Studio, Jan, llama.cpp, vLLM, KoboldCpp | Werden samt ihren Modellen automatisch erkannt. Nichts verlässt Ihr Gerät. |
 
 Wählen Sie ein beliebiges Modell, das ein Anbieter bereitstellt. Wenn die gewählte Engine ausfällt

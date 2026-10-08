@@ -23,7 +23,7 @@
 | 방법 | 선택지 | 참고 |
 |---|---|---|
 | API 키 | Gemini, OpenAI, Anthropic, OpenRouter, DeepSeek, Qwen, Mistral, Groq, xAI 또는 모든 OpenAI 호환 주소 | Gemini와 OpenAI는 음성 인식(음성을 텍스트로 변환)에도 쓸 수 있습니다. |
-| 사용 중인 구독 | Claude(Claude Code를 통해), ChatGPT(Codex를 통해), GitHub Copilot, Google AI(Antigravity를 통해) | tarjim은 여러분의 로그인 정보로 각 공급업체의 자체 프로그램을 실행합니다. 사용량은 여러분의 요금제에서 차감되며 각 공급업체의 약관이 적용됩니다. |
+| 사용 중인 구독 | Claude(Claude Code를 통해), ChatGPT(Codex를 통해), Grok(Grok Build를 통해), GitHub Copilot, Google AI(Antigravity를 통해) | tarjim은 여러분의 로그인 정보로 각 공급업체의 자체 프로그램을 실행합니다. 사용량은 여러분의 요금제에서 차감되며 각 공급업체의 약관이 적용됩니다. |
 | 내 컴퓨터에서 | Ollama, LM Studio, Jan, llama.cpp, vLLM, KoboldCpp | 모델과 함께 자동으로 감지됩니다. 어떤 데이터도 기기 밖으로 나가지 않습니다. |
 
 공급업체가 제공하는 모델이라면 무엇이든 고를 수 있습니다. 선택한 엔진이 실패하거나 할당량이 소진되면, 로컬 엔진이 있는 경우 tarjim이 자동으로 로컬 엔진으로 전환합니다.

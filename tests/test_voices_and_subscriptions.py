@@ -63,3 +63,41 @@ def test_codex_tries_the_remembered_model_first(tmp_path: Path,
     monkeypatch.setattr(subscription.Path, "home", lambda: tmp_path)
     monkeypatch.setattr(subscription, "setting", lambda name: "small")
     assert subscription.codex_models() == ["small", "big"]
+
+
+def test_grok_models_come_from_its_own_listing_with_the_default_first() -> None:
+    from tarjim.engines import grok
+
+    listing = ("\nYou are logged in with grok.com.\n\nDefault model: grok-4.7\n\n"
+               "Available models:\n  - grok-4.7-build-fast\n  * grok-4.7 (default)\n  - grok-4.6\n")
+    assert [row[0] for row in grok.grok_rows(listing)] == ["grok-4.7", "grok-4.7-build-fast",
+                                                          "grok-4.6"]
+    assert grok.signed_in(listing) and not grok.signed_in("You are not logged in.")
+    assert not grok.signed_in("")
+
+
+def test_grok_is_asked_once_with_no_tools_and_its_structured_answer_is_used(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    import json
+    import subprocess
+
+    from tarjim.engines import grok
+    from tarjim.engines.web import RESULT
+
+    seen: list[list[str]] = []
+
+    def fake_run(command: list[str], _prompt: str, _folder: str) -> Any:
+        seen.append(command)
+        question = Path(command[command.index("--prompt-file") + 1]).read_text(encoding="utf-8")
+        reply = {"text": "ignored", "structuredOutput": {RESULT: [{"id": 1, "text": question}]}}
+        return subprocess.CompletedProcess(command, 0, json.dumps(reply), "")
+
+    monkeypatch.setattr(grok, "launcher", lambda _name: ["grok"])
+    monkeypatch.setattr(grok, "run", fake_run)
+    monkeypatch.setattr(grok, "setting", lambda _name: "grok-4.7")
+    schema = {"type": "array", "items": {"type": "object"}}
+    answer = grok.GrokAsker().ask("مرحبا", None, schema)
+    assert answer == [{"id": 1, "text": "مرحبا"}]
+    command = seen[0]
+    assert command[command.index("--tools") + 1] == "" and "--disable-web-search" in command
+    assert command[-2:] == ["-m", "grok-4.7"]

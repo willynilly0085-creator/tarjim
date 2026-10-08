@@ -69,17 +69,32 @@ def api_rows(provider: str) -> list[Row]:
     return rows
 
 
+def claude_list() -> list[Model]:
+    from tarjim.engines.subscription_models import claude_models
+
+    return claude_models()
+
+
+def grok_list() -> list[Model]:
+    """Grok's models with the account's default suggested: the lighter "build" models are tuned
+    for code, and nothing has shown yet that they translate well."""
+    from tarjim.engines.grok import grok_rows, listing
+
+    models = describe(grok_rows(listing()), keep_order=True)
+    return [{**model, "suggested": "yes" if at == 0 else ""} for at, model in enumerate(models)]
+
+
+OWN_LISTS = {"claude": claude_list, "codex": lambda: describe(codex_rows(), keep_order=True),
+             "grok": grok_list}
+
+
 def models_for(provider: str) -> list[Model]:
     """The models a provider offers, shaped for the page; empty when it cannot be asked."""
     found = BY_ID.get(provider)
     if found is None:
         return []
-    if provider == "claude":
-        from tarjim.engines.subscription_models import claude_models
-
-        return claude_models()
-    if provider == "codex":
-        return describe(codex_rows(), keep_order=True)
+    if provider in OWN_LISTS:
+        return OWN_LISTS[provider]()
     if found.method == SUBSCRIPTION:
         return describe([(m, "", "") for m in found.models], keep_order=True)
     try:

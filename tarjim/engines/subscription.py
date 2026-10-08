@@ -20,9 +20,14 @@ REFUSED = "not supported"
 HIDDEN = 0x08000000 if sys.platform == "win32" else 0
 
 
+OWN_FOLDERS = (Path(".local") / "bin", Path(".grok") / "bin")
+
+
 def own_folder(name: str) -> str | None:
-    folder = Path.home() / ".local" / "bin"
-    return next((str(p) for p in (folder / f"{name}.exe", folder / name) if p.is_file()), None)
+    """Where vendors' own installers put their program when it is not on PATH yet."""
+    places = [Path.home() / folder / file for folder in OWN_FOLDERS
+              for file in (f"{name}.exe", name)]
+    return next((str(p) for p in places if p.is_file()), None)
 
 
 def launcher(name: str) -> list[str]:
@@ -155,4 +160,8 @@ class PromptAsker:
 def subscription_asker(provider: str) -> Any:
     if provider == "claude":
         return ClaudeAsker()
+    if provider == "grok":
+        from tarjim.engines.grok import GrokAsker
+
+        return GrokAsker()
     return CodexAsker() if provider == "codex" else PromptAsker(provider)

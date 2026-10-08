@@ -30,7 +30,7 @@
 | الطريقة | الخيارات | ملاحظات |
 |---|---|---|
 | مفتاح API | Gemini و OpenAI و Anthropic و OpenRouter و DeepSeek و Qwen و Mistral و Groq و xAI، أو أي عنوان متوافق مع OpenAI | Gemini و OpenAI يقدرون كمان يسمعون الكلام (تحويل الكلام لنص). |
-| اشتراكك | Claude (عن طريق Claude Code)، و ChatGPT (عن طريق Codex)، و GitHub Copilot، و Google AI (عن طريق Antigravity) | ترجم يشغّل برنامج الشركة نفسه بتسجيل دخولك. الاستهلاك ينحسب من اشتراكك وتنطبق شروط كل شركة. |
+| اشتراكك | Claude (عن طريق Claude Code)، و ChatGPT (عن طريق Codex)، و Grok (عن طريق Grok Build)، و GitHub Copilot، و Google AI (عن طريق Antigravity) | ترجم يشغّل برنامج الشركة نفسه بتسجيل دخولك. الاستهلاك ينحسب من اشتراكك وتنطبق شروط كل شركة. |
 | على جهازك | Ollama و LM Studio و Jan و llama.cpp و vLLM و KoboldCpp | يلقاها تلقائياً مع نماذجها. ولا شي يطلع من جهازك. |
 
 اختر أي نموذج يقدمه المزوّد. ولو المحرك اللي اخترته تعطّل أو خلصت حصته، يرجع ترجم للمحرك المحلي إذا

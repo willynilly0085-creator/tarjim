@@ -34,7 +34,7 @@ gömer, bir `.srt` dosyası yazar ya da videoyu her konuşmacı için ayrı bir 
 | Yol | Seçenekler | Notlar |
 |---|---|---|
 | API anahtarı | Gemini, OpenAI, Anthropic, OpenRouter, DeepSeek, Qwen, Mistral, Groq, xAI ya da OpenAI uyumlu herhangi bir adres | Gemini ve OpenAI dinleyebilir de (konuşmadan metne). |
-| Aboneliğiniz | Claude (Claude Code üzerinden), ChatGPT (Codex üzerinden), GitHub Copilot, Google AI (Antigravity üzerinden) | tarjim, sağlayıcının kendi programını sizin oturumunuzla çalıştırır. Kullanım planınızdan düşülür ve her sağlayıcının kendi koşulları geçerlidir. |
+| Aboneliğiniz | Claude (Claude Code üzerinden), ChatGPT (Codex üzerinden), Grok (Grok Build üzerinden), GitHub Copilot, Google AI (Antigravity üzerinden) | tarjim, sağlayıcının kendi programını sizin oturumunuzla çalıştırır. Kullanım planınızdan düşülür ve her sağlayıcının kendi koşulları geçerlidir. |
 | Bilgisayarınızda | Ollama, LM Studio, Jan, llama.cpp, vLLM, KoboldCpp | Modelleriyle birlikte otomatik olarak bulunur. Hiçbir şey cihazınızdan çıkmaz. |
 
 Bir sağlayıcının sunduğu herhangi bir modeli seçin. Seçilen motor başarısız olursa ya da kotası

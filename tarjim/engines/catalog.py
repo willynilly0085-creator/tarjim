@@ -66,6 +66,8 @@ PROVIDERS = (
              models=("opus", "sonnet", "haiku")),
     Provider("codex", "ChatGPT", SUBSCRIPTION, program="codex", login=("codex", "login"),
              install="npm install -g @openai/codex"),
+    Provider("grok", "Grok", SUBSCRIPTION, program="grok", login=("grok", "login"),
+             install="https://x.ai/cli"),
     Provider("copilot", "GitHub Copilot", SUBSCRIPTION, program="copilot", login=("copilot",),
              install="npm install -g @github/copilot",
              models=("gpt-5.4", "claude-haiku-4.5", "gpt-5.3-codex")),

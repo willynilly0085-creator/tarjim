@@ -13,7 +13,8 @@ from tarjim.engines.catalog import BY_ID, SUBSCRIPTION
 from tarjim.engines.subscription import HIDDEN, launcher
 
 BROWSER = {"claude": (("auth", "login", "--claudeai"), ("auth", "status")),
-           "codex": (("login",), ("login", "status"))}
+           "codex": (("login",), ("login", "status")),
+           "grok": (("login", "--oauth"), ("models",))}
 CODE = re.compile(r"^[\w#.~-]{6,512}$")
 STATUS_SECONDS = 30
 waiting: dict[str, subprocess.Popen[str]] = {}
@@ -70,4 +71,8 @@ def signed_in(provider: str) -> bool:
             return bool(json.loads(done.stdout).get("loggedIn"))
         except ValueError:
             return False
+    if provider == "grok":
+        from tarjim.engines.grok import signed_in as grok_signed_in
+
+        return done.returncode == 0 and grok_signed_in(done.stdout)
     return done.returncode == 0 and "not logged in" not in done.stdout.lower()
