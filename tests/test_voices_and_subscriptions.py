@@ -1,7 +1,7 @@
-from pathlib import sys
+import sys
+from pathlib import Path
 from typing import Any
 
-import Path
 import pytest
 
 from tarjim.dub import gemini_voice
