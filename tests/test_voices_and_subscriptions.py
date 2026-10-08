@@ -1,6 +1,7 @@
-from pathlib import Path
+from pathlib import sys
 from typing import Any
 
+import Path
 import pytest
 
 from tarjim.dub import gemini_voice
@@ -42,6 +43,7 @@ def test_codex_schema_is_made_strict() -> None:
     assert shape["items"]["required"] == ["id", "text"]
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="npm writes .cmd launchers on Windows only")
 def test_npm_launchers_run_the_real_program_not_cmd(tmp_path: Path,
                                                     monkeypatch: pytest.MonkeyPatch) -> None:
     shim = tmp_path / "codex.cmd"

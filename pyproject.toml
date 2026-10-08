@@ -29,7 +29,7 @@ Developer = "https://indicators.sa/"
 [project.optional-dependencies]
 dub = ["torchcodec", "demucs", "catt-tashkeel", "edge-tts", "fish-audio-sdk", "num2words", "librosa",
        "einops", "soundfile"]
-dev = ["pytest", "pytest-cov", "ruff", "mypy"]
+dev = ["pytest", "pytest-cov", "ruff", "mypy", "num2words"]
 
 [project.scripts]
 tarjim = "tarjim.cli:main"
