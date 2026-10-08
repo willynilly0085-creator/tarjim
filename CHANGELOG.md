@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2 (2026-10-08)
+
+- A subscription that is installed but signed out can be chosen in the setup plan, and signing in
+  happens right there. Before, the choice was greyed out with "sign in first" and nowhere to do it.
+
 ## 1.0.1 (2026-10-08)
 
 - Every failure now says where it stopped, what it means and the real reason, in the page, the

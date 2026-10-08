@@ -3,6 +3,7 @@ import { t } from "./i18n.js";
 import { keyNeed } from "./assistant_key.js";
 import { listenOptions, translateOptions } from "./assistant_options.js";
 import { fillModels, modelOptions } from "./models.js";
+import { signInPanel } from "./signin.js";
 import { button, el, status } from "./ui.js";
 
 function missing(state) {
@@ -78,6 +79,16 @@ function needsKey(state) {
   return [plan.translate, plan.listen].some((c) => ["gemini", "openai"].includes(c.provider) && !c.ready);
 }
 
+// A subscription that is installed but signed out is still a choice: signing in happens right here.
+function signInNeed(state, repaint) {
+  const app = state.scan.subscriptions.apps.find((a) => a.id === state.plan.translate.provider);
+  if (!app || app.signed_in) return "";
+  const signed = () => { app.signed_in = true; state.plan.translate.ready = true; repaint(); };
+  return el("div", { className: "plan-row need" },
+    el("p", { className: "field-label", textContent: t("needTitle") }),
+    el("p", { textContent: t("needSignIn", { name: app.name }) }), signInPanel(app, signed));
+}
+
 export function planScreen(screen, state, { back, apply, manual }) {
   const note = status();
   const start = button(t("planStart"), async () => {
@@ -89,7 +100,7 @@ export function planScreen(screen, state, { back, apply, manual }) {
     else { note.textContent = t("planApplyFailed"); start.disabled = false; }
   }, "primary");
   const paint = () => {
-    const keyPart = needsKey(state) ? keyNeed(state, paint) : "";
+    const keyPart = needsKey(state) ? keyNeed(state, paint) : signInNeed(state, paint);
     start.disabled = Boolean(keyPart);
     screen(el("h1", { tabIndex: -1, textContent: t("planTitle") }),
       el("p", { className: "lede", textContent: t("planHint") }),

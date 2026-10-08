@@ -251,7 +251,7 @@
   "freeKey": "kostenloser Schlüssel",
   "needsDownload": "{gb} GB Download",
   "reason_signed_in": "Du bist schon angemeldet, daher übersetzt tarjim über dein Abo ohne zusätzlichen Schlüssel.",
-  "reason_sign_in_first": "Installiert, aber nicht angemeldet. Melde dich über „Nutze die KI, für die du schon bezahlst“ an.",
+  "reason_sign_in_first": "Installiert, aber abgemeldet. Wählen Sie es aus und melden Sie sich gleich hier an.",
   "reason_key": "Nutzt den Schlüssel, den du schon gespeichert hast.",
   "reason_local": "Läuft auf deiner Grafikkarte. Nichts verlässt deinen Computer.",
   "reason_local_slow": "Läuft ohne Grafikkarte auf diesem Computer und ist daher langsam.",
@@ -366,5 +366,6 @@
   "madeBy": "Entwickelt von Indicators",
   "err_signin": "Ihr KI-Abo erfordert eine erneute Anmeldung. Öffnen Sie tarjim, gehen Sie zu den Einstellungen, melden Sie sich an und versuchen Sie es erneut.",
   "failedAt": "Angehalten bei „{stage}“.",
-  "errorDetail": "Details: {detail}"
+  "errorDetail": "Details: {detail}",
+  "needSignIn": "Melden Sie sich bei {name} an, damit mit Ihrem Abo übersetzt wird, ganz ohne Schlüssel."
 }

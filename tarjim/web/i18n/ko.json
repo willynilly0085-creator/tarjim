@@ -251,7 +251,7 @@
   "freeKey": "무료 키",
   "needsDownload": "{gb} GB 다운로드",
   "reason_signed_in": "이미 로그인되어 있어서, 추가 키 없이 내 요금제로 번역해요.",
-  "reason_sign_in_first": "설치되어 있지만 로그인하지 않았어요. “이미 결제 중인 AI 사용”에서 로그인하세요.",
+  "reason_sign_in_first": "설치되어 있지만 로그인되어 있지 않아요. 선택한 뒤 여기서 바로 로그인하세요.",
   "reason_key": "이미 저장한 키를 사용해요.",
   "reason_local": "그래픽 카드에서 실행돼요. 어떤 데이터도 컴퓨터 밖으로 나가지 않아요.",
   "reason_local_slow": "그래픽 카드 없이 이 컴퓨터에서 실행되므로 느려요.",
@@ -366,5 +366,6 @@
   "madeBy": "개발: Indicators",
   "err_signin": "AI 구독에 다시 로그인해야 해요. tarjim을 열고 설정에서 로그인한 뒤 다시 시도하세요.",
   "failedAt": "“{stage}” 단계에서 멈췄어요.",
-  "errorDetail": "자세한 내용: {detail}"
+  "errorDetail": "자세한 내용: {detail}",
+  "needSignIn": "{name}에 로그인하면 키 없이 구독으로 번역해요."
 }

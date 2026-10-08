@@ -251,7 +251,7 @@
   "freeKey": "kunci gratis",
   "needsDownload": "unduhan {gb} GB",
   "reason_signed_in": "Kamu sudah masuk, jadi terjemahan memakai paketmu tanpa kunci tambahan.",
-  "reason_sign_in_first": "Terpasang tapi belum masuk. Pilih “Pakai AI yang sudah kamu bayar” untuk masuk.",
+  "reason_sign_in_first": "Terpasang tetapi belum masuk. Pilih dan masuk langsung di sini.",
   "reason_key": "Memakai kunci yang sudah kamu simpan.",
   "reason_local": "Berjalan di kartu grafismu. Tidak ada yang keluar dari komputermu.",
   "reason_local_slow": "Berjalan di komputer ini tanpa kartu grafis, jadi akan lambat.",
@@ -366,5 +366,6 @@
   "madeBy": "Dikembangkan oleh Indicators",
   "err_signin": "Langganan AI-mu perlu masuk lagi. Buka tarjim, buka Pengaturan, masuk, lalu coba lagi.",
   "failedAt": "Berhenti di “{stage}”.",
-  "errorDetail": "Rincian: {detail}"
+  "errorDetail": "Rincian: {detail}",
+  "needSignIn": "Masuk ke {name} agar terjemahan memakai langgananmu, tanpa kunci apa pun."
 }

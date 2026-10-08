@@ -251,7 +251,7 @@
   "freeKey": "clé gratuite",
   "needsDownload": "{gb} Go à télécharger",
   "reason_signed_in": "Vous êtes déjà connecté : la traduction utilise votre abonnement, sans clé supplémentaire.",
-  "reason_sign_in_first": "Installé mais non connecté. Utilisez « Utiliser l'IA que vous payez déjà » pour vous connecter.",
+  "reason_sign_in_first": "Installé mais déconnecté. Choisissez-le et connectez-vous ici même.",
   "reason_key": "Utilise la clé que vous avez déjà enregistrée.",
   "reason_local": "Tourne sur votre carte graphique. Rien ne quitte votre ordinateur.",
   "reason_local_slow": "Tourne sur cet ordinateur sans carte graphique, ce sera donc lent.",
@@ -366,5 +366,6 @@
   "madeBy": "Développé par Indicators",
   "err_signin": "Votre abonnement IA demande une nouvelle connexion. Ouvrez tarjim, allez dans les Réglages, connectez-vous, puis réessayez.",
   "failedAt": "Arrêté à « {stage} ».",
-  "errorDetail": "Détails : {detail}"
+  "errorDetail": "Détails : {detail}",
+  "needSignIn": "Connectez-vous à {name} pour traduire avec votre abonnement, sans aucune clé."
 }

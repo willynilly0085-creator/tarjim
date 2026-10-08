@@ -251,7 +251,7 @@
   "freeKey": "chave grátis",
   "needsDownload": "download de {gb} GB",
   "reason_signed_in": "Você já está conectado, então a tradução usa seu plano sem nenhuma chave extra.",
-  "reason_sign_in_first": "Instalado, mas sem login. Use “Use a IA que você já paga” para entrar.",
+  "reason_sign_in_first": "Instalado, mas sem sessão. Escolha e entre aqui mesmo.",
   "reason_key": "Usa a chave que você já salvou.",
   "reason_local": "Roda na sua placa de vídeo. Nada sai do seu computador.",
   "reason_local_slow": "Roda neste computador sem placa de vídeo, então vai ser lento.",
@@ -366,5 +366,6 @@
   "madeBy": "Desenvolvido pela Indicators",
   "err_signin": "Sua assinatura de IA precisa que você entre de novo. Abra o tarjim, vá em Configurações, entre e tente outra vez.",
   "failedAt": "Parou em “{stage}”.",
-  "errorDetail": "Detalhes: {detail}"
+  "errorDetail": "Detalhes: {detail}",
+  "needSignIn": "Entre no {name} para traduzir com a sua assinatura, sem nenhuma chave."
 }

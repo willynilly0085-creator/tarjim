@@ -251,7 +251,7 @@
   "freeKey": "免费密钥",
   "needsDownload": "需下载 {gb} GB",
   "reason_signed_in": "你已登录，因此翻译会使用你的套餐，无需额外密钥。",
-  "reason_sign_in_first": "已安装但未登录。请通过“使用你已付费的 AI”登录。",
+  "reason_sign_in_first": "已安装但未登录。选中它，就在这里登录。",
   "reason_key": "使用你已保存的密钥。",
   "reason_local": "在你的显卡上运行，任何内容都不会离开你的电脑。",
   "reason_local_slow": "在没有显卡的情况下于这台电脑上运行，因此速度较慢。",
@@ -366,5 +366,6 @@
   "madeBy": "由 Indicators 开发",
   "err_signin": "你的 AI 订阅需要重新登录。打开 tarjim，进入设置登录，然后再试一次。",
   "failedAt": "停在“{stage}”。",
-  "errorDetail": "详情：{detail}"
+  "errorDetail": "详情：{detail}",
+  "needSignIn": "登录 {name}，即可用你的订阅翻译，无需任何密钥。"
 }

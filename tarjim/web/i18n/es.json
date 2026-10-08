@@ -251,7 +251,7 @@
   "freeKey": "clave gratuita",
   "needsDownload": "descarga de {gb} GB",
   "reason_signed_in": "Ya tienes la sesión iniciada, así que la traducción usa tu plan sin ninguna clave extra.",
-  "reason_sign_in_first": "Instalado, pero sin sesión iniciada. Usa «Usa la IA que ya pagas» para iniciar sesión.",
+  "reason_sign_in_first": "Instalado pero sin sesión. Elígelo e inicia sesión aquí mismo.",
   "reason_key": "Usa la clave que ya guardaste.",
   "reason_local": "Funciona con tu tarjeta gráfica. Nada sale de tu computadora.",
   "reason_local_slow": "Funciona en esta computadora sin tarjeta gráfica, así que será lento.",
@@ -366,5 +366,6 @@
   "madeBy": "Desarrollado por Indicators",
   "err_signin": "Tu suscripción de IA necesita que vuelvas a iniciar sesión. Abre tarjim, ve a Ajustes, inicia sesión y vuelve a intentarlo.",
   "failedAt": "Se detuvo en «{stage}».",
-  "errorDetail": "Detalles: {detail}"
+  "errorDetail": "Detalles: {detail}",
+  "needSignIn": "Inicia sesión en {name} para traducir con tu suscripción, sin ninguna clave."
 }

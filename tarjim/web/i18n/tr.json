@@ -251,7 +251,7 @@
   "freeKey": "ücretsiz anahtar",
   "needsDownload": "{gb} GB indirme",
   "reason_signed_in": "Zaten giriş yaptın, bu yüzden çeviri ek anahtar olmadan aboneliğini kullanır.",
-  "reason_sign_in_first": "Yüklü ama giriş yapılmamış. Giriş yapmak için “Zaten ödediğin yapay zekâyı kullan” seçeneğini kullan.",
+  "reason_sign_in_first": "Kurulu ama oturum açılmamış. Seç ve tam burada oturum aç.",
   "reason_key": "Daha önce kaydettiğin anahtarı kullanır.",
   "reason_local": "Ekran kartında çalışır. Hiçbir şey bilgisayarından çıkmaz.",
   "reason_local_slow": "Bu bilgisayarda ekran kartı olmadan çalışır, bu yüzden yavaş olur.",
@@ -366,5 +366,6 @@
   "madeBy": "Indicators tarafından geliştirildi",
   "err_signin": "Yapay zekâ aboneliğin için yeniden oturum açman gerekiyor. tarjim'i aç, Ayarlar'a git, oturum aç ve tekrar dene.",
   "failedAt": "“{stage}” aşamasında durdu.",
-  "errorDetail": "Ayrıntı: {detail}"
+  "errorDetail": "Ayrıntı: {detail}",
+  "needSignIn": "Aboneliğinle, anahtar olmadan çevirmek için {name} oturumunu aç."
 }

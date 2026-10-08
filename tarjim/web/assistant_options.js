@@ -19,7 +19,7 @@ function option(value, label, why, choice, disabled = false) {
 function subscriptions(scan) {
   return scan.subscriptions.apps.filter((a) => a.installed).map((a) => option(`sub:${a.id}`,
     a.signed_in ? a.name : `${a.name} · ${t("needsSignIn")}`, t(a.signed_in ? "reason_signed_in" : "reason_sign_in_first"),
-    { provider: a.id, ready: a.signed_in }, !a.signed_in));
+    { provider: a.id, ready: a.signed_in }));
 }
 
 function locals(scan) {

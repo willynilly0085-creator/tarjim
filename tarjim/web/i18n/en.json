@@ -251,7 +251,7 @@
   "freeKey": "free key",
   "needsDownload": "{gb} GB download",
   "reason_signed_in": "You are already signed in, so translation uses your plan with no extra key.",
-  "reason_sign_in_first": "Installed but not signed in. Use “Use the AI you already pay for” to sign in.",
+  "reason_sign_in_first": "Installed but signed out. Choose it and sign in right here.",
   "reason_key": "Uses the key you already saved.",
   "reason_local": "Runs on your graphics card. Nothing leaves your computer.",
   "reason_local_slow": "Runs on this computer without a graphics card, so it will be slow.",
@@ -366,5 +366,6 @@
   "madeBy": "Developed by Indicators",
   "err_signin": "Your AI subscription needs you to sign in again. Open tarjim, go to Settings, sign in, then try again.",
   "failedAt": "Stopped at “{stage}”.",
-  "errorDetail": "Details: {detail}"
+  "errorDetail": "Details: {detail}",
+  "needSignIn": "Sign in to {name} so it translates with your subscription, no key needed."
 }
