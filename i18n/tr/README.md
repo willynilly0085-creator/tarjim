@@ -2,6 +2,8 @@
 <!-- languages -->
 [English](../../README.md) · [العربية](../../i18n/ar/README.md) · [Español](../../i18n/es/README.md) · [Français](../../i18n/fr/README.md) · [Português](../../i18n/pt/README.md) · [Deutsch](../../i18n/de/README.md) · [Русский](../../i18n/ru/README.md) · **Türkçe** · [हिन्दी](../../i18n/hi/README.md) · [اردو](../../i18n/ur/README.md) · [Bahasa Indonesia](../../i18n/id/README.md) · [日本語](../../i18n/ja/README.md) · [中文](../../i18n/zh/README.md) · [한국어](../../i18n/ko/README.md)
 
+[Indicators](https://indicators.sa/) tarafından geliştirildi · [indicators.sa](https://indicators.sa/)
+
 **Her video için altyazı ve seslendirme; sizin dilinizde, kendi bilgisayarınızda.**
 
 Bir bağlantı yapıştırın ya da bir dosya bırakın. tarjim dinler, her satırı söylendiği ana göre
@@ -160,6 +162,16 @@ tarjim video.mp4                 # Arabic (Saudi), burned into the video
 tarjim video.mp4 --to fr         # any target language
 tarjim video.mp4 --no-burn       # .srt and .ass only
 ```
+
+## Güncellemeler
+
+tarjim kendini güncel tutar. Motor günde bir kez GitHub'a en son sürümün numarasını sorar: sizinle
+ya da videolarınızla ilgili hiçbir şey taşımayan tek bir istek. **Yeni sürüm çıkınca tarjim'i
+otomatik güncelle** açıkken (kurulum sırasında sunulur ve Ayarlar'dan değiştirilebilir), daha yeni
+bir sürüm, çalışan bir iş olmadığı sürece arka planda kurulur ve tarjim birkaç dakika içinde
+kendiliğinden geri gelir; tarayıcı eklentisi de buna uymak için kendini yeniler. Kapalıyken sayfa
+bir uyarı ve bir **Şimdi güncelle** düğmesi gösterir. Kaynaktan çalıştırdığınız kopya `git pull` ile
+güncellenir.
 
 ## Gizlilik ve güvenlik
 

@@ -362,5 +362,6 @@
   "updateFailed": "更新が完了せず、現在のバージョンが再び動いています。しばらくしてからもう一度お試しください。",
   "updateManual": "このコピーはソースコードから実行されており、git で更新します。",
   "autoUpdate": "新しいバージョンが出たら tarjim を自動で更新する（1 日に 1 回、最新バージョンの番号を確認するだけです）",
-  "versionLine": "バージョン {version}"
+  "versionLine": "バージョン {version}",
+  "madeBy": "開発: Indicators"
 }

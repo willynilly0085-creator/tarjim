@@ -2,6 +2,8 @@
 <!-- languages -->
 [English](../../README.md) · [العربية](../../i18n/ar/README.md) · [Español](../../i18n/es/README.md) · [Français](../../i18n/fr/README.md) · [Português](../../i18n/pt/README.md) · [Deutsch](../../i18n/de/README.md) · [Русский](../../i18n/ru/README.md) · [Türkçe](../../i18n/tr/README.md) · [हिन्दी](../../i18n/hi/README.md) · **اردو** · [Bahasa Indonesia](../../i18n/id/README.md) · [日本語](../../i18n/ja/README.md) · [中文](../../i18n/zh/README.md) · [한국어](../../i18n/ko/README.md)
 
+تیار کردہ: [Indicators](https://indicators.sa/) · [indicators.sa](https://indicators.sa/)
+
 **کسی بھی ویڈیو کے لیے سب ٹائٹل اور ڈبنگ، آپ کی زبان میں، آپ کے اپنے کمپیوٹر پر۔**
 
 لنک چسپاں کیجیے یا فائل ڈال دیجیے۔ tarjim سنتا ہے، ہر سطر کو ٹھیک اُس لمحے سے ملاتا ہے جب وہ بولی
@@ -151,6 +153,15 @@ tarjim video.mp4                 # Arabic (Saudi), burned into the video
 tarjim video.mp4 --to fr         # any target language
 tarjim video.mp4 --no-burn       # .srt and .ass only
 ```
+
+## اپ ڈیٹس
+
+tarjim خود کو اپ ڈیٹ رکھتا ہے۔ دن میں ایک بار انجن GitHub سے تازہ ترین ریلیز کا نمبر پوچھتا ہے: ایک
+ہی درخواست، جس میں آپ یا آپ کی ویڈیوز کے بارے میں کچھ نہیں ہوتا۔ **نیا ورژن آنے پر tarjim کو خود
+بخود اپ ڈیٹ کریں** آن ہو (سیٹ اپ کے دوران پیش کیا جاتا ہے اور ترتیبات میں بدلا جا سکتا ہے) تو نئی
+ریلیز پس منظر میں اس وقت انسٹال ہو جاتی ہے جب کوئی کام نہ چل رہا ہو، اور tarjim چند منٹ میں خود واپس
+آ جاتا ہے؛ براؤزر ایکسٹینشن بھی اس کے مطابق خود ری لوڈ ہو جاتی ہے۔ آف ہو تو صفحہ ایک نوٹس اور **ابھی
+اپ ڈیٹ کریں** بٹن دکھاتا ہے۔ سورس سے چلائی گئی کاپی `git pull` سے اپ ڈیٹ ہوتی ہے۔
 
 ## رازداری اور سلامتی
 

@@ -1,0 +1,10 @@
+.made-by { margin-top: var(--space-xl); padding: var(--space-md) 0 var(--space-lg); border-top: 1px solid var(--line); }
+.made-by a { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--space-xs); color: var(--muted); font-size: var(--text-meta); text-decoration: none; }
+.made-by a:hover { color: var(--text); }
+.made-by img { height: 24px; width: auto; }
+.made-by .made-by-site { font-weight: 700; }
+.made-by .logo-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  .made-by .logo-light { display: none; }
+  .made-by .logo-dark { display: inline; }
+}

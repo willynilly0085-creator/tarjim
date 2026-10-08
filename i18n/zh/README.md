@@ -2,6 +2,8 @@
 <!-- languages -->
 [English](../../README.md) · [العربية](../../i18n/ar/README.md) · [Español](../../i18n/es/README.md) · [Français](../../i18n/fr/README.md) · [Português](../../i18n/pt/README.md) · [Deutsch](../../i18n/de/README.md) · [Русский](../../i18n/ru/README.md) · [Türkçe](../../i18n/tr/README.md) · [हिन्दी](../../i18n/hi/README.md) · [اردو](../../i18n/ur/README.md) · [Bahasa Indonesia](../../i18n/id/README.md) · [日本語](../../i18n/ja/README.md) · **中文** · [한국어](../../i18n/ko/README.md)
 
+由 [Indicators](https://indicators.sa/) 开发 · [indicators.sa](https://indicators.sa/)
+
 **为任何视频生成字幕和配音，用你的语言，在你自己的电脑上完成。**
 
 粘贴一个链接或拖入一个文件即可。tarjim 会聆听音频，把每一行精确对齐到说出它的那一刻，区分每位说话人，翻译成自然的口语，然后把字幕烧录进视频、生成 `.srt` 文件，或者为每位说话人配上各自的声音进行配音。
@@ -106,6 +108,10 @@ tarjim video.mp4                 # Arabic (Saudi), burned into the video
 tarjim video.mp4 --to fr         # any target language
 tarjim video.mp4 --no-burn       # .srt and .ass only
 ```
+
+## 更新
+
+tarjim 会自己保持最新。引擎每天向 GitHub 查询一次最新版本的编号：只是一次请求，不包含任何关于你或你的视频的信息。开启 **有新版本时自动更新 tarjim** 后（安装设置时会询问，也可以在设置中更改），较新的版本会在没有任务运行时于后台安装，tarjim 几分钟后自动回来；浏览器扩展也会自行重新加载以保持一致。关闭时，页面会显示提示和 **立即更新** 按钮。从源码运行的副本用 `git pull` 更新。
 
 ## 隐私与安全
 

@@ -365,5 +365,8 @@
   },
   "phoneSettingsButton": {
     "message": "Phone settings"
+  },
+  "madeBy": {
+    "message": "Developed by Indicators"
   }
 }

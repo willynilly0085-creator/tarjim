@@ -66,7 +66,8 @@ def server_program(uv: str) -> str:
     return str(tool_bin(uv) / name)
 
 
-KEEP_ENV = ("PYTHONPATH", "TARJIM_HOME", "TARJIM_SERVER", "UV_TOOL_DIR", "UV_TOOL_BIN_DIR")
+KEEP_ENV = ("PYTHONPATH", "TARJIM_HOME", "TARJIM_SERVER", "UV_TOOL_DIR", "UV_TOOL_BIN_DIR",
+            "TARJIM_RELEASES", "TARJIM_ARCHIVE")
 CREATE_OUTSIDE_JOB = "\n".join((
     "$si = New-CimInstance -ClassName Win32_ProcessStartup -ClientOnly "
     "-Property @{{ShowWindow=[uint16]0}}",

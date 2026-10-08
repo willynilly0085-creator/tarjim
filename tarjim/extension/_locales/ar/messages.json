@@ -365,5 +365,8 @@
   },
   "phoneSettingsButton": {
     "message": "إعدادات الجوال"
+  },
+  "madeBy": {
+    "message": "تطوير شركة المؤشرات لتحليل البيانات"
   }
 }

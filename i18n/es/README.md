@@ -2,6 +2,8 @@
 <!-- languages -->
 [English](../../README.md) · [العربية](../../i18n/ar/README.md) · **Español** · [Français](../../i18n/fr/README.md) · [Português](../../i18n/pt/README.md) · [Deutsch](../../i18n/de/README.md) · [Русский](../../i18n/ru/README.md) · [Türkçe](../../i18n/tr/README.md) · [हिन्दी](../../i18n/hi/README.md) · [اردو](../../i18n/ur/README.md) · [Bahasa Indonesia](../../i18n/id/README.md) · [日本語](../../i18n/ja/README.md) · [中文](../../i18n/zh/README.md) · [한국어](../../i18n/ko/README.md)
 
+Desarrollado por [Indicators](https://indicators.sa/) · [indicators.sa](https://indicators.sa/)
+
 **Subtítulos y doblaje para cualquier vídeo, en tu idioma, en tu propio ordenador.**
 
 Pega un enlace o suelta un archivo. tarjim escucha, sincroniza cada línea con el momento exacto en
@@ -159,6 +161,16 @@ tarjim video.mp4                 # Arabic (Saudi), burned into the video
 tarjim video.mp4 --to fr         # any target language
 tarjim video.mp4 --no-burn       # .srt and .ass only
 ```
+
+## Actualizaciones
+
+tarjim se mantiene actualizado solo. Una vez al día el motor le pregunta a GitHub por el número de
+la última versión: una sola petición que no lleva nada sobre ti ni sobre tus vídeos. Con
+**Actualizar tarjim automáticamente** activado (se ofrece durante la configuración y se puede
+cambiar en Ajustes), una versión nueva se instala en segundo plano mientras no haya ningún trabajo
+en curso, y tarjim vuelve solo en unos minutos; la extensión del navegador se recarga sola para
+coincidir. Con la opción desactivada, la página muestra un aviso y un botón **Actualizar ahora**.
+Una copia que ejecutas desde el código fuente se actualiza con `git pull`.
 
 ## Privacidad y seguridad
 

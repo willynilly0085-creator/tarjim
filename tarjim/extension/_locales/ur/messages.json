@@ -365,5 +365,8 @@
   },
   "phoneSettingsButton": {
     "message": "فون کی ترتیبات"
+  },
+  "madeBy": {
+    "message": "تیار کردہ: ⁦Indicators⁩"
   }
 }

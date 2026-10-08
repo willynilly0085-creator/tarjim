@@ -362,5 +362,6 @@
   "updateFailed": "Pembaruan tidak selesai dan versi saat ini berjalan lagi. Coba lagi sebentar lagi.",
   "updateManual": "Salinan ini berjalan dari kode sumber dan diperbarui dengan git.",
   "autoUpdate": "Perbarui tarjim otomatis saat versi baru keluar (hanya menanyakan nomor versi terbaru sekali sehari)",
-  "versionLine": "Versi {version}"
+  "versionLine": "Versi {version}",
+  "madeBy": "Dikembangkan oleh Indicators"
 }

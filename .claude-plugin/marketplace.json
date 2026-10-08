@@ -2,7 +2,7 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "tarjim",
   "description": "Subtitles and dubbing for any video, in any language, on your own computer.",
-  "owner": { "name": "tarjim", "email": "willy.nilly0085@gmail.com" },
+  "owner": { "name": "Indicators", "email": "willy.nilly0085@gmail.com", "url": "https://indicators.sa/" },
   "plugins": [
     {
       "name": "tarjim",

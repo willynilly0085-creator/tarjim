@@ -362,5 +362,6 @@
   "updateFailed": "A atualização não terminou e a versão atual voltou a funcionar. Tente de novo daqui a pouco.",
   "updateManual": "Esta cópia roda a partir do código-fonte e é atualizada com git.",
   "autoUpdate": "Atualizar o tarjim automaticamente quando sair uma versão nova (só pergunta uma vez por dia o número da versão mais recente)",
-  "versionLine": "Versão {version}"
+  "versionLine": "Versão {version}",
+  "madeBy": "Desenvolvido pela Indicators"
 }

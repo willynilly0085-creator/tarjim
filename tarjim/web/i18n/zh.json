@@ -362,5 +362,6 @@
   "updateFailed": "更新没有完成，当前版本已恢复运行。请稍后再试。",
   "updateManual": "这个副本从源代码运行，请用 git 更新。",
   "autoUpdate": "有新版本时自动更新 tarjim（每天只询问一次最新版本号）",
-  "versionLine": "版本 {version}"
+  "versionLine": "版本 {version}",
+  "madeBy": "由 Indicators 开发"
 }

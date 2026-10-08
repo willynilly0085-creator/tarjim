@@ -2,6 +2,8 @@
 <!-- languages -->
 [English](../../README.md) · [العربية](../../i18n/ar/README.md) · [Español](../../i18n/es/README.md) · [Français](../../i18n/fr/README.md) · [Português](../../i18n/pt/README.md) · [Deutsch](../../i18n/de/README.md) · [Русский](../../i18n/ru/README.md) · [Türkçe](../../i18n/tr/README.md) · [हिन्दी](../../i18n/hi/README.md) · [اردو](../../i18n/ur/README.md) · **Bahasa Indonesia** · [日本語](../../i18n/ja/README.md) · [中文](../../i18n/zh/README.md) · [한국어](../../i18n/ko/README.md)
 
+Dikembangkan oleh [Indicators](https://indicators.sa/) · [indicators.sa](https://indicators.sa/)
+
 **Subtitle dan sulih suara untuk video apa pun, dalam bahasa Anda, di komputer Anda sendiri.**
 
 Tempel tautan atau letakkan berkas. tarjim mendengarkan, menyelaraskan setiap baris dengan saat
@@ -154,6 +156,16 @@ tarjim video.mp4                 # Arabic (Saudi), burned into the video
 tarjim video.mp4 --to fr         # any target language
 tarjim video.mp4 --no-burn       # .srt and .ass only
 ```
+
+## Pembaruan
+
+tarjim memperbarui dirinya sendiri. Sekali sehari mesin menanyakan nomor rilis terbaru ke GitHub:
+satu permintaan yang tidak membawa apa pun tentang Anda atau video Anda. Saat **Perbarui tarjim
+otomatis** aktif (ditawarkan saat pengaturan awal dan bisa diubah di Pengaturan), rilis yang lebih
+baru dipasang di latar belakang selama tidak ada tugas yang berjalan, dan tarjim kembali sendiri
+dalam beberapa menit; ekstensi browser memuat ulang dirinya agar sesuai. Saat nonaktif, halaman
+menampilkan pemberitahuan dan tombol **Perbarui sekarang**. Salinan yang Anda jalankan dari kode
+sumber diperbarui dengan `git pull`.
 
 ## Privasi dan keamanan
 

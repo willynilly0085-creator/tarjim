@@ -365,5 +365,8 @@
   },
   "phoneSettingsButton": {
     "message": "휴대폰 설정"
+  },
+  "madeBy": {
+    "message": "개발: Indicators"
   }
 }

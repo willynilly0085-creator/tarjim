@@ -365,5 +365,8 @@
   },
   "phoneSettingsButton": {
     "message": "Pengaturan ponsel"
+  },
+  "madeBy": {
+    "message": "Dikembangkan oleh Indicators"
   }
 }

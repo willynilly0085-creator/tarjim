@@ -365,5 +365,8 @@
   },
   "phoneSettingsButton": {
     "message": "Telefon ayarları"
+  },
+  "madeBy": {
+    "message": "Indicators tarafından geliştirildi"
   }
 }

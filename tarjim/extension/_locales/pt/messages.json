@@ -365,5 +365,8 @@
   },
   "phoneSettingsButton": {
     "message": "Configurações do celular"
+  },
+  "madeBy": {
+    "message": "Desenvolvido pela Indicators"
   }
 }

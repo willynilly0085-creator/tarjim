@@ -2,6 +2,8 @@
 <!-- languages -->
 [English](../../README.md) · [العربية](../../i18n/ar/README.md) · [Español](../../i18n/es/README.md) · [Français](../../i18n/fr/README.md) · [Português](../../i18n/pt/README.md) · [Deutsch](../../i18n/de/README.md) · [Русский](../../i18n/ru/README.md) · [Türkçe](../../i18n/tr/README.md) · [हिन्दी](../../i18n/hi/README.md) · [اردو](../../i18n/ur/README.md) · [Bahasa Indonesia](../../i18n/id/README.md) · [日本語](../../i18n/ja/README.md) · [中文](../../i18n/zh/README.md) · **한국어**
 
+개발: [Indicators](https://indicators.sa/) · [indicators.sa](https://indicators.sa/)
+
 **어떤 동영상이든, 여러분의 언어로 자막과 더빙을. 모두 여러분의 컴퓨터에서.**
 
 링크를 붙여 넣거나 파일을 끌어다 놓기만 하면 됩니다. tarjim은 음성을 듣고, 각 줄을 말하는 순간에 정확히 맞추고, 화자를 하나하나 구분하고, 자연스러운 구어체로 번역합니다. 그런 다음 자막을 동영상에 입히거나, `.srt` 파일을 만들거나, 화자마다 목소리를 따로 입혀 더빙합니다.
@@ -106,6 +108,10 @@ tarjim video.mp4                 # Arabic (Saudi), burned into the video
 tarjim video.mp4 --to fr         # any target language
 tarjim video.mp4 --no-burn       # .srt and .ass only
 ```
+
+## 업데이트
+
+tarjim은 스스로 최신 상태를 유지해요. 하루에 한 번 엔진이 GitHub에 최신 릴리스 번호를 물어보는데, 여러분이나 영상에 관한 정보는 전혀 담지 않은 요청 한 번이에요. **새 버전이 나오면 tarjim을 자동으로 업데이트** 를 켜 두면(설정할 때 안내하고 설정에서 바꿀 수 있어요) 실행 중인 작업이 없을 때 새 릴리스가 백그라운드에서 설치되고, tarjim은 몇 분 안에 저절로 다시 돌아와요. 브라우저 확장 프로그램도 맞춰서 스스로 다시 불러와요. 꺼 두면 페이지에 알림과 **지금 업데이트** 버튼이 나타나요. 소스에서 직접 실행하는 사본은 `git pull`로 업데이트해요.
 
 ## 개인정보 보호와 보안
 

@@ -14,3 +14,5 @@ samples/
 
 # Old extension folder kept as a link for Chrome installs loaded from it
 /extension
+build/
+dist/

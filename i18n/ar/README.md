@@ -2,6 +2,8 @@
 <!-- languages -->
 [English](../../README.md) · **العربية** · [Español](../../i18n/es/README.md) · [Français](../../i18n/fr/README.md) · [Português](../../i18n/pt/README.md) · [Deutsch](../../i18n/de/README.md) · [Русский](../../i18n/ru/README.md) · [Türkçe](../../i18n/tr/README.md) · [हिन्दी](../../i18n/hi/README.md) · [اردو](../../i18n/ur/README.md) · [Bahasa Indonesia](../../i18n/id/README.md) · [日本語](../../i18n/ja/README.md) · [中文](../../i18n/zh/README.md) · [한국어](../../i18n/ko/README.md)
 
+تطوير [شركة المؤشرات لتحليل البيانات](https://indicators.sa/) · [indicators.sa](https://indicators.sa/)
+
 **ترجمة ودبلجة لأي فيديو، بلغتك، على جهازك.**
 
 الصق رابط أو اسحب ملف. ترجم (tarjim) يسمع الكلام، ويضبط كل سطر على لحظة نطقه بالضبط، ويفصل كلام كل
@@ -140,6 +142,14 @@ tarjim video.mp4                 # Arabic (Saudi), burned into the video
 tarjim video.mp4 --to fr         # any target language
 tarjim video.mp4 --no-burn       # .srt and .ass only
 ```
+
+## التحديثات
+
+ترجم يحدّث نفسه. مرة باليوم يسأل المحرك GitHub عن رقم آخر نسخة: طلب واحد ما فيه أي شي عنك ولا عن
+مقاطعك. إذا كان خيار **حدّث ترجم تلقائياً** مفعّل (ينعرض عليك وقت الإعداد، وتغيّره من الإعدادات)،
+تتركّب النسخة الجديدة في الخلفية لما ما يكون فيه ترجمة شغّالة، ويرجع ترجم يشتغل لحاله خلال دقايق،
+وإضافة المتصفح تحدّث نفسها معه. وإذا كان مطفي، تطلع لك في الصفحة ملاحظة وزر **حدّث الآن**. والنسخة
+اللي تشغّلها من الكود مباشرة تتحدّث بـ `git pull`.
 
 ## الخصوصية والأمان
 

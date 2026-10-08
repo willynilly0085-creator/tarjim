@@ -2,6 +2,8 @@
 <!-- languages -->
 [English](../../README.md) · [العربية](../../i18n/ar/README.md) · [Español](../../i18n/es/README.md) · [Français](../../i18n/fr/README.md) · [Português](../../i18n/pt/README.md) · [Deutsch](../../i18n/de/README.md) · [Русский](../../i18n/ru/README.md) · [Türkçe](../../i18n/tr/README.md) · [हिन्दी](../../i18n/hi/README.md) · [اردو](../../i18n/ur/README.md) · [Bahasa Indonesia](../../i18n/id/README.md) · **日本語** · [中文](../../i18n/zh/README.md) · [한국어](../../i18n/ko/README.md)
 
+開発: [Indicators](https://indicators.sa/) · [indicators.sa](https://indicators.sa/)
+
 **あらゆる動画に、あなたの言語で字幕と吹き替えを。すべてあなたのコンピューター上で。**
 
 リンクを貼り付けるか、ファイルをドロップするだけ。tarjim は音声を聞き取り、各行を発話の瞬間に合わせてタイミング調整し、話者ごとに区別し、自然な話し言葉に翻訳します。そのうえで字幕を動画に焼き込むか、`.srt` を書き出すか、話者ごとに声を割り当てて吹き替えます。
@@ -106,6 +108,10 @@ tarjim video.mp4                 # Arabic (Saudi), burned into the video
 tarjim video.mp4 --to fr         # any target language
 tarjim video.mp4 --no-burn       # .srt and .ass only
 ```
+
+## アップデート
+
+tarjim は自分で最新の状態を保ちます。1 日に 1 回、エンジンが GitHub に最新リリースの番号を問い合わせます。これはあなたや動画に関する情報を一切含まない 1 回のリクエストです。**新しいバージョンが出たら tarjim を自動で更新する** がオンの場合（セットアップ時に案内され、設定で変更できます）、実行中のジョブがないときに新しいリリースがバックグラウンドでインストールされ、数分で tarjim が自動的に戻ってきます。ブラウザー拡張機能も合わせて自動で再読み込みされます。オフの場合は、ページにお知らせと **今すぐ更新** ボタンが表示されます。ソースから実行しているコピーは `git pull` で更新します。
 
 ## プライバシーとセキュリティ
 

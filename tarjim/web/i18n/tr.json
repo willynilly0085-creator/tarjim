@@ -362,5 +362,6 @@
   "updateFailed": "Güncelleme tamamlanmadı ve mevcut sürüm yeniden çalışıyor. Biraz sonra tekrar dene.",
   "updateManual": "Bu kopya kaynak koddan çalışıyor ve git ile güncellenir.",
   "autoUpdate": "Yeni sürüm çıkınca tarjim'i otomatik güncelle (günde bir kez yalnızca son sürüm numarasını sorar)",
-  "versionLine": "Sürüm {version}"
+  "versionLine": "Sürüm {version}",
+  "madeBy": "Indicators tarafından geliştirildi"
 }

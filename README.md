@@ -4,6 +4,8 @@
 <!-- languages -->
 **English** · [العربية](i18n/ar/README.md) · [Español](i18n/es/README.md) · [Français](i18n/fr/README.md) · [Português](i18n/pt/README.md) · [Deutsch](i18n/de/README.md) · [Русский](i18n/ru/README.md) · [Türkçe](i18n/tr/README.md) · [हिन्दी](i18n/hi/README.md) · [اردو](i18n/ur/README.md) · [Bahasa Indonesia](i18n/id/README.md) · [日本語](i18n/ja/README.md) · [中文](i18n/zh/README.md) · [한국어](i18n/ko/README.md)
 
+Developed by [Indicators](https://indicators.sa/) · [indicators.sa](https://indicators.sa/)
+
 Paste a link or drop a file. tarjim listens, times every line to the moment it is spoken, keeps
 each speaker apart, translates into natural speech, and burns the subtitles into the video, writes
 an `.srt`, or dubs it with a voice for every speaker.
@@ -150,6 +152,15 @@ tarjim video.mp4                 # Arabic (Saudi), burned into the video
 tarjim video.mp4 --to fr         # any target language
 tarjim video.mp4 --no-burn       # .srt and .ass only
 ```
+
+## Updates
+
+tarjim keeps itself up to date. Once a day the engine asks GitHub for the number of the latest
+release: one request that carries nothing about you or your videos. With **Update tarjim
+automatically** on (offered during setup, and changeable in Settings), a newer release is installed
+in the background while no job is running, and tarjim comes back by itself in a few minutes; the
+browser extension reloads itself to match. With it off, the page shows a notice and an **Update
+now** button. A copy you run from source is updated with `git pull`.
 
 ## Privacy and security
 

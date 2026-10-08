@@ -362,5 +362,6 @@
   "updateFailed": "업데이트가 끝나지 않아 현재 버전이 다시 실행 중이에요. 잠시 후 다시 시도하세요.",
   "updateManual": "이 사본은 소스 코드에서 실행되며 git으로 업데이트해요.",
   "autoUpdate": "새 버전이 나오면 tarjim을 자동으로 업데이트 (하루에 한 번 최신 버전 번호만 확인해요)",
-  "versionLine": "버전 {version}"
+  "versionLine": "버전 {version}",
+  "madeBy": "개발: Indicators"
 }

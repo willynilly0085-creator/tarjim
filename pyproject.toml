@@ -4,6 +4,7 @@ version = "1.0.0"
 description = "Subtitles and dubbing for any video, from any language to any language, on your own computer"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0 with Commons Clause 1.0" }
+authors = [{ name = "Indicators (indicators.sa)", email = "willy.nilly0085@gmail.com" }]
 dependencies = [
     "numpy",
     "soundfile",
@@ -23,6 +24,7 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/willynilly0085-creator/tarjim"
 Issues = "https://github.com/willynilly0085-creator/tarjim/issues"
+Developer = "https://indicators.sa/"
 
 [project.optional-dependencies]
 dub = ["torchcodec", "demucs", "catt-tashkeel", "edge-tts", "fish-audio-sdk", "num2words", "librosa",

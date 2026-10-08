@@ -365,5 +365,8 @@
   },
   "phoneSettingsButton": {
     "message": "手机设置"
+  },
+  "madeBy": {
+    "message": "由 Indicators 开发"
   }
 }

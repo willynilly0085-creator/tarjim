@@ -365,5 +365,8 @@
   },
   "phoneSettingsButton": {
     "message": "Настройки телефона"
+  },
+  "madeBy": {
+    "message": "Разработано компанией Indicators"
   }
 }
