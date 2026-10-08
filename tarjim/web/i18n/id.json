@@ -363,5 +363,8 @@
   "updateManual": "Salinan ini berjalan dari kode sumber dan diperbarui dengan git.",
   "autoUpdate": "Perbarui tarjim otomatis saat versi baru keluar (hanya menanyakan nomor versi terbaru sekali sehari)",
   "versionLine": "Versi {version}",
-  "madeBy": "Dikembangkan oleh Indicators"
+  "madeBy": "Dikembangkan oleh Indicators",
+  "err_signin": "Langganan AI-mu perlu masuk lagi. Buka tarjim, buka Pengaturan, masuk, lalu coba lagi.",
+  "failedAt": "Berhenti di “{stage}”.",
+  "errorDetail": "Rincian: {detail}"
 }

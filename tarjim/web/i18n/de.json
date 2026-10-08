@@ -363,5 +363,8 @@
   "updateManual": "Diese Kopie läuft aus dem Quellcode und wird mit git aktualisiert.",
   "autoUpdate": "tarjim automatisch aktualisieren, wenn eine neue Version erscheint (fragt nur einmal täglich nach der neuesten Versionsnummer)",
   "versionLine": "Version {version}",
-  "madeBy": "Entwickelt von Indicators"
+  "madeBy": "Entwickelt von Indicators",
+  "err_signin": "Ihr KI-Abo erfordert eine erneute Anmeldung. Öffnen Sie tarjim, gehen Sie zu den Einstellungen, melden Sie sich an und versuchen Sie es erneut.",
+  "failedAt": "Angehalten bei „{stage}“.",
+  "errorDetail": "Details: {detail}"
 }

@@ -363,5 +363,8 @@
   "updateManual": "This copy runs from source and is updated with git.",
   "autoUpdate": "Update tarjim automatically when a new version is out (it only asks once a day for the latest version number)",
   "versionLine": "Version {version}",
-  "madeBy": "Developed by Indicators"
+  "madeBy": "Developed by Indicators",
+  "err_signin": "Your AI subscription needs you to sign in again. Open tarjim, go to Settings, sign in, then try again.",
+  "failedAt": "Stopped at “{stage}”.",
+  "errorDetail": "Details: {detail}"
 }

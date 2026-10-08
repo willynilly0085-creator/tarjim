@@ -14,7 +14,9 @@ PAUSE_TICK = 0.5
 IDLE_SECONDS = 300.0
 ENDED = ("done", "failed", "cancelled")
 CONTROLS = {"pause": "paused", "resume": "run", "cancel": "cancelled"}
-REASONS = [("quota", ("QuotaExhausted", "quota", " 429:")),
+SIGNED_OUT = ("Failed to authenticate", "OAuth session expired", "ot logged in", "run /login",
+              "login required", "ign in again")
+REASONS = [("quota", ("QuotaExhausted", "quota", " 429:")), ("signin", SIGNED_OUT),
            ("key", ("API key missing", " 401:", " 403:")),
            ("download", ("DownloadError", "download")), ("tools", ("not found; install",)),
            ("dub", ("DubUnavailable",))]
@@ -45,6 +47,7 @@ class Task:
     stage: str = "queued"
     error: str = ""
     error_code: str = ""
+    failed_at: str = ""
     video: Path | None = None
     outputs: list[Path] = field(default_factory=list)
     created: float = field(default_factory=time.time)
@@ -61,8 +64,11 @@ class Task:
             raise Stopped
 
     def view(self) -> dict[str, object]:
+        from tarjim.server.evidence import evidence
+
         return {"id": self.id, "stage": self.stage, "error": self.error,
                 "error_code": self.error_code, "finished": self.finished,
+                "failed_at": self.failed_at, "detail": evidence(self.error),
                 "paused": self.control == "paused",
                 "link": self.order.source.startswith(("http://", "https://")),
                 "target": self.order.target, "mode": self.order.mode,
@@ -142,5 +148,6 @@ class Board:
             except Stopped:
                 task.stage = "cancelled"
             except Exception as error:
+                task.failed_at = task.stage
                 task.stage, task.error = "failed", str(error)[:300]
                 task.error_code = classify(error)

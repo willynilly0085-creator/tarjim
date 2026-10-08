@@ -182,3 +182,19 @@ def test_models_are_released_once_the_board_goes_idle() -> None:
         time.sleep(0.05)
     time.sleep(0.2)
     assert task.stage == "done" and released == [1]
+
+
+def test_an_expired_sign_in_is_named_and_every_failure_keeps_safe_evidence() -> None:
+    from tarjim.server.evidence import evidence
+    from tarjim.server.jobs import Order, Task, classify
+
+    expired = RuntimeError("claude 1: Failed to authenticate: OAuth session expired and could "
+                           "not be refreshed")
+    assert classify(expired) == "signin"
+    assert classify(RuntimeError("codex 1: Not logged in")) == "signin"
+    task = Task(Order("https://example.com/v"), stage="failed", failed_at="translating",
+                error="request to https://api.x/bot123456:" + "A" * 35 + "/send failed\nmore")
+    view = task.view()
+    assert view["failed_at"] == "translating" and "A" * 10 not in str(view["detail"])
+    assert str(view["detail"]).startswith("request to https://api.x/bot123456:***")
+    assert len(evidence("x" * 5 + " " + "word " * 100)) <= 220

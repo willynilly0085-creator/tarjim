@@ -368,5 +368,14 @@
   },
   "madeBy": {
     "message": "Desarrollado por Indicators"
+  },
+  "errSignin": {
+    "message": "Tu suscripción de IA necesita que vuelvas a iniciar sesión. Abre tarjim, ve a Ajustes, inicia sesión y vuelve a intentarlo."
+  },
+  "failedAtLabel": {
+    "message": "Se detuvo en"
+  },
+  "detailLabel": {
+    "message": "Detalles:"
   }
 }

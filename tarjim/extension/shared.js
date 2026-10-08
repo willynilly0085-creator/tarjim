@@ -6,7 +6,7 @@ const STAGE_KEYS = {
   translating: "stageTranslating", writing: "stageWriting", burning: "stageBurning", dubbing: "stageDubbing",
   done: "stageDone", failed: "stageFailed", cancelled: "stageCancelled",
 };
-const ERROR_KEYS = { quota: "errQuota", key: "errKey", download: "errDownload", tools: "errTools", dub: "errDub" };
+const ERROR_KEYS = { quota: "errQuota", signin: "errSignin", key: "errKey", download: "errDownload", tools: "errTools", dub: "errDub" };
 
 const RTL = new Set(["ar", "fa", "ur", "he"]);
 const LOCALES = new Set(["ar", "en", "es", "fr", "pt", "de", "ru", "tr", "hi", "ur", "id", "ja", "zh", "ko"]);
@@ -85,6 +85,12 @@ export const post = (path, body) => api(path, {
 export const stageLabel = (stage) => t(STAGE_KEYS[stage] || "stageQueued");
 
 export const errorLabel = (job) => t(ERROR_KEYS[job.error_code] || "errUnknown");
+
+// Every failure says where it stopped, what it means and the real reason.
+export function failureText(job) {
+  const where = job.failed_at ? `${t("failedAtLabel")} ${stageLabel(job.failed_at)}. ` : "";
+  return `${where}${errorLabel(job)}${job.detail ? `\n${t("detailLabel")} ${job.detail}` : ""}`;
+}
 
 export function stepsFor(job) {
   const wanted = { downloading: job.link, burning: job.mode !== "srt", dubbing: job.mode.startsWith("dub") };

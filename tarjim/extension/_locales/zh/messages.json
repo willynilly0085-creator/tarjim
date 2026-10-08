@@ -368,5 +368,14 @@
   },
   "madeBy": {
     "message": "由 Indicators 开发"
+  },
+  "errSignin": {
+    "message": "你的 AI 订阅需要重新登录。打开 tarjim，进入设置登录，然后再试一次。"
+  },
+  "failedAtLabel": {
+    "message": "停在"
+  },
+  "detailLabel": {
+    "message": "详情："
   }
 }

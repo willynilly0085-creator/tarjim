@@ -368,5 +368,14 @@
   },
   "madeBy": {
     "message": "Indicators tarafından geliştirildi"
+  },
+  "errSignin": {
+    "message": "Yapay zekâ aboneliğin için yeniden oturum açman gerekiyor. tarjim'i aç, Ayarlar'a git, oturum aç ve tekrar dene."
+  },
+  "failedAtLabel": {
+    "message": "Durduğu aşama:"
+  },
+  "detailLabel": {
+    "message": "Ayrıntı:"
   }
 }

@@ -363,5 +363,8 @@
   "updateManual": "このコピーはソースコードから実行されており、git で更新します。",
   "autoUpdate": "新しいバージョンが出たら tarjim を自動で更新する（1 日に 1 回、最新バージョンの番号を確認するだけです）",
   "versionLine": "バージョン {version}",
-  "madeBy": "開発: Indicators"
+  "madeBy": "開発: Indicators",
+  "err_signin": "AI のサブスクリプションに再度サインインする必要があります。tarjim を開き、設定からサインインして、もう一度お試しください。",
+  "failedAt": "「{stage}」で止まりました。",
+  "errorDetail": "詳細: {detail}"
 }

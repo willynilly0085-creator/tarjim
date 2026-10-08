@@ -25,10 +25,12 @@ class Sender:
         except TelegramError:
             return
 
-    def tell(self, key: str) -> None:
-        """A problem is sent as a new message too, so the phone notifies the person."""
+    def tell(self, key: str, detail: str = "") -> None:
+        """A problem is sent as a new message too, so the phone notifies the person, with the
+        real reason under it."""
+        text = "\n".join([say(key), say("errorDetail", detail=detail)] if detail else [say(key)])
         try:
-            self.bot.say(self.chat, say(key))
+            self.bot.say(self.chat, text)
         except TelegramError:
             return
 
@@ -44,7 +46,7 @@ class Sender:
 
     def deliver(self) -> None:
         if self.task.stage == "failed":
-            self.tell(f"err_{self.task.error_code or 'unknown'}")
+            self.tell(f"err_{self.task.error_code or 'unknown'}", str(self.task.view()["detail"]))
         elif self.task.stage == "done":
             self.send(list(self.task.outputs), str(self.task.order.mode))
 

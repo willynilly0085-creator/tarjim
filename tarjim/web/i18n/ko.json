@@ -363,5 +363,8 @@
   "updateManual": "이 사본은 소스 코드에서 실행되며 git으로 업데이트해요.",
   "autoUpdate": "새 버전이 나오면 tarjim을 자동으로 업데이트 (하루에 한 번 최신 버전 번호만 확인해요)",
   "versionLine": "버전 {version}",
-  "madeBy": "개발: Indicators"
+  "madeBy": "개발: Indicators",
+  "err_signin": "AI 구독에 다시 로그인해야 해요. tarjim을 열고 설정에서 로그인한 뒤 다시 시도하세요.",
+  "failedAt": "“{stage}” 단계에서 멈췄어요.",
+  "errorDetail": "자세한 내용: {detail}"
 }

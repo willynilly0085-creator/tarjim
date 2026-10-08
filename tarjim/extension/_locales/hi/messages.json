@@ -368,5 +368,14 @@
   },
   "madeBy": {
     "message": "Indicators द्वारा विकसित"
+  },
+  "errSignin": {
+    "message": "आपकी AI सदस्यता में दोबारा साइन इन करना होगा। tarjim खोलें, सेटिंग्स में जाएँ, साइन इन करें, फिर दोबारा कोशिश करें।"
+  },
+  "failedAtLabel": {
+    "message": "यहाँ रुका:"
+  },
+  "detailLabel": {
+    "message": "विवरण:"
   }
 }

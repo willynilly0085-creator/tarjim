@@ -363,5 +363,8 @@
   "updateManual": "Cette copie s'exécute depuis le code source et se met à jour avec git.",
   "autoUpdate": "Mettre tarjim à jour automatiquement quand une nouvelle version sort (il demande seulement une fois par jour le numéro de la dernière version)",
   "versionLine": "Version {version}",
-  "madeBy": "Développé par Indicators"
+  "madeBy": "Développé par Indicators",
+  "err_signin": "Votre abonnement IA demande une nouvelle connexion. Ouvrez tarjim, allez dans les Réglages, connectez-vous, puis réessayez.",
+  "failedAt": "Arrêté à « {stage} ».",
+  "errorDetail": "Détails : {detail}"
 }

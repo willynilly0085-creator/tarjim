@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.1 (2026-10-08)
+
+- Every failure now says where it stopped, what it means and the real reason, in the page, the
+  extension and the phone bot, with anything that looks like a key masked. Before, an error tarjim
+  did not recognise showed only "Something unexpected went wrong".
+- A subscription whose sign-in expired is named as that, with what to do, instead of an unknown
+  error.
+- The licence names the developer, Indicators (indicators.sa), as the rights holder.
+
 ## 1.0.0 (2026-10-08)
 
 The first public release.

@@ -368,5 +368,14 @@
   },
   "madeBy": {
     "message": "تیار کردہ: ⁦Indicators⁩"
+  },
+  "errSignin": {
+    "message": "آپ کی AI سبسکرپشن میں دوبارہ سائن ان کرنا ہوگا۔ ⁦tarjim⁩ کھولیں، ترتیبات میں جائیں، سائن ان کریں، پھر دوبارہ کوشش کریں۔"
+  },
+  "failedAtLabel": {
+    "message": "یہاں رکا:"
+  },
+  "detailLabel": {
+    "message": "تفصیل:"
   }
 }

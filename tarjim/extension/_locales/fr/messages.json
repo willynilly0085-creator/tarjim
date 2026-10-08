@@ -368,5 +368,14 @@
   },
   "madeBy": {
     "message": "Développé par Indicators"
+  },
+  "errSignin": {
+    "message": "Votre abonnement IA demande une nouvelle connexion. Ouvrez tarjim, allez dans les Réglages, connectez-vous, puis réessayez."
+  },
+  "failedAtLabel": {
+    "message": "Arrêté à"
+  },
+  "detailLabel": {
+    "message": "Détails :"
   }
 }

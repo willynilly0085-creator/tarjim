@@ -368,5 +368,14 @@
   },
   "madeBy": {
     "message": "開発: Indicators"
+  },
+  "errSignin": {
+    "message": "AI のサブスクリプションに再度サインインする必要があります。tarjim を開き、設定からサインインして、もう一度お試しください。"
+  },
+  "failedAtLabel": {
+    "message": "停止した段階:"
+  },
+  "detailLabel": {
+    "message": "詳細:"
   }
 }

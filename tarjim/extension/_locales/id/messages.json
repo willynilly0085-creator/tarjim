@@ -368,5 +368,14 @@
   },
   "madeBy": {
     "message": "Dikembangkan oleh Indicators"
+  },
+  "errSignin": {
+    "message": "Langganan AI-mu perlu masuk lagi. Buka tarjim, buka Pengaturan, masuk, lalu coba lagi."
+  },
+  "failedAtLabel": {
+    "message": "Berhenti di"
+  },
+  "detailLabel": {
+    "message": "Rincian:"
   }
 }

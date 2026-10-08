@@ -363,5 +363,8 @@
   "updateManual": "Esta cópia roda a partir do código-fonte e é atualizada com git.",
   "autoUpdate": "Atualizar o tarjim automaticamente quando sair uma versão nova (só pergunta uma vez por dia o número da versão mais recente)",
   "versionLine": "Versão {version}",
-  "madeBy": "Desenvolvido pela Indicators"
+  "madeBy": "Desenvolvido pela Indicators",
+  "err_signin": "Sua assinatura de IA precisa que você entre de novo. Abra o tarjim, vá em Configurações, entre e tente outra vez.",
+  "failedAt": "Parou em “{stage}”.",
+  "errorDetail": "Detalhes: {detail}"
 }

@@ -1,4 +1,4 @@
-import { api, errorLabel, modeLabel, post, sinceText, stageLabel, stepsFor, t } from "./shared.js";
+import { api, failureText, modeLabel, post, sinceText, stageLabel, stepsFor, t } from "./shared.js";
 
 const rows = new Map();
 const spoken = new Map();
@@ -64,7 +64,7 @@ function paint(row, job, languages, refresh) {
   row.querySelector(".job-meta").textContent = metaText(job, languages);
   const error = row.querySelector(".job-error");
   error.hidden = job.stage !== "failed";
-  error.textContent = job.stage === "failed" ? errorLabel(job) : "";
+  error.textContent = job.stage === "failed" ? failureText(job) : "";
   trackFor(job, row.querySelector(".track"));
   actionsFor(job, row.querySelector(".job-actions"), refresh);
 }

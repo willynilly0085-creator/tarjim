@@ -363,5 +363,8 @@
   "updateManual": "Bu kopya kaynak koddan çalışıyor ve git ile güncellenir.",
   "autoUpdate": "Yeni sürüm çıkınca tarjim'i otomatik güncelle (günde bir kez yalnızca son sürüm numarasını sorar)",
   "versionLine": "Sürüm {version}",
-  "madeBy": "Indicators tarafından geliştirildi"
+  "madeBy": "Indicators tarafından geliştirildi",
+  "err_signin": "Yapay zekâ aboneliğin için yeniden oturum açman gerekiyor. tarjim'i aç, Ayarlar'a git, oturum aç ve tekrar dene.",
+  "failedAt": "“{stage}” aşamasında durdu.",
+  "errorDetail": "Ayrıntı: {detail}"
 }

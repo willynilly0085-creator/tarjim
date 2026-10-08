@@ -363,5 +363,8 @@
   "updateManual": "这个副本从源代码运行，请用 git 更新。",
   "autoUpdate": "有新版本时自动更新 tarjim（每天只询问一次最新版本号）",
   "versionLine": "版本 {version}",
-  "madeBy": "由 Indicators 开发"
+  "madeBy": "由 Indicators 开发",
+  "err_signin": "你的 AI 订阅需要重新登录。打开 tarjim，进入设置登录，然后再试一次。",
+  "failedAt": "停在“{stage}”。",
+  "errorDetail": "详情：{detail}"
 }

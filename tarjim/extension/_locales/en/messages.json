@@ -368,5 +368,14 @@
   },
   "madeBy": {
     "message": "Developed by Indicators"
+  },
+  "errSignin": {
+    "message": "Your AI subscription needs you to sign in again. Open tarjim, go to Settings, sign in, then try again."
+  },
+  "failedAtLabel": {
+    "message": "Stopped at"
+  },
+  "detailLabel": {
+    "message": "Details:"
   }
 }

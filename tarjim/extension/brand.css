@@ -8,3 +8,4 @@
   .made-by .logo-light { display: none; }
   .made-by .logo-dark { display: inline; }
 }
+.job-error { white-space: pre-line; overflow-wrap: anywhere; }

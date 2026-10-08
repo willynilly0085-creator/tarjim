@@ -2,7 +2,7 @@ import { $, api, post } from "./api.js";
 import { t } from "./i18n.js";
 
 const STAGES = ["downloading", "hearing", "timing", "translating", "writing", "burning", "dubbing"];
-const ERRORS = ["quota", "key", "download", "tools", "dub"];
+const ERRORS = ["quota", "signin", "key", "download", "tools", "dub"];
 const rows = new Map();
 const seen = new Map();
 
@@ -54,6 +54,13 @@ function modeText(mode) {
   return t(mode.startsWith("dub") ? "outputDub" : mode === "srt" ? "outputSrt" : "outputBurn");
 }
 
+// Every failure says where it stopped, what it means and the real reason.
+function failure(job) {
+  const where = job.failed_at ? `${t("failedAt", { stage: t(`stage_${job.failed_at}`) })} ` : "";
+  const meaning = t(`err_${ERRORS.includes(job.error_code) ? job.error_code : "unknown"}`);
+  return `${where}${meaning}${job.detail ? `\n${t("errorDetail", { detail: job.detail })}` : ""}`;
+}
+
 function paint(row, job, languages, refresh) {
   row.dataset.stage = job.stage;
   row.dataset.paused = String(Boolean(job.paused));
@@ -64,7 +71,7 @@ function paint(row, job, languages, refresh) {
   row.querySelector(".job-meta").textContent = `${languages.get(job.target) || job.target} · ${modeText(job.mode)}${since}`;
   const error = row.querySelector(".job-error");
   error.hidden = job.stage !== "failed";
-  error.textContent = job.stage === "failed" ? t(`err_${ERRORS.includes(job.error_code) ? job.error_code : "unknown"}`) : "";
+  error.textContent = job.stage === "failed" ? failure(job) : "";
   track(job, row.querySelector(".track"));
   actions(job, row.querySelector(".job-actions"), refresh);
   const before = seen.get(job.id);

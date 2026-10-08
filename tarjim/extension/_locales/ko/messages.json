@@ -368,5 +368,14 @@
   },
   "madeBy": {
     "message": "개발: Indicators"
+  },
+  "errSignin": {
+    "message": "AI 구독에 다시 로그인해야 해요. tarjim을 열고 설정에서 로그인한 뒤 다시 시도하세요."
+  },
+  "failedAtLabel": {
+    "message": "멈춘 단계:"
+  },
+  "detailLabel": {
+    "message": "자세한 내용:"
   }
 }
