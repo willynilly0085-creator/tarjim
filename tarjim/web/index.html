@@ -52,6 +52,8 @@
       <dl class="facts" id="facts"></dl>
       <p class="advice" id="device-advice"></p>
       <label class="check-option"><input type="checkbox" id="autostart"><span data-t="autostart"></span></label>
+      <label class="check-option"><input type="checkbox" id="auto-update"><span data-t="autoUpdate"></span></label>
+      <p class="meta" id="version-line"></p>
       <div class="stack" id="gpu-fix" hidden>
         <p class="meta" data-t="gpuFix"></p>
         <code class="command" id="gpu-fix-command" dir="ltr"></code>
@@ -124,6 +126,7 @@
   </main>
 
   <main id="workspace" hidden>
+    <p class="update-banner" id="update-banner" role="status" hidden></p>
     <form id="order" class="order" novalidate>
       <input type="file" id="file" accept="video/*,audio/*" class="visually-hidden">
       <label for="file" class="drop-zone" id="drop-zone">

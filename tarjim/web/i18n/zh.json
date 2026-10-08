@@ -354,5 +354,13 @@
   "phone_step_prepare": "为手机准备副本",
   "phone_step_send": "发送到手机",
   "phone_elapsed": "已用 {min} 分钟",
-  "phone_size": "{mb} MB"
+  "phone_size": "{mb} MB",
+  "updateAvailable": "tarjim 有新版本了（{version}）。",
+  "updateNow": "立即更新",
+  "updating": "正在更新。几分钟后 tarjim 会自动重新运行。请保持电脑开机。",
+  "updateBusy": "有翻译正在进行。等它完成后再更新。",
+  "updateFailed": "更新没有完成，当前版本已恢复运行。请稍后再试。",
+  "updateManual": "这个副本从源代码运行，请用 git 更新。",
+  "autoUpdate": "有新版本时自动更新 tarjim（每天只询问一次最新版本号）",
+  "versionLine": "版本 {version}"
 }

@@ -354,5 +354,13 @@
   "phone_step_prepare": "Menyiapkan salinan untuk ponsel",
   "phone_step_send": "Mengirim ke ponselmu",
   "phone_elapsed": "Sudah {min} menit",
-  "phone_size": "{mb} MB"
+  "phone_size": "{mb} MB",
+  "updateAvailable": "Versi baru tarjim sudah ada ({version}).",
+  "updateNow": "Perbarui sekarang",
+  "updating": "Sedang memperbarui. tarjim akan kembali sendiri dalam beberapa menit. Biarkan komputer menyala.",
+  "updateBusy": "Ada terjemahan yang sedang berjalan. Biarkan selesai, lalu perbarui.",
+  "updateFailed": "Pembaruan tidak selesai dan versi saat ini berjalan lagi. Coba lagi sebentar lagi.",
+  "updateManual": "Salinan ini berjalan dari kode sumber dan diperbarui dengan git.",
+  "autoUpdate": "Perbarui tarjim otomatis saat versi baru keluar (hanya menanyakan nomor versi terbaru sekali sehari)",
+  "versionLine": "Versi {version}"
 }

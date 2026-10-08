@@ -1,8 +1,11 @@
-"""Install the tarjim engine for someone who only has the chat plugin, then start it.
+"""Install the tarjim engine for someone who only has the chat plugin, then start it; and replace
+a running engine with a newer release.
 
-Runs as its own hidden background process (standard library only) and records its progress in
-~/.tarjim/install.json so the chat tools can report it.
+Runs as its own hidden background process (standard library only, so a copy of this one file can
+run outside the engine's own folder while that folder is replaced) and records its progress in
+~/.tarjim/install.json, or ~/.tarjim/update.json for an update.
 """
+import argparse
 import json
 import os
 import shutil
@@ -13,17 +16,19 @@ from pathlib import Path
 
 HOME = Path(os.environ.get("TARJIM_HOME", Path.home() / ".tarjim"))
 STATE = HOME / "install.json"
+UPDATE_STATE = HOME / "update.json"
 LOG = HOME / "install.log"
+EXIT_WAIT = 90
 NO_WINDOW = 0x08000000 if sys.platform == "win32" else 0
 DETACHED = 0x00000008 if sys.platform == "win32" else 0
 BREAKAWAY = 0x01000000 if sys.platform == "win32" else 0
 STILL_ACTIVE = 259
 
 
-def record(state: str, detail: str = "") -> None:
+def record(state: str, detail: str = "", target: Path = STATE) -> None:
     HOME.mkdir(parents=True, exist_ok=True)
-    STATE.write_text(json.dumps({"state": state, "detail": detail, "at": time.time(),
-                                 "pid": os.getpid()}), encoding="utf-8")
+    target.write_text(json.dumps({"state": state, "detail": detail, "at": time.time(),
+                                  "pid": os.getpid()}), encoding="utf-8")
 
 
 def alive(pid: int) -> bool:
@@ -106,22 +111,37 @@ def start_detached(command: list[str], log: Path) -> None:
                 continue
 
 
-def main(source: str) -> int:
+def wait_for_exit(pid: int) -> None:
+    """The engine being replaced closes itself; its files cannot be replaced while it runs."""
+    until = time.time() + EXIT_WAIT
+    while pid and alive(pid) and time.time() < until:
+        time.sleep(1)
+
+
+def main(source: str, after: int = 0, port: int = 0) -> int:
+    state = UPDATE_STATE if after else STATE
     uv = shutil.which("uv")
     if not uv:
-        record("failed", "uv is missing: install it from https://docs.astral.sh/uv/")
+        record("failed", "uv is missing: install it from https://docs.astral.sh/uv/", state)
         return 1
-    record("installing", "downloading the engine and its models' libraries")
+    wait_for_exit(after)
+    record("installing", "downloading the engine and its models' libraries", state)
     with LOG.open("ab") as out:
         done = subprocess.run(install_command(uv, source), stdout=out, stderr=out,
                               creationflags=NO_WINDOW, check=False)
+    start_detached([server_program(uv), *(["--port", str(port)] if port else [])],
+                   HOME / "server.log")
     if done.returncode != 0:
-        record("failed", f"install failed, see {LOG}")
+        record("failed", f"install failed, see {LOG}", state)
         return 1
-    start_detached([server_program(uv)], HOME / "server.log")
-    record("done", "the engine is installed and starting")
+    record("done", "the engine is installed and starting", state)
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main(sys.argv[1] if len(sys.argv) > 1 else "."))
+    options = argparse.ArgumentParser()
+    options.add_argument("source", nargs="?", default=".")
+    options.add_argument("--after", type=int, default=0)
+    options.add_argument("--port", type=int, default=0)
+    chosen = options.parse_args()
+    raise SystemExit(main(chosen.source, chosen.after, chosen.port))

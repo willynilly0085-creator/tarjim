@@ -57,12 +57,22 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name !== POLL) return;
   if (await loadWords()) buildMenus();
+  await matchEngine();
   if ((await claimPending()) === "paired") {
     notify(`paired-${Date.now()}`, t("appName"), t("pairedNotice"));
     await sendWaitingJob();
   }
   refresh();
 });
+
+// After the engine updates itself it refreshes this extension's folder; reload once to match it.
+async function matchEngine() {
+  const engine = (await api("/update").catch(() => null))?.extension;
+  const { reloadedFor } = await chrome.storage.local.get("reloadedFor");
+  if (!engine || engine === chrome.runtime.getManifest().version || engine === reloadedFor) return;
+  await chrome.storage.local.set({ reloadedFor: engine });
+  chrome.runtime.reload();
+}
 
 async function refresh() {
   let jobs;

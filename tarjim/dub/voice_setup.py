@@ -32,3 +32,16 @@ def install() -> None:
     importlib.invalidate_caches()
     if done.returncode != 0 or not ready():
         raise RuntimeError(f"could not install the voice engine: {done.stderr.strip()[-200:]}")
+
+
+def repair() -> None:
+    """After an update replaced the engine's folder, put the voice engine back if its model is
+    still on this computer, so dubbing keeps working without asking to download again."""
+    from tarjim.tools import VOICE_REPO, hub_ready
+
+    if ready() or not hub_ready(VOICE_REPO):
+        return
+    try:
+        install()
+    except (RuntimeError, OSError, subprocess.TimeoutExpired):
+        return

@@ -1,6 +1,7 @@
 import { $, api, post, upload } from "./api.js";
 import { t } from "./i18n.js";
 import { watchJobs } from "./jobs.js";
+import { showUpdate } from "./update.js";
 
 const MEDIA = /\.(mp4|mkv|webm|mov|avi|m4v|mp3|m4a|wav|flac|ogg|opus|aac)$/i;
 const state = { file: null, poll: 0, wired: false, languages: new Map() };
@@ -82,6 +83,7 @@ export async function openWorkspace() {
   $("workspace").hidden = false;
   $("open-settings").hidden = false;
   if (!state.wired) wire();
+  showUpdate();
   const languages = await api("/languages");
   state.languages = new Map(languages.map((l) => [l.code, l.native]));
   const current = $("target").value || (document.documentElement.lang === "ar" ? "ar" : "en");

@@ -354,5 +354,13 @@
   "phone_step_prepare": "スマートフォン用コピーの準備",
   "phone_step_send": "スマートフォンへ送信",
   "phone_elapsed": "経過 {min} 分",
-  "phone_size": "{mb} MB"
+  "phone_size": "{mb} MB",
+  "updateAvailable": "tarjim の新しいバージョンがあります（{version}）。",
+  "updateNow": "今すぐ更新",
+  "updating": "更新中です。数分で tarjim は自動的に再開します。コンピューターの電源は切らないでください。",
+  "updateBusy": "翻訳が実行中です。終わってから更新してください。",
+  "updateFailed": "更新が完了せず、現在のバージョンが再び動いています。しばらくしてからもう一度お試しください。",
+  "updateManual": "このコピーはソースコードから実行されており、git で更新します。",
+  "autoUpdate": "新しいバージョンが出たら tarjim を自動で更新する（1 日に 1 回、最新バージョンの番号を確認するだけです）",
+  "versionLine": "バージョン {version}"
 }

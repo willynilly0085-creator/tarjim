@@ -354,5 +354,13 @@
   "phone_step_prepare": "휴대폰용 사본 준비",
   "phone_step_send": "휴대폰으로 보내기",
   "phone_elapsed": "{min}분 지남",
-  "phone_size": "{mb} MB"
+  "phone_size": "{mb} MB",
+  "updateAvailable": "tarjim 새 버전이 나왔어요 ({version}).",
+  "updateNow": "지금 업데이트",
+  "updating": "업데이트 중이에요. 몇 분 뒤 tarjim이 스스로 다시 시작돼요. 컴퓨터를 켜 두세요.",
+  "updateBusy": "번역이 진행 중이에요. 끝난 뒤에 업데이트하세요.",
+  "updateFailed": "업데이트가 끝나지 않아 현재 버전이 다시 실행 중이에요. 잠시 후 다시 시도하세요.",
+  "updateManual": "이 사본은 소스 코드에서 실행되며 git으로 업데이트해요.",
+  "autoUpdate": "새 버전이 나오면 tarjim을 자동으로 업데이트 (하루에 한 번 최신 버전 번호만 확인해요)",
+  "versionLine": "버전 {version}"
 }

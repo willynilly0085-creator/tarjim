@@ -11,6 +11,7 @@ from tarjim.server.guard import extension_origin
 from tarjim.server.onboard_routes import OnboardRoutes
 from tarjim.server.pairing import Pairing
 from tarjim.server.phone_routes import PhoneRoutes
+from tarjim.server.update_routes import UpdateRoutes
 from tarjim.tools import Shelf
 from tarjim.ui_languages import available, codes
 
@@ -27,7 +28,14 @@ def setup_finished() -> bool:
     return setting("setup_done") == "yes" or setting("translate_provider") in TRANSLATORS
 
 
-class SetupRoutes(OnboardRoutes, PhoneRoutes):
+def save_switches(data: dict[str, Any]) -> None:
+    if isinstance(data.get("auto_update"), bool):
+        save("auto_update", "yes" if data["auto_update"] else "no")
+    if isinstance(data.get("autostart"), bool):
+        (autostart.enable if data["autostart"] else autostart.disable)()
+
+
+class SetupRoutes(OnboardRoutes, PhoneRoutes, UpdateRoutes):
     shelf: ClassVar[Shelf]
     pairing: ClassVar[Pairing]
     token: ClassVar[str]
@@ -65,6 +73,7 @@ class SetupRoutes(OnboardRoutes, PhoneRoutes):
         state["subscriptions"] = installed()
         state["ui_languages"] = list(available())
         state["autostart"] = autostart.enabled()
+        state["auto_update"] = setting("auto_update") != "no"
         self.reply(200, state)
 
     def save_setup(self, query: Query) -> None:
@@ -74,8 +83,7 @@ class SetupRoutes(OnboardRoutes, PhoneRoutes):
                 save(name, str(data[name]))
         if isinstance(data.get("glossary"), str) and len(data["glossary"]) <= GLOSSARY_CHARS:
             save("glossary", data["glossary"])
-        if isinstance(data.get("autostart"), bool):
-            (autostart.enable if data["autostart"] else autostart.disable)()
+        save_switches(data)
         if MODEL_TAG.match(str(data.get("local_model", ""))):
             save("local_model", str(data["local_model"]))
         self.setup_state(query)

@@ -354,5 +354,13 @@
   "phone_step_prepare": "Telefon için kopya hazırlama",
   "phone_step_send": "Telefonuna gönderme",
   "phone_elapsed": "{min} dk geçti",
-  "phone_size": "{mb} MB"
+  "phone_size": "{mb} MB",
+  "updateAvailable": "tarjim'in yeni sürümü çıktı ({version}).",
+  "updateNow": "Şimdi güncelle",
+  "updating": "Güncelleniyor. tarjim birkaç dakika içinde kendiliğinden geri gelir. Bilgisayarı açık bırak.",
+  "updateBusy": "Bir çeviri sürüyor. Bitmesini bekle, sonra güncelle.",
+  "updateFailed": "Güncelleme tamamlanmadı ve mevcut sürüm yeniden çalışıyor. Biraz sonra tekrar dene.",
+  "updateManual": "Bu kopya kaynak koddan çalışıyor ve git ile güncellenir.",
+  "autoUpdate": "Yeni sürüm çıkınca tarjim'i otomatik güncelle (günde bir kez yalnızca son sürüm numarasını sorar)",
+  "versionLine": "Sürüm {version}"
 }

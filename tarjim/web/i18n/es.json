@@ -354,5 +354,13 @@
   "phone_step_prepare": "Preparar copia para el teléfono",
   "phone_step_send": "Enviar a tu teléfono",
   "phone_elapsed": "{min} min hasta ahora",
-  "phone_size": "{mb} MB"
+  "phone_size": "{mb} MB",
+  "updateAvailable": "Hay una versión nueva de tarjim ({version}).",
+  "updateNow": "Actualizar ahora",
+  "updating": "Actualizando. tarjim vuelve solo en unos minutos. Deja el ordenador encendido.",
+  "updateBusy": "Hay una traducción en curso. Deja que termine y luego actualiza.",
+  "updateFailed": "La actualización no terminó y la versión actual vuelve a funcionar. Inténtalo de nuevo en un rato.",
+  "updateManual": "Esta copia se ejecuta desde el código fuente y se actualiza con git.",
+  "autoUpdate": "Actualizar tarjim automáticamente cuando salga una versión nueva (solo pregunta una vez al día por el número de la última versión)",
+  "versionLine": "Versión {version}"
 }
