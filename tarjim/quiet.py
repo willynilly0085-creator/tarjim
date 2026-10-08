@@ -16,5 +16,5 @@ def hide_child_windows() -> None:
             kwargs["creationflags"] = NO_WINDOW
         original(self, *args, **kwargs)
 
-    subprocess.Popen.__init__ = start  # type: ignore[method-assign]
-    subprocess.Popen._tarjim_quiet = True  # type: ignore[attr-defined]
+    setattr(subprocess.Popen, "__init__", start)  # noqa: B010
+    setattr(subprocess.Popen, "_tarjim_quiet", True)  # noqa: B010
