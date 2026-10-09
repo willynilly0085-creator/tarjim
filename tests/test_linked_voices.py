@@ -59,8 +59,9 @@ def test_each_speaker_gets_a_different_ready_voice_and_the_preferred_one_leads(
         service: Service) -> None:
     voices = eleven.ElevenVoices("key", {"S1": Path("a.wav"), "S2": Path("b.wav")},
                                  preferred="v-two")
-    assert len(voices.speak_all(LINES)) == 2 and spoken_with(service) == ["v-two", "v-one"]
-    sent = next(o for m, u, o in service.asked if "text-to-speech" in u)
+    assert len(voices.speak_all(LINES)) == 2 and voices.voices == {"S1": "v-two", "S2": "v-one"}
+    assert sorted(spoken_with(service)) == ["v-one", "v-two"]
+    sent = next(o for m, u, o in service.asked if u.endswith("/text-to-speech/v-two"))
     assert sent["headers"] == {"xi-api-key": "key"} and sent["json"]["text"] == "مرحبا"
     assert cast.assign(["a", "b", "c"], ["x", "y"]) == {"a": "x", "b": "y", "c": "x"}
 
@@ -90,7 +91,8 @@ def test_any_service_in_openais_speech_format_can_dub(service: Service) -> None:
         config.save(name, value)
     speech.SpeechVoices(["S1", "S2"]).speak_all(LINES)
     sent = [o for _m, u, o in service.asked if u == "https://voices.example/v1/audio/speech"]
-    assert [o["json"]["voice"] for o in sent] == ["nova", "sage"]
+    assert {o["json"]["input"]: o["json"]["voice"] for o in sent} == {
+        "مرحبا": "nova", "أهلين": "sage"}
     assert sent[0]["json"]["model"] == "tts-2" and "Bearer sk-speech" in str(sent[0]["headers"])
 
 
