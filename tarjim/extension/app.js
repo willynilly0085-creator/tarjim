@@ -3,6 +3,7 @@ import { api, loadWords, post, remember, settings, t, uiDirection, uiLanguage } 
 import { downloadable } from "./posts.js";
 import { $, show } from "./dom.js";
 import { claimPending } from "./pairing.js";
+import { showLinkedVoices } from "./keys.js";
 import { autoPair, openSettings, wirePanels } from "./panels.js";
 import { isMedia, upload } from "./upload.js";
 
@@ -60,9 +61,7 @@ function syncDialect() {
   if (!arabic && $("voice").value === "fishvoice") $("voice").value = "clone";
 }
 
-function persist() {
-  remember({ ...choices(), voice: $("voice").value });
-}
+const persist = () => remember({ ...choices(), voice: $("voice").value });
 
 async function describeSource() {
   if (pageMode) {
@@ -88,6 +87,7 @@ async function openMain() {
   const [output, dubVoice] = saved.mode.startsWith("dub-") ? ["dub", saved.mode.slice(4)] : [saved.mode, saved.voice];
   document.querySelector(`input[name=mode][value=${output}]`).checked = true;
   $("voice").value = dubVoice || "gemini";
+  await showLinkedVoices($("voice"));
   syncDialect();
   syncVoice();
   await describeSource();

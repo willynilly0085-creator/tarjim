@@ -8,7 +8,10 @@ from typing import Any
 from tarjim.config import setting
 from tarjim.phone.words import result_name
 
-MODES = ("burn", "srt", "dub-gemini", "dub-clone", "dub-studio")
+ALWAYS = ("burn", "srt", "dub-gemini", "dub-clone", "dub-studio")
+LINKED = {"dub-eleven": "eleven_api_key", "dub-elevenclone": "eleven_api_key",
+          "dub-speech": "speech_api_key"}
+MODES = (*ALWAYS, *LINKED)
 KEEP = 50
 
 
@@ -32,9 +35,14 @@ class Waiting:
             return self.items.pop(key, None)
 
 
+def offered() -> list[str]:
+    """Voices that need the person's own key are offered once that key is saved."""
+    return [*ALWAYS, *[mode for mode, key in LINKED.items() if setting(key)]]
+
+
 def ordered_modes() -> list[str]:
-    current = setting("phone_mode") or "burn"
-    return [current, *[m for m in MODES if m != current]] if current in MODES else list(MODES)
+    current, modes = setting("phone_mode") or "burn", offered()
+    return [current, *[m for m in modes if m != current]] if current in modes else modes
 
 
 def label(mode: str, current: str) -> str:
@@ -50,5 +58,6 @@ def choices_keyboard(key: str) -> str:
 
 def modes_keyboard() -> str:
     current = setting("phone_mode") or "burn"
-    rows = [[{"text": label(mode, current), "callback_data": f"mode:{mode}"}] for mode in MODES]
+    rows = [[{"text": label(mode, current), "callback_data": f"mode:{mode}"}]
+            for mode in offered()]
     return json.dumps({"inline_keyboard": rows})

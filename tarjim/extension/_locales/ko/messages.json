@@ -377,5 +377,14 @@
   },
   "detailLabel": {
     "message": "자세한 내용:"
+  },
+  "voiceEleven": {
+    "message": "ElevenLabs 목소리 (텍스트만 전송)"
+  },
+  "voiceElevenClone": {
+    "message": "ElevenLabs, 화자 본인의 목소리 (음성 샘플 전송)"
+  },
+  "voiceSpeech": {
+    "message": "연결한 음성 서비스 (텍스트만 전송)"
   }
 }

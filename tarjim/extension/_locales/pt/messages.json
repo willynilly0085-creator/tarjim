@@ -377,5 +377,14 @@
   },
   "detailLabel": {
     "message": "Detalhes:"
+  },
+  "voiceEleven": {
+    "message": "Vozes da ElevenLabs (envia só o texto)"
+  },
+  "voiceElevenClone": {
+    "message": "ElevenLabs, a voz de quem fala (envia uma amostra de voz)"
+  },
+  "voiceSpeech": {
+    "message": "Seu serviço de voz conectado (envia só o texto)"
   }
 }

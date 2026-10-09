@@ -12,6 +12,7 @@ from tarjim.server.onboard_routes import OnboardRoutes
 from tarjim.server.pairing import Pairing
 from tarjim.server.phone_routes import PhoneRoutes
 from tarjim.server.update_routes import UpdateRoutes
+from tarjim.server.voice_routes import VoiceRoutes
 from tarjim.tools import Shelf
 from tarjim.ui_languages import available, codes
 
@@ -35,7 +36,7 @@ def save_switches(data: dict[str, Any]) -> None:
         (autostart.enable if data["autostart"] else autostart.disable)()
 
 
-class SetupRoutes(OnboardRoutes, PhoneRoutes, UpdateRoutes):
+class SetupRoutes(OnboardRoutes, PhoneRoutes, UpdateRoutes, VoiceRoutes):
     shelf: ClassVar[Shelf]
     pairing: ClassVar[Pairing]
     token: ClassVar[str]

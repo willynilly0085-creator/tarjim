@@ -377,5 +377,14 @@
   },
   "detailLabel": {
     "message": "Rincian:"
+  },
+  "voiceEleven": {
+    "message": "Suara ElevenLabs (hanya mengirim teks)"
+  },
+  "voiceElevenClone": {
+    "message": "ElevenLabs, suara pembicara sendiri (mengirim contoh suara)"
+  },
+  "voiceSpeech": {
+    "message": "Layanan suara Anda yang terhubung (hanya mengirim teks)"
   }
 }

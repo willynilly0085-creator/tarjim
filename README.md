@@ -21,7 +21,7 @@ an `.srt`, or dubs it with a voice for every speaker.
   voice-activity detection). Subtitles never run across a shot cut into the next person's shot.
 - **Speaker aware:** dialogue lines with dashes, one line per speaker.
 - **Dubbing:** a natural Gemini voice per speaker (matched by pitch), a local voice clone of each
-  speaker (VoxCPM2), studio voices, or Fish Audio. A separate voice script writes names as they
+  speaker (VoxCPM2), studio voices, Fish Audio, ElevenLabs, or any voice service in OpenAI's speech format that you link with your own key. A separate voice script writes names as they
   are pronounced and numbers as words, so the voice says them correctly.
 - **Three ways to use it:** a right-click menu in the browser ("ترجم للعربية"), a local web page,
   or a chat: add tarjim to the Claude app, Claude Code or Codex and ask it to translate a link.

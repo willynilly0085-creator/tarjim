@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.0.10 (2026-10-09)
+
+- Dubbing is no longer limited to the voices tarjim came with. Link a voice service with your own
+  key: **ElevenLabs** (ready voices from your library, a different one per speaker, or each
+  speaker's own voice cloned for the job and deleted from ElevenLabs when it ends), or **any
+  service that speaks OpenAI's speech format** (you give its address, key, model and voice names).
+- A new "Dubbing voice" step in setup and Settings, and a line in the setup plan. The linked
+  voices appear in the voice list of the page and the extension, and as buttons in the phone bot,
+  once the key is saved.
+- A linked voice is used as it is or not at all: without its key the job says so, and it is never
+  swapped for another service.
+- Not tested with a real key: ElevenLabs and the open speech format were built from their API
+  references and checked against ElevenLabs only as far as a refused key goes. If you use one,
+  please report what you see.
+- Gemini's subscription (through Antigravity) translates but cannot dub: that program answers in
+  text only, so Gemini's natural voices still need a Gemini API key.
+
 ## 1.0.9 (2026-10-09)
 
 - Gemini through Antigravity is now verified with a signed-in Google account: the page lists the

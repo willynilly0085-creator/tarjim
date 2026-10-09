@@ -2,9 +2,11 @@ import { $, api, post, upload } from "./api.js";
 import { t } from "./i18n.js";
 import { watchJobs } from "./jobs.js";
 import { showUpdate } from "./update.js";
+import { linkedVoices, loadVoices } from "./voices.js";
 
 const MEDIA = /\.(mp4|mkv|webm|mov|avi|m4v|mp3|m4a|wav|flac|ogg|opus|aac)$/i;
 const state = { file: null, poll: 0, wired: false, languages: new Map() };
+const LINKED = { eleven: "voiceEleven", elevenclone: "voiceElevenClone", speech: "voiceSpeech" };
 
 const linkReady = () => /^https?:\/\//i.test($("link").value.trim());
 const ready = () => Boolean(state.file) || linkReady();
@@ -17,6 +19,18 @@ function sync() {
   if (!arabic && $("voice").value === "fishvoice") $("voice").value = "clone";
   $("voice-field").hidden = form.mode.value !== "dub";
   $("go").disabled = !ready();
+}
+
+// Voices from a service the person linked with their own key appear once it is linked.
+async function showLinkedVoices() {
+  await loadVoices();
+  $("voice").querySelectorAll("[data-linked]").forEach((option) => option.remove());
+  for (const id of linkedVoices()) {
+    const option = new Option(t(LINKED[id]), id);
+    Object.assign(option.dataset, { t: LINKED[id], linked: "yes" });
+    $("voice").append(option);
+  }
+  $("voice-more").hidden = linkedVoices().length > 0;
 }
 
 function take(file) {
@@ -88,6 +102,7 @@ export async function openWorkspace() {
   state.languages = new Map(languages.map((l) => [l.code, l.native]));
   const current = $("target").value || (document.documentElement.lang === "ar" ? "ar" : "en");
   $("target").replaceChildren(...languages.map((l) => new Option(l.native, l.code, false, l.code === current)));
+  await showLinkedVoices();
   sync();
   clearInterval(state.poll);
   state.poll = watchJobs(state.languages);

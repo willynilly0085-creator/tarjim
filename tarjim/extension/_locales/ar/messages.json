@@ -377,5 +377,14 @@
   },
   "detailLabel": {
     "message": "التفاصيل:"
+  },
+  "voiceEleven": {
+    "message": "أصوات ElevenLabs (يرسل النص فقط)"
+  },
+  "voiceElevenClone": {
+    "message": "ElevenLabs بصوت المتكلم نفسه (يرسل عينة صوت)"
+  },
+  "voiceSpeech": {
+    "message": "خدمة الصوت المربوطة (يرسل النص فقط)"
   }
 }

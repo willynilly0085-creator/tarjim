@@ -6,7 +6,8 @@ from tarjim.engines.catalog import BY_ID, compatible
 from tarjim.engines.catalog import PROVIDERS as CATALOG
 
 KEY_SHAPE = re.compile(r"^[A-Za-z0-9._-]{16,256}$")
-PROVIDERS = {**{p.id: p.key_name for p in CATALOG if p.key_name}, "fish": "fish_api_key"}
+PROVIDERS = {**{p.id: p.key_name for p in CATALOG if p.key_name}, "fish": "fish_api_key",
+             "eleven": "eleven_api_key", "speech": "speech_api_key"}
 
 CHECK_MS = 20_000
 
@@ -42,8 +43,15 @@ def anthropic_works(key: str) -> bool:
                      {"x-api-key": key, "anthropic-version": VERSION})
 
 
+def eleven_works(key: str) -> bool:
+    from tarjim.dub.eleven import works
+
+    return works(key)
+
+
 CHECKS: dict[str, Callable[[str], bool]] = {
-    "gemini": gemini_works, "openai": openai_works, "anthropic": anthropic_works}
+    "gemini": gemini_works, "openai": openai_works, "anthropic": anthropic_works,
+    "eleven": eleven_works}
 
 
 def compatible_works(provider: str, key: str) -> bool:

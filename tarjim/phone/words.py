@@ -27,5 +27,7 @@ def result_name(mode: str) -> str:
     if not mode.startswith("dub-"):
         return say("outputSrt" if mode == "srt" else "outputBurn")
     voice = {"gemini": "voiceNatural", "clone": "voiceClone", "studio": "voiceStudio",
-             "fish": "voiceFish", "fishvoice": "voiceNarrator"}.get(mode[4:], "voiceNatural")
+             "fish": "voiceFish", "fishvoice": "voiceNarrator", "eleven": "voiceEleven",
+             "elevenclone": "voiceElevenClone",
+             "speech": "voiceSpeech"}.get(mode[4:], "voiceNatural")
     return f"{say('outputDub')} · {say(voice)}"

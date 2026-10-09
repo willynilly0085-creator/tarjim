@@ -83,6 +83,12 @@
       <ul class="tool-list" id="tool-list"></ul>
     </section>
 
+    <section class="step" data-step="voice">
+      <h1 data-t="voiceTitle"></h1>
+      <p class="lede" data-t="voiceHint"></p>
+      <div id="voice-body"></div>
+    </section>
+
     <section class="step" data-step="extension">
       <h1 data-t="extTitle"></h1>
       <p class="lede" data-t="extHint"></p>
@@ -154,11 +160,11 @@
       <label class="field" id="voice-field" hidden><span class="field-label" data-t="voice"></span>
         <select id="voice" class="select">
           <option value="gemini" data-t="voiceNatural"></option>
-            <option value="clone" data-t="voiceClone"></option>
+          <option value="clone" data-t="voiceClone"></option>
           <option value="studio" data-t="voiceStudio"></option>
           <option value="fish" data-t="voiceFish"></option>
           <option value="fishvoice" id="voice-narrator" data-t="voiceNarrator"></option>
-        </select></label>
+        </select><span class="meta" id="voice-more" data-t="voiceMore"></span></label>
       <div class="upload" id="upload" hidden><div class="meter"><span id="upload-bar"></span></div><p class="meta" id="upload-text"></p></div>
       <button class="primary" id="go" type="submit" data-t="translate" disabled></button>
       <p class="notice" id="notice" role="status" aria-live="polite"></p>

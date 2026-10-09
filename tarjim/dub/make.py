@@ -21,8 +21,9 @@ SAVED_VOICE = "fish:saved"
 FIRST_SECONDS = 10.0
 SAFE = re.compile(r"[^\w.-]")
 NUMBER = re.compile(r"\d+")
-PLAIN_TEXT = ("gemini", "clone")
+PLAIN_TEXT = ("gemini", "clone", "eleven", "speech")
 KEYS = {"gemini": "gemini_api_key", "fish": "fish_api_key"}
+LINKED = {"eleven": ("eleven_api_key", "ElevenLabs"), "speech": ("speech_api_key", "voice service")}
 
 
 class DubUnavailable(RuntimeError):
@@ -38,11 +39,21 @@ def choose(engine: str, language: str) -> str:
     computer is never swapped for a cloud one: the text would go to a company the person did not
     choose."""
     wanted = engine.split(":", maxsplit=1)[0]
+    if wanted in LINKED:
+        return linked(wanted)
     keyless = wanted in KEYS and not setting(KEYS[wanted])
     if keyless or (wanted == "studio" and language not in VOICES):
         wanted = "clone"
     if wanted == "clone" and language not in CLONE_LANGUAGES:
         raise DubUnavailable(f"no dubbing voice for language {language}")
+    return wanted
+
+
+def linked(wanted: str) -> str:
+    """A voice service the person linked with their own key is used as it is, or not at all."""
+    key, name = LINKED[wanted]
+    if not setting(key):
+        raise DubUnavailable(f"{name} API key missing: add it in tarjim's settings")
     return wanted
 
 
@@ -60,7 +71,20 @@ def references(stems: Stems, words: list[Word], folder: Path) -> dict[str, Path]
             for speaker, chosen in spans.items()}
 
 
+def linked_voices(engine: str, spec: str, samples: dict[str, Path]) -> Voices:
+    if engine == "speech":
+        from tarjim.dub.speech import SpeechVoices
+
+        return SpeechVoices(sorted(samples))
+    from tarjim.dub.eleven import ElevenVoices
+
+    return ElevenVoices(setting("eleven_api_key"), samples, clone=spec.endswith(":clone"),
+                        preferred=setting("eleven_voice"))
+
+
 def voices_for(engine: str, spec: str, job: Job, samples: dict[str, Path]) -> Voices:
+    if engine in LINKED:
+        return linked_voices(engine, spec, samples)
     if engine == "gemini":
         from tarjim.dub.gemini_voice import GeminiVoices
 

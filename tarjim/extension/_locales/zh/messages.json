@@ -377,5 +377,14 @@
   },
   "detailLabel": {
     "message": "详情："
+  },
+  "voiceEleven": {
+    "message": "ElevenLabs 声音（只发送文字）"
+  },
+  "voiceElevenClone": {
+    "message": "ElevenLabs，说话人自己的声音（会发送声音样本）"
+  },
+  "voiceSpeech": {
+    "message": "你连接的语音服务（只发送文字）"
   }
 }

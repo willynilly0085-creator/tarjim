@@ -377,5 +377,14 @@
   },
   "detailLabel": {
     "message": "Ayrıntı:"
+  },
+  "voiceEleven": {
+    "message": "ElevenLabs sesleri (yalnızca metni gönderir)"
+  },
+  "voiceElevenClone": {
+    "message": "ElevenLabs, konuşmacının kendi sesi (ses örneği gönderir)"
+  },
+  "voiceSpeech": {
+    "message": "Bağladığın ses hizmeti (yalnızca metni gönderir)"
   }
 }

@@ -7,7 +7,8 @@ from pathlib import Path
 from queue import Empty, Queue
 
 DUBBING = {"dub-gemini": "gemini", "dub-clone": "clone", "dub-studio": "studio", "dub-fish": "fish",
-           "dub-fishvoice": "fish:saved"}
+           "dub-fishvoice": "fish:saved", "dub-eleven": "eleven", "dub-elevenclone": "eleven:clone",
+           "dub-speech": "speech"}
 MODES = ("srt", "burn", *DUBBING)
 KEEP = 50
 PAUSE_TICK = 0.5
@@ -19,7 +20,7 @@ SIGNED_OUT = ("Failed to authenticate", "OAuth session expired", "ot logged in",
 REASONS = [("quota", ("QuotaExhausted", "quota", " 429:")), ("signin", SIGNED_OUT),
            ("key", ("API key missing", "API key not valid", " 401:", " 403:")),
            ("download", ("DownloadError", "download")), ("tools", ("not found; install",)),
-           ("dub", ("DubUnavailable",))]
+           ("dub", ("DubUnavailable", "VoiceError"))]
 
 
 class Stopped(Exception):

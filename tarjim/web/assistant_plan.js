@@ -5,6 +5,7 @@ import { listenOptions, translateOptions } from "./assistant_options.js";
 import { fillModels, modelOptions } from "./models.js";
 import { signInPanel } from "./signin.js";
 import { button, el, status } from "./ui.js";
+import { loadVoices, voicePanel } from "./voices.js";
 
 function missing(state) {
   const installed = state.scan.tools.installed;
@@ -109,9 +110,12 @@ export function planScreen(screen, state, { back, apply, manual }) {
       modelRow(state),
       choiceRow(t("planListen"), listenOptions(state.scan), state.plan.listen.provider,
         (o) => { state.plan.listen = o.choice; paint(); }),
+      el("div", { className: "plan-row" }, el("p", { className: "field-label", textContent: t("voiceTitle") }),
+        voicePanel(paint)),
       downloadPart(state), handPart(state), keyPart,
       el("nav", { className: "step-nav" }, button(t("back"), back), start), note);
   };
   state.plan.translate.value = translateOptions(state.scan).find((o) => o.matches(state.plan.translate))?.value;
   paint();
+  loadVoices().then(paint);
 }

@@ -1,11 +1,14 @@
 import { $, api, post } from "./api.js";
 import { t } from "./i18n.js";
 import { button, copyText, el, selectText, status } from "./ui.js";
+import { linkedVoices, loadVoices } from "./voices.js";
 
 const WATCH_MS = 3000;
 const BOTFATHER = "https://t.me/BotFather";
 const MODES = ["burn", "srt", "dub-gemini", "dub-clone", "dub-studio"];
-const VOICE = { "dub-gemini": "voiceNatural", "dub-clone": "voiceClone", "dub-studio": "voiceStudio" };
+const VOICE = { "dub-gemini": "voiceNatural", "dub-clone": "voiceClone", "dub-studio": "voiceStudio",
+  "dub-eleven": "voiceEleven", "dub-elevenclone": "voiceElevenClone", "dub-speech": "voiceSpeech" };
+const offered = () => [...MODES, ...linkedVoices().map((voice) => `dub-${voice}`)];
 let watching = 0;
 
 const modeName = (mode) => (VOICE[mode] ? `${t("outputDub")} · ${t(VOICE[mode])}` : t(mode === "srt" ? "outputSrt" : "outputBurn"));
@@ -66,7 +69,7 @@ async function paired(view) {
   return el("div", { className: "stack phone-paired" },
     el("p", { className: "meta ok", textContent: t("phonePaired", { bot: `\u2066@${view.bot}\u2069` }) }),
     choice(t("phoneTarget"), languages.map((l) => [l.code, l.native]), view.target, "target"),
-    choice(t("phoneResult"), MODES.map((m) => [m, modeName(m)]), view.mode, "mode"),
+    choice(t("phoneResult"), offered().map((m) => [m, modeName(m)]), view.mode, "mode"),
     arabic ? choice(t("dialect"), [["saudi", t("dialectSaudi")], ["msa", t("dialectMsa")]], view.dialect, "dialect") : "",
     el("p", { className: "meta", id: "phone-saved", role: "status" }),
     el("p", { className: "meta", textContent: t("phoneOnlyWhenOn") }),
@@ -93,6 +96,7 @@ async function watch() {
 }
 
 export async function renderPhone() {
+  await loadVoices();
   paint(await api("/phone").catch(() => ({ bot: "" })));
 }
 

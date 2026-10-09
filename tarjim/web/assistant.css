@@ -28,6 +28,8 @@
 .plain .why { display: block; }
 .need { padding: var(--space-md); border: 1px solid var(--accent-line); border-radius: var(--radius); background: var(--raised); }
 .need .text-input { max-width: 32rem; }
+.voice-link, .voice-form { justify-items: stretch; max-width: 32rem; }
+.voice-link .button-quiet { justify-self: start; }
 
 .ai-apps { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
 .ai-app { display: grid; grid-template-columns: 1fr auto; gap: var(--space-md); align-items: center;

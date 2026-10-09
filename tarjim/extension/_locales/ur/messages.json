@@ -377,5 +377,14 @@
   },
   "detailLabel": {
     "message": "تفصیل:"
+  },
+  "voiceEleven": {
+    "message": "⁦ElevenLabs⁩ کی آوازیں (صرف متن بھیجتا ہے)"
+  },
+  "voiceElevenClone": {
+    "message": "⁦ElevenLabs⁩، بولنے والے کی اپنی آواز (آواز کا نمونہ بھیجتا ہے)"
+  },
+  "voiceSpeech": {
+    "message": "آپ کی جوڑی ہوئی آواز کی سروس (صرف متن بھیجتی ہے)"
   }
 }

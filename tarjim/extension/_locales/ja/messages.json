@@ -377,5 +377,14 @@
   },
   "detailLabel": {
     "message": "詳細:"
+  },
+  "voiceEleven": {
+    "message": "ElevenLabs の声（テキストのみ送信）"
+  },
+  "voiceElevenClone": {
+    "message": "ElevenLabs、話者本人の声（音声サンプルを送信）"
+  },
+  "voiceSpeech": {
+    "message": "接続した音声サービス（テキストのみ送信）"
   }
 }

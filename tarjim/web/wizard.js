@@ -6,8 +6,9 @@ import { fillLanguageChoices } from "./languages.js";
 import { copyText, selectText } from "./ui.js";
 import { renderPhone } from "./phone.js";
 import { renderDevice, renderTools } from "./steps.js";
+import { renderVoices } from "./voices.js";
 
-const STEPS = ["language", "device", "connect", "tools", "extension", "chat", "done"];
+const STEPS = ["language", "device", "connect", "tools", "voice", "extension", "chat", "done"];
 let at = 0;
 let poll = 0;
 let state;
@@ -18,6 +19,7 @@ const ENTER = {
   device: () => renderDevice(state),
   connect: () => renderConnect(),
   tools: () => watchTools(),
+  voice: () => renderVoices(),
   extension: () => {
     $("extension-path").textContent = state.setup.extension_path;
     $("copy-path").textContent = t("copy");
