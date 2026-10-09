@@ -71,11 +71,11 @@ def references(stems: Stems, words: list[Word], folder: Path) -> dict[str, Path]
             for speaker, chosen in spans.items()}
 
 
-def linked_voices(engine: str, spec: str, samples: dict[str, Path]) -> Voices:
+def linked_voices(engine: str, spec: str, job: Job, samples: dict[str, Path]) -> Voices:
     if engine == "speech":
         from tarjim.dub.speech import SpeechVoices
 
-        return SpeechVoices(sorted(samples))
+        return SpeechVoices(sorted(samples), job.target)
     from tarjim.dub.eleven import ElevenVoices
 
     return ElevenVoices(setting("eleven_api_key"), samples, clone=spec.endswith(":clone"),
@@ -84,7 +84,7 @@ def linked_voices(engine: str, spec: str, samples: dict[str, Path]) -> Voices:
 
 def voices_for(engine: str, spec: str, job: Job, samples: dict[str, Path]) -> Voices:
     if engine in LINKED:
-        return linked_voices(engine, spec, samples)
+        return linked_voices(engine, spec, job, samples)
     if engine == "gemini":
         from tarjim.dub.gemini_voice import GeminiVoices
 

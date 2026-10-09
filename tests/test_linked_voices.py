@@ -82,18 +82,44 @@ def test_a_cloned_voice_is_deleted_when_the_job_ends_even_if_it_fails(
 
 def test_any_service_in_openais_speech_format_can_dub(service: Service) -> None:
     config.save("speech_api_key", "sk-speech-key-000000")
-    assert speech.address() == speech.OPENAI and speech.voice_names()[0] == "alloy"
     assert voice_routes.speech_choice({"url": "ftp://x", "model": "m", "voices": "a"}) is None
+    assert voice_routes.speech_choice({"preset": "nobody"}) is None
     chosen = voice_routes.speech_choice({"url": "https://voices.example/v1/", "model": "tts-2",
                                          "voices": "nova, sage"})
-    assert chosen is not None
+    assert chosen is not None and chosen["speech_preset"] == "custom"
     for name, value in chosen.items():
         config.save(name, value)
-    speech.SpeechVoices(["S1", "S2"]).speak_all(LINES)
+    speech.SpeechVoices(["S1", "S2"], "ar").speak_all(LINES)
     sent = [o for _m, u, o in service.asked if u == "https://voices.example/v1/audio/speech"]
     assert {o["json"]["input"]: o["json"]["voice"] for o in sent} == {
         "مرحبا": "nova", "أهلين": "sage"}
     assert sent[0]["json"]["model"] == "tts-2" and "Bearer sk-speech" in str(sent[0]["headers"])
+
+
+def use(preset: str) -> None:
+    chosen = voice_routes.speech_choice({"preset": preset})
+    assert chosen is not None
+    for name, value in chosen.items():
+        config.save(name, value)
+
+
+def test_a_service_known_by_name_brings_its_model_and_voices_for_the_language(
+        service: Service) -> None:
+    use("groq")
+    assert speech.offer("ar")[0] == "canopylabs/orpheus-arabic-saudi"
+    assert speech.offer("en")[1].startswith("troy")
+    with pytest.raises(cast.VoiceError, match="Groq: no voice for language fr"):
+        speech.SpeechVoices(["S1"], "fr")
+    long_line = Line(0.0, 9.0, "S1", " ".join(["كلمة"] * 80), "words")
+    speech.SpeechVoices(["S1"], "ar").speak_all([long_line])
+    sent = [o["json"] for _m, u, o in service.asked if u.endswith("/openai/v1/audio/speech")]
+    assert len(sent) > 1 and all(len(body["input"]) <= 200 for body in sent)
+    assert {body["voice"] for body in sent} == {"abdullah"} and sent[0]["response_format"] == "wav"
+    assert " ".join(body["input"] for body in sent) == long_line.text
+    use("openai")
+    assert speech.offer("ja") == ("gpt-4o-mini-tts", speech.OPENAI_VOICES)
+    listed = {p["id"]: p["languages"] for p in voice_routes.view()["speech"]["presets"]}
+    assert listed["groq"] == ["ar", "en"] and listed["openai"] == [] and "openrouter" in listed
 
 
 def test_a_linked_voice_without_its_key_says_so_and_is_never_swapped(

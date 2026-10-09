@@ -2,7 +2,7 @@ import { $, api, post, upload } from "./api.js";
 import { t } from "./i18n.js";
 import { watchJobs } from "./jobs.js";
 import { showUpdate } from "./update.js";
-import { linkedVoices, loadVoices } from "./voices.js";
+import { linkedVoices, loadVoices, speechName } from "./voices.js";
 
 const MEDIA = /\.(mp4|mkv|webm|mov|avi|m4v|mp3|m4a|wav|flac|ogg|opus|aac)$/i;
 const state = { file: null, poll: 0, wired: false, languages: new Map() };
@@ -26,8 +26,9 @@ async function showLinkedVoices() {
   await loadVoices();
   $("voice").querySelectorAll("[data-linked]").forEach((option) => option.remove());
   for (const id of linkedVoices()) {
-    const option = new Option(t(LINKED[id]), id);
-    Object.assign(option.dataset, { t: LINKED[id], linked: "yes" });
+    const named = id === "speech" && speechName();
+    const option = new Option(named ? t("voiceLinked", { name: speechName() }) : t(LINKED[id]), id);
+    Object.assign(option.dataset, named ? { linked: "yes" } : { t: LINKED[id], linked: "yes" });
     $("voice").append(option);
   }
   $("voice-more").hidden = linkedVoices().length > 0;

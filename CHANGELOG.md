@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.0.11 (2026-10-09)
+
+- The voice services you can link for dubbing are now listed by name, each with a link to get its
+  key: **Google Gemini**, **ElevenLabs**, **Fish Audio**, **OpenAI**, **Groq**, **OpenRouter** and
+  **Together AI**, plus "another voice service" for any address in OpenAI's speech format. In
+  1.0.10 the list had only ElevenLabs and the open address.
+- A named service brings its own model and voices for the language you dub into, so there is
+  nothing to type but the key. Groq brings its Saudi Arabic voices (Abdullah, Noura, Fahad, Lulwa,
+  Sultan, Aisha) and its English ones; a long line is sent in parts because Groq takes 200
+  characters at a time.
+- A service that has no voice for the language says so instead of speaking it badly (Groq speaks
+  Arabic and English, Together AI's listed model English).
+- Not tested with real keys: each named service's address was checked only as far as it refusing
+  a made-up key. Not added because their own documentation could not be confirmed: xAI's Grok
+  voices, Mistral's Voxtral, MiniMax and Deepgram; Voxtral and others can be reached through
+  OpenRouter by typing the model name.
+
 ## 1.0.10 (2026-10-09)
 
 - Dubbing is no longer limited to the voices tarjim came with. Link a voice service with your own
