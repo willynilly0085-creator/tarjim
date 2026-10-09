@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.8 (2026-10-09)
+
+- A Google account's Gemini (Google AI Pro, Ultra, or the free allowance) is offered through
+  Google's Antigravity CLI: tarjim installs it from the page, asks `agy models` for the models
+  your account has, and runs it in plan mode with a sandbox. Google stopped serving personal
+  accounts through Gemini CLI on 2026-06-18, so that program is not offered. Not verified yet with
+  a signed-in account: the model list and a full translation.
+- Any API key works without picking a model first: the model the provider's own list suggests is
+  used and remembered.
+- An API that refuses a temperature or a reply format (some reasoning models, some local servers)
+  is asked again without them, and a reply that wraps its JSON in a sentence is still read.
+- Claude: Haiku 5.5 is listed with the newest models, and the API default is Sonnet 5.5.
+- An Anthropic API reply with no answer is a failure, not an empty translation.
+
 ## 1.0.7 (2026-10-09)
 
 - A voice on your computer is never replaced by a cloud voice. Before, dubbing "in the speaker's

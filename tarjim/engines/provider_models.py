@@ -84,8 +84,28 @@ def grok_list() -> list[Model]:
     return [{**model, "suggested": "yes" if at == 0 else ""} for at, model in enumerate(models)]
 
 
+def antigravity_list() -> list[Model]:
+    from tarjim.engines.antigravity import listing, rows
+
+    return describe(rows(listing()), keep_order=True)
+
+
 OWN_LISTS = {"claude": claude_list, "codex": lambda: describe(codex_rows(), keep_order=True),
-             "grok": grok_list}
+             "grok": grok_list, "antigravity": antigravity_list}
+
+
+def model_in_use(provider: str, default: str = "") -> str:
+    """The model the person chose; without one, the model this provider's own list suggests,
+    remembered so the list is asked once."""
+    from tarjim.config import save
+
+    name = BY_ID[provider].model_name
+    if setting(name):
+        return setting(name)
+    suggested = next((m["id"] for m in models_for(provider) if m["suggested"]), "")
+    if suggested:
+        save(name, suggested)
+    return suggested or default
 
 
 def models_for(provider: str) -> list[Model]:

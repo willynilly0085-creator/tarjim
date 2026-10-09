@@ -31,7 +31,7 @@ an `.srt`, or dubs it with a voice for every speaker.
 | Way | Choices | Notes |
 |---|---|---|
 | API key | Gemini, OpenAI, Anthropic, OpenRouter, DeepSeek, Qwen, Mistral, Groq, xAI, or any OpenAI-compatible address | Gemini and OpenAI can also listen (speech to text). |
-| Your subscription | Claude (through Claude Code), ChatGPT (through Codex), Grok (through Grok Build), GitHub Copilot, Google AI (through Antigravity) | tarjim runs the vendor's own program with your sign-in. Usage counts against your plan and each vendor's terms apply. |
+| Your subscription | Claude (through Claude Code), ChatGPT (through Codex), Grok (through Grok Build), Gemini with a Google account (through Antigravity), GitHub Copilot | tarjim runs the vendor's own program with your sign-in. Usage counts against your plan and each vendor's terms apply. |
 | On your computer | Ollama, LM Studio, Jan, llama.cpp, vLLM, KoboldCpp | Found automatically with their models. Nothing leaves your device. |
 
 Pick any model a provider offers. If the chosen engine fails or runs out of quota, tarjim falls

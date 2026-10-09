@@ -42,12 +42,12 @@ def local() -> dict[str, Any]:
 
 def subscriptions() -> dict[str, Any]:
     from tarjim.engines.catalog import SUBSCRIPTION, of_method
-    from tarjim.engines.sign_in import BROWSER, signed_in
+    from tarjim.engines.sign_in import ASKED, BROWSER, signed_in
     from tarjim.engines.subscription import launcher
 
     def look(provider: Any) -> dict[str, Any]:
         present = bool(launcher(provider.program))
-        known = provider.id in BROWSER
+        known = provider.id in BROWSER or provider.id in ASKED
         return {"id": provider.id, "name": provider.name, "installed": present,
                 "signed_in": present and known and signed_in(provider.id)}
 

@@ -3,6 +3,7 @@ from typing import Any
 
 TIMEOUT = 300
 TOO_MANY = 429
+BAD_REQUEST = 400
 OK = 200
 RESULT = "result"
 
@@ -23,11 +24,24 @@ def unwrap(value: Any) -> Any:
 
 
 def parse_json(text: str) -> Any:
+    """The JSON in a model's reply, also when it wrapped it in a code fence or in a sentence."""
     cleaned = text.strip().removeprefix("```json").removeprefix("```").removesuffix("```")
+    start, end = cleaned.find("{"), cleaned.rfind("}")
+    inside = cleaned[start:end + 1] if 0 <= start < end else ""
+    for candidate in (cleaned or "null", inside):
+        try:
+            return json.loads(candidate)
+        except ValueError:
+            continue
+    raise EngineError("reply", 0, f"not JSON: {cleaned[:80]}")
+
+
+def reply_text(provider: str, answer: Any) -> str:
+    """The words of a chat-format answer; an answer of another shape is an engine error."""
     try:
-        return json.loads(cleaned or "null")
-    except ValueError as error:
-        raise EngineError("reply", 0, f"not JSON: {cleaned[:80]}") from error
+        return str(answer["choices"][0]["message"]["content"] or "")
+    except (LookupError, TypeError) as error:
+        raise EngineError(provider, 0, f"unexpected answer: {str(answer)[:120]}") from error
 
 
 def post(provider: str, url: str, headers: dict[str, str], **payload: Any) -> Any:

@@ -8,7 +8,7 @@ then this computer's graphics card, then the free Gemini key.
 import re
 from typing import Any
 
-SUBSCRIPTION_ORDER = ("claude", "codex", "grok", "copilot", "antigravity")
+SUBSCRIPTION_ORDER = ("claude", "codex", "grok", "antigravity", "copilot")
 KEY_ORDER = ("gemini", "openai", "anthropic", "openrouter", "deepseek", "qwen", "mistral", "groq",
              "xai", "opencode", "opencode_go", "kimi", "glm", "minimax")
 HEARS = ("gemini", "openai")

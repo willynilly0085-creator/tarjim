@@ -11,9 +11,9 @@ import os
 import re
 from pathlib import Path
 
-CLAUDE_LATEST = ("claude-opus-5-5", "claude-fable-5-1", "claude-sonnet-5-5", "claude-haiku-4-5")
-CLAUDE_MORE = ("claude-sonnet-5", "claude-opus-5", "claude-fable-5", "claude-opus-4-8",
-               "claude-opus-4-7", "claude-opus-4-6", "claude-sonnet-4-6")
+CLAUDE_LATEST = ("claude-opus-5-5", "claude-fable-5-1", "claude-sonnet-5-5", "claude-haiku-5-5")
+CLAUDE_MORE = ("claude-sonnet-5", "claude-opus-5", "claude-fable-5", "claude-haiku-4-5",
+               "claude-opus-4-8", "claude-opus-4-7", "claude-opus-4-6", "claude-sonnet-4-6")
 CLAUDE_SUGGESTED = "claude-sonnet-5-5"
 MODEL_ID = re.compile(r"^claude-([a-z]+)-(\d+)(?:-(\d+))?")
 Model = dict[str, str]

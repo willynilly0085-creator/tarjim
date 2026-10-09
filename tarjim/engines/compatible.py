@@ -6,10 +6,20 @@ from typing import Any
 
 from tarjim.config import setting
 from tarjim.engines.catalog import BY_ID
-from tarjim.engines.web import parse_json, post, unwrap, wrap
+from tarjim.engines.web import (
+    BAD_REQUEST,
+    EngineError,
+    parse_json,
+    post,
+    reply_text,
+    unwrap,
+    wrap,
+)
 
 LIST_TIMEOUT = 8
 ANSWER_SHAPE = "Reply with one JSON object matching this schema:"
+# Some models refuse a temperature, and some local servers a reply format: asked again without.
+EXTRAS = {"temperature": 0.2, "response_format": {"type": "json_object"}}
 
 
 def address(provider: str) -> str:
@@ -62,15 +72,24 @@ class CompatibleAsker:
 
     def ask(self, prompt: str, _audio: bytes | None, schema: dict[str, Any]) -> Any:
         shape = json.dumps(wrap(schema), ensure_ascii=False)
-        body = {"model": self.model, "temperature": 0.2,
-                "response_format": {"type": "json_object"},
+        body = {"model": self.model,
                 "messages": [{"role": "system", "content": f"{ANSWER_SHAPE} {shape}"},
                              {"role": "user", "content": prompt}]}
-        answer = post(self.name, f"{self.base_url}/chat/completions", headers(self.key, self.name),
-                      json=body)
-        return unwrap(parse_json(answer["choices"][0]["message"]["content"] or ""))
+        try:
+            answer = self.send({**body, **EXTRAS})
+        except EngineError as error:
+            if error.status != BAD_REQUEST:
+                raise
+            answer = self.send(body)
+        return unwrap(parse_json(reply_text(self.name, answer)))
+
+    def send(self, body: dict[str, Any]) -> Any:
+        return post(self.name, f"{self.base_url}/chat/completions", headers(self.key, self.name),
+                    json=body)
 
 
 def api_asker(provider: str) -> CompatibleAsker:
+    from tarjim.engines.provider_models import model_in_use
+
     key = setting(BY_ID[provider].key_name)
-    return CompatibleAsker(provider, address(provider), key, setting(BY_ID[provider].model_name))
+    return CompatibleAsker(provider, address(provider), key, model_in_use(provider))

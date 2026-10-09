@@ -20,7 +20,8 @@ REFUSED = "not supported"
 HIDDEN = 0x08000000 if sys.platform == "win32" else 0
 
 
-OWN_FOLDERS = (Path(".local") / "bin", Path(".grok") / "bin")
+OWN_FOLDERS = (Path(".local") / "bin", Path(".grok") / "bin",
+               Path("AppData") / "Local" / "agy" / "bin")
 
 
 def own_folder(name: str) -> str | None:
@@ -48,11 +49,12 @@ def installed() -> list[str]:
     return [p.id for p in of_method(SUBSCRIPTION) if launcher(p.program)]
 
 
-def run(command: list[str], prompt: str, folder: str) -> subprocess.CompletedProcess[str]:
+def run(command: list[str], prompt: str, folder: str,
+        env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
     try:
         return subprocess.run(command, input=prompt, capture_output=True, text=True,
                               encoding="utf-8", errors="replace", timeout=TIMEOUT, cwd=folder,
-                              creationflags=HIDDEN, check=False)
+                              creationflags=HIDDEN, check=False, env=env)
     except (OSError, subprocess.TimeoutExpired) as error:
         raise EngineError(command[0], 0, str(error)) from error
 
@@ -164,4 +166,8 @@ def subscription_asker(provider: str) -> Any:
         from tarjim.engines.grok import GrokAsker
 
         return GrokAsker()
+    if provider == "antigravity":
+        from tarjim.engines.antigravity import AntigravityAsker
+
+        return AntigravityAsker()
     return CodexAsker() if provider == "codex" else PromptAsker(provider)

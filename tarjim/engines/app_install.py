@@ -11,6 +11,8 @@ from pathlib import Path
 HIDDEN = 0x08000000 if sys.platform == "win32" else 0
 PACKAGES = {"claude": "@anthropic-ai/claude-code", "codex": "@openai/codex",
             "copilot": "@github/copilot"}
+
+
 def native(address: str) -> list[str]:
     """The vendor's own installer: a PowerShell script on Windows, a shell one elsewhere."""
     if sys.platform == "win32":
@@ -19,7 +21,8 @@ def native(address: str) -> list[str]:
     return ["bash", "-c", f"curl -fsSL {address}.sh | bash"]
 
 
-NATIVE = {"claude": native("https://claude.ai/install"), "grok": native("https://x.ai/cli/install")}
+NATIVE = {"claude": native("https://claude.ai/install"), "grok": native("https://x.ai/cli/install"),
+          "antigravity": native("https://antigravity.google/cli/install")}
 NATIVE_BIN = Path.home() / ".local" / "bin"
 running: dict[str, subprocess.Popen[bytes]] = {}
 

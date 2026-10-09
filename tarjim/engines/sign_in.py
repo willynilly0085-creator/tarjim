@@ -1,8 +1,8 @@
 """Sign in to a subscription through the browser, with no terminal window.
 
 Claude Code and Codex open the browser themselves and finish on their own; when the sign-in page
-shows a code instead, the page hands it to the waiting program. Programs without a browser sign-in
-still open in a console.
+shows a code instead, the page hands it to the waiting program. Programs without a sign-in
+command (Antigravity signs in when it is opened) still open in a console.
 """
 import json
 import re
@@ -15,6 +15,7 @@ from tarjim.engines.subscription import HIDDEN, launcher
 BROWSER = {"claude": (("auth", "login", "--claudeai"), ("auth", "status")),
            "codex": (("login",), ("login", "status")),
            "grok": (("login", "--oauth"), ("models",))}
+ASKED = {"antigravity": ("models",)}
 CODE = re.compile(r"^[\w#.~-]{6,512}$")
 STATUS_SECONDS = 30
 waiting: dict[str, subprocess.Popen[str]] = {}
@@ -57,15 +58,21 @@ def send_code(provider: str, code: str) -> bool:
 
 
 def signed_in(provider: str) -> bool:
-    program = launcher(BY_ID[provider].program) if provider in BROWSER else []
+    status = BROWSER[provider][1] if provider in BROWSER else ASKED.get(provider, ())
+    program = launcher(BY_ID[provider].program) if status else []
     if not program:
         return False
     try:
-        done = subprocess.run([*program, *BROWSER[provider][1]], capture_output=True, text=True,
+        done = subprocess.run([*program, *status], capture_output=True, text=True,
+                              stdin=subprocess.DEVNULL,
                               encoding="utf-8", errors="replace", timeout=STATUS_SECONDS,
                               creationflags=HIDDEN, check=False)
     except (OSError, subprocess.TimeoutExpired):
         return False
+    return says_signed_in(provider, done)
+
+
+def says_signed_in(provider: str, done: "subprocess.CompletedProcess[str]") -> bool:
     if provider == "claude":
         try:
             return bool(json.loads(done.stdout).get("loggedIn"))
@@ -75,4 +82,8 @@ def signed_in(provider: str) -> bool:
         from tarjim.engines.grok import signed_in as grok_signed_in
 
         return done.returncode == 0 and grok_signed_in(done.stdout)
+    if provider == "antigravity":
+        from tarjim.engines.antigravity import rows
+
+        return bool(rows(done.stdout))
     return done.returncode == 0 and "not logged in" not in done.stdout.lower()

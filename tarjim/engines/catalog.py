@@ -62,8 +62,7 @@ PROVIDERS = (
              key_url="https://opencode.ai/auth", plan=True),
     Provider("custom", "OpenAI-compatible", API),
     Provider("claude", "Claude", SUBSCRIPTION, program="claude", login=("claude",),
-             install="npm install -g @anthropic-ai/claude-code",
-             models=("opus", "sonnet", "haiku")),
+             install="npm install -g @anthropic-ai/claude-code"),
     Provider("codex", "ChatGPT", SUBSCRIPTION, program="codex", login=("codex", "login"),
              install="npm install -g @openai/codex"),
     Provider("grok", "Grok", SUBSCRIPTION, program="grok", login=("grok", "login"),
@@ -71,8 +70,8 @@ PROVIDERS = (
     Provider("copilot", "GitHub Copilot", SUBSCRIPTION, program="copilot", login=("copilot",),
              install="npm install -g @github/copilot",
              models=("gpt-5.4", "claude-haiku-4.5", "gpt-5.3-codex")),
-    Provider("antigravity", "Google AI (Antigravity)", SUBSCRIPTION, program="agy", login=("agy",),
-             install="https://antigravity.google/docs/cli"),
+    Provider("antigravity", "Gemini (Google Antigravity)", SUBSCRIPTION, program="agy",
+             login=("agy",), install="https://antigravity.google/docs/cli"),
 )
 BY_ID = {provider.id: provider for provider in PROVIDERS}
 

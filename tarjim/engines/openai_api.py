@@ -1,7 +1,7 @@
 from typing import Any
 
 from tarjim.config import setting
-from tarjim.engines.web import parse_json, post, unwrap, wrap
+from tarjim.engines.web import parse_json, post, reply_text, unwrap, wrap
 from tarjim.listen.gemini_listen import Utterance, parse
 
 BASE = "https://api.openai.com/v1"
@@ -21,12 +21,14 @@ class OpenAIAsker:
     hears = False
 
     def ask(self, prompt: str, _audio: bytes | None, schema: dict[str, Any]) -> Any:
-        body = {"model": setting("openai_model") or CHAT_MODEL, "temperature": 0.2,
+        from tarjim.engines.provider_models import model_in_use
+
+        body = {"model": model_in_use("openai", CHAT_MODEL),
                 "messages": [{"role": "user", "content": prompt}],
                 "response_format": {"type": "json_schema", "json_schema": {
                     "name": "answer", "schema": wrap(schema)}}}
         answer = post("openai", f"{base_url()}/chat/completions", headers(), json=body)
-        return unwrap(parse_json(answer["choices"][0]["message"]["content"] or ""))
+        return unwrap(parse_json(reply_text("openai", answer)))
 
 
 def listen(audio: bytes) -> tuple[str, list[Utterance]]:

@@ -103,7 +103,7 @@ def change_settings(interface_language: str = "", listening_engine: str = "",
     interface_language: ar or en. listening_engine: gemini, openai or local.
     translation_engine: any id from list_connections: an API provider (gemini, openai,
     anthropic, openrouter, deepseek, qwen, mistral, groq, xai, custom), a subscription
-    (claude, codex, grok, copilot, antigravity) or local.
+    (claude, codex, grok, antigravity, copilot) or local.
     local_model: the model name for local translation, e.g. aya-expanse:8b.
     """
     wanted = {"ui_language": interface_language, "listen_provider": listening_engine,
@@ -151,8 +151,8 @@ def install_tool(tool_id: str) -> Any:
 
 @tarjim.tool()
 def sign_in(provider: str) -> Any:
-    """Open the sign-in window of a subscription (claude, codex, grok, copilot, antigravity) so the
-    person can log in with their own account."""
+    """Open the sign-in window of a subscription (claude, codex, grok, antigravity, copilot) so
+    the person can log in with their own account."""
     return call("/connections/sign-in", {"provider": provider})
 
 
