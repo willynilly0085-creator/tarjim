@@ -55,6 +55,10 @@ def test_the_new_plain_wording_of_a_daily_limit_is_recognised() -> None:
     assert not gemini_client.used_up_today(Refusal("Rate limit exceeded: 5 requests per minute"))
 
 
+# The wait is a difference of two clock readings, so it can come out a hair over the delay.
+ROUNDING = 1e-6
+
+
 def test_a_busy_model_is_skipped_and_waiting_happens_once_per_round(
         monkeypatch: pytest.MonkeyPatch) -> None:
     slept: list[float] = []
@@ -74,7 +78,7 @@ def test_a_busy_model_is_skipped_and_waiting_happens_once_per_round(
     client = bare_client({})
     client.call = later  # type: ignore[method-assign]
     assert client.ask("p", b"", {}) == ["late"]
-    assert len(slept) == 1 and slept[0] <= 59.0
+    assert len(slept) == 1 and slept[0] <= 59.0 + ROUNDING
 
 
 def test_a_request_that_never_answers_gives_up_instead_of_hanging(
