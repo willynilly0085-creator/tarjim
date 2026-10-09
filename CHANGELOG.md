@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.12 (2026-10-09)
+
+- An assistant in chat (Claude, Claude Code, Codex) can now change every setting the page can:
+  scan the computer and apply the suggested setup, install a subscription's program, start or find
+  the AI programs on the computer, choose the dubbing voice service, set the phone bot's language
+  and result, turn starting with the computer and automatic updates on or off, check that the
+  setup works, and update tarjim. Before, it could change the engines, the tools and the glossary
+  only.
+- Keys and bot tokens are still never taken in chat: no tool accepts one, a test keeps it that
+  way, and the assistant opens tarjim's page for you to type them. Allowing a browser extension
+  to pair also stays with you.
+- A computer whose graphics card has less than 8 GB is no longer advised to listen on the
+  computer (the listening model needs about that much); Gemini is suggested and the reason is
+  shown. Before, any graphics card was enough for that advice.
+
 ## 1.0.11 (2026-10-09)
 
 - The voice services you can link for dubbing are now listed by name, each with a link to get its

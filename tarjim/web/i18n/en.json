@@ -259,6 +259,7 @@
   "listenLocalName": "On this computer (free, runs on the graphics card)",
   "reason_gpu": "tarjim downloads this free listening model once, on any computer with a graphics card. It understands the language of the clip by itself, and the audio stays on your computer.",
   "reason_cpu_slow": "Without a graphics card, listening on this computer is several times slower than the video. Gemini is faster.",
+  "reason_gpu_small": "This graphics card has less than 8 GB of memory, so listening on this computer can fail or run slowly. Gemini is the safer choice.",
   "reason_gemini_listen": "Gemini hears most languages very accurately. The audio of each clip is sent to Google.",
   "needTitle": "One thing from you",
   "need_key_gemini": "Paste your free Gemini key. Get it from Google in one minute with your Google account.",

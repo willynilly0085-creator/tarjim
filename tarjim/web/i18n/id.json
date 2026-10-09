@@ -259,6 +259,7 @@
   "listenLocalName": "Di komputer ini (gratis, pakai kartu grafis)",
   "reason_gpu": "tarjim mengunduh model pendengar gratis ini sekali saja di komputer mana pun yang punya kartu grafis. Ia memahami bahasa klip sendiri, dan audionya tetap di komputermu.",
   "reason_cpu_slow": "Tanpa kartu grafis, mendengar di komputer ini beberapa kali lebih lama dari durasi video. Gemini lebih cepat.",
+  "reason_gpu_small": "Kartu grafis ini memorinya kurang dari 8 GB, jadi mendengarkan di komputer ini bisa gagal atau lambat. Gemini pilihan yang lebih aman.",
   "reason_gemini_listen": "Gemini mendengar sebagian besar bahasa dengan sangat akurat. Audio tiap klip dikirim ke Google.",
   "needTitle": "Satu hal darimu",
   "need_key_gemini": "Tempel kunci Gemini gratismu. Dapatkan dari Google dalam satu menit dengan akun Google-mu.",

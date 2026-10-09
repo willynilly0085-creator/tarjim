@@ -62,10 +62,11 @@ def listen_choice(scan: Plan, translate: Plan) -> Plan:
         return {"provider": key, "reason": "key", "ready": True}
     if translate["provider"] == "gemini":
         return {"provider": "gemini", "reason": "same_key", "ready": False}
-    if scan["device"]["gpu"]:
+    if scan["device"]["vram_gb"] >= LOCAL_VRAM:
         ready = scan["tools"]["installed"]["accuracy"]
         return {"provider": "local", "reason": "gpu", "ready": ready}
-    return {"provider": "gemini", "reason": "no_gpu", "ready": False}
+    reason = "small_gpu" if scan["device"]["gpu"] else "no_gpu"
+    return {"provider": "gemini", "reason": reason, "ready": False}
 
 
 def needs(translate: Plan, listen: Plan) -> list[Plan]:

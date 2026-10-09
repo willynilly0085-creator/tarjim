@@ -259,6 +259,7 @@
   "listenLocalName": "Auf diesem Computer (kostenlos, auf der Grafikkarte)",
   "reason_gpu": "tarjim lädt dieses kostenlose Hörmodell einmal auf jeden Computer mit Grafikkarte. Es erkennt die Sprache des Clips selbst, und der Ton bleibt auf deinem Computer.",
   "reason_cpu_slow": "Ohne Grafikkarte dauert die Spracherkennung auf diesem Computer ein Vielfaches der Videolänge. Gemini ist schneller.",
+  "reason_gpu_small": "Diese Grafikkarte hat weniger als 8 GB Speicher, daher kann das Zuhören auf diesem Computer scheitern oder langsam sein. Gemini ist die sicherere Wahl.",
   "reason_gemini_listen": "Gemini erkennt die meisten Sprachen sehr genau. Der Ton jedes Abschnitts wird an Google gesendet.",
   "needTitle": "Eine Sache brauchen wir von dir",
   "need_key_gemini": "Füge deinen kostenlosen Gemini-Schlüssel ein. Du bekommst ihn in einer Minute mit deinem Google-Konto.",

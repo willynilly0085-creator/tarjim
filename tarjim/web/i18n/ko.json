@@ -259,6 +259,7 @@
   "listenLocalName": "이 컴퓨터에서 (무료, 그래픽카드 사용)",
   "reason_gpu": "tarjim은 그래픽카드가 있는 컴퓨터라면 이 무료 듣기 모델을 한 번만 내려받아요. 영상 언어를 스스로 알아듣고, 소리는 컴퓨터 밖으로 나가지 않아요.",
   "reason_cpu_slow": "그래픽 카드가 없으면 이 컴퓨터에서 듣는 데 동영상 길이의 몇 배가 걸려요. Gemini가 더 빨라요.",
+  "reason_gpu_small": "이 그래픽 카드는 메모리가 8 GB보다 적어서 이 컴퓨터에서 듣기가 실패하거나 느릴 수 있어요. Gemini가 더 안전해요.",
   "reason_gemini_listen": "Gemini는 대부분의 언어를 매우 정확하게 들어요. 각 구간의 오디오는 Google로 전송돼요.",
   "needTitle": "한 가지만 해 주세요",
   "need_key_gemini": "무료 Gemini 키를 붙여 넣으세요. Google 계정으로 1분이면 Google에서 받을 수 있어요.",

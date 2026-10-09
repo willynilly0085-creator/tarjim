@@ -5,6 +5,7 @@ const NAMES = { gemini: "Google Gemini", openai: "OpenAI", anthropic: "Anthropic
   custom: "OpenAI-compatible" };
 const PREFERENCE = ["aya", "qwen", "gemma", "llama", "mistral"];
 const TOO_BIG = /[:-](\d{2,3})b\b/;
+const ENOUGH_GB = 8;
 
 function bestModel(models) {
   const fitting = models.filter((m) => !(TOO_BIG.test(m) && Number(m.match(TOO_BIG)[1]) >= 30));
@@ -41,11 +42,13 @@ export function translateOptions(scan) {
 export function listenOptions(scan) {
   const saved = scan.keys.saved;
   const accuracy = scan.tools.installed.accuracy;
+  const strong = scan.device.gpu && scan.device.vram_gb >= ENOUGH_GB;
+  const why = strong ? "reason_gpu" : scan.device.gpu ? "reason_gpu_small" : "reason_cpu_slow";
   const local = option("local", accuracy ? t("listenLocalName") : `${t("listenLocalName")} · ${t("needsDownload", { gb: scan.tools.sizes.accuracy })}`,
-    t(scan.device.gpu ? "reason_gpu" : "reason_cpu_slow"), { provider: "local", ready: accuracy });
+    t(why), { provider: "local", ready: accuracy });
   const gemini = option("gemini", saved.includes("gemini") ? "Google Gemini" : `Google Gemini · ${t("freeKey")}`,
     t("reason_gemini_listen"), { provider: "gemini", ready: saved.includes("gemini") });
   const openai = saved.includes("openai") ? [option("openai", "OpenAI", t("reason_key"), { provider: "openai", ready: true })] : [];
-  const cloudFirst = !scan.device.gpu;
+  const cloudFirst = !strong;
   return cloudFirst ? [gemini, local, ...openai] : [local, gemini, ...openai];
 }

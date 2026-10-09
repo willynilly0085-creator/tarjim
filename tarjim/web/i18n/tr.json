@@ -259,6 +259,7 @@
   "listenLocalName": "Bu bilgisayarda (ücretsiz, ekran kartında)",
   "reason_gpu": "tarjim bu ücretsiz dinleme modelini ekran kartı olan her bilgisayara bir kez indirir. Videonun dilini kendisi anlar ve ses bilgisayarında kalır.",
   "reason_cpu_slow": "Ekran kartı olmadan bu bilgisayarda dinlemek videonun süresinden birkaç kat uzun sürer. Gemini daha hızlıdır.",
+  "reason_gpu_small": "Bu ekran kartının belleği 8 GB'tan az, bu yüzden bu bilgisayarda dinleme başarısız olabilir ya da yavaş çalışabilir. Gemini daha güvenli seçim.",
   "reason_gemini_listen": "Gemini çoğu dili çok doğru duyar. Her parçanın sesi Google'a gönderilir.",
   "needTitle": "Senden bir şey lazım",
   "need_key_gemini": "Ücretsiz Gemini anahtarını yapıştır. Google hesabınla Google'dan bir dakikada alabilirsin.",

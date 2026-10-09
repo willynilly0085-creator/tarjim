@@ -259,6 +259,7 @@
   "listenLocalName": "Neste computador (grátis, usa a placa de vídeo)",
   "reason_gpu": "O tarjim baixa esse modelo de escuta gratuito uma única vez em qualquer computador com placa de vídeo. Ele entende sozinho o idioma do vídeo e o áudio fica no seu computador.",
   "reason_cpu_slow": "Sem placa de vídeo, ouvir neste computador é várias vezes mais lento que o vídeo. O Gemini é mais rápido.",
+  "reason_gpu_small": "Esta placa de vídeo tem menos de 8 GB de memória, então ouvir neste computador pode falhar ou ficar lento. O Gemini é a escolha mais segura.",
   "reason_gemini_listen": "O Gemini ouve a maioria dos idiomas com muita precisão. O áudio de cada trecho é enviado ao Google.",
   "needTitle": "Só uma coisa de você",
   "need_key_gemini": "Cole sua chave grátis do Gemini. Pegue com o Google em um minuto usando sua conta Google.",

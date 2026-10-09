@@ -259,6 +259,7 @@
   "listenLocalName": "在本机（免费，使用显卡）",
   "reason_gpu": "只要电脑有显卡，tarjim 就会下载一次这个免费的听写模型。它能自动理解视频的语言，音频不会离开你的电脑。",
   "reason_cpu_slow": "没有显卡时，在这台电脑上听取所需时间是视频时长的好几倍。Gemini 更快。",
+  "reason_gpu_small": "这块显卡的显存不足 8 GB，在这台电脑上听写可能失败或很慢。用 Gemini 更稳妥。",
   "reason_gemini_listen": "Gemini 能非常准确地听取大多数语言。每个片段的音频都会发送给 Google。",
   "needTitle": "还需要你做一件事",
   "need_key_gemini": "粘贴你的免费 Gemini 密钥。用你的 Google 账号，一分钟即可从 Google 获取。",

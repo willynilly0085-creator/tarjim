@@ -1,13 +1,12 @@
 """tarjim as an MCP server: Claude or any MCP client can translate and adjust settings in chat."""
 import urllib.parse
-import webbrowser
 from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
-from tarjim.assistant_http import SERVER, call, fetch_text, wait_for
+from tarjim.assistant_http import call, fetch_text, wait_for
+from tarjim.assistant_settings import attach
 from tarjim.assistant_setup import install, start, status
-from tarjim.config import setting
 
 OUTPUTS = {"subtitles": "srt", "burned": "burn", "dubbed": "dub"}
 VOICES = ("natural", "clone", "studio", "fish", "fishvoice", "eleven", "elevenclone", "speech")
@@ -17,7 +16,9 @@ MAX_WAIT = 240
 
 tarjim = MCPServer("tarjim", instructions=(
     "tarjim is a tool on this computer that subtitles and dubs videos, any language to any "
-    "language. Start with setup_status. Never take API keys in chat: use open_tarjim_page."))
+    "language. Start with setup_status. You can change every setting with these tools. "
+    "Never take API keys or bot tokens in chat: the person types them on tarjim's page, which "
+    "open_tarjim_page opens."))
 
 
 def mode_for(output: str, voice: str) -> str:
@@ -90,35 +91,6 @@ def read_subtitles(job_id: str) -> Any:
 
 
 @tarjim.tool()
-def get_settings() -> Any:
-    """Current settings: interface language, engines, which keys are set (never the keys)."""
-    return call("/setup")
-
-
-@tarjim.tool()
-def change_settings(interface_language: str = "", listening_engine: str = "",
-                    translation_engine: str = "", local_model: str = "") -> Any:
-    """Change settings. Leave a field empty to keep it.
-
-    interface_language: ar or en. listening_engine: gemini, openai or local.
-    translation_engine: any id from list_connections: an API provider (gemini, openai,
-    anthropic, openrouter, deepseek, qwen, mistral, groq, xai, custom), a subscription
-    (claude, codex, grok, antigravity, copilot) or local.
-    local_model: the model name for local translation, e.g. aya-expanse:8b.
-    """
-    wanted = {"ui_language": interface_language, "listen_provider": listening_engine,
-              "translate_provider": translation_engine, "local_model": local_model}
-    return call("/setup", {k: v for k, v in wanted.items() if v})
-
-
-@tarjim.tool()
-def set_glossary(terms: str) -> Any:
-    """Fix how names are translated, one per line "term = translation"; prefix a language
-    code to limit a line to it ("ar: tarjim = ترجم"). Replaces the list; "" clears it."""
-    return call("/setup", {"glossary": terms})
-
-
-@tarjim.tool()
 def list_connections() -> Any:
     """Every way to connect an AI: API providers (key saved or not), subscriptions ("ready" means
     the app is installed, "signed_in" that it can be used now), plans, and AI programs on this
@@ -127,13 +99,15 @@ def list_connections() -> Any:
 
 
 @tarjim.tool()
-def use_connection(provider: str, model: str = "") -> Any:
+def use_connection(provider: str, model: str = "", local_program: str = "") -> Any:
     """Translate with this provider from now on, optionally with a specific model.
 
     provider: an id from list_connections, or "local" for the AI on this computer.
     model: any model name the provider offers (leave empty for its default).
+    local_program (with "local"): ollama, lmstudio, jan, llamacpp or koboldcpp.
     """
-    return call("/connections/use", {"provider": provider, "model": model})
+    wanted = {"provider": provider, "model": model, "server": local_program}
+    return call("/connections/use", {k: v for k, v in wanted.items() if v})
 
 
 @tarjim.tool()
@@ -182,11 +156,7 @@ def list_languages() -> Any:
     return call("/languages")
 
 
-@tarjim.tool()
-def open_tarjim_page() -> str:
-    """Open the tarjim page in the browser, where keys and tools are managed safely."""
-    webbrowser.open(f"{setting('server') or SERVER}/")
-    return "Opened the tarjim page in the browser."
+attach(tarjim)
 
 
 def main() -> None:

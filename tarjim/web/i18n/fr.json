@@ -259,6 +259,7 @@
   "listenLocalName": "Sur cet ordinateur (gratuit, sur la carte graphique)",
   "reason_gpu": "tarjim télécharge ce modèle d'écoute gratuit une seule fois, sur tout ordinateur doté d'une carte graphique. Il comprend seul la langue du clip et l'audio reste sur votre ordinateur.",
   "reason_cpu_slow": "Sans carte graphique, l'écoute sur cet ordinateur est plusieurs fois plus lente que la vidéo. Gemini est plus rapide.",
+  "reason_gpu_small": "Cette carte graphique a moins de 8 Go de mémoire : l'écoute sur cet ordinateur peut échouer ou être lente. Gemini est le choix le plus sûr.",
   "reason_gemini_listen": "Gemini comprend la plupart des langues avec une grande précision. L'audio de chaque extrait est envoyé à Google.",
   "needTitle": "Une chose de votre part",
   "need_key_gemini": "Collez votre clé Gemini gratuite. Obtenez-la auprès de Google en une minute avec votre compte Google.",

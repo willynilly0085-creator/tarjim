@@ -41,6 +41,12 @@ def test_a_subscriber_with_a_graphics_card_listens_on_the_card() -> None:
     assert plan["downloads"] == ["ffmpeg", "timing", "accuracy"]
 
 
+def test_a_small_graphics_card_is_not_asked_to_listen() -> None:
+    plan = make_plan(computer(gpu=True, vram=4, apps=[app("claude", True)]))
+    assert plan["listen"] == {"provider": "gemini", "reason": "small_gpu", "ready": False}
+    assert "accuracy" not in plan["downloads"]
+
+
 def test_a_signed_in_claude_subscription_translates_without_any_key() -> None:
     plan = make_plan(computer(gpu=True, vram=16, apps=[app("claude", True)]))
     assert plan["translate"]["provider"] == "claude" and plan["translate"]["reason"] == "signed_in"
