@@ -66,9 +66,10 @@ class Task:
     def view(self) -> dict[str, object]:
         from tarjim.server.evidence import evidence
 
-        return {"id": self.id, "stage": self.stage, "error": self.error,
+        detail = evidence(self.error)
+        return {"id": self.id, "stage": self.stage, "error": detail,
                 "error_code": self.error_code, "finished": self.finished,
-                "failed_at": self.failed_at, "detail": evidence(self.error),
+                "failed_at": self.failed_at, "detail": detail,
                 "paused": self.control == "paused",
                 "link": self.order.source.startswith(("http://", "https://")),
                 "target": self.order.target, "mode": self.order.mode,

@@ -18,8 +18,10 @@ def server_entry() -> list[str]:
 
 
 def desktop_config() -> Path:
-    base = os.environ.get("APPDATA") or str(Path.home() / "Library" / "Application Support")
-    return Path(base) / "Claude" / "claude_desktop_config.json"
+    mac = Path.home() / "Library" / "Application Support"
+    unix = mac if sys.platform == "darwin" else Path(
+        os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config")
+    return Path(os.environ.get("APPDATA") or unix) / "Claude" / "claude_desktop_config.json"
 
 
 def link_desktop() -> tuple[bool, str]:

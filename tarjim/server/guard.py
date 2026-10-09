@@ -2,6 +2,7 @@ import hmac
 import re
 from http.cookies import CookieError, SimpleCookie
 from pathlib import Path
+from typing import Any
 
 LOCAL_HOSTS = {"127.0.0.1", "localhost"}
 EXTENSION_ORIGINS = ("chrome-extension://", "moz-extension://", "extension://")
@@ -43,8 +44,20 @@ def cookie_token(header: str) -> str:
     return morsel.value if morsel else ""
 
 
-def same_origin(origin: str, host: str) -> bool:
-    return origin in ("", f"http://{host}")
+def page_key(token: str) -> str:
+    """What the page's cookie carries: made from the token, never the token itself, so a cookie
+    seen by another program on this computer does not open the API."""
+    return hmac.new(token.encode(), b"tarjim page", "sha256").hexdigest()[:32]
+
+
+def from_the_page(headers: Any) -> bool:
+    """A browser says where a request comes from. Another local page (a different port) is
+    "same-site", never "same-origin"; a browser too old to say is judged by Origin or Referer."""
+    site, own = str(headers.get("Sec-Fetch-Site", "")), f"http://{headers.get('Host', '')}"
+    if site:
+        return site in ("same-origin", "none")
+    origin, referer = str(headers.get("Origin", "")), str(headers.get("Referer", ""))
+    return origin == own or referer.startswith(f"{own}/")
 
 
 def extension_origin(origin: str) -> bool:

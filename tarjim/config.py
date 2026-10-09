@@ -4,6 +4,7 @@ import os
 import secrets
 import tempfile
 import threading
+import time
 from pathlib import Path
 
 from tarjim import vault
@@ -14,6 +15,8 @@ TOKEN_BYTES = 16
 OWNER_DIR = 0o700
 OWNER_FILE = 0o600
 SAVING = threading.Lock()
+TRIES = 5
+PAUSE = 0.2
 
 
 def settings() -> dict[str, str]:
@@ -39,9 +42,26 @@ def private_home() -> None:
         os.chmod(HOME, OWNER_DIR)
 
 
+def stored() -> dict[str, str]:
+    """What a save builds on. A file that is there but busy stops the save instead of being
+    replaced by an empty one; a damaged file is set aside under another name, not lost."""
+    for _ in range(TRIES):
+        try:
+            data = json.loads(CONFIG.read_text(encoding="utf-8"))
+            return {k: str(v) for k, v in data.items()} if isinstance(data, dict) else {}
+        except FileNotFoundError:
+            return {}
+        except ValueError:
+            os.replace(CONFIG, HOME / "config.broken.json")
+            return {}
+        except OSError:
+            time.sleep(PAUSE)
+    raise PermissionError("the settings file is in use by another program")
+
+
 def save(name: str, value: str) -> None:
     with SAVING:
-        data = settings()
+        data = stored()
         if name in vault.SECRETS and vault.write(name, value):
             data.pop(name, None)
         else:
@@ -56,11 +76,23 @@ def write_settings(data: dict[str, str]) -> None:
         os.chmod(temporary, OWNER_FILE)
         with os.fdopen(handle, "w", encoding="utf-8") as out:
             out.write(json.dumps(data, ensure_ascii=False, indent=1))
-        os.replace(temporary, CONFIG)
+        put_in_place(temporary)
     except BaseException:
         with contextlib.suppress(OSError):
             os.unlink(temporary)
         raise
+
+
+def put_in_place(temporary: str) -> None:
+    """On Windows the swap fails while another thread is reading the file; that passes."""
+    for attempt in range(TRIES):
+        try:
+            os.replace(temporary, CONFIG)
+            return
+        except PermissionError:
+            if attempt == TRIES - 1:
+                raise
+            time.sleep(PAUSE)
 
 
 def lock_secrets() -> None:

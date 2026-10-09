@@ -49,8 +49,10 @@ def test_page_sets_a_strict_session_cookie_and_cannot_be_framed(port: int) -> No
     assert page.status == 200 and "HttpOnly" in cookie and "SameSite=Strict" in cookie
     assert "frame-ancestors 'none'" in (page.getheader("Content-Security-Policy") or "")
     session = cookie.split(";")[0]
-    assert call(port, "GET /jobs", headers={"Cookie": session}).status == 200
-    foreign = {"Cookie": session, "Origin": "https://evil.example"}
+    own = {"Cookie": session, "Sec-Fetch-Site": "same-origin"}
+    assert call(port, "GET /jobs", headers=own).status == 200
+    foreign = {"Cookie": session, "Sec-Fetch-Site": "cross-site",
+               "Origin": "https://evil.example"}
     assert call(port, "GET /jobs", headers=foreign).status == 403
 
 

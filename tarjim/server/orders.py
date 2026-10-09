@@ -15,11 +15,16 @@ def order_from(source: str, data: dict[str, Any], name: str = "") -> Order:
                  str(data.get("dialect") or "saudi"), name)
 
 
-def copy_limited(source: Any, target: Any, size: int) -> None:
+def copy_limited(source: Any, target: Any, size: int) -> int:
+    """Copy up to size bytes and say how many arrived, so a cut-off upload can be refused."""
     left = size
     while left > 0:
-        chunk = source.read(min(BLOCK, left))
+        try:
+            chunk = source.read(min(BLOCK, left))
+        except OSError:
+            break
         if not chunk:
             break
         target.write(chunk)
         left -= len(chunk)
+    return size - left

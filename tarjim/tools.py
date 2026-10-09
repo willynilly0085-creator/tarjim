@@ -9,6 +9,8 @@ from tarjim.config import setting
 
 VOICE_REPO = "openbmb/VoxCPM2"
 DUPLICATE_WEIGHTS = ["*.bin"]
+ONLINE = threading.Lock()
+DOWNLOADING: list[bool] = []
 
 
 @dataclass(frozen=True)
@@ -110,14 +112,21 @@ def installed(tool: Tool) -> bool:
 
 @contextmanager
 def online() -> Iterator[None]:
+    """Several downloads can run at once; the engine goes back offline when the last one ends."""
     from huggingface_hub import constants
 
-    before = constants.HF_HUB_OFFLINE
-    constants.HF_HUB_OFFLINE = False
+    with ONLINE:
+        if not DOWNLOADING:
+            DOWNLOADING.append(constants.HF_HUB_OFFLINE)
+        DOWNLOADING.append(True)
+        constants.HF_HUB_OFFLINE = False
     try:
         yield
     finally:
-        constants.HF_HUB_OFFLINE = before
+        with ONLINE:
+            DOWNLOADING.pop()
+            if len(DOWNLOADING) == 1:
+                constants.HF_HUB_OFFLINE = bool(DOWNLOADING.pop())
 
 
 def fetch(tool: Tool) -> None:

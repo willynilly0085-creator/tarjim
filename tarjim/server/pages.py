@@ -2,7 +2,7 @@ from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 from typing import Any, ClassVar
 
-from tarjim.server.guard import COOKIE
+from tarjim.server.guard import COOKIE, page_key
 
 WEB = Path(__file__).resolve().parent.parent / "web"
 TYPES = {".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8",
@@ -41,6 +41,6 @@ class PageRoutes(BaseHTTPRequestHandler):
             self.send_header(name, value)
         if cookie:
             self.send_header("Set-Cookie",
-                             f"{COOKIE}={self.token}; HttpOnly; SameSite=Strict; Path=/")
+                             f"{COOKIE}={page_key(self.token)}; HttpOnly; SameSite=Strict; Path=/")
         self.end_headers()
         self.wfile.write(body)

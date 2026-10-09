@@ -11,9 +11,10 @@ from tarjim.server.connections import ConnectionRoutes
 from tarjim.server.guard import (
     allowed_origin,
     cookie_token,
+    from_the_page,
     local_host,
+    page_key,
     safe_name,
-    same_origin,
     token_ok,
 )
 from tarjim.server.jobs import MODES, Board, Order, Task
@@ -70,9 +71,9 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes):
 
     def credentialed(self) -> bool:
         given = next((self.headers.get(h, "") for h in TOKEN_HEADERS if self.headers.get(h)), "")
-        same = same_origin(self.headers.get("Origin", ""), self.headers.get("Host", ""))
-        cookie = cookie_token(self.headers.get("Cookie", "")) if same else ""
-        return token_ok(given, self.token) or token_ok(cookie, self.token)
+        cookie = cookie_token(self.headers.get("Cookie", "")) if from_the_page(
+            self.headers) else ""
+        return token_ok(given, self.token) or token_ok(cookie, page_key(self.token))
 
     def do_GET(self) -> None:
         self.dispatch(GET_ROUTES)
@@ -104,8 +105,9 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes):
 
     def create_json(self, _query: Query) -> None:
         self.create(self.read_json())
+
     def read_json(self) -> dict[str, Any]:
-        size = int(self.headers.get("Content-Length", "0") or 0)
+        size = body_size(self.headers)
         try:
             data = json.loads(self.rfile.read(min(size, BLOCK)) or b"{}")
         except ValueError:
@@ -132,13 +134,16 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes):
 
     def upload(self, query: Query) -> None:
         name = safe_name(first(query, "name"))
-        size = int(self.headers.get("Content-Length", "0") or 0)
+        size = body_size(self.headers)
         if name is None or not 0 < size <= MAX_UPLOAD:
             return self.reply(400, {"error": "file"})
         folder = self.uploads / Task(Order("")).id
         folder.mkdir(parents=True, exist_ok=True)
         with (folder / name).open("wb") as out:
-            copy_limited(self.rfile, out, size)
+            whole = copy_limited(self.rfile, out, size) == size
+        if not whole:
+            shutil.rmtree(folder, ignore_errors=True)
+            return self.reply(400, {"error": "file"})
         options = {k: first(query, k) for k in ("target", "mode", "dialect")}
         self.accept(order_from(str(folder / name), options, name))
 
@@ -192,6 +197,11 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes):
 
     def log_message(self, format: str, *args: Any) -> None:
         return None
+
+
+def body_size(headers: Any) -> int:
+    length = str(headers.get("Content-Length", "") or "0")
+    return int(length) if length.isdigit() else 0
 
 
 def serve(board: Board, token: str, uploads: Path, port: int = PORT) -> None:

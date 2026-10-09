@@ -6,6 +6,7 @@ Windows: a small script in the Startup folder. macOS: a LaunchAgent. Linux: an a
 import os
 import sys
 from pathlib import Path
+from xml.sax.saxutils import escape
 
 STARTUP = Path("Microsoft") / "Windows" / "Start Menu" / "Programs" / "Startup"
 
@@ -34,13 +35,15 @@ def windows_script(python: str) -> str:
 def mac_agent(python: str) -> str:
     return ('<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0"><dict>'
             "<key>Label</key><string>com.tarjim.server</string>"
-            f"<key>ProgramArguments</key><array><string>{python}</string><string>-m</string>"
+            f"<key>ProgramArguments</key><array><string>{escape(python)}</string>"
+            "<string>-m</string>"
             "<string>tarjim.server</string></array><key>RunAtLoad</key><true/></dict></plist>\n")
 
 
 def linux_entry(python: str) -> str:
     return ("[Desktop Entry]\nType=Application\nName=tarjim\n"
-            f"Exec={python} -m tarjim.server\nNoDisplay=true\nX-GNOME-Autostart-enabled=true\n")
+            f'Exec="{python}" -m tarjim.server\nNoDisplay=true\n'
+            "X-GNOME-Autostart-enabled=true\n")
 
 
 def enabled() -> bool:

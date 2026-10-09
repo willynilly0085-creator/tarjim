@@ -52,8 +52,10 @@ def server_for(path: Path) -> str:
 def remember(path_text: str) -> str:
     from tarjim.config import save
 
-    path = Path(path_text.strip().strip('"'))
-    server = server_for(path) if path.is_file() else ""
+    text = path_text.strip().strip('"')
+    path = Path(text)
+    on_this_computer = path.is_absolute() and not text.startswith(("\\\\", "//"))
+    server = server_for(path) if on_this_computer and path.is_file() else ""
     if server:
         save(f"local_program_{server}", str(path))
     return server

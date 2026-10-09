@@ -55,10 +55,12 @@ def run_alongside(port: int) -> Board:
 
     from tarjim.memory import release_models
     from tarjim.phone.service import service
+    from tarjim.server.housekeeping import sweep
     from tarjim.server.update_routes import watch
 
     downloads = Path(setting("downloads") or DOWNLOADS)
     board = Board(lambda task: perform(task, downloads), idle=release_models)
+    sweep([HOME / "uploads", HOME / "sources"])
     service.begin(board, HOME / "uploads")
     threading.Thread(target=watch, args=(board, port, threading.Event()), daemon=True).start()
     return board

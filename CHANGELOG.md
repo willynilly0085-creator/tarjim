@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.0.6 (2026-10-09)
+
+- The page's cookie no longer carries the engine's token. It carries a value made from it that
+  works only for requests the browser marks as coming from tarjim's own page, so a page served
+  from another local port can no longer start jobs, and another program that reads the cookie
+  cannot use it as the token.
+- A program on a network share, or given without its full path, is never accepted as a local AI
+  program to start.
+- A failed job shows only the masked reason: anything that looks like a key, and the home folder,
+  no longer reach the extension, the chat tools or the job list.
+- Settings are not lost when the settings file is busy or damaged: a busy file stops the save, and
+  a damaged one is kept as `config.broken.json`.
+- A cut-off upload is refused instead of being queued as a half video.
+- Copies of videos that tarjim keeps to work on (uploads and downloads from links, up to 8 GB
+  each) are cleared a week after their last use. Results in your downloads folder are not touched.
+- Two tool downloads at once no longer leave the engine online for model lookups afterwards.
+- Linux: the Claude desktop settings are found in `~/.config`, and starting with the computer
+  works when the Python path has spaces.
+
 ## 1.0.5 (2026-10-09)
 
 - A video whose title has an apostrophe ("Don't", "I'm") is burned. Before, ffmpeg could not
