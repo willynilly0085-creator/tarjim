@@ -340,6 +340,7 @@
   "phone_bad_code": "Bu kodun süresi dolmuş ya da yanlış. Bilgisayarındaki tarjim'in Ayarlar bölümünden yeni bir kod al.",
   "phone_help": "Bana bir video bağlantısı gönder ya da boyutu 20 MB altındaysa videonun kendisini gönder.",
   "phone_file_big": "Bu videonun boyutu 20 MB üzerinde ve Telegram botların bunu indirmesine izin vermiyor. Bunun yerine bağlantısını gönder.",
+  "phone_fetch_failed": "Bu videoyu Telegram'dan alamadım; bağlantı sürekli koptu. Tekrar gönder ya da bağlantısını gönder.",
   "phone_too_big": "Video Telegram'ın boyut sınırını aşıyor, o yüzden altyazı dosyası burada. Videonun tamamı bilgisayarında.",
   "phone_mode_title": "Sana ne göndereyim?",
   "phone_mode_saved": "Bundan sonra şunu göndereceğim: {mode}",

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.4 (2026-10-09)
+
+- A video sent to the Telegram bot is taken even when Telegram's file server stalls partway: the
+  download continues from where it stopped. Before, the bot waited five minutes, started nothing
+  and said nothing. The message now shows "Downloading" on the tap, and a download that cannot
+  finish is reported with what to do next.
+
 ## 1.0.3 (2026-10-08)
 
 - A Grok subscription (SuperGrok, X Premium+) translates through xAI's own program, Grok Build:

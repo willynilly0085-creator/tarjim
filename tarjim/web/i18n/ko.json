@@ -340,6 +340,7 @@
   "phone_bad_code": "이 코드는 만료됐거나 잘못됐어요. 컴퓨터의 tarjim 설정에서 새 코드를 받으세요.",
   "phone_help": "동영상 링크를 보내 주세요. 20 MB보다 작으면 동영상 파일을 바로 보내도 돼요.",
   "phone_file_big": "이 동영상은 20 MB가 넘어서 Telegram이 봇의 다운로드를 허용하지 않아요. 대신 링크를 보내 주세요.",
+  "phone_fetch_failed": "Telegram에서 이 동영상을 가져오지 못했어요. 연결이 계속 끊겼어요. 다시 보내거나 링크를 보내 주세요.",
   "phone_too_big": "동영상이 Telegram 크기 제한을 넘어서 자막 파일을 보내 드려요. 전체 동영상은 컴퓨터에 있어요.",
   "phone_mode_title": "무엇을 돌려 드릴까요?",
   "phone_mode_saved": "지금부터 이걸 돌려 드려요: {mode}",

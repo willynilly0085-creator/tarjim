@@ -340,6 +340,7 @@
   "phone_bad_code": "Ce code a expiré ou est incorrect. Obtenez-en un nouveau dans les paramètres de tarjim sur votre ordinateur.",
   "phone_help": "Envoyez-moi un lien vidéo, ou la vidéo elle-même si elle fait moins de 20 MB.",
   "phone_file_big": "Cette vidéo dépasse 20 MB, et Telegram n'autorise pas les bots à la télécharger. Envoyez plutôt son lien.",
+  "phone_fetch_failed": "Je n'ai pas pu récupérer cette vidéo sur Telegram, la connexion coupait sans cesse. Renvoyez-la ou envoyez son lien.",
   "phone_too_big": "La vidéo dépasse la limite de taille de Telegram, voici donc le fichier de sous-titres. La vidéo complète est sur votre ordinateur.",
   "phone_mode_title": "Que dois-je vous renvoyer ?",
   "phone_mode_saved": "Désormais, je vous renvoie : {mode}",

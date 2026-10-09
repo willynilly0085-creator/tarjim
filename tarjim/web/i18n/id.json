@@ -340,6 +340,7 @@
   "phone_bad_code": "Kode ini sudah kedaluwarsa atau salah. Ambil kode baru dari Pengaturan tarjim di komputermu.",
   "phone_help": "Kirim tautan video, atau videonya langsung kalau ukurannya di bawah 20 MB.",
   "phone_file_big": "Video ini berukuran lebih dari 20 MB, dan Telegram tidak mengizinkan bot mengunduhnya. Kirim tautannya saja.",
+  "phone_fetch_failed": "Saya tidak bisa mengambil video ini dari Telegram; koneksinya terus terputus. Kirim lagi, atau kirim tautannya.",
   "phone_too_big": "Video melebihi batas ukuran Telegram, jadi ini file subtitelnya. Video lengkapnya ada di komputermu.",
   "phone_mode_title": "Mau kukirim balik apa?",
   "phone_mode_saved": "Mulai sekarang aku kirim balik: {mode}",

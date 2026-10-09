@@ -2,7 +2,7 @@
 re-raised without the address and the token never reaches a log or a message."""
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, BinaryIO
 
 API = "https://api.telegram.org"
 TOKEN_SHAPE = re.compile(r"^\d{5,12}:[\w-]{30,50}$")
@@ -11,6 +11,11 @@ SEND_LIMIT = 50 * 1024 * 1024
 FETCH_LIMIT = 20 * 1024 * 1024
 UPLOAD_SECONDS = 600
 SLOWEST_UPLOAD = 30_000
+PARTIAL = 206
+PIECE = 64 * 1024
+CONNECT_SECONDS = 10
+STALL_SECONDS = 4
+STALLS = 6
 
 
 class TelegramError(RuntimeError):
@@ -21,6 +26,22 @@ class TelegramError(RuntimeError):
 
 def well_formed(token: str) -> bool:
     return bool(TOKEN_SHAPE.match(token))
+
+
+def resume(address: str, out: BinaryIO) -> bool:
+    """Append what the server sends from where the file stands; False when the line dropped."""
+    import requests
+
+    try:
+        with requests.get(address, headers={"Range": f"bytes={out.tell()}-"}, stream=True,
+                          timeout=(CONNECT_SECONDS, STALL_SECONDS)) as reply:
+            if reply.status_code != PARTIAL:
+                raise TelegramError(str(reply.status_code), reply.status_code)
+            for piece in reply.iter_content(PIECE):
+                out.write(piece)
+    except requests.RequestException:
+        return False
+    return True
 
 
 class Bot:
@@ -68,12 +89,15 @@ class Bot:
                       supports_streaming="true" if video else "false")
 
     def fetch(self, file_id: str, target: Path) -> None:
-        import requests
-
+        """Telegram's file server often stalls partway, so each try continues the file; only
+        tries in a row that bring nothing count against it."""
         info = self.call("getFile", file_id=file_id)
-        try:
-            reply = requests.get(f"{API}/file/bot{self.token}/{info['file_path']}", timeout=300)
-            reply.raise_for_status()
-        except requests.RequestException as error:
-            raise TelegramError(type(error).__name__) from None
-        target.write_bytes(reply.content)
+        address, stalls = f"{API}/file/bot{self.token}/{info['file_path']}", 0
+        with target.open("wb") as out:
+            while stalls < STALLS:
+                before = out.tell()
+                if resume(address, out):
+                    return
+                stalls = 0 if out.tell() > before else stalls + 1
+        target.unlink(missing_ok=True)
+        raise TelegramError("download stalled")

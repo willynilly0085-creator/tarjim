@@ -114,7 +114,14 @@ class Inbox:
             bot.edit(chat, message, say("phone_choice_expired"))
             return
         save("phone_mode", mode)
-        task = self.follower.jobs.submit(order_for(self.fetched(bot, item), item["name"], mode))
+        if "file_id" in item:
+            bot.edit(chat, message, say("stage_downloading"))
+        try:
+            source = self.fetched(bot, item)
+        except (TelegramError, OSError):
+            bot.edit(chat, message, say("phone_fetch_failed"))
+            return
+        task = self.follower.jobs.submit(order_for(source, item["name"], mode))
         self.follower.adopt(bot, chat, message, task)
 
     def pressed(self, bot: Bot, press: dict[str, Any]) -> None:

@@ -340,6 +340,7 @@
   "phone_bad_code": "Este código caducó o es incorrecto. Consigue uno nuevo en los ajustes de tarjim en tu computadora.",
   "phone_help": "Envíame el enlace de un video, o el video mismo si pesa menos de 20 MB.",
   "phone_file_big": "Este video pesa más de 20 MB, y Telegram no deja que los bots lo descarguen. Envía su enlace en su lugar.",
+  "phone_fetch_failed": "No pude descargar este video de Telegram; la conexión se cortaba. Envíalo otra vez o envía su enlace.",
   "phone_too_big": "El video supera el límite de tamaño de Telegram, así que te envío el archivo de subtítulos. El video completo está en tu computadora.",
   "phone_mode_title": "¿Qué te devuelvo?",
   "phone_mode_saved": "Desde ahora te devuelvo: {mode}",
