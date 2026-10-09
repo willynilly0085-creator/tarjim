@@ -85,9 +85,13 @@ def grok_list() -> list[Model]:
 
 
 def antigravity_list() -> list[Model]:
-    from tarjim.engines.antigravity import listing, rows
+    from tarjim.engines.antigravity import listing, rows, suggested
 
-    return describe(rows(listing()), keep_order=True)
+    found = rows(listing())
+    models, light = describe(found, keep_order=True), suggested(found)
+    if not light:
+        return models
+    return [{**m, "suggested": "yes" if m["id"] == light else ""} for m in models]
 
 
 OWN_LISTS = {"claude": claude_list, "codex": lambda: describe(codex_rows(), keep_order=True),

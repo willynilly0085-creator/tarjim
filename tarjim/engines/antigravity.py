@@ -2,12 +2,15 @@
 has) through Google's own program, Antigravity CLI (`agy`). Google moved personal accounts here
 from Gemini CLI on 2026-06-18.
 
-The program is asked one question in plan mode (it may read, never change), sandboxed, in an empty
-folder, and answers in the JSON shape tarjim asks for. `agy models` gives both the sign-in state
-and the models this account can use. Its flags follow `agy --help` of version 1.3.2.
+The program is asked one question, sandboxed, in an empty folder that is deleted afterwards, and
+answers in the JSON shape tarjim asks for. Without a terminal it denies every shell command by
+itself and can write only inside that folder. Plan mode is not used: measured, it writes a plan
+file first and takes four times as long (38 s against 9 s for six lines). `agy models` gives the
+sign-in state and the models this account can use, each as an id, a tab and a name. The lightest
+model is suggested: the "high" one took 43 s for two lines. Its flags follow `agy --help` of
+version 1.3.2.
 """
 import json
-import re
 import subprocess
 import tempfile
 from typing import Any
@@ -16,11 +19,11 @@ from tarjim.config import setting
 from tarjim.engines.subscription import HIDDEN, launcher, run, strict
 from tarjim.engines.web import EngineError, unwrap, wrap
 
-PLAIN = ("--mode", "plan", "--sandbox", "--disable-slash-commands")
+PLAIN = ("--sandbox", "--disable-slash-commands")
+LIGHTEST = ("flash", "-low")
 LIST_SECONDS = 40
 SIGN_IN = "sign in"
 NOT_SIGNED_IN = "not logged in: open Antigravity and sign in with your Google account"
-LISTED = re.compile(r"^\s*(?:[*•-]\s+)?([a-z][\w.:-]*\d[\w.:-]*)\b(.*)$", re.MULTILINE)
 
 
 class AntigravityAsker:
@@ -64,8 +67,12 @@ def listing() -> str:
     return done.stdout
 
 
+def suggested(found: list[tuple[str, str, str]]) -> str:
+    fitting = [slug for slug, _name, _note in found if all(mark in slug for mark in LIGHTEST)]
+    return fitting[0] if fitting else ""
+
+
 def rows(text: str) -> list[tuple[str, str, str]]:
-    """Model ids from the listing, in the program's own order; none while signed out."""
-    if SIGN_IN in text.lower():
-        return []
-    return [(name, "", "") for name, _rest in LISTED.findall(text)]
+    """Each line of the listing is a model's id, a tab, and its name; none while signed out."""
+    pairs = [line.split("\t", 1) for line in text.splitlines() if "\t" in line]
+    return [(slug.strip(), name.strip(), "") for slug, name in pairs if slug.strip()]

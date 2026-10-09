@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.9 (2026-10-09)
+
+- Gemini through Antigravity is now verified with a signed-in Google account: the page lists the
+  account's own models by name (Gemini 3.8 Flash, Gemini 3.1 Pro and the rest), and a translation
+  comes back through the subscription with no API key. In 1.0.8 the model list came out empty.
+- The lightest Gemini model is suggested (about 10 s for six lines; the "high" one took 43 s for
+  two), and the slow plan mode is no longer used.
+
 ## 1.0.8 (2026-10-09)
 
 - A Google account's Gemini (Google AI Pro, Ultra, or the free allowance) is offered through

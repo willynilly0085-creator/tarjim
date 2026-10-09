@@ -45,13 +45,28 @@ def test_antigravity_is_asked_once_in_plan_mode_and_its_structured_answer_is_use
     assert antigravity.AntigravityAsker().ask("Translate.", None, SCHEMA) == GOOD
     command = seen["command"]
     assert command[:3] == ["agy", "--print", "Translate."] and seen["stdin"] == ""
-    assert command[command.index("--mode") + 1] == "plan" and "--sandbox" in command
+    assert "--sandbox" in command and "--mode" not in command
     assert command[-2:] == ["--model", "gemini-3-flash"]
     assert "--dangerously-skip-permissions" not in command
 
 
 SIGNED_OUT = ("Fetching available models...\nError: Please sign in to view available models. "
               "Launch the CLI without arguments to sign in.\n")
+
+
+LISTING = ("gemini-3.8-flash-high\tGemini 3.8 Flash (High)\n"
+           "gemini-3.8-flash-low\tGemini 3.8 Flash (Low)\n"
+           "gemini-3.1-pro-high\tGemini 3.1 Pro (High)\nclaude-sonnet-4-6\tClaude Sonnet 4.6\n")
+
+
+def test_antigravity_lists_the_accounts_models_by_name_and_suggests_the_lightest(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(antigravity, "listing", lambda: LISTING)
+    models = provider_models.models_for("antigravity")
+    assert [m["id"] for m in models] == ["gemini-3.8-flash-high", "gemini-3.8-flash-low",
+                                         "gemini-3.1-pro-high", "claude-sonnet-4-6"]
+    assert models[1]["name"] == "Gemini 3.8 Flash (Low)"
+    assert [m["id"] for m in models if m["suggested"]] == ["gemini-3.8-flash-low"]
 
 
 def test_a_signed_out_antigravity_lists_nothing_and_is_named_as_a_sign_in_problem() -> None:
