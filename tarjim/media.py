@@ -31,9 +31,9 @@ def tool(name: str) -> str:
     return found
 
 
-def run(args: list[str]) -> subprocess.CompletedProcess[str]:
+def run(args: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
     return subprocess.run(args, capture_output=True, text=True, encoding="utf-8",
-                          errors="replace", check=False)
+                          errors="replace", check=False, cwd=cwd)
 
 
 def probe(video: Path) -> VideoInfo:

@@ -31,7 +31,7 @@ class Pairing:
 
     def take(self, offered: str) -> bool:
         good = bool(self.code) and time.time() < self.until and secrets.compare_digest(
-            offered, self.code)
+            offered.encode(), self.code.encode())
         if good:
             self.code = ""
         return good

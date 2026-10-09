@@ -19,7 +19,7 @@ def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcrip
     if cached.exists():
         return Transcript.load(cached)
     audio = media.extract_audio(job.video, job.cache / "audio.wav")
-    transcript = listen_and_align(job, audio, report) or qwen_transcript(audio)
+    transcript = listen_and_align(job, audio, report) or local_transcript(audio)
     transcript.save(cached)
     return transcript
 
@@ -115,8 +115,17 @@ def listen_and_align(job: Job, audio: Path,
 def second_opinion(audio: Path) -> list[Word]:
     try:
         return qwen_transcript(audio).words
-    except (RuntimeError, ValueError, MemoryError):
+    except (RuntimeError, ValueError, MemoryError, OSError, ImportError):
         return []
+
+
+def local_transcript(audio: Path) -> Transcript:
+    """What is left when the chosen listener heard nothing or failed."""
+    try:
+        return qwen_transcript(audio)
+    except (OSError, ImportError) as error:
+        raise RuntimeError("no speech was heard, and the local listener is not installed to "
+                           "try again") from error
 
 
 def qwen_transcript(audio: Path) -> Transcript:

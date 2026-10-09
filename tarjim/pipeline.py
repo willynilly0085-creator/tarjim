@@ -12,6 +12,16 @@ from tarjim.render.srt import render_srt
 from tarjim.segment import build_cues
 
 Report = Callable[[str], None]
+BAD_REPLY = (RuntimeError, ValueError, LookupError, TypeError)
+
+
+def first_failure(failures: list[Exception]) -> RuntimeError:
+    """The engine the person chose explains the failure, not the backup tried after it."""
+    if not failures:
+        return RuntimeError("no translation engine")
+    first = failures[0]
+    return first if isinstance(first, RuntimeError) else RuntimeError(
+        f"translation reply could not be read: {first!r}")
 
 
 def quiet(_stage: str) -> None:
@@ -42,9 +52,9 @@ def translate(job: Job, cues: list[Cue]) -> list[Cue]:
     for provider in chain("translate"):
         try:
             return Translator(asker(provider)).translate(cues, audio, brief)
-        except RuntimeError as error:
+        except BAD_REPLY as error:
             failures.append(error)
-    raise failures[-1] if failures else RuntimeError("no translation engine")
+    raise first_failure(failures)
 
 
 def save_review(job: Job, cues: list[Cue]) -> None:

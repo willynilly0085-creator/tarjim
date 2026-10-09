@@ -49,6 +49,9 @@ class Translator:
         retry = [cue for cue in cues if needs_retry(cue, strict)]
         if retry:
             self.fill(retry, sound, brief)
+        spoken = [cue for cue in cues if any(ch.isalpha() for ch in cue.source)]
+        if spoken and not any(cue.text.strip() for cue in spoken):
+            raise RuntimeError(f"empty translation: none of {len(spoken)} lines came back")
 
     def fill(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
         answer = self.client.ask(build_prompt(cues, brief), sound, SCHEMA)

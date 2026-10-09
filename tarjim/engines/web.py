@@ -24,7 +24,10 @@ def unwrap(value: Any) -> Any:
 
 def parse_json(text: str) -> Any:
     cleaned = text.strip().removeprefix("```json").removeprefix("```").removesuffix("```")
-    return json.loads(cleaned or "null")
+    try:
+        return json.loads(cleaned or "null")
+    except ValueError as error:
+        raise EngineError("reply", 0, f"not JSON: {cleaned[:80]}") from error
 
 
 def post(provider: str, url: str, headers: dict[str, str], **payload: Any) -> Any:

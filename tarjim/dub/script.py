@@ -3,6 +3,7 @@ from dataclasses import replace
 
 from tarjim.dub.lines import Line
 from tarjim.engines.choice import asker, chain
+from tarjim.translate.clean import line_number
 
 SCHEMA = {"type": "array", "items": {"type": "object", "properties": {
     "id": {"type": "integer"}, "say": {"type": "string"}}, "required": ["id", "say"]}}
@@ -47,8 +48,8 @@ def spoken_lines(lines: list[Line], language: str, dialect: str,
                                          SCHEMA)
         except Exception:
             continue
-        said = {int(item["id"]): str(item["say"]).strip() for item in answer or []
-                if isinstance(item, dict) and str(item.get("say", "")).strip()}
-        if len(said) == len(lines):
+        said = {line_number(item.get("id")): str(item.get("say", "")).strip()
+                for item in answer or [] if isinstance(item, dict)}
+        if all(said.get(n) for n in range(1, len(lines) + 1)):
             return [replace(line, text=said[n]) for n, line in enumerate(lines, start=1)]
     return None

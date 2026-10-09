@@ -1,6 +1,7 @@
 """A small Telegram Bot API client. The bot's token is part of every address, so errors are
 re-raised without the address and the token never reaches a log or a message."""
 import re
+import time
 from pathlib import Path
 from typing import Any, BinaryIO
 
@@ -11,7 +12,9 @@ SEND_LIMIT = 50 * 1024 * 1024
 FETCH_LIMIT = 20 * 1024 * 1024
 UPLOAD_SECONDS = 600
 SLOWEST_UPLOAD = 30_000
-PARTIAL = 206
+PARTIAL, WHOLE = 206, 200
+FETCH_SECONDS = 900
+SECRET = re.compile(r"\d{5,12}:[\w-]{30,50}")
 PIECE = 64 * 1024
 CONNECT_SECONDS = 10
 STALL_SECONDS = 4
@@ -28,15 +31,22 @@ def well_formed(token: str) -> bool:
     return bool(TOKEN_SHAPE.match(token))
 
 
+def note(where: str, error: Exception) -> None:
+    """One line in the engine's log, never with the bot's token in it."""
+    reason = SECRET.sub("<token>", str(error))[:200]
+    print(f"phone bot, {where}: {type(error).__name__}: {reason}", flush=True)
+
+
 def resume(address: str, out: BinaryIO) -> bool:
-    """Append what the server sends from where the file stands; False when the line dropped."""
+    """Append what the server sends from where the file stands; False when the line dropped or
+    the server answered with something that cannot be appended."""
     import requests
 
     try:
         with requests.get(address, headers={"Range": f"bytes={out.tell()}-"}, stream=True,
                           timeout=(CONNECT_SECONDS, STALL_SECONDS)) as reply:
-            if reply.status_code != PARTIAL:
-                raise TelegramError(str(reply.status_code), reply.status_code)
+            if reply.status_code != PARTIAL and (out.tell() or reply.status_code != WHOLE):
+                return False
             for piece in reply.iter_content(PIECE):
                 out.write(piece)
     except requests.RequestException:
@@ -57,8 +67,12 @@ class Bot:
                                   timeout=wait)
         except requests.RequestException as error:
             raise TelegramError(type(error).__name__) from None
-        body = reply.json() if reply.headers.get("content-type", "").startswith(
-            "application/json") else {}
+        try:
+            body = reply.json() if reply.headers.get("content-type", "").startswith(
+                "application/json") else {}
+        except ValueError:
+            raise TelegramError(f"unreadable reply {reply.status_code}",
+                                reply.status_code) from None
         if not body.get("ok"):
             raise TelegramError(str(body.get("description", reply.status_code)),
                                 int(body.get("error_code", reply.status_code)))
@@ -90,13 +104,15 @@ class Bot:
 
     def fetch(self, file_id: str, target: Path) -> None:
         """Telegram's file server often stalls partway, so each try continues the file; only
-        tries in a row that bring nothing count against it."""
+        tries in a row that bring nothing count against it, within a quarter of an hour."""
         info = self.call("getFile", file_id=file_id)
-        address, stalls = f"{API}/file/bot{self.token}/{info['file_path']}", 0
+        address, size = f"{API}/file/bot{self.token}/{info['file_path']}", int(
+            info.get("file_size") or 0)
+        stalls, deadline = 0, time.monotonic() + FETCH_SECONDS
         with target.open("wb") as out:
-            while stalls < STALLS:
+            while stalls < STALLS and time.monotonic() < deadline:
                 before = out.tell()
-                if resume(address, out):
+                if resume(address, out) or 0 < size <= out.tell():
                     return
                 stalls = 0 if out.tell() > before else stalls + 1
         target.unlink(missing_ok=True)

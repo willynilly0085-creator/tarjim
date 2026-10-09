@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.5 (2026-10-09)
+
+- A video whose title has an apostrophe ("Don't", "I'm") is burned. Before, ffmpeg could not
+  open the subtitle file and the job failed.
+- A hyphen inside a word stays in dialogue lines ("Est-ce que", "twenty-one"). Before, the first
+  hyphen of each speaker's part was removed.
+- A translation that comes back empty is a failure, and the next engine is tried. Before, the job
+  ended as done with empty subtitles. A single line left empty is listed by the quality check.
+- When the chosen engine fails, its own reason is shown (for example "sign in again"), not the
+  backup engine's. A reply that is not valid JSON moves on to the next engine.
+- A number at the start of speech ("3 things") no longer gets a subtitle at 0:00.
+- A missing optional second listener no longer stops a job after listening is done.
+- Phone bot: it keeps answering after an unexpected error (a pairing code in non-English letters
+  from a stranger used to stop it until the engine restarted), a started job is followed even when
+  its first message cannot be shown, and a result that cannot be prepared is reported.
+
 ## 1.0.4 (2026-10-09)
 
 - A video sent to the Telegram bot is taken even when Telegram's file server stalls partway: the

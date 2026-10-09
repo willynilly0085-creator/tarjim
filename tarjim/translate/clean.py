@@ -11,15 +11,25 @@ def normalize(text: str, arabic: bool = True) -> str:
     return " ".join(text.split())
 
 
-def map_results(items: list[dict[str, object]], count: int,
+def map_results(items: list[object], count: int,
                 arabic: bool = True) -> dict[int, str]:
     results: dict[int, str] = {}
     for item in items:
-        number = item.get("id")
-        text = item.get("text")
-        if isinstance(number, int) and 1 <= number <= count and isinstance(text, str):
+        if not isinstance(item, dict):
+            continue
+        number, text = line_number(item.get("id")), item.get("text")
+        if 1 <= number <= count and isinstance(text, str):
             results[number] = normalize(text, arabic)
     return results
+
+
+def line_number(value: object) -> int:
+    """Models sometimes write the number as "3" or 3.0."""
+    try:
+        number = float(str(value))
+    except ValueError:
+        return 0
+    return int(number) if number.is_integer() else 0
 
 
 def over_budget(results: dict[int, str], budgets: list[int]) -> list[int]:

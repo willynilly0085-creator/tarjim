@@ -7,7 +7,7 @@ from typing import Any
 from tarjim.config import save, setting
 from tarjim.phone.bot import Inbox, Pairing
 from tarjim.phone.progress import Follower, Jobs
-from tarjim.phone.telegram import Bot, TelegramError, well_formed
+from tarjim.phone.telegram import Bot, TelegramError, note, well_formed
 from tarjim.phone.words import say
 
 RETRY = (5, 15, 30, 60)
@@ -43,13 +43,15 @@ class Service:
         while not self.stop.is_set():
             bot = self.bot()
             if bot is None or self.inbox is None:
-                self.stop.wait(RETRY[-1])
+                self.stop.wait(RETRY[0])
                 continue
             try:
                 self.receive(bot)
                 self.problem, misses = "", 0
-            except TelegramError as error:
-                self.problem = {401: "rejected", 409: "elsewhere"}.get(error.code, "offline")
+            except Exception as error:
+                note("reading messages", error)
+                self.problem = {401: "rejected", 409: "elsewhere"}.get(
+                    getattr(error, "code", 0), "offline")
                 self.stop.wait(RETRY[min(misses, len(RETRY) - 1)])
                 misses += 1
 
@@ -59,8 +61,8 @@ class Service:
             try:
                 if self.inbox is not None:
                     self.inbox.handle(bot, update)
-            except (TelegramError, OSError, KeyError, ValueError):
-                continue
+            except Exception as error:
+                note("answering a message", error)
 
     def connect(self, token: str) -> dict[str, Any]:
         if not well_formed(token):

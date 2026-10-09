@@ -25,6 +25,8 @@ def check(cues: list[Cue], rules: Rules = DEFAULT_RULES) -> list[Issue]:
 
 def cue_issues(number: int, cue: Cue, rules: Rules) -> list[Issue]:
     issues = []
+    if not cue.text.strip() and any(ch.isalpha() for ch in cue.source):
+        issues.append(Issue(number, "untranslated", cue.source[:40]))
     lines = display_lines(cue.text, rules) if cue.text else []
     if any(len(line) > rules.line_chars for line in lines):
         issues.append(Issue(number, "line_length", str([len(x) for x in lines])))

@@ -74,7 +74,7 @@ def split_long(block: Piece, rules: Rules) -> list[Piece]:
     if len(block.words) < MIN_SPLITTABLE or fits(block.words, rules):
         return [block]
     index = best_split(block.words)
-    head = Piece(block.words[:index], new_speaker=block.new_speaker)
+    head = Piece(block.words[:index], block.new_speaker, block.after_cut)
     tail = Piece(block.words[index:], new_speaker=False)
     return split_long(head, rules) + split_long(tail, rules)
 

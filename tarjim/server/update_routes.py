@@ -15,7 +15,7 @@ CLOSE_AFTER = 1.5
 
 
 def idle(board: Board) -> bool:
-    return all(task.finished for task in board.tasks.values())
+    return all(task.finished for task in board.recent())
 
 
 def replace_engine(port: int) -> bool:
@@ -40,9 +40,12 @@ def watch(board: Board, port: int, stop: threading.Event) -> None:
     wait = FIRST_LOOK
     while not stop.wait(wait):
         wait = LOOK_EVERY
-        state = update.view()
-        if state["available"] and state["automatic"] and state["can_install"] and idle(board):
-            replace_engine(port)
+        try:
+            state = update.view()
+            if state["available"] and state["automatic"] and state["can_install"] and idle(board):
+                replace_engine(port)
+        except Exception as error:
+            print(f"update watch: {type(error).__name__}: {error}", flush=True)
 
 
 class UpdateRoutes:

@@ -75,8 +75,9 @@ def fill_gaps(slots: list[Slot]) -> None:
     for index, slot in enumerate(slots):
         if slot.timed:
             continue
-        slot.start = slots[index - 1].end if index else 0.0
         later = [s.start for s in slots[index + 1:] if s.timed]
+        before = max(0.0, later[0] - GAP_FALLBACK) if later else 0.0
+        slot.start = slots[index - 1].end if index else before
         slot.end = later[0] if later else slot.start + GAP_FALLBACK
         slot.start = min(slot.start, slot.end)
 

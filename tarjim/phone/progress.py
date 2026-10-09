@@ -7,7 +7,7 @@ from typing import Any, Protocol
 
 from tarjim.phone.checklist import ENDED, checklist
 from tarjim.phone.sender import Sender
-from tarjim.phone.telegram import Bot, TelegramError
+from tarjim.phone.telegram import Bot, TelegramError, note
 from tarjim.phone.words import say
 
 TICK = 3.0
@@ -47,16 +47,23 @@ class Follower:
     def adopt(self, bot: Bot, chat: int, message: int, task: Any) -> None:
         """Turn the question message into this job's status message."""
         watch = Watch(chat, message)
-        watch.shown = status_text(task, watch)
-        bot.edit(chat, message, watch.shown, reply_markup=cancel_button(task.id))
         with self.lock:
             self.watching[task.id] = watch
+        text = status_text(task, watch)
+        try:
+            bot.edit(chat, message, text, reply_markup=cancel_button(task.id))
+            watch.shown = text
+        except TelegramError as error:
+            note("showing a new job", error)
 
     def run(self, bot_now: Any, stop: threading.Event) -> None:
         while not stop.wait(TICK):
             bot = bot_now()
-            if bot is not None:
-                self.tick(bot)
+            try:
+                if bot is not None:
+                    self.tick(bot)
+            except Exception as error:
+                note("following jobs", error)
 
     def tick(self, bot: Bot) -> None:
         with self.lock:
@@ -90,4 +97,9 @@ class Follower:
 
 
 def deliver(bot: Bot, watch: Watch, task: Any) -> None:
-    Sender(bot, watch.chat, watch.message, task).deliver()
+    sender = Sender(bot, watch.chat, watch.message, task)
+    try:
+        sender.deliver()
+    except Exception as error:
+        note("sending a result", error)
+        sender.tell("phone_send_failed")

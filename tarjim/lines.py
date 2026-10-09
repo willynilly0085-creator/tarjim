@@ -1,7 +1,10 @@
+import re
+
 from tarjim.rules import DEFAULT_RULES, Rules
 
 SEPARATOR = "||"
 DASH = "- "
+LEADING_DASH = re.compile(r"^\s*[-–—]\s*")
 CLAUSE_END = ("،", ",", ".", "؟", "?", "!", "؛", ":", "。", "，", "、", "！", "？", "：")
 CLAUSE_BONUS = 12
 OVERFLOW_PENALTY = 1000
@@ -26,7 +29,7 @@ def join_penalty(before: str, after: str) -> int:
 def display_lines(text: str, rules: Rules = DEFAULT_RULES) -> list[str]:
     if SEPARATOR not in text:
         return balance_lines(text, rules)
-    parts = [" ".join(p.replace(DASH.strip(), "", 1).split()) for p in text.split(SEPARATOR)]
+    parts = [" ".join(LEADING_DASH.sub("", p).split()) for p in text.split(SEPARATOR)]
     return [DASH + part for part in parts if part]
 
 
