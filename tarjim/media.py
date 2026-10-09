@@ -11,6 +11,7 @@ SCENE_THRESHOLD = 0.25
 MIN_CUT_SPACING = 0.2
 SAMPLE_RATE = 16000
 PTS = re.compile(r"pts_time:([\d.]+)")
+RUN_SECONDS = 6 * 3600
 
 
 @dataclass(frozen=True)
@@ -32,23 +33,31 @@ def tool(name: str) -> str:
 
 
 def run(args: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(args, capture_output=True, text=True, encoding="utf-8",
-                          errors="replace", check=False, cwd=cwd)
+    try:
+        return subprocess.run(args, capture_output=True, text=True, encoding="utf-8",
+                              errors="replace", check=False, cwd=cwd, timeout=RUN_SECONDS)
+    except subprocess.TimeoutExpired:
+        raise RuntimeError(f"{Path(args[0]).stem} did not finish within six hours") from None
 
 
 def probe(video: Path) -> VideoInfo:
-    out = run([tool("ffprobe"), "-v", "error", "-select_streams", "v:0",
-               "-show_entries", "stream=width,height:format=duration", "-of", "json",
-               str(video)])
+    out = run([tool("ffprobe"), "-v", "error", "-select_streams", "v:0", "-show_entries",
+               "stream=width,height:stream_disposition=attached_pic:format=duration",
+               "-of", "json", str(video)])
     data = json.loads(out.stdout or "{}")
-    streams = data.get("streams") or [{"width": 0, "height": 0}]
+    stream = (data.get("streams") or [{}])[0]
+    cover = bool(stream.get("disposition", {}).get("attached_pic"))
     duration = float(data.get("format", {}).get("duration", 0.0))
-    return VideoInfo(streams[0]["width"], streams[0]["height"], duration)
+    if cover:
+        return VideoInfo(0, 0, duration)
+    return VideoInfo(int(stream.get("width", 0)), int(stream.get("height", 0)), duration)
 
 
 def extract_audio(video: Path, target: Path) -> Path:
-    run([tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", "-i", str(video),
-         "-vn", "-ac", "1", "-ar", str(SAMPLE_RATE), str(target)])
+    done = run([tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", "-i", str(video),
+                "-vn", "-ac", "1", "-ar", str(SAMPLE_RATE), str(target)])
+    if done.returncode != 0 or not target.is_file():
+        raise RuntimeError(f"this file has no sound that can be read: {done.stderr.strip()[-160:]}")
     return target
 
 
@@ -61,9 +70,12 @@ def audio_bytes(video: Path, start: float = 0.0, end: float | None = None) -> by
     return result.stdout
 
 
-def scene_cuts(video: Path, threshold: float = SCENE_THRESHOLD) -> list[float]:
+def scene_cuts(video: Path, threshold: float = SCENE_THRESHOLD) -> list[float] | None:
+    """Where the picture cuts; None when the scan itself failed, so the miss is not kept."""
     out = run([tool("ffmpeg"), "-hide_banner", "-i", str(video), "-an",
                "-vf", f"select='gt(scene,{threshold})',showinfo", "-f", "null", "-"])
+    if out.returncode != 0:
+        return None
     times = sorted({round(float(t), 2) for t in PTS.findall(out.stderr)})
     return [t for i, t in enumerate(times) if i == 0 or t - times[i - 1] > MIN_CUT_SPACING]
 

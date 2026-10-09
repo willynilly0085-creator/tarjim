@@ -12,6 +12,7 @@ RETRY_PAUSE = 3.0
 MAX_WAIT = 90.0
 REQUEST_MS = 240_000
 TOO_MANY = 429
+REFUSED = (400, 401, 403)
 DAILY = re.compile(r"per ?day", re.IGNORECASE)
 DELAY = re.compile(r"retryDelay'?\"?:\s*'?\"?(\d+(?:\.\d+)?)s")
 
@@ -61,6 +62,9 @@ class GeminiClient:
         raise RuntimeError("all Gemini models failed: " + "; ".join(errors[-4:]))
 
     def note(self, model: str, error: Exception) -> None:
+        code = getattr(error, "code", None)
+        if code in REFUSED:
+            raise RuntimeError(f"Gemini {code}: {str(error)[:160]}") from error
         if used_up_today(error):
             self.spent.add(model)
             return
@@ -82,4 +86,6 @@ class GeminiClient:
         response = self.client.models.generate_content(
             model=model, contents=content, config=config)
         self.model_used = model
-        return json.loads(response.text or "null")
+        if not response.text:
+            raise RuntimeError("Gemini returned an empty answer")
+        return json.loads(response.text)

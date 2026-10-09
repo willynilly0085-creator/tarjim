@@ -11,9 +11,13 @@ someone do. Reports are read and answered as soon as possible.
 ## What tarjim protects
 
 - **Keys and the pairing token** live in the operating system's encrypted vault through `keyring`.
-  They never appear in the settings file, in server responses, in logs or in chat tools.
+  They never appear in server responses, in logs or in chat tools, and not in the settings file
+  either, except on a computer with no vault backend (some Linux servers), where they are kept
+  in the settings file with owner-only permissions.
 - **The local server** (`tarjim-serve`) listens on 127.0.0.1 only and refuses:
-  - requests without the token (`X-Tarjim-Token`) or the page's HttpOnly, SameSite=Strict cookie;
+  - requests without the token (`X-Tarjim-Token`) or the page's HttpOnly, SameSite=Strict cookie
+    (the cookie is derived from the token, is not the token, and counts only on requests the
+    browser marks `Sec-Fetch-Site: same-origin` or `none`);
   - requests whose `Host` is not local (DNS rebinding);
   - pairing requests that do not come from a browser extension;
   - any path outside its own web folder and the finished outputs of a job.

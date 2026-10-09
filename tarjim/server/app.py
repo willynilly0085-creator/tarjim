@@ -18,7 +18,7 @@ from tarjim.server.guard import (
     token_ok,
 )
 from tarjim.server.jobs import MODES, Board, Order, Task
-from tarjim.server.orders import copy_limited, first, order_from
+from tarjim.server.orders import body_size, copy_limited, first, json_body, order_from
 from tarjim.server.pages import PageRoutes
 from tarjim.server.pairing import Pairing
 from tarjim.server.routes import GET_ROUTES, POST_ROUTES, KeyRoutes, Query, Routes, is_open
@@ -107,12 +107,7 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes):
         self.create(self.read_json())
 
     def read_json(self) -> dict[str, Any]:
-        size = body_size(self.headers)
-        try:
-            data = json.loads(self.rfile.read(min(size, BLOCK)) or b"{}")
-        except ValueError:
-            return {}
-        return data if isinstance(data, dict) else {}
+        return json_body(self.headers, self.rfile)
 
     def create(self, data: dict[str, Any]) -> None:
         source = str(data.get("url", "")).strip()
@@ -197,11 +192,6 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes):
 
     def log_message(self, format: str, *args: Any) -> None:
         return None
-
-
-def body_size(headers: Any) -> int:
-    length = str(headers.get("Content-Length", "") or "0")
-    return int(length) if length.isdigit() else 0
 
 
 def serve(board: Board, token: str, uploads: Path, port: int = PORT) -> None:

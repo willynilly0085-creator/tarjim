@@ -17,7 +17,7 @@ CONTROLS = {"pause": "paused", "resume": "run", "cancel": "cancelled"}
 SIGNED_OUT = ("Failed to authenticate", "OAuth session expired", "ot logged in", "run /login",
               "login required", "ign in again")
 REASONS = [("quota", ("QuotaExhausted", "quota", " 429:")), ("signin", SIGNED_OUT),
-           ("key", ("API key missing", " 401:", " 403:")),
+           ("key", ("API key missing", "API key not valid", " 401:", " 403:")),
            ("download", ("DownloadError", "download")), ("tools", ("not found; install",)),
            ("dub", ("DubUnavailable",))]
 

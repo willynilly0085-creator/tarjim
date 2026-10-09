@@ -50,6 +50,15 @@ def free_for_voice() -> None:
     empty_card()
 
 
+def free_for_listening() -> None:
+    """A new job starts by listening: the voice of the job before it leaves the card first."""
+    from tarjim.dub.clone import voice_model
+
+    if voice_model.cache_info().currsize:
+        voice_model.cache_clear()
+        empty_card()
+
+
 def release_models() -> None:
     from tarjim.dub.clone import voice_model
 

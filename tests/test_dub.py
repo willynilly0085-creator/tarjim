@@ -38,8 +38,9 @@ def test_engine_falls_back_when_a_language_or_key_is_missing(monkeypatch) -> Non
     monkeypatch.setattr(make, "setting", lambda _name: "")
     assert make.choose("fish", "ar") == "clone"
     assert make.choose("studio", "nl") == "clone"
-    assert make.choose("clone", "ur") == "studio"
     assert make.choose("clone", "sw") == "clone"
+    with pytest.raises(make.DubUnavailable):
+        make.choose("clone", "ur")
     with pytest.raises(make.DubUnavailable):
         make.choose("clone", "am")
 

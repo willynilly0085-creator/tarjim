@@ -12,11 +12,16 @@ GENTLE = 1.02
 QUIET = 0.01
 EDGE_PAD = 0.04
 FADE = 0.06
+FFMPEG_SECONDS = 3600
 
 
 def ffmpeg(args: list[str], data: bytes | None = None) -> bytes:
-    result = subprocess.run([tool("ffmpeg"), "-hide_banner", "-loglevel", "error", *args],
-                            input=data, capture_output=True, check=False)
+    try:
+        result = subprocess.run([tool("ffmpeg"), "-hide_banner", "-loglevel", "error", *args],
+                                input=data, capture_output=True, check=False,
+                                timeout=FFMPEG_SECONDS)
+    except subprocess.TimeoutExpired:
+        raise RuntimeError("ffmpeg did not finish within an hour") from None
     if result.returncode != 0:
         raise RuntimeError(result.stderr.decode("utf-8", "replace")[-300:])
     return result.stdout

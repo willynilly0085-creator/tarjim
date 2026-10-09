@@ -33,6 +33,8 @@ def cuts_for(job: Job) -> list[float]:
     if cached.exists():
         return list(json.loads(cached.read_text(encoding="utf-8")))
     cuts = media.scene_cuts(job.video)
+    if cuts is None:
+        return []
     cached.write_text(json.dumps(cuts), encoding="utf-8")
     return cuts
 
@@ -84,6 +86,7 @@ def write_outputs(job: Job, cues: list[Cue], words: list[Word], report: Report) 
 
 
 def run(job: Job, report: Report = quiet) -> tuple[list[Cue], list[Issue]]:
+    job.claim_cache()
     report("hearing")
     words = transcript_for(job, report).words
     cues = build_cues(words, cuts_for(job))

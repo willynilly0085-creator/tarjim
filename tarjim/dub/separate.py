@@ -19,7 +19,9 @@ def separate(video: Path) -> Stems:
     mixture = decode(video, channels=2)
     try:
         voices, background = split_voices(mixture)
-    except (ImportError, RuntimeError, OSError):
+    except (ImportError, RuntimeError, OSError) as error:
+        print(f"dubbing: voices not separated from the background ({type(error).__name__}); "
+              "the original sound is kept quietly under the new voices", flush=True)
         mono = mixture.mean(axis=1)
         return Stems(mono, mixture * BACKGROUND_WITHOUT_STEMS, separated=False)
     return Stems(voices.mean(axis=1), background, separated=True)

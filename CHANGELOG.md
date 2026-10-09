@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.0.7 (2026-10-09)
+
+- A voice on your computer is never replaced by a cloud voice. Before, dubbing "in the speaker's
+  own voice" into a language that voice does not speak (Urdu, Persian) sent the text to
+  Microsoft's voices without saying so; now dubbing stops and says the language has no voice.
+- When a natural (Gemini) voice fails and no voice is installed on the computer, you see why the
+  natural voice failed, not a missing-module error.
+- A Fish Audio dub where every line failed is a failure, not a video with background only, and a
+  temporary voice uploaded to Fish is always deleted.
+- A rejected Gemini key stops at once and is named as a key problem (before: 18 attempts and
+  "all models failed"). An empty answer from listening is a failure instead of being kept.
+- A video with no sound says so. An audio file with cover art is no longer treated as a video.
+- Work kept beside a video is not reused for a different file with the same name.
+- Pause and cancel take effect between dubbing steps; ffmpeg can no longer hang a job forever.
+- A second dubbing job no longer holds two large models on the graphics card at once.
+- The extracted audio (about 115 MB per hour) is deleted once the transcript is saved.
+- Grok Build can be installed from the page (the button was never offered).
+- README and SECURITY say plainly where keys are kept without a system vault, what is downloaded
+  on the first dub, and what the local page does not protect against.
+
 ## 1.0.6 (2026-10-09)
 
 - The page's cookie no longer carries the engine's token. It carries a value made from it that

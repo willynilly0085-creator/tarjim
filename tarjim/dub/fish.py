@@ -20,8 +20,12 @@ class FishVoices:
 
         self.session: Any = Session(key)
         self.owned: list[str] = []
-        self.models = ({speaker: saved_voice for speaker in references} if saved_voice
-                       else {speaker: self.upload(path) for speaker, path in references.items()})
+        try:
+            self.models = ({speaker: saved_voice for speaker in references} if saved_voice else
+                           {speaker: self.upload(path) for speaker, path in references.items()})
+        except Exception:
+            self.close()
+            raise
 
     def upload(self, reference: Path) -> str:
         model = self.session.create_model(title="tarjim-temporary", voices=[reference.read_bytes()],
@@ -44,9 +48,12 @@ class FishVoices:
     def speak_all(self, lines: list[Line]) -> list[np.ndarray]:
         try:
             with ThreadPoolExecutor(max_workers=PARALLEL) as pool:
-                return list(pool.map(self.speak, lines))
+                speech = list(pool.map(self.speak, lines))
         finally:
             self.close()
+        if lines and not any(wav.size for wav in speech):
+            raise RuntimeError("Fish Audio returned no line: check the key and its balance")
+        return speech
 
     def close(self) -> None:
         for model in self.owned:

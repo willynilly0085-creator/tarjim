@@ -32,10 +32,10 @@ class Utterance:
 
 def listen(audio: bytes, client: GeminiClient | None = None) -> tuple[str, list[Utterance]]:
     answer = (client or GeminiClient()).ask(PROMPT, audio, SCHEMA)
-    rows = answer.get("utterances", []) if isinstance(answer, dict) else []
-    utterances = [u for row in rows if (u := parse(row)) is not None]
-    language = str(answer.get("language", "")) if isinstance(answer, dict) else ""
-    return language, sorted(utterances, key=lambda u: u.start)
+    if not isinstance(answer, dict):
+        raise RuntimeError("listening returned nothing readable")
+    utterances = [u for row in answer.get("utterances", []) if (u := parse(row)) is not None]
+    return str(answer.get("language", "")), sorted(utterances, key=lambda u: u.start)
 
 
 def parse(row: Any) -> Utterance | None:

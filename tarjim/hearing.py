@@ -18,9 +18,13 @@ def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcrip
     cached = job.cache / "transcript.json"
     if cached.exists():
         return Transcript.load(cached)
+    from tarjim.memory import free_for_listening
+
+    free_for_listening()
     audio = media.extract_audio(job.video, job.cache / "audio.wav")
     transcript = listen_and_align(job, audio, report) or local_transcript(audio)
     transcript.save(cached)
+    audio.unlink(missing_ok=True)
     return transcript
 
 

@@ -165,15 +165,21 @@ now** button. A copy you run from source is updated with `git pull`.
 ## Privacy and security
 
 - **Keys** are stored in your operating system's encrypted vault (Windows Credential Manager,
-  macOS Keychain, Secret Service). The settings file holds none.
+  macOS Keychain, Secret Service). The settings file holds none. On a computer that has no such
+  vault (some Linux servers), they are kept in the settings file, readable by your account only.
 - **What leaves your device** depends on the way you connect: the audio of the clip goes to the
   listening provider you chose, and the text goes to the translation and voice providers you chose.
   In local mode nothing leaves: this was measured by watching every connection during a full local
-  job, dubbing included (zero external connections). Models load offline; the internet is used only
-  when you download a tool.
-- **The local server** listens on 127.0.0.1 only. Every request needs a token or the page's
-  same-site cookie, foreign `Host` headers are refused (DNS rebinding), websites cannot reach it or
-  ask to pair, and it serves no file outside its own folders.
+  job, dubbing included (zero external connections). Models load offline; the internet is used
+  when you download a tool, and once on your first dub to fetch the small model (80 MB) that
+  separates voices from the background. A voice on your computer is never replaced by a cloud
+  voice: when a language has no voice on your computer, dubbing stops and says so.
+- **The local server** listens on 127.0.0.1 only. Every request needs a token, or the page's
+  cookie on a request the browser marks as coming from tarjim's own page; foreign `Host` headers
+  are refused (DNS rebinding), websites and pages on other local ports cannot reach it or ask to
+  pair, and it serves no file outside its own folders. Other programs running on your computer can
+  open the page as you can; tarjim does not protect against them.
+- **Copies of your videos** that tarjim keeps to work on are cleared a week after their last use.
 
 See [SECURITY.md](SECURITY.md) to report a problem.
 
@@ -198,8 +204,9 @@ Tested on Windows 11 with an RTX 5080, and from a clean install with no graphics
 files, burned subtitles and `.srt`, French and Arabic, pause, resume, cancel and retry, the three
 ways to connect (Claude and ChatGPT subscriptions, local Ollama), the chat tools, dubbing in the
 speaker's own voice (English into Saudi Arabic) and the security checks above. Not tested yet:
-macOS, Linux, GitHub Copilot and Antigravity subscriptions, and the phone bot against the live
-Telegram service (its code is covered by tests with a simulated Telegram).
+macOS, Linux, and GitHub Copilot and Antigravity subscriptions. The phone bot's video download was
+measured against the live Telegram service; the rest of the bot is covered by tests with a
+simulated Telegram.
 
 ## License
 

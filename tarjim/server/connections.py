@@ -39,8 +39,8 @@ def subscription_view(provider: Provider) -> dict[str, Any]:
             **models, "install": provider.install,
             "model": setting(provider.model_name) or models["suggested"],
             "node": bool(app_install.npm()),
-            "can_install": provider.id in app_install.PACKAGES and bool(
-                app_install.npm() or provider.id in app_install.NATIVE),
+            "can_install": provider.id in app_install.NATIVE or bool(
+                provider.id in app_install.PACKAGES and app_install.npm()),
             "installing": app_install.installing(provider.id),
             "install_failed": app_install.failed(provider.id)}
 

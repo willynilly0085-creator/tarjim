@@ -12,8 +12,9 @@ from tarjim.dub.mix import mix, mux
 from tarjim.dub.separate import Stems, separate
 from tarjim.dub.studio import VOICES
 from tarjim.dub.voices import reference_spans
-from tarjim.job import Job
+from tarjim.job import Job, checkpoint
 from tarjim.media import probe
+from tarjim.memory import free_for_voice
 from tarjim.models import Cue, Word
 
 SAVED_VOICE = "fish:saved"
@@ -21,6 +22,7 @@ FIRST_SECONDS = 10.0
 SAFE = re.compile(r"[^\w.-]")
 NUMBER = re.compile(r"\d+")
 PLAIN_TEXT = ("gemini", "clone")
+KEYS = {"gemini": "gemini_api_key", "fish": "fish_api_key"}
 
 
 class DubUnavailable(RuntimeError):
@@ -32,18 +34,22 @@ class Voices(Protocol):
 
 
 def choose(engine: str, language: str) -> str:
+    """The voice asked for, or the one on this computer when it cannot be used. A voice on the
+    computer is never swapped for a cloud one: the text would go to a company the person did not
+    choose."""
     wanted = engine.split(":", maxsplit=1)[0]
-    if wanted == "gemini" and not setting("gemini_api_key"):
-        wanted = "clone"
-    if wanted == "fish" and not setting("fish_api_key"):
-        wanted = "clone"
-    if wanted == "studio" and language not in VOICES:
+    keyless = wanted in KEYS and not setting(KEYS[wanted])
+    if keyless or (wanted == "studio" and language not in VOICES):
         wanted = "clone"
     if wanted == "clone" and language not in CLONE_LANGUAGES:
-        wanted = "studio" if language in VOICES else ""
-    if not wanted:
         raise DubUnavailable(f"no dubbing voice for language {language}")
     return wanted
+
+
+def clone_installed() -> bool:
+    from tarjim.tools import BY_ID, installed
+
+    return installed(BY_ID["dubbing"])
 
 
 def references(stems: Stems, words: list[Word], folder: Path) -> dict[str, Path]:
@@ -108,12 +114,14 @@ def fallback_spoken(lines: list[Line], engine: str, language: str) -> list[Line]
 
 
 def speak(engine: str, job: Job, samples: dict[str, Path], lines: list[Line]) -> list[np.ndarray]:
+    """A natural voice that fails is replaced by the voice on this computer, when there is one;
+    otherwise the person sees why the natural voice failed."""
     try:
         return voices_for(engine, job.dub, job, samples).speak_all(lines)
     except RuntimeError:
-        if engine != "gemini":
+        if engine != "gemini" or job.target not in CLONE_LANGUAGES or not clone_installed():
             raise
-    backup = choose("clone", job.target)
+    backup = "clone"
     return voices_for(backup, backup, job, samples).speak_all(
         fallback_spoken(lines, backup, job.target))
 
@@ -121,8 +129,12 @@ def speak(engine: str, job: Job, samples: dict[str, Path], lines: list[Line]) ->
 def dub_video(job: Job, cues: list[Cue], words: list[Word], picture: Path) -> Path:
     engine = choose(job.dub, job.target)
     lines = spoken(lines_from(cues, probe(job.video).duration), engine, job)
+    checkpoint()
+    free_for_voice()
     stems = separate(job.video)
     samples = references(stems, words, job.cache / "voices")
+    checkpoint()
     speech = speak(engine, job, samples, lines)
+    checkpoint()
     sound = write_wav(job.cache / f"dub.{job.target}.wav", mix(lines, speech, stems.background))
     return mux(picture, sound, job.output(".dub.mp4"))
