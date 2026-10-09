@@ -34,11 +34,10 @@ def translate_video(source: str, language: str = "ar", output: str = "burned",
     language: target language code such as ar, en, fr, ja. Arabic is Saudi by default;
     use "ar-msa" for Modern Standard Arabic.
     output: "burned" (subtitles inside the video), "subtitles" (an .srt file) or "dubbed".
-    voice (dubbing only): "natural" lifelike Gemini voices matched to each speaker (default),
-    "clone" each speaker's own voice on this computer, "studio",
-    "fish" cloning in the cloud, "fishvoice" the calm Arabic narrator, "eleven" ready ElevenLabs
-    voices, "elevenclone" the speaker's voice cloned at ElevenLabs, or "speech" another voice
-    service the person linked (OpenAI's speech format).
+    voice (dubbing only): "natural" lifelike Gemini voices per speaker (default), "clone" each
+    speaker's own voice on this computer, "studio", "fish" cloud cloning, "fishvoice" the calm
+    Arabic narrator, "eleven" ElevenLabs voices, "elevenclone" the speaker's voice at ElevenLabs,
+    or "speech" another linked voice service.
     """
     target, _, dialect = language.partition("-")
     order = {"target": target, "mode": mode_for(output, voice),
