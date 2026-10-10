@@ -1,5 +1,41 @@
 # Changelog
 
+## 1.0.15 (2026-10-10)
+
+Security fixes from a full read of the code against tarjim's threat model. Update when you can.
+
+- **A saved key no longer follows a changed address.** Changing the custom API address, or the
+  address or service of a linked voice, now clears the key saved for the old one, so you type it
+  again on tarjim's page. Before, an assistant steered by text it had read could point the
+  address at another server and the next request would have carried your key there.
+- **Pairing shows a number.** When a browser extension asks to connect, the extension and
+  tarjim's page now show the same four-digit number; allow the request only when they match.
+  Asking again replaces the earlier request instead of queueing behind it, so another extension
+  can no longer leave a request waiting for your click.
+- **No link can start a job.** The old `/translate?url=...` address is removed; work starts only
+  from the page, the extension, a chat tool or the phone bot.
+- **Files on this computer only.** A job from a file path refuses network shares, so opening a
+  path can no longer make Windows sign in to someone else's server.
+- **Local AI programs are looked for where programs are installed**, not through the whole home
+  folder, so a file that merely has the right name in Downloads is never started.
+- **Downloads have an end.** A link download stops at 8 GB, refuses live broadcasts, and Cancel
+  now stops it while it is running.
+- **Subtitle files carry text only.** Drawing and styling commands (`{\...}` and `<...>` tags)
+  from a model's answer are removed from `.srt` files, as they already were from burned
+  subtitles.
+- Dubbing refuses soundtracks longer than six hours instead of running out of memory.
+- File names from Telegram follow the same rules as uploads; only `http` and `https` links are
+  taken from a message.
+- Errors shown by the connection test and by tool downloads pass through the same masking as job
+  errors.
+- The extension no longer sends addresses inside your home network (private ranges, `.local`)
+  to tarjim, including the post link it finds around a video.
+
+Known and not fixed in this release: updates and tool downloads are fetched over HTTPS from
+their publishers but not checked against a pinned hash; the Codex, Copilot and Antigravity
+programs are run in an empty folder with their sandbox on, but their own tools are not yet
+switched off the way Claude's and Grok's are.
+
 ## 1.0.14 (2026-10-09)
 
 - The phone bot now shows a progress bar with the megabytes on every transfer, not only on large

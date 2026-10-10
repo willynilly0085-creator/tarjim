@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tarjim.config import setting
+from tarjim.server.evidence import evidence
 
 VOICE_REPO = "openbmb/VoxCPM2"
 DUPLICATE_WEIGHTS = ["*.bin"]
@@ -191,4 +192,4 @@ class Shelf:
             fetch(tool)
             self.progress[tool.id] = Progress("done")
         except Exception as error:
-            self.progress[tool.id] = Progress("failed", str(error)[:200])
+            self.progress[tool.id] = Progress("failed", evidence(str(error))[:200])

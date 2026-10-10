@@ -8,6 +8,7 @@ async function check() {
   const pending = await api("/pairs").catch(() => []);
   current = pending[0]?.id ?? null;
   $("pairing").hidden = !current;
+  if (current) $("pairing").querySelector("p").textContent = `${t("pairAsk")} (${pending[0].code})`;
 }
 
 async function decide(verdict) {

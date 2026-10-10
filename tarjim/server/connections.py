@@ -145,8 +145,9 @@ class ConnectionRoutes:
     def save_address(self, _query: Query) -> None:
         url = str(self.read_json().get("url", "")).rstrip("/")
         if not ADDRESS.match(url):
-            self.reply(400, {"error": "address"})
-            return
+            return self.reply(400, {"error": "address"})
+        if url != setting("custom_base_url"):
+            save("custom_api_key", "")  # a key goes only where the person typed it for
         save("custom_base_url", url)
         self.reply(200, {"saved": True})
 
@@ -195,6 +196,5 @@ class ConnectionRoutes:
     def link_assistant(self, _query: Query) -> None:
         from tarjim.server.assistant_link import link
 
-        app = str(self.read_json().get("app", ""))
-        done, detail = link(app)
+        done, detail = link(str(self.read_json().get("app", "")))
         self.reply(200 if done else 400, {"linked": done, "detail": detail})

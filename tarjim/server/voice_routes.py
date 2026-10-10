@@ -73,6 +73,8 @@ class VoiceRoutes:
         chosen = speech_choice(self.read_json())
         if chosen is None:
             return self.reply(400, {"error": "speech"})
+        if any(chosen[name] != setting(name) for name in ("speech_preset", "speech_base_url")):
+            save("speech_api_key", "")  # a key goes only where the person typed it for
         for name, value in chosen.items():
             save(name, value)
         self.reply(200, view())

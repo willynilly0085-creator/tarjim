@@ -32,8 +32,11 @@ def outside(address: str) -> bool:
 
 def public(url: str) -> bool:
     try:
-        host = (urlsplit(url).hostname or "").rstrip(".").lower()
+        parts = urlsplit(url)
+        host = (parts.hostname or "").rstrip(".").lower()
     except ValueError:
+        return False
+    if parts.scheme.lower() not in ("http", "https"):
         return False
     if not host or host == "localhost" or host.endswith(LOCAL_NAMES):
         return False

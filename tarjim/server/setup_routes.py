@@ -104,13 +104,14 @@ class SetupRoutes(OnboardRoutes, PhoneRoutes, UpdateRoutes, VoiceRoutes):
         if request is None:
             self.reply(403, {"error": "pair"})
             return
-        self.reply(200, {"id": request.id})
+        self.reply(200, {"id": request.id, "code": request.code})
 
     def pair_state(self, _query: Query, request_id: str) -> None:
         self.reply(200, self.pairing.claim(request_id, self.token))
 
     def list_pairs(self, _query: Query) -> None:
-        self.reply(200, [{"id": r.id, "origin": r.origin} for r in self.pairing.pending()])
+        self.reply(200, [{"id": r.id, "origin": r.origin, "code": r.code}
+                         for r in self.pairing.pending()])
 
     def decide_pair(self, _query: Query, request_id: str, verdict: str) -> None:
         done = self.pairing.decide(request_id, verdict == "allow")

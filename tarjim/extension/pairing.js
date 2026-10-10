@@ -6,9 +6,9 @@ export async function serverBase() {
 
 export async function askToPair() {
   const reply = await fetch(`${await serverBase()}/pair`, { method: "POST" }).catch(() => null);
-  const id = reply?.ok ? (await reply.json()).id : null;
-  if (id) await remember({ pairId: id });
-  return id;
+  const asked = reply?.ok ? await reply.json() : null;
+  if (asked?.id) await remember({ pairId: asked.id });
+  return asked;
 }
 
 export async function claimPending() {

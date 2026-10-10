@@ -16,7 +16,7 @@ def table(pairs: list[tuple[str, str]]) -> Routes:
 GET_ROUTES = table([
     (r"^/ping$", "ping"), (r"^/languages$", "languages"), (r"^/jobs$", "list_jobs"),
     (rf"^/jobs/{JOB}$", "show"), (rf"^/files/{JOB}/([^/]+)$", "send_output"),
-    (r"^/translate$", "legacy"), (r"^/keys$", "key_status"), (r"^/$", "home"),
+    (r"^/keys$", "key_status"), (r"^/$", "home"),
     (r"^/web/([\w.-]+(?:/[\w.-]+)?)$", "asset"), (r"^/system$", "system"),
     (r"^/setup$", "setup_state"), (r"^/tools$", "list_tools"),
     (rf"^/pair/{PAIR}$", "pair_state"), (r"^/pairs$", "list_pairs"),

@@ -14,6 +14,7 @@ class Request:
     state: str = "pending"
     created: float = field(default_factory=time.time)
     claimed: bool = False
+    code: str = field(default_factory=lambda: f"{secrets.randbelow(10000):04d}")
 
     @property
     def expired(self) -> bool:
@@ -32,6 +33,10 @@ class Pairing:
     def ask(self, origin: str) -> Request | None:
         with self.lock:
             self.tidy()
+            waiting = (origin, "pending")
+            again = [k for k, r in self.requests.items() if (r.origin, r.state) == waiting]
+            for key in again:  # one waiting request per extension: asking again replaces it
+                del self.requests[key]
             if sum(r.state == "pending" for r in self.requests.values()) >= LIMIT:
                 return None
             request = Request(origin)

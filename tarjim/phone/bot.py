@@ -18,6 +18,7 @@ from tarjim.phone.meter import shown
 from tarjim.phone.progress import Follower
 from tarjim.phone.telegram import FETCH_LIMIT, Bot, TelegramError
 from tarjim.phone.words import result_name, say
+from tarjim.server.guard import safe_name
 
 CODE_SECONDS = 15 * 60
 SAFE = re.compile(r"[^\w.-]")
@@ -100,7 +101,8 @@ class Inbox:
         if big and (not large.ready() or size > large.LIMIT):
             bot.say(chat, say("phone_file_huge" if large.ready() else "phone_file_big"))
             return
-        name = SAFE.sub("_", str(video.get("file_name") or "telegram-video.mp4"))[-80:]
+        named = safe_name(str(video.get("file_name") or "")) or "telegram-video.mp4"
+        name = SAFE.sub("_", named)[-80:]
         self.ask(bot, chat, {"file_id": str(video["file_id"]), "name": name, "chat": chat,
                              "message": video["message"] if big else 0})
 

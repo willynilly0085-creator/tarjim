@@ -21,7 +21,7 @@ chrome.storage.onChanged.addListener((changes) => { if (changes.target || change
 
 async function pickUrl(info, tab) {
   const direct = [info.linkUrl, info.srcUrl].find(downloadable);
-  return direct || (await clickedPost(info, tab)) || [info.pageUrl, tab?.url].find(downloadable) || "";
+  return direct || [await clickedPost(info, tab), info.pageUrl, tab?.url].find(downloadable) || "";
 }
 
 function notify(id, title, message) {

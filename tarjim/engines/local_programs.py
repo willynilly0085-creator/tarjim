@@ -64,7 +64,7 @@ def remember(path_text: str) -> str:
 def roots() -> list[Path]:
     names = ("ProgramFiles", "ProgramFiles(x86)", "LOCALAPPDATA", "APPDATA")
     found = [Path(os.environ[name]) for name in names if os.environ.get(name)]
-    return [*found, Path.home()]
+    return [*found, Path.home() / ".lmstudio"]
 
 
 def walk(folder: Path, depth: int, deadline: float, found: dict[str, str]) -> None:

@@ -117,8 +117,10 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes):
 
     def create_local(self, _query: Query) -> None:
         data = self.read_json()
-        path = Path(str(data.get("path", ""))).expanduser()
-        if not path.is_file() or safe_name(path.name) is None:
+        text = str(data.get("path", "")).strip()
+        path = Path(text).expanduser()
+        here = path.is_absolute() and not text.startswith(("\\\\", "//"))
+        if not here or not path.is_file() or safe_name(path.name) is None:
             return self.reply(400, {"error": "file"})
         self.accept(order_from(str(path.resolve()), data, path.name))
 
@@ -185,10 +187,6 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes):
     def retry(self, _query: Query, task_id: str) -> None:
         task = self.board.retry(task_id)
         self.reply(200, task.view()) if task else self.reply(404, {"error": "job"})
-
-    def legacy(self, query: Query) -> None:
-        mode = LEGACY.get(first(query, "mode"), first(query, "mode") or "srt")
-        self.create({"url": first(query, "url"), "mode": mode if mode in MODES else "burn"})
 
     def log_message(self, format: str, *args: Any) -> None:
         return None

@@ -19,6 +19,7 @@ from tarjim.models import Cue, Word
 
 SAVED_VOICE = "fish:saved"
 FIRST_SECONDS = 10.0
+LONGEST = 6 * 3600.0
 SAFE = re.compile(r"[^\w.-]")
 NUMBER = re.compile(r"\d+")
 PLAIN_TEXT = ("gemini", "clone", "eleven", "speech")
@@ -152,7 +153,10 @@ def speak(engine: str, job: Job, samples: dict[str, Path], lines: list[Line]) ->
 
 def dub_video(job: Job, cues: list[Cue], words: list[Word], picture: Path) -> Path:
     engine = choose(job.dub, job.target)
-    lines = spoken(lines_from(cues, probe(job.video).duration), engine, job)
+    length = probe(job.video).duration
+    if length > LONGEST:
+        raise RuntimeError("dubbing stops at six hours of sound")
+    lines = spoken(lines_from(cues, length), engine, job)
     checkpoint()
     free_for_voice()
     stems = separate(job.video)

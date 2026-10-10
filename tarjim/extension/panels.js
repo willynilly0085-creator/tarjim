@@ -26,10 +26,10 @@ const ATTEMPTS = 400;
 
 export async function autoPair(ready) {
   show("pair");
-  const id = await askToPair();
-  if (!id) return show("offline");
+  const asked = await askToPair();
+  if (!asked?.id) return show("offline");
   $("pair-waiting").hidden = false;
-  $("pair-waiting").textContent = t("pairWaiting");
+  $("pair-waiting").textContent = `${t("pairWaiting")} (${asked.code})`;
   $("open-tarjim").hidden = false;
   chrome.tabs.create({ url: `${await serverBase()}/` });
   for (let i = 0; i < ATTEMPTS; i += 1) {

@@ -2,6 +2,8 @@
 with their own eyes that the connection works before they start."""
 from typing import Any
 
+from tarjim.server.evidence import evidence
+
 SAMPLE = "Welcome to tarjim. Every video, in your language."
 SCHEMA = {"type": "object", "properties": {"text": {"type": "string"}}, "required": ["text"]}
 MAX_ERROR = 200
@@ -20,6 +22,6 @@ def selftest(language: str) -> dict[str, Any]:
     try:
         answer = asker(chosen("translate")).ask(prompt, None, SCHEMA)
     except Exception as error:
-        return {"ok": False, "error": str(error)[:MAX_ERROR]}
+        return {"ok": False, "error": evidence(str(error))[:MAX_ERROR]}
     text = str(answer.get("text", "")) if isinstance(answer, dict) else str(answer or "")
     return {"ok": bool(text.strip()), "text": text.strip()}

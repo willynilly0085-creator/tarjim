@@ -10,7 +10,7 @@ export function isPost(url) {
 }
 
 export function downloadable(url) {
-  if (!/^https?:\/\//i.test(url || "") || /^https?:\/\/(127\.0\.0\.1|localhost)/i.test(url)) return false;
+  if (!/^https?:\/\//i.test(url || "") || /^https?:\/\/(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.|\[|localhost|[^/]*\.(local|lan|internal)([:/]|$))/i.test(url)) return false;
   return !FEEDS.test(url) || isPost(url);
 }
 
