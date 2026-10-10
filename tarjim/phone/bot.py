@@ -14,6 +14,7 @@ from tarjim.config import save, setting
 from tarjim.phone import large
 from tarjim.phone.choice import MODES, Waiting, choices_keyboard, modes_keyboard
 from tarjim.phone.links import first_link
+from tarjim.phone.meter import shown
 from tarjim.phone.progress import Follower
 from tarjim.phone.telegram import FETCH_LIMIT, Bot, TelegramError
 from tarjim.phone.words import result_name, say
@@ -108,12 +109,13 @@ class Inbox:
             return str(item["source"])
         folder = self.uploads / f"telegram-{secrets.token_hex(6)}"
         folder.mkdir(parents=True, exist_ok=True)
+        def tell(done: int, total: int) -> None:
+            bot.edit(item["chat"], item["status"], shown(say("stage_downloading"), done, total))
+
         if item.get("message"):
-            large.fetch(item["chat"], item["message"], folder / item["name"],
-                        lambda done, total: bot.edit(item["chat"], item["status"], large.shown(
-                            say("stage_downloading"), done, total)))
+            large.fetch(item["chat"], item["message"], folder / item["name"], tell)
         else:
-            bot.fetch(item["file_id"], folder / item["name"])
+            bot.fetch(item["file_id"], folder / item["name"], tell)
         return str(folder / item["name"])
 
     def start_choice(self, bot: Bot, chat: int, message: int, choice: str) -> None:

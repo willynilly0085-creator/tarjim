@@ -5,7 +5,7 @@ from pathlib import Path
 
 from tarjim.config import HOME, prepare_environment, private_home, save, setting, token
 from tarjim.fetch import is_url, resolve
-from tarjim.job import CHECKPOINT, Job
+from tarjim.job import CHECKPOINT, PROGRESS, Job
 from tarjim.server.app import PORT, serve
 from tarjim.server.jobs import DUBBING, Board, Task
 
@@ -15,8 +15,10 @@ DOWNLOADS = Path.home() / "Downloads" / "tarjim"
 def perform(task: Task, downloads: Path) -> None:
     order = task.order
     CHECKPOINT.set(task.checkpoint)
+    PROGRESS.set(lambda done, total: setattr(task, "moved", (done, total)))
     task.stage = "downloading" if is_url(order.source) else "hearing"
     task.video = resolve(order.source, HOME / "sources")
+    task.moved = (0, 0)
     downloads.mkdir(parents=True, exist_ok=True)
     job = Job(task.video, order.target, order.dialect, burn=order.mode != "srt",
               dub=DUBBING.get(order.mode, ""), out_dir=downloads)

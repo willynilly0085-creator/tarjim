@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Protocol
 
 from tarjim.phone.checklist import ENDED, checklist
+from tarjim.phone.meter import MB, amount
 from tarjim.phone.sender import Sender
 from tarjim.phone.telegram import Bot, TelegramError, note
 from tarjim.phone.words import say
@@ -35,7 +36,10 @@ def cancel_button(task_id: str) -> str:
 def status_text(task: Any, watch: Watch) -> str:
     if task.stage not in ENDED:
         watch.step = task.stage
-    return checklist(task, watch.step)
+    done, total = getattr(task, "moved", (0, 0))
+    moving = task.stage == "downloading" and total > 0
+    note = amount(round(done / MB), round(total / MB)) if moving else ""
+    return checklist(task, watch.step, note)
 
 
 class Follower:

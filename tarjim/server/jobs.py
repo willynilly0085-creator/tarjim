@@ -53,6 +53,7 @@ class Task:
     outputs: list[Path] = field(default_factory=list)
     created: float = field(default_factory=time.time)
     control: str = "run"
+    moved: tuple[int, int] = (0, 0)
 
     @property
     def finished(self) -> bool:
@@ -76,6 +77,7 @@ class Task:
                 "target": self.order.target, "mode": self.order.mode,
                 "title": self.order.name or (self.video.stem if self.video else self.order.source),
                 "outputs": [p.name for p in self.outputs], "created": self.created,
+                "progress": list(self.moved),
                 "files": [str(p) for p in self.outputs]}
 
 

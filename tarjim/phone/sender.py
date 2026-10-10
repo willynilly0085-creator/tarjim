@@ -8,6 +8,7 @@ from typing import Any
 from tarjim.phone import large
 from tarjim.phone.checklist import checklist
 from tarjim.phone.delivery import chosen_output, phone_copy
+from tarjim.phone.meter import amount
 from tarjim.phone.telegram import SEND_LIMIT, Bot, TelegramError
 from tarjim.phone.words import say
 
@@ -35,15 +36,16 @@ class Sender:
         except TelegramError:
             return
 
+    def told(self, done: int, total: int) -> None:
+        self.show("send", amount(done, total))
+
     def upload(self, path: Path) -> bool:
         for attempt in range(ATTEMPTS):
             try:
                 if path.stat().st_size > SEND_LIMIT:
-                    large.send(self.chat, path, lambda done, total: self.show(
-                        "send", f"{large.bar(done, total)} " + say(
-                            "phone_progress", done=done, total=total)))
+                    large.send(self.chat, path, self.told)
                 else:
-                    self.bot.send_file(self.chat, path, video=path.suffix == ".mp4")
+                    self.bot.send_file(self.chat, path, path.suffix == ".mp4", self.told)
                 return True
             except TelegramError:
                 if attempt < ATTEMPTS - 1:

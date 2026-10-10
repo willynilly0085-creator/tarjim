@@ -60,7 +60,7 @@ def test_a_download_that_never_moves_gives_up_and_leaves_no_half_file(
 
 
 class Unreachable(FakeBot):
-    def fetch(self, _file_id: str, target: Path) -> None:
+    def fetch(self, _file_id: str, target: Path, tell: Any = None) -> None:
         raise telegram.TelegramError("download stalled")
 
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.14 (2026-10-09)
+
+- The phone bot now shows a progress bar with the megabytes on every transfer, not only on large
+  videos: a small video coming in, the result going back to your phone, and a link (YouTube, X
+  and the rest) being downloaded on your computer, where the bar sits on its line of the
+  checklist.
+- To tell how far an upload is, the result is now sent as it is read from disk instead of being
+  built whole in memory first, so a 50 MB result no longer takes 50 MB of memory to send.
+- A job's state now carries how many bytes of its download have arrived, for anything that
+  shows jobs.
+
 ## 1.0.13 (2026-10-09)
 
 - **Large videos through the phone bot, up to 2 GB.** Telegram lets a bot take only 20 MB and

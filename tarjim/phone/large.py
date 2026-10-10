@@ -10,13 +10,13 @@ system's vault with the keys, never in a session file on disk.
 import asyncio
 import re
 import threading
-import time
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Any
 
 from tarjim import config
 from tarjim.config import setting
+from tarjim.phone.meter import Meter, Tell
 from tarjim.phone.telegram import TelegramError
 
 LIMIT = 2000 * 1024 * 1024
@@ -25,40 +25,6 @@ APP_ID = re.compile(r"^\d{4,12}$")
 APP_HASH = re.compile(r"^[0-9a-f]{32}$")
 ONE_AT_A_TIME = threading.Lock()
 Work = Callable[[Any], Awaitable[Any]]
-Tell = Callable[[int, int], None]
-EVERY = 4.0
-MB = 1024 * 1024
-
-
-def bar(done: int, total: int, cells: int = 10) -> str:
-    """A bar of filled and empty cells: Telegram has no progress bar for a bot's message, so the
-    message draws its own."""
-    filled = min(cells, round(cells * done / max(total, 1)))
-    return "▰" * filled + "▱" * (cells - filled)
-
-
-def shown(step: str, done: int, total: int) -> str:
-    """The step's name, and under it the bar with the megabytes so far."""
-    from tarjim.phone.words import say
-
-    return "\n".join((step, f"{bar(done, total)} " + say("phone_progress", done=done, total=total)))
-
-
-class Meter:
-    """Say how far a transfer is, in megabytes, at most once every few seconds. A message that
-    cannot be shown never stops the transfer."""
-
-    def __init__(self, tell: Tell) -> None:
-        self.tell, self.last = tell, 0.0
-
-    def __call__(self, done: int, total: int) -> None:
-        if time.monotonic() - self.last < EVERY:
-            return
-        self.last = time.monotonic()
-        try:
-            self.tell(round(done / MB), max(1, round(total / MB)))
-        except (TelegramError, OSError):
-            return
 
 
 def well_formed(app_id: str, app_hash: str) -> bool:

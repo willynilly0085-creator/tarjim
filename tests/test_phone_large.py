@@ -8,7 +8,7 @@ import pytest
 from test_phone import OWNER, FakeBot, message, setup_inbox, tap
 
 from tarjim import config
-from tarjim.phone import large, sender, telegram
+from tarjim.phone import large, meter, sender, telegram
 from tarjim.phone.words import say
 
 MB = 1024 * 1024
@@ -65,16 +65,16 @@ def test_a_big_video_is_taken_through_the_app_protocol_by_its_message(
     bar = "▰▰▰▰▱▱▱▱▱▱"
     progress = f"{bar} {say('phone_progress', done=47, total=120)}"
     assert "\n".join((say("stage_downloading"), progress)) in shown
-    assert large.bar(0, 120) == "▱" * 10 and large.bar(120, 120) == "▰" * 10
+    assert meter.bar(0, 120) == "▱" * 10 and meter.bar(120, 120) == "▰" * 10
 
 
 def test_progress_is_told_in_megabytes_and_not_too_often(monkeypatch: pytest.MonkeyPatch) -> None:
     told: list[tuple[int, int]] = []
     clock = iter([100.0, 100.0, 101.0, 105.0, 105.0])
-    monkeypatch.setattr(large.time, "monotonic", lambda: next(clock))
-    meter = large.Meter(lambda done, total: told.append((done, total)))
+    monkeypatch.setattr(meter.time, "monotonic", lambda: next(clock))
+    watch = meter.Meter(lambda done, total: told.append((done, total)))
     for done in (10 * MB, 20 * MB, 60 * MB):
-        meter(done, 120 * MB)
+        watch(done, 120 * MB)
     assert told == [(10, 120), (60, 120)]
 
 
@@ -83,7 +83,7 @@ class Uploads(FakeBot):
         super().__init__()
         self.sent: list[str] = []
 
-    def send_file(self, _chat: int, path: Path, video: bool) -> None:
+    def send_file(self, _chat: int, path: Path, video: bool, tell: Any = None) -> None:
         self.sent.append(path.name)
 
 

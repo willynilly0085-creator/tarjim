@@ -34,7 +34,7 @@ class FakeBot:
     def call(self, method: str, **_params: Any) -> None:
         self.calls.append(method)
 
-    def fetch(self, _file_id: str, target: Path) -> None:
+    def fetch(self, _file_id: str, target: Path, tell: Any = None) -> None:
         target.write_bytes(b"video")
 
 
@@ -201,7 +201,7 @@ class Uploads(FakeBot):
         super().__init__()
         self.failures, self.sent = failures, []
 
-    def send_file(self, _chat: int, path: Path, video: bool) -> None:
+    def send_file(self, _chat: int, path: Path, video: bool, tell: Any = None) -> None:
         if self.failures:
             self.failures -= 1
             raise telegram.TelegramError("Request Entity Too Large", 413)

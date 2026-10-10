@@ -1,5 +1,7 @@
 from pathlib import Path
+from typing import Any
 
+from tarjim.job import progress
 from tarjim.media import tool
 
 FORMAT = "bv*[ext=mp4][height<=1080]+ba[ext=m4a]/b[ext=mp4]/b"
@@ -11,13 +13,19 @@ def is_url(text: str) -> bool:
     return text.strip().lower().startswith(("http://", "https://"))
 
 
+def told(state: dict[str, Any]) -> None:
+    """Pass the downloader's own count of bytes on to the job."""
+    total = state.get("total_bytes") or state.get("total_bytes_estimate") or 0
+    progress(int(state.get("downloaded_bytes") or 0), int(total))
+
+
 def download(url: str, folder: Path) -> Path:
     from yt_dlp import YoutubeDL
 
     folder.mkdir(parents=True, exist_ok=True)
     options = {"format": FORMAT, "outtmpl": str(folder / NAME), "merge_output_format": "mp4",
                "ffmpeg_location": tool("ffmpeg"), "noplaylist": True, "quiet": True,
-               "no_warnings": True}
+               "no_warnings": True, "progress_hooks": [told]}
     with YoutubeDL(options) as ydl:
         info = ydl.extract_info(url, download=True)
         path = Path(ydl.prepare_filename(info))

@@ -11,6 +11,15 @@ from tarjim.rules import Rules, rules_for
 CHECKPOINT: ContextVar[Callable[[], None]] = ContextVar("checkpoint", default=lambda: None)
 
 
+PROGRESS: ContextVar[Callable[[int, int], None]] = ContextVar(
+    "progress", default=lambda _done, _total: None)
+
+
+def progress(done: int, total: int) -> None:
+    """How far a download is, in bytes, for whoever is showing the job."""
+    PROGRESS.get()(done, total)
+
+
 def checkpoint() -> None:
     """Between long steps: where the person's pause or cancel takes effect."""
     CHECKPOINT.get()()
