@@ -99,7 +99,9 @@ def tap(inbox: Inbox, bot: FakeBot, mode: str, chat: int = OWNER) -> None:
                                           "message": {"chat": {"id": chat}, "message_id": 9}}})
 
 
-def test_a_link_asks_what_to_make_and_starts_on_the_tap(home: Path) -> None:
+def test_a_link_asks_what_to_make_and_starts_on_the_tap(
+        home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(links, "addresses", lambda _host: ["142.250.1.1"])
     inbox, bot, jobs, _pairing = setup_inbox(home)
     config.save("phone_chat", str(OWNER))
     config.save("phone_mode", "srt")
