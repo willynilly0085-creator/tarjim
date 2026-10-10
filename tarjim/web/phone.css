@@ -6,6 +6,8 @@
 .phone-paired { gap: var(--space-md); justify-items: stretch; }
 .phone-paired > .button-quiet { justify-self: start; }
 .phone-paired > p:empty { display: none; }
+.phone-large { justify-items: stretch; max-width: 32rem; padding-top: var(--space-md); border-top: 1px solid var(--line); }
+.phone-large .button-quiet, .phone-large .text-link { justify-self: start; }
 [data-step="phone"] h1:focus { outline: none; }
 .update-banner { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); border: 1px solid var(--accent-line); border-radius: var(--radius); background: var(--raised); }
 .update-banner[hidden] { display: none; }

@@ -63,6 +63,33 @@ function choice(label, options, value, name) {
   return el("label", { className: "field" }, el("span", { className: "field-label", textContent: label }), select);
 }
 
+// Videos over the Bot API's limits need Telegram's app id and hash, saved once by the person.
+function largePart(view) {
+  const title = el("p", { className: "field-label", textContent: t("phoneLargeTitle") });
+  if (view.large) {
+    return el("div", { className: "stack phone-large" }, title,
+      el("p", { className: "meta ok", textContent: t("phoneLargeOn") }),
+      button(t("phoneLargeOff"), async () => paint(await post("/phone/large", {}))));
+  }
+  const input = (id, type) => el("input", { className: "text-input", id, type, dir: "ltr", autocomplete: "off", spellcheck: false });
+  const [appId, appHash] = [input("phone-large-id", "text"), input("phone-large-hash", "password")];
+  const note = status();
+  const go = button(t("phoneLargeSave"), async () => {
+    go.disabled = true;
+    note.textContent = t("phoneChecking");
+    const reply = await post("/phone/large", { api_id: appId.value.trim(), api_hash: appHash.value.trim() }).catch((error) => error.body || {});
+    if (reply.large) return paint(reply);
+    go.disabled = false;
+    note.textContent = t("phoneLargeBad");
+    note.className = "meta error";
+  });
+  const field = (label, control) => el("label", { className: "field" }, el("span", { className: "field-label", textContent: label }), control);
+  return el("div", { className: "stack phone-large" }, title,
+    el("p", { className: "meta", textContent: t("phoneLargeHint") }),
+    el("a", { className: "text-link", href: "https://my.telegram.org/apps", target: "_blank", rel: "noopener noreferrer", textContent: t("phoneLargeOpen") }),
+    field(t("phoneLargeId"), appId), field(t("phoneLargeHash"), appHash), go, note);
+}
+
 async function paired(view) {
   const languages = await api("/languages").catch(() => []);
   const arabic = view.target === "ar";
@@ -73,6 +100,7 @@ async function paired(view) {
     arabic ? choice(t("dialect"), [["saudi", t("dialectSaudi")], ["msa", t("dialectMsa")]], view.dialect, "dialect") : "",
     el("p", { className: "meta", id: "phone-saved", role: "status" }),
     el("p", { className: "meta", textContent: t("phoneOnlyWhenOn") }),
+    largePart(view),
     button(t("phoneForget"), forget));
 }
 

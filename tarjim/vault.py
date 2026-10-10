@@ -11,7 +11,8 @@ def service_for(home: str) -> str:
 
 SERVICE = service_for(os.environ.get("TARJIM_HOME", ""))
 SECRETS = frozenset({*(p.key_name for p in PROVIDERS if p.key_name), "fish_api_key", "token",
-                     "telegram_token", "eleven_api_key", "speech_api_key"})
+                     "telegram_token", "eleven_api_key", "speech_api_key",
+                     "telegram_api_hash", "telegram_session"})
 
 
 def backend() -> Any | None:

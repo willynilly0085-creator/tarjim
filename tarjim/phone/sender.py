@@ -5,9 +5,10 @@ import time
 from pathlib import Path
 from typing import Any
 
+from tarjim.phone import large
 from tarjim.phone.checklist import checklist
 from tarjim.phone.delivery import chosen_output, phone_copy
-from tarjim.phone.telegram import Bot, TelegramError
+from tarjim.phone.telegram import SEND_LIMIT, Bot, TelegramError
 from tarjim.phone.words import say
 
 ATTEMPTS = 3
@@ -37,7 +38,12 @@ class Sender:
     def upload(self, path: Path) -> bool:
         for attempt in range(ATTEMPTS):
             try:
-                self.bot.send_file(self.chat, path, video=path.suffix == ".mp4")
+                if path.stat().st_size > SEND_LIMIT:
+                    large.send(self.chat, path, lambda done, total: self.show(
+                        "send", f"{large.bar(done, total)} " + say(
+                            "phone_progress", done=done, total=total)))
+                else:
+                    self.bot.send_file(self.chat, path, video=path.suffix == ".mp4")
                 return True
             except TelegramError:
                 if attempt < ATTEMPTS - 1:
@@ -58,7 +64,9 @@ class Sender:
             return
         if wanted.suffix == ".mp4":
             self.show("prepare")
-        ready = phone_copy(wanted) if wanted.suffix == ".mp4" else wanted
+        whole = wanted.suffix != ".mp4" or (
+            large.ready() and wanted.stat().st_size <= large.LIMIT)
+        ready = wanted if whole else phone_copy(wanted)
         if ready is not None:
             self.show("send", say("phone_size", mb=max(1, round(ready.stat().st_size / MB))))
             sent = self.upload(ready)

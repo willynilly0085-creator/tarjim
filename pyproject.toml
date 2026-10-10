@@ -1,6 +1,6 @@
 [project]
 name = "tarjim"
-version = "1.0.12"
+version = "1.0.13"
 description = "Subtitles and dubbing for any video, from any language to any language, on your own computer"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0 with Commons Clause 1.0" }
@@ -19,6 +19,8 @@ dependencies = [
     "requests",
     "segno",
     "huggingface_hub",
+    "telethon",
+    "cryptg",
 ]
 
 [project.urls]

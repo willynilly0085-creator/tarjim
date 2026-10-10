@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from tarjim.config import save, setting
+from tarjim.phone import large
 from tarjim.phone.bot import Inbox, Pairing
 from tarjim.phone.progress import Follower, Jobs
 from tarjim.phone.telegram import Bot, TelegramError, note, well_formed
@@ -97,7 +98,8 @@ class Service:
         view: dict[str, Any] = {"bot": name, "paired": paired, "problem": self.problem,
                                 "target": setting("phone_target") or "ar",
                                 "mode": setting("phone_mode") or "burn",
-                                "dialect": setting("phone_dialect") or "saudi"}
+                                "dialect": setting("phone_dialect") or "saudi",
+                                "large": large.ready()}
         if name and not paired and link:
             address = f"https://t.me/{name}?start={self.pairing.fresh()}"
             view.update(link=address, qr=qr_image(address))

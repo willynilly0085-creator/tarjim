@@ -53,6 +53,16 @@ def probe(video: Path) -> VideoInfo:
     return VideoInfo(int(stream.get("width", 0)), int(stream.get("height", 0)), duration)
 
 
+def video_kbps(video: Path) -> int:
+    """How many kilobits a second the picture takes in this file; 0 when the file does not say."""
+    out = run([tool("ffprobe"), "-v", "error", "-select_streams", "v:0", "-show_entries",
+               "stream=bit_rate:format=bit_rate", "-of", "json", str(video)])
+    data = json.loads(out.stdout or "{}")
+    stated = [(data.get("streams") or [{}])[0].get("bit_rate"), data.get("format", {}).get(
+        "bit_rate")]
+    return next((int(rate) // 1000 for rate in stated if str(rate or "").isdigit()), 0)
+
+
 def extract_audio(video: Path, target: Path) -> Path:
     done = run([tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", "-i", str(video),
                 "-vn", "-ac", "1", "-ar", str(SAMPLE_RATE), str(target)])

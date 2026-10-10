@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.13 (2026-10-09)
+
+- **Large videos through the phone bot, up to 2 GB.** Telegram lets a bot take only 20 MB and
+  return 50 MB. With an app id and hash that you create once for free at my.telegram.org and save
+  in tarjim's phone settings, the bot takes videos up to 2 GB and returns the result whole, with
+  no smaller phone copy. Tried on a real 48 MB video: taken, subtitled and returned.
+- While a large video downloads or uploads, the bot's message shows a bar and the megabytes so far.
+- A video over 20 MB with large videos off is answered with how to turn them on, not "send a
+  link instead".
+- **A burned video is no longer two to three times the size of its source.** The result may now
+  spend 15% more than the source did and no more. Measured on the same clip: 127 MB before,
+  52 MB now, from a 48 MB source, and the two results look the same (SSIM 0.989).
+- The app hash and the bot's sign-in are kept in the system vault like the keys; no chat tool
+  can read or set them.
+
 ## 1.0.12 (2026-10-09)
 
 - An assistant in chat (Claude, Claude Code, Codex) can now change every setting the page can:

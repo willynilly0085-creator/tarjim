@@ -42,6 +42,7 @@ POST_ROUTES = table([
     (r"^/connections/assistant$", "link_assistant"), (r"^/phone/connect$", "phone_connect"),
     (r"^/phone/link$", "phone_link"), (r"^/phone/forget$", "phone_forget"),
     (r"^/phone/choices$", "phone_choices"), (r"^/update/apply$", "update_apply"),
+    (r"^/phone/large$", "phone_large"),
     (r"^/voices/eleven$", "voices_eleven"), (r"^/voices/speech$", "voices_speech")])
 OPEN = [re.compile(p) for p in (r"^/$", r"^/web/", r"^/ping$", r"^/languages$", r"^/pair$",
                                   rf"^/pair/{PAIR}$", r"^/ui-language$")]

@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from tarjim.config import save, setting
+from tarjim.phone import large
 from tarjim.phone.choice import MODES, Waiting, choices_keyboard, modes_keyboard
 from tarjim.phone.links import first_link
 from tarjim.phone.progress import Follower
@@ -85,7 +86,7 @@ class Inbox:
         if link:
             self.ask(bot, chat, {"source": link, "name": ""})
         elif str(video.get("mime_type", "")).startswith("video/"):
-            self.ask_file(bot, chat, video)
+            self.ask_file(bot, chat, {**video, "message": int(message.get("message_id") or 0)})
         else:
             bot.say(chat, say("phone_help"))
 
@@ -93,18 +94,26 @@ class Inbox:
         bot.say(chat, say("phone_choose"), reply_markup=choices_keyboard(self.waiting.keep(item)))
 
     def ask_file(self, bot: Bot, chat: int, video: dict[str, Any]) -> None:
-        if int(video.get("file_size") or 0) > FETCH_LIMIT:
-            bot.say(chat, say("phone_file_big"))
+        size = int(video.get("file_size") or 0)
+        big = size > FETCH_LIMIT
+        if big and (not large.ready() or size > large.LIMIT):
+            bot.say(chat, say("phone_file_huge" if large.ready() else "phone_file_big"))
             return
         name = SAFE.sub("_", str(video.get("file_name") or "telegram-video.mp4"))[-80:]
-        self.ask(bot, chat, {"file_id": str(video["file_id"]), "name": name})
+        self.ask(bot, chat, {"file_id": str(video["file_id"]), "name": name, "chat": chat,
+                             "message": video["message"] if big else 0})
 
     def fetched(self, bot: Bot, item: dict[str, Any]) -> str:
         if "file_id" not in item:
             return str(item["source"])
         folder = self.uploads / f"telegram-{secrets.token_hex(6)}"
         folder.mkdir(parents=True, exist_ok=True)
-        bot.fetch(item["file_id"], folder / item["name"])
+        if item.get("message"):
+            large.fetch(item["chat"], item["message"], folder / item["name"],
+                        lambda done, total: bot.edit(item["chat"], item["status"], large.shown(
+                            say("stage_downloading"), done, total)))
+        else:
+            bot.fetch(item["file_id"], folder / item["name"])
         return str(folder / item["name"])
 
     def start_choice(self, bot: Bot, chat: int, message: int, choice: str) -> None:
@@ -115,6 +124,7 @@ class Inbox:
             return
         save("phone_mode", mode)
         if "file_id" in item:
+            item["status"] = message
             bot.edit(chat, message, say("stage_downloading"))
         try:
             source = self.fetched(bot, item)
