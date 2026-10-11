@@ -4,7 +4,7 @@ from typing import Any
 
 from tarjim.config import save, setting
 from tarjim.engines.catalog import API, BY_ID, LOCAL, SUBSCRIPTION, Provider, of_method
-from tarjim.engines.choice import LISTENERS, chosen, has_key
+from tarjim.engines.choice import LISTENERS, chosen, has_key, usable
 
 MODEL_NAME = re.compile(r"^[\w.:/@+\[\]-]{1,120}$")
 ADDRESS = re.compile(r"^https?://[\w.-]+(:\d{1,5})?(/[\w./-]*)?$")
@@ -64,7 +64,7 @@ def overview() -> dict[str, Any]:
     signed = {a["id"]: a["signed_in"] for a in section("subscriptions")["apps"]}
     subscriptions = [{**subscription_view(p), "signed_in": signed.get(p.id, False)}
                      for p in of_method(SUBSCRIPTION)]
-    return {"api": [api_view(p) for p in of_method(API)], "listening": listening_overview(),
+    return {"api": [api_view(p) for p in of_method(API)], "listening": listening_overview(signed),
             "subscription": subscriptions,
             "local": local_view(),
             "chosen": {"listen": chosen("listen"), "translate": chosen("translate")}}
@@ -98,7 +98,7 @@ def listener_for(provider: str) -> str:
 
 def acceptable(provider: str, listen: str, model: str) -> bool:
     known = provider == LOCAL or provider in BY_ID
-    hears = listen in LISTENERS and (listen == LOCAL or has_key(listen))
+    hears = listen in LISTENERS and usable(listen, "listen")
     return known and hears and (not model or bool(MODEL_NAME.match(model)))
 
 

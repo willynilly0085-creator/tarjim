@@ -82,6 +82,10 @@ def cloud_listener(provider: str) -> Callable[[bytes], Heard]:
     from tarjim.listen.gemini_listen import listen
     from tarjim.listen.merge import listen_many
 
+    if provider == "antigravity":  # the Gemini subscription hears through its own program
+        from tarjim.engines.antigravity import AntigravityAsker
+
+        return lambda sound: listen_many(lambda: listen(sound, AntigravityAsker()))
     return lambda sound: listen_many(lambda: listen(sound))
 
 

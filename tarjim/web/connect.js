@@ -119,7 +119,7 @@ async function detail() {
 }
 
 function listenLabel(way) {
-  if (way.id !== "local") return way.ready ? way.name : `${way.name} · ${t("needsKey")}`;
+  if (way.id !== "local") return way.ready ? way.name : `${way.name} · ${t(way.sign_in ? "needsSignIn" : "needsKey")}`;
   return way.ready ? t("listenLocalName") : `${t("listenLocalName")} · ${t("needsDownload", { gb: way.download_gb })}`;
 }
 

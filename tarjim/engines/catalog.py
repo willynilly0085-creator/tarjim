@@ -70,7 +70,7 @@ PROVIDERS = (
     Provider("copilot", "GitHub Copilot", SUBSCRIPTION, program="copilot", login=("copilot",),
              install="npm install -g @github/copilot",
              models=("gpt-5.4", "claude-haiku-4.5", "gpt-5.3-codex")),
-    Provider("antigravity", "Gemini (Google Antigravity)", SUBSCRIPTION, program="agy",
+    Provider("antigravity", "Gemini (Google Antigravity)", SUBSCRIPTION, hears=True, program="agy",
              login=("agy",), install="https://antigravity.google/docs/cli"),
 )
 BY_ID = {provider.id: provider for provider in PROVIDERS}

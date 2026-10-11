@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Protocol
 
 from tarjim.gemini_client import GeminiClient
 
@@ -22,6 +22,10 @@ SCHEMA = {"type": "object", "properties": {
     "required": ["language", "utterances"]}
 
 
+class Hearer(Protocol):
+    def ask(self, prompt: str, audio: bytes | None, schema: dict[str, Any]) -> Any: ...
+
+
 @dataclass(frozen=True)
 class Utterance:
     start: float
@@ -30,7 +34,7 @@ class Utterance:
     text: str
 
 
-def listen(audio: bytes, client: GeminiClient | None = None) -> tuple[str, list[Utterance]]:
+def listen(audio: bytes, client: Hearer | None = None) -> tuple[str, list[Utterance]]:
     answer = (client or GeminiClient()).ask(PROMPT, audio, SCHEMA)
     if not isinstance(answer, dict):
         raise RuntimeError("listening returned nothing readable")

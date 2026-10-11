@@ -49,6 +49,7 @@ export function listenOptions(scan) {
   const gemini = option("gemini", saved.includes("gemini") ? "Google Gemini" : `Google Gemini · ${t("freeKey")}`,
     t("reason_gemini_listen"), { provider: "gemini", ready: saved.includes("gemini") });
   const openai = saved.includes("openai") ? [option("openai", "OpenAI", t("reason_key"), { provider: "openai", ready: true })] : [];
-  const cloudFirst = !strong;
-  return cloudFirst ? [gemini, local, ...openai] : [local, gemini, ...openai];
+  const plan = scan.subscriptions.apps.filter((a) => a.id === "antigravity" && a.signed_in).map((a) =>
+    option("antigravity", a.name, t("reason_gemini_listen"), { provider: "antigravity", ready: true }));
+  return strong ? [local, ...plan, gemini, ...openai] : [...plan, gemini, local, ...openai];
 }

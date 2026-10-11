@@ -9,10 +9,16 @@ file first and takes four times as long (38 s against 9 s for six lines). `agy m
 sign-in state and the models this account can use, each as an id, a tab and a name. The lightest
 model is suggested: the "high" one took 43 s for two lines. Its flags follow `agy --help` of
 version 1.3.2.
+
+It also listens: shown an audio file in that folder, the model hears it through the program's
+file viewer, with no terminal command (measured: six minutes of English and Arabic speech heard to
+the last second in 48 s). Grok Build, Codex and Claude Code were given the same file and cannot.
 """
 import json
 import subprocess
 import tempfile
+from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
 from tarjim.config import setting
@@ -23,20 +29,42 @@ PLAIN = ("--sandbox", "--disable-slash-commands")
 LIGHTEST = ("flash", "-low")
 LIST_SECONDS = 40
 SIGN_IN = "sign in"
+SOUND = "sound.mp3"
+HEAR = (f"The audio to work on is the file {SOUND} in the current folder. Open it with your file "
+        "viewer and listen to it; do not run any terminal command, script or program.\n\n")
 NOT_SIGNED_IN = "not logged in: open Antigravity and sign in with your Google account"
 
 
 class AntigravityAsker:
     hears = False
 
-    def ask(self, prompt: str, _audio: bytes | None, schema: dict[str, Any]) -> Any:
-        model = setting("antigravity_model")
+    def ask(self, prompt: str, audio: bytes | None, schema: dict[str, Any]) -> Any:
+        """With audio, the program is shown the sound as a file: Gemini hears what it opens.
+        Hearing uses the lightest model (measured on 94 s of speech: 16 s, against 446 s for the
+        program's default) and is tried again once, since the service sometimes answers 503."""
+        if not audio:
+            return self.once(prompt, None, schema, setting("antigravity_model"))
+        try:
+            return self.once(HEAR + prompt, audio, schema, hearing_model())
+        except EngineError as error:
+            if NOT_SIGNED_IN in str(error):
+                raise
+            return self.once(HEAR + prompt, audio, schema, hearing_model())
+
+    def once(self, prompt: str, audio: bytes | None, schema: dict[str, Any], model: str) -> Any:
         command = [*launcher("agy"), "--print", prompt, "--output-format", "json",
                    "--json-schema", json.dumps(strict(wrap(schema))), *PLAIN,
                    *(["--model", model] if model else [])]
         with tempfile.TemporaryDirectory() as folder:
+            if audio:
+                (Path(folder) / SOUND).write_bytes(audio)
             done = run(command, "", folder)
         return unwrap(answer_of(done.returncode, done.stdout, done.stderr))
+
+
+@lru_cache(maxsize=1)
+def hearing_model() -> str:
+    return suggested(rows(listing())) or setting("antigravity_model")
 
 
 def answer_of(code: int, printed: str, complaint: str) -> Any:

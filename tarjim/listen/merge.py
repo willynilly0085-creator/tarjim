@@ -7,6 +7,7 @@ from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.vote import AGREE, vote
 
 PASSES = 3
+CLOSE = 0.9
 
 Listen = Callable[[], tuple[str, list[Utterance]]]
 
@@ -29,4 +30,18 @@ def listen_many(listen: Listen, passes: int = PASSES) -> Heard:
         raise RuntimeError("every listening pass failed")
     results.sort(key=lambda r: len(r[1]), reverse=True)
     runs = [utterances for _, utterances in results]
-    return Heard(results[0][0], vote(runs, min(AGREE, len(runs))), runs)
+    return Heard(results[0][0], settled(vote(runs, min(AGREE, len(runs))), runs), runs)
+
+
+def spoken(run: list[Utterance]) -> int:
+    return sum(len(u.text.split()) for u in run)
+
+
+def settled(voted: list[Utterance], runs: list[list[Utterance]]) -> list[Utterance]:
+    """Passes that hear the same words but place them seconds apart lose whole lines in the vote
+    (measured with a Gemini subscription: three passes of 147 to 154 words voted down to 96).
+    When the passes agree on how much was said and the vote kept clearly less, the fullest pass
+    stands; the words are timed afterwards on this computer either way."""
+    counts = sorted(spoken(run) for run in runs)
+    agreed = len(runs) > 1 and counts[0] >= CLOSE * counts[-1]
+    return max(runs, key=spoken) if agreed and spoken(voted) < CLOSE * counts[-1] else voted

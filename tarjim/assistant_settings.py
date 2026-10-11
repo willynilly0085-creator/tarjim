@@ -25,8 +25,9 @@ def change_settings(interface_language: str = "", listening_engine: str = "",
                     start_with_computer: str = "", automatic_updates: str = "") -> Any:
     """Change general settings. Leave a field empty to keep it.
 
-    interface_language: a code from get_settings' ui_languages. listening_engine: gemini,
-    openai or local. start_with_computer and automatic_updates: "yes" or "no".
+    interface_language: a code from get_settings' ui_languages. listening_engine: gemini or
+    openai (keys), antigravity (a signed-in Gemini subscription) or local.
+    start_with_computer and automatic_updates: "yes" or "no".
     To change the translation engine or its model, use use_connection.
     """
     wanted: dict[str, Any] = {"ui_language": interface_language,

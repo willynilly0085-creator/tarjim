@@ -4,7 +4,7 @@ from tarjim.config import setting
 from tarjim.engines.catalog import API, BY_ID, PROVIDERS, SUBSCRIPTION, compatible
 
 LOCAL = "local"
-LISTENERS = ("gemini", "openai", LOCAL)
+LISTENERS = ("gemini", "openai", "antigravity", LOCAL)
 TRANSLATORS = (*(p.id for p in PROVIDERS), LOCAL)
 SUBSCRIPTIONS = tuple(p.id for p in PROVIDERS if p.method == SUBSCRIPTION)
 
@@ -40,7 +40,7 @@ def subscribed(provider: str) -> bool:
 
 def usable(provider: str, role: str) -> bool:
     if provider in SUBSCRIPTIONS:
-        return role == "translate" and subscribed(provider)
+        return subscribed(provider) and (role == "translate" or provider in LISTENERS)
     if provider == LOCAL:
         return role == "listen" or local_translation_ready()
     return has_key(provider) and (role == "translate" or provider in LISTENERS)

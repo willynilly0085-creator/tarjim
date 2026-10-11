@@ -65,6 +65,8 @@ def listen_choice(scan: Plan, translate: Plan) -> Plan:
     if scan["device"]["vram_gb"] >= LOCAL_VRAM:
         ready = scan["tools"]["installed"]["accuracy"]
         return {"provider": "local", "reason": "gpu", "ready": ready}
+    if any(a["id"] == "antigravity" and a["signed_in"] for a in scan["subscriptions"]["apps"]):
+        return {"provider": "antigravity", "reason": "signed_in", "ready": True}
     reason = "small_gpu" if scan["device"]["gpu"] else "no_gpu"
     return {"provider": "gemini", "reason": reason, "ready": False}
 

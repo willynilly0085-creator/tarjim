@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.16 (2026-10-11)
+
+- **A Gemini subscription can now listen.** If you are signed in to Google's Antigravity, pick
+  "Gemini (Google Antigravity)" under listening: your plan hears the speech, with no API key and
+  without downloading the listening model (about 6 GB) or needing a graphics card. The timing of
+  every word is still worked out on your computer. The audio of each clip is sent to Google, as
+  with a Gemini key. On a computer without a strong graphics card, setup now suggests it when you
+  are signed in.
+- Measured before release: six minutes of English and Arabic speech heard to the last second in
+  48 seconds; a 94-second clip with seven speakers through tarjim's full listening path (three
+  passes and the vote) in 16 to 95 seconds depending on how busy Google's service was.
+- Claude, ChatGPT (Codex) and Grok subscriptions were tested with the same audio file and cannot
+  take audio, so they stay translation only.
+- When listening passes agree on the words but place them seconds apart, the vote no longer drops
+  whole lines: the fullest pass is kept. This applies to every cloud listener.
+
 ## 1.0.15 (2026-10-10)
 
 Security fixes from a full read of the code against tarjim's threat model. Update when you can.
