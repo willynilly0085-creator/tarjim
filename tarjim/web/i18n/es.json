@@ -269,7 +269,7 @@
   "getKeyFree": "Conseguir la clave",
   "progressTitle": "Preparando todo",
   "progressHint": "Puedes cerrar esta página; las descargas siguen.",
-  "progressFailed": "Una descarga se detuvo. Revisa tu conexión a internet e inténtalo de nuevo.",
+  "progressFailed": "Una descarga se detuvo. El motivo está abajo. Inténtelo de nuevo: continúa donde se quedó.",
   "toolReady": "Lista",
   "toolFailed": "Detenida",
   "readyTitle": "tarjim está listo",

@@ -269,7 +269,7 @@
   "getKeyFree": "Dapatkan kuncinya",
   "progressTitle": "Menyiapkan semuanya",
   "progressHint": "Kamu bisa menutup halaman ini; unduhan tetap berjalan.",
-  "progressFailed": "Sebuah unduhan berhenti. Periksa internetmu lalu coba lagi.",
+  "progressFailed": "Sebuah unduhan berhenti. Alasannya ada di bawah. Coba lagi: unduhan lanjut dari tempat berhentinya.",
   "toolReady": "Siap",
   "toolFailed": "Berhenti",
   "readyTitle": "tarjim sudah siap",

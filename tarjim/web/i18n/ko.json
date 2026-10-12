@@ -269,7 +269,7 @@
   "getKeyFree": "키 받기",
   "progressTitle": "모든 것을 준비하는 중",
   "progressHint": "이 페이지를 닫아도 다운로드는 계속돼요.",
-  "progressFailed": "다운로드가 멈췄어요. 인터넷 연결을 확인하고 다시 시도하세요.",
+  "progressFailed": "다운로드가 멈췄습니다. 이유는 아래에 있습니다. 다시 시도하면 멈춘 곳부터 이어집니다.",
   "toolReady": "준비됨",
   "toolFailed": "멈춤",
   "readyTitle": "tarjim 준비가 끝났어요",

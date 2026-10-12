@@ -269,7 +269,7 @@
   "getKeyFree": "Anahtarı al",
   "progressTitle": "Her şey hazırlanıyor",
   "progressHint": "Bu sayfayı kapatabilirsin, indirmeler devam eder.",
-  "progressFailed": "Bir indirme durdu. İnternet bağlantını kontrol edip tekrar dene.",
+  "progressFailed": "Bir indirme durdu. Nedeni aşağıda. Yeniden deneyin: kaldığı yerden devam eder.",
   "toolReady": "Hazır",
   "toolFailed": "Durdu",
   "readyTitle": "tarjim hazır",

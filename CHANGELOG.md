@@ -6,6 +6,10 @@
   kept looking for Claude Code, Codex, Node.js and the others on the PATH it was started with, so
   a program installed afterwards was reported as missing until the computer restarted. It now
   also reads the computer's current PATH from Windows on every look, and npm's own folder.
+- **A download that stops in setup now says why.** The screen showed only "stopped, check the
+  internet"; it now shows the downloader's own error for each part (no connection, time-out,
+  disk full). A dropped download is also tried again by itself up to four times before it is
+  reported, and it continues where it stopped.
 - Shown on this computer: started with a PATH that had none of them, the old lookup found
   nothing and the new one found Claude Code, Codex, Grok and npm. Not tested on another computer.
 

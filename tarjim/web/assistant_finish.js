@@ -12,6 +12,11 @@ function toolRow(tool) {
     el("span", { className: "check-value", textContent: `${label} · ${tool.size_gb} GB` }));
 }
 
+// Why a download stopped, in the downloader's own words: never a failure without its reason.
+function reason(tool) {
+  return el("p", { className: "job-error", dir: "auto", textContent: `${t(`tool_${tool.id}`)}: ${tool.detail}` });
+}
+
 export async function progressScreen(screen, started, onDone) {
   const ids = Object.keys(started || {});
   if (!ids.length) return onDone();
@@ -25,7 +30,7 @@ export async function progressScreen(screen, started, onDone) {
     const failed = tools.filter((tool) => tool.state === "failed" && !tool.installed);
     if (failed.length && tools.every((tool) => tool.installed || tool.state !== "downloading")) {
       note.textContent = t("progressFailed");
-      note.after(button(t("tryAgain"), async () => {
+      note.after(...failed.filter((tool) => tool.detail).map(reason), button(t("tryAgain"), async () => {
         await Promise.all(failed.map((tool) => post(`/tools/${tool.id}`, {}).catch(() => null)));
         progressScreen(screen, started, onDone);
       }, "primary"));

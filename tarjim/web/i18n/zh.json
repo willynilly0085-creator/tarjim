@@ -269,7 +269,7 @@
   "getKeyFree": "获取密钥",
   "progressTitle": "正在准备一切",
   "progressHint": "你可以关闭此页面，下载会继续进行。",
-  "progressFailed": "有一项下载中断了。请检查网络后重试。",
+  "progressFailed": "有一项下载停了，原因写在下面。再试一次：会从停下的地方继续。",
   "toolReady": "就绪",
   "toolFailed": "已中断",
   "readyTitle": "tarjim 已准备就绪",

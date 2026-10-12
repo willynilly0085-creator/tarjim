@@ -269,7 +269,7 @@
   "getKeyFree": "Get the key",
   "progressTitle": "Getting everything ready",
   "progressHint": "You can close this page; the downloads keep going.",
-  "progressFailed": "A download stopped. Check your internet and try again.",
+  "progressFailed": "A download stopped. The reason is below. Try again: it continues where it stopped.",
   "toolReady": "Ready",
   "toolFailed": "Stopped",
   "readyTitle": "tarjim is ready",

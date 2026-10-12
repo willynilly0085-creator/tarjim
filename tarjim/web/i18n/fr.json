@@ -269,7 +269,7 @@
   "getKeyFree": "Obtenir la clé",
   "progressTitle": "Préparation en cours",
   "progressHint": "Vous pouvez fermer cette page ; les téléchargements continuent.",
-  "progressFailed": "Un téléchargement s'est arrêté. Vérifiez votre connexion internet et réessayez.",
+  "progressFailed": "Un téléchargement s'est arrêté. La raison est indiquée ci-dessous. Réessayez : il reprend là où il s'est arrêté.",
   "toolReady": "Prêt",
   "toolFailed": "Arrêté",
   "readyTitle": "tarjim est prêt",

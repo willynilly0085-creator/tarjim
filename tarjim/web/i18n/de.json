@@ -269,7 +269,7 @@
   "getKeyFree": "Schlüssel holen",
   "progressTitle": "Alles wird vorbereitet",
   "progressHint": "Du kannst diese Seite schließen, die Downloads laufen weiter.",
-  "progressFailed": "Ein Download wurde unterbrochen. Prüfe deine Internetverbindung und versuche es erneut.",
+  "progressFailed": "Ein Download wurde unterbrochen. Der Grund steht unten. Versuchen Sie es erneut: Er wird dort fortgesetzt, wo er aufgehört hat.",
   "toolReady": "Bereit",
   "toolFailed": "Unterbrochen",
   "readyTitle": "tarjim ist bereit",

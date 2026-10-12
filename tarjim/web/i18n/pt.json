@@ -269,7 +269,7 @@
   "getKeyFree": "Pegar a chave",
   "progressTitle": "Preparando tudo",
   "progressHint": "Você pode fechar esta página; os downloads continuam.",
-  "progressFailed": "Um download parou. Confira sua internet e tente de novo.",
+  "progressFailed": "Um download parou. O motivo está abaixo. Tente de novo: ele continua de onde parou.",
   "toolReady": "Pronta",
   "toolFailed": "Parada",
   "readyTitle": "O tarjim está pronto",

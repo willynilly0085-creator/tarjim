@@ -269,7 +269,7 @@
   "getKeyFree": "キーを取得",
   "progressTitle": "準備を進めています",
   "progressHint": "このページを閉じても、ダウンロードは続きます。",
-  "progressFailed": "ダウンロードが止まりました。インターネット接続を確認して、もう一度お試しください。",
+  "progressFailed": "ダウンロードが止まりました。理由は下にあります。もう一度試すと、止まったところから続きます。",
   "toolReady": "準備完了",
   "toolFailed": "停止",
   "readyTitle": "tarjim の準備ができました",
