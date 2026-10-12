@@ -15,6 +15,8 @@ PLACES = (("HKEY_CURRENT_USER", "Environment"),
 
 
 def stored(root: str, key: str) -> str:
+    if sys.platform != "win32":
+        return ""
     import winreg
 
     try:

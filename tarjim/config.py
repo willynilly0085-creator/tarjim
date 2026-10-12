@@ -115,7 +115,11 @@ def prepare_environment() -> None:
     lock_secrets()
     for name in ("HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE", "HF_HUB_DISABLE_TELEMETRY"):
         os.environ.setdefault(name, "1")
-    models = setting("models")
+    from tarjim.model_home import fallback
+
+    models = setting("models") or fallback(setting("models"), HOME / "models")
+    if models and not setting("models"):
+        save("models", models)
     if models:
         os.environ.setdefault("HF_HOME", models)
         os.environ.setdefault("TORCH_HOME", str(Path(models) / "torch"))

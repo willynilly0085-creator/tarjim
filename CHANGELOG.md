@@ -10,6 +10,10 @@
   internet"; it now shows the downloader's own error for each part (no connection, time-out,
   disk full). A dropped download is also tried again by itself up to four times before it is
   reported, and it continues where it stopped.
+- **Downloads no longer fail with "Access is denied" on the model folder.** On a computer where
+  the shared model folder (`.cache\huggingface` in the user folder) cannot be written, which is
+  what stopped a new person's setup, tarjim now keeps its models in its own folder
+  (`.tarjim\models`) and remembers it. Where the shared folder works nothing changes.
 - Shown on this computer: started with a PATH that had none of them, the old lookup found
   nothing and the new one found Claude Code, Codex, Grok and npm. Not tested on another computer.
 
