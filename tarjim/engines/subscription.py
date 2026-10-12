@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from tarjim.config import save, setting
+from tarjim.engines import own_node
 from tarjim.engines.catalog import BY_ID, SUBSCRIPTION, of_method
 from tarjim.engines.web import EngineError, parse_json, unwrap, wrap
 
@@ -25,10 +26,10 @@ OWN_FOLDERS = (Path(".local") / "bin", Path(".grok") / "bin",
 
 
 def own_folder(name: str) -> str | None:
-    """Where vendors' own installers put their program when it is not on PATH yet."""
+    """Where vendors' own installers, or tarjim's own Node.js, put a program not on PATH yet."""
     places = [Path.home() / folder / file for folder in OWN_FOLDERS
               for file in (f"{name}.exe", name)]
-    return next((str(p) for p in places if p.is_file()), None)
+    return next((str(p) for p in places if p.is_file()), None) or own_node.shim(name)
 
 
 def launcher(name: str) -> list[str]:
@@ -41,7 +42,7 @@ def launcher(name: str) -> list[str]:
     target = Path(found).parent / targets[-1]
     if target.suffix.lower() != ".js":
         return [str(target)]
-    node = shutil.which("node")
+    node = shutil.which("node") or own_node.node()
     return [node, str(target)] if node else []
 
 

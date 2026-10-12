@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.0.18 (2026-10-12)
+
+- **Choose any subscription in setup, installed or not.** The setup plan now lists every
+  subscription (Gemini through Antigravity, Claude, ChatGPT, Grok, Copilot). When the program of
+  the one you choose is not on the computer, the same screen installs it and then signs you in;
+  nothing is typed in a terminal. Before, a subscription whose program was missing was not
+  offered at all, so a person with nothing installed saw only the key choices.
+- ChatGPT and Copilot no longer send you to install Node.js: on Windows tarjim downloads the
+  official portable Node.js (about 38 MB) into its own folder and installs the program beside
+  it. Nothing else on the computer changes.
+- A failed install now shows what the installer itself said, and can be tried again. An installer
+  that ends without leaving its program behind counts as failed instead of waiting ten minutes.
+- When both a program and a key are still needed, both are shown, not only the key.
+- Tested on Windows 11 as a person with no AI program and no Node.js, from the setup screen:
+  Gemini (Antigravity), Claude, Grok and ChatGPT were each installed and found. Sign-in was then
+  offered for Claude and Grok; for Gemini and ChatGPT it could not be tested here, because the
+  test shared this computer's saved sign-in. Copilot, Windows 10, macOS and Linux were not tested.
+
 ## 1.0.17 (2026-10-12)
 
 - **Install with one file.** Download tarjim from GitHub, unzip it and double-click `install`:

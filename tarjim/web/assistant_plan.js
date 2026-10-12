@@ -1,9 +1,9 @@
-import { post } from "./api.js";
+import { api, post } from "./api.js";
+import { connectBody } from "./assistant_ai.js";
 import { t } from "./i18n.js";
 import { keyNeed } from "./assistant_key.js";
 import { listenOptions, translateOptions } from "./assistant_options.js";
 import { fillModels, modelOptions } from "./models.js";
-import { signInPanel } from "./signin.js";
 import { button, el, status } from "./ui.js";
 import { loadVoices, voicePanel } from "./voices.js";
 
@@ -80,14 +80,20 @@ function needsKey(state) {
   return [plan.translate, plan.listen].some((c) => ["gemini", "openai"].includes(c.provider) && !c.ready);
 }
 
-// A subscription that is installed but signed out is still a choice: signing in happens right here.
+// A subscription that is not ready is still a choice: its program is installed and signed in here.
 function signInNeed(state, repaint) {
   const app = state.scan.subscriptions.apps.find((a) => a.id === state.plan.translate.provider);
   if (!app || app.signed_in) return "";
-  const signed = () => { app.signed_in = true; state.plan.translate.ready = true; repaint(); };
+  const sub = state.view.subscription.find((s) => s.id === app.id) || { id: app.id, name: app.name, install: "" };
+  const ready = async () => {
+    Object.assign(app, { installed: true, signed_in: true });
+    state.plan.translate.ready = true;
+    state.view = await api("/connections").catch(() => state.view);
+    repaint();
+  };
   return el("div", { className: "plan-row need" },
     el("p", { className: "field-label", textContent: t("needTitle") }),
-    el("p", { textContent: t("needSignIn", { name: app.name }) }), signInPanel(app, signed));
+    el("p", { textContent: t(app.installed ? "needSignIn" : "needInstall", { name: app.name }) }), connectBody(app, sub, ready, repaint));
 }
 
 export function planScreen(screen, state, { back, apply, manual }) {
@@ -101,8 +107,8 @@ export function planScreen(screen, state, { back, apply, manual }) {
     else { note.textContent = t("planApplyFailed"); start.disabled = false; }
   }, "primary");
   const paint = () => {
-    const keyPart = needsKey(state) ? keyNeed(state, paint) : signInNeed(state, paint);
-    start.disabled = Boolean(keyPart);
+    const needs = [signInNeed(state, paint), needsKey(state) ? keyNeed(state, paint) : ""].filter(Boolean);
+    start.disabled = needs.length > 0;
     screen(el("h1", { tabIndex: -1, textContent: t("planTitle") }),
       el("p", { className: "lede", textContent: t("planHint") }),
       choiceRow(t("planTranslate"), translateOptions(state.scan), state.plan.translate.value || "",
@@ -112,7 +118,7 @@ export function planScreen(screen, state, { back, apply, manual }) {
         (o) => { state.plan.listen = o.choice; paint(); }),
       el("div", { className: "plan-row" }, el("p", { className: "field-label", textContent: t("voiceTitle") }),
         voicePanel(paint)),
-      downloadPart(state), handPart(state), keyPart,
+      downloadPart(state), handPart(state), ...needs,
       el("nav", { className: "step-nav" }, button(t("back"), back), start), note);
   };
   state.plan.translate.value = translateOptions(state.scan).find((o) => o.matches(state.plan.translate))?.value;

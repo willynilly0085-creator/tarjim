@@ -17,10 +17,13 @@ function option(value, label, why, choice, disabled = false) {
     matches: (c) => c.provider === choice.provider && (c.server || "") === (choice.server || "") };
 }
 
+// Every subscription is a choice, ready or not: what it still needs is done on the plan screen.
 function subscriptions(scan) {
-  return scan.subscriptions.apps.filter((a) => a.installed).map((a) => option(`sub:${a.id}`,
-    a.signed_in ? a.name : `${a.name} · ${t("needsSignIn")}`, t(a.signed_in ? "reason_signed_in" : "reason_sign_in_first"),
-    { provider: a.id, ready: a.signed_in }));
+  const state = (a) => (a.signed_in ? "signed_in" : a.installed ? "sign_in_first" : "install_first");
+  const tag = { signed_in: "", sign_in_first: "needsSignIn", install_first: "needsInstall" };
+  const rank = { signed_in: 0, sign_in_first: 1, install_first: 2 };
+  return [...scan.subscriptions.apps].sort((a, b) => rank[state(a)] - rank[state(b)]).map((a) => option(`sub:${a.id}`,
+    tag[state(a)] ? `${a.name} · ${t(tag[state(a)])}` : a.name, t(`reason_${state(a)}`), { provider: a.id, ready: a.signed_in }));
 }
 
 function locals(scan) {

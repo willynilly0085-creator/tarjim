@@ -104,5 +104,6 @@ def test_a_running_job_can_be_stopped_between_dubbing_steps() -> None:
 
 def test_grok_can_be_installed_without_node(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(app_install, "npm", lambda: "")
+    monkeypatch.setattr(app_install.own_node, "AVAILABLE", False)
     assert connections.subscription_view(BY_ID["grok"])["can_install"] is True
     assert connections.subscription_view(BY_ID["codex"])["can_install"] is False

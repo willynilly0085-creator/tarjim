@@ -32,6 +32,7 @@ def test_a_subscription_program_is_installed_hidden_only_when_node_is_there(
     monkeypatch.setattr(app_install.subprocess, "Popen", Process)
     app_install.running.clear()
     monkeypatch.setattr(app_install, "npm", lambda: "")
+    monkeypatch.setattr(app_install.own_node, "AVAILABLE", False)
     assert app_install.start("codex") == "no_node" and started == []
     assert app_install.start("claude") == "started" and started[0] == app_install.NATIVE["claude"]
     app_install.running.clear()

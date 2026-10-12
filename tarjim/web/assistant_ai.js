@@ -6,32 +6,57 @@ import { button, el, status, wait } from "./ui.js";
 const INSTALL_POLL_MS = 4000;
 const INSTALL_ROUNDS = 150;
 
-async function install(sub, body, done) {
-  body.replaceChildren(status(t("aiInstalling")));
-  const reply = await post("/connections/install-app", { provider: sub.id }).catch(() => null);
-  if (!reply) return body.replaceChildren(status(t("aiInstallFailed"), "error"));
-  for (let round = 0; round < INSTALL_ROUNDS; round += 1) {
-    await wait(INSTALL_POLL_MS);
-    const now = (await api("/connections").catch(() => null))?.subscription.find((s) => s.id === sub.id);
-    if (now?.install_failed) return body.replaceChildren(status(t("aiInstallFailed"), "error"));
-    if (now?.ready) return body.replaceChildren(signInPanel(now, done));
-  }
-  return body.replaceChildren(status(t("aiInstallFailed"), "error"));
+// A failed install shows what the installer itself said, and can be tried again.
+function failure(row, detail) {
+  row.sub.installing = false;
+  row.body.replaceChildren(status(t("aiInstallFailed"), "error"),
+    detail ? el("p", { className: "job-error", dir: "ltr", textContent: detail }) : "",
+    button(t("aiInstall"), () => install(row)));
 }
 
-function action(app, sub, body, done) {
-  if (app.signed_in) return [button(t("aiUse"), done, "primary compact")];
-  if (app.installed) return [signInPanel(sub, done)];
-  if (sub.can_install) return [button(t("aiInstall"), () => install(sub, body, done))];
+async function follow(row) {
+  for (let round = 0; round < INSTALL_ROUNDS && row.body.isConnected; round += 1) {
+    await wait(INSTALL_POLL_MS);
+    const now = (await api("/connections").catch(() => null))?.subscription.find((s) => s.id === row.sub.id);
+    if (now?.install_failed) return failure(row, now.install_detail);
+    if (now?.ready) {
+      Object.assign(row.sub, now);
+      row.app.installed = true;
+      return row.installed();
+    }
+  }
+  return row.body.isConnected ? failure(row, "") : null;
+}
+
+async function install(row) {
+  row.sub.installing = true;
+  row.body.replaceChildren(status(t("aiInstalling")));
+  const reply = await post("/connections/install-app", { provider: row.sub.id }).catch(() => null);
+  return reply ? follow(row) : failure(row, "");
+}
+
+function action(row) {
+  const { app, sub } = row;
+  if (app.signed_in) return [button(t("aiUse"), row.done, "primary compact")];
+  if (app.installed || sub.ready) return [signInPanel(sub, row.done)];
+  if (sub.installing) { follow(row); return [status(t("aiInstalling"))]; }
+  if (sub.can_install) return [button(t("aiInstall"), () => install(row))];
   const site = sub.install.startsWith("http");
   return [status(t(site ? "aiFromSite" : "aiNeedsNode")), el("a", { className: "text-link", href: site ? sub.install : "https://nodejs.org/",
     target: "_blank", rel: "noopener noreferrer", textContent: t(site ? "aiOpenSite" : "aiGetNode") })];
 }
 
+// Whatever this subscription still needs, in one place: install its program, then sign in.
+export function connectBody(app, sub, done, installed) {
+  const row = { app, sub, done, body: el("div", { className: "ai-body" }) };
+  row.installed = installed || (() => row.body.replaceChildren(signInPanel(sub, done)));
+  row.body.append(...action(row).filter(Boolean));
+  return row.body;
+}
+
 function appRow(app, sub, done) {
   const state = app.signed_in ? "aiSignedIn" : app.installed ? "aiInstalled" : "aiMissing";
-  const body = el("div", { className: "ai-body" });
-  body.append(...action(app, sub, body, done));
+  const body = connectBody(app, sub, done);
   return el("li", { className: "ai-app" },
     el("div", {}, el("p", { className: "choice-name", textContent: app.name }), el("p", { className: "meta", textContent: t(state) })),
     body);
