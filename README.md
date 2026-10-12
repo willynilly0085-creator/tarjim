@@ -64,6 +64,51 @@ Measured on Windows 11 with an RTX 5080 (16 GB) and 32 GB of RAM: listening on t
 RAM before settling at 2.5 GB, which is why it asks for 16 GB. The engine itself (Python with the
 graphics-card build of PyTorch) takes about 4 GB of the disk figures above.
 
+## Install on Windows (one file)
+
+You need nothing installed first: no Python, no AI tool, no terminal.
+
+1. On this page press **Code**, then **Download ZIP**, and unzip it.
+2. Open the folder and double-click **install** (`install.cmd`). If Windows asks whether to run
+   it, allow it (**Run**, or **More info** then **Run anyway**).
+3. Leave the window open until it says "Ready". tarjim's page then opens in your browser, and
+   setup continues there: your language, the AI you want to use, and the browser extension.
+
+After that tarjim runs in the background with no window and starts with the computer. A **tarjim**
+shortcut on the desktop opens its page.
+
+### What the file does, and what it downloads
+
+It downloads about 4 GB, once. tarjim itself is under 2 MB; the rest is what it runs on.
+
+| What is installed | Size | Why |
+|---|---|---|
+| uv, a small installer tool | 33 MB | Gets Python and the libraries into tarjim's own folder, so nothing else on the computer is touched |
+| Python 3.11, when the computer has none | small | tarjim is written in Python; it gets its own copy |
+| PyTorch | 2.8 GB with an NVIDIA card, smaller without | Runs the model that places every word at the moment it is spoken, which every job needs, and the listening and voice models if you choose to run them on this computer |
+| About 160 other libraries | about 1 GB | Downloading a video from a link, talking to the AI you connect, listening, dubbing, the phone bot |
+
+Then the file starts tarjim, adds it to the programs that start with Windows, puts the shortcut on
+the desktop and opens the page. It changes nothing else, and needs no administrator rights.
+
+The setup page downloads the rest, and only what your choices need:
+
+| Downloaded by setup | Size | When |
+|---|---|---|
+| The timing model | 1.2 GB | Always |
+| ffmpeg | 80 MB | Always (it reads the video and burns the subtitles) |
+| The listening model | 6.3 GB | Only if you choose listening on this computer |
+| The speaker-voice model | 4.7 GB | Only if you dub in each speaker's own voice |
+
+With a cloud AI (a Gemini key, or a Gemini, Claude, ChatGPT or Grok subscription) only the first
+two are needed: no AI runs on your computer.
+
+To remove tarjim: run `uv tool uninstall tarjim`, then delete the `.tarjim` folder in your user
+folder and the shortcut.
+
+Tested by running the file where uv was not installed: it installed uv and tarjim and started the
+engine. Windows 10 was not tested by us.
+
 ## Install with your AI (one step)
 
 In Claude Code:

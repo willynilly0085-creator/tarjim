@@ -70,6 +70,53 @@ yaklaşık 3 saniye sürdü. Konuşmacı sesi modelini yüklemek, 2.5 GB düzeyi
 süreliğine yaklaşık 11 GB RAM kullanır; 16 GB istenmesinin nedeni budur. Motorun kendisi (Python ile
 PyTorch'un ekran kartı sürümü) yukarıdaki disk rakamlarının içinde yaklaşık 4 GB yer tutar.
 
+## Windows'ta kurulum (tek dosya)
+
+Önceden hiçbir şeyin kurulu olması gerekmez: Python yok, yapay zekâ aracı yok, terminal yok.
+
+1. Bu sayfada önce **Code**, sonra **Download ZIP** düğmesine basın ve arşivi açın.
+2. Klasörü açın ve **install** (`install.cmd`) dosyasına çift tıklayın. Windows çalıştırıp
+   çalıştırmayacağınızı sorarsa izin verin (**Run** ya da **More info**, ardından **Run anyway**).
+3. Pencerede "Ready" yazana kadar pencereyi açık bırakın. Ardından tarjim'in sayfası tarayıcınızda
+   açılır ve kurulum orada devam eder: diliniz, kullanmak istediğiniz yapay zekâ ve tarayıcı
+   eklentisi.
+
+Bundan sonra tarjim arka planda pencere olmadan çalışır ve bilgisayarla birlikte başlar.
+Masaüstündeki **tarjim** kısayolu sayfasını açar.
+
+### Dosya ne yapar ve ne indirir
+
+Bir kez, yaklaşık 4 GB indirir. tarjim'in kendisi 2 MB'tan küçüktür; geri kalanı onun üzerinde
+çalıştığı şeylerdir.
+
+| Ne kurulur | Boyut | Neden |
+|---|---|---|
+| uv, küçük bir kurulum aracı | 33 MB | Python'u ve kütüphaneleri tarjim'in kendi klasörüne getirir, böylece bilgisayardaki başka hiçbir şeye dokunulmaz |
+| Python 3.11, bilgisayarda yoksa | küçük | tarjim Python ile yazılmıştır; kendi kopyasını alır |
+| PyTorch | NVIDIA kartla 2.8 GB, kartsız daha az | Her kelimeyi söylendiği ana yerleştiren modeli çalıştırır, ki her iş buna ihtiyaç duyar; ayrıca dinleme ve ses modellerini de, bunları bu bilgisayarda çalıştırmayı seçerseniz |
+| Yaklaşık 160 başka kütüphane | yaklaşık 1 GB | Bağlantıdan video indirme, bağladığınız yapay zekâyla konuşma, dinleme, seslendirme, telefon botu |
+
+Sonra dosya tarjim'i başlatır, Windows ile başlayan programlara ekler, kısayolu masaüstüne koyar ve
+sayfayı açar. Başka hiçbir şeyi değiştirmez ve yönetici hakları gerektirmez.
+
+Kurulum sayfası gerisini indirir, yalnızca seçimlerinizin gerektirdiklerini:
+
+| Kurulumun indirdiği | Boyut | Ne zaman |
+|---|---|---|
+| Zamanlama modeli | 1.2 GB | Her zaman |
+| ffmpeg | 80 MB | Her zaman (videoyu okur ve altyazıları gömer) |
+| Dinleme modeli | 6.3 GB | Yalnızca bu bilgisayarda dinlemeyi seçerseniz |
+| Konuşmacı sesi modeli | 4.7 GB | Yalnızca her konuşmacıyı kendi sesiyle seslendirirseniz |
+
+Bulut yapay zekâsıyla (bir Gemini anahtarı ya da Gemini, Claude, ChatGPT veya Grok aboneliği)
+yalnızca ilk ikisi gerekir: bilgisayarınızda hiçbir yapay zekâ çalışmaz.
+
+tarjim'i kaldırmak için: `uv tool uninstall tarjim` komutunu çalıştırın, ardından kullanıcı
+klasörünüzdeki `.tarjim` klasörünü ve kısayolu silin.
+
+Test edildi: dosya uv'nin kurulu olmadığı bir bilgisayarda çalıştırıldı; uv'yi ve tarjim'i kurdu ve
+motoru başlattı. Windows 10'u biz test etmedik.
+
 ## Yapay zekânızla kurun (tek adım)
 
 Claude Code'da:

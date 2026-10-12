@@ -73,6 +73,55 @@ Sprecherstimme werden kurzzeitig etwa 11 GB RAM belegt, bevor es sich bei 2.5 GB
 werden 16 GB verlangt. Die Engine selbst (Python mit der Grafikkarten-Variante von PyTorch) belegt
 etwa 4 GB der oben genannten Speicherplatzwerte.
 
+## Installation unter Windows (eine Datei)
+
+Sie müssen vorher nichts installiert haben: kein Python, kein KI-Werkzeug, kein Terminal.
+
+1. Drücken Sie auf dieser Seite **Code**, dann **Download ZIP**, und entpacken Sie die Datei.
+2. Öffnen Sie den Ordner und doppelklicken Sie auf **install** (`install.cmd`). Fragt Windows, ob
+   die Datei ausgeführt werden soll, erlauben Sie es (**Run**, oder **More info** und dann
+   **Run anyway**).
+3. Lassen Sie das Fenster offen, bis „Ready“ erscheint. Danach öffnet sich die Seite von tarjim in
+   Ihrem Browser, und die Einrichtung geht dort weiter: Ihre Sprache, die KI, die Sie verwenden
+   möchten, und die Browser-Erweiterung.
+
+Danach läuft tarjim im Hintergrund ohne Fenster und startet mit dem Computer. Eine Verknüpfung
+**tarjim** auf dem Desktop öffnet die Seite.
+
+### Was die Datei macht und was sie herunterlädt
+
+Sie lädt einmalig etwa 4 GB herunter. tarjim selbst ist kleiner als 2 MB; der Rest ist das, worauf
+es läuft.
+
+| Was installiert wird | Größe | Wozu |
+|---|---|---|
+| uv, ein kleines Installationswerkzeug | 33 MB | Bringt Python und die Bibliotheken in den eigenen Ordner von tarjim, damit nichts sonst auf dem Computer angetastet wird |
+| Python 3.11, falls der Computer keines hat | klein | tarjim ist in Python geschrieben und bekommt seine eigene Kopie |
+| PyTorch | 2.8 GB mit NVIDIA-Karte, ohne Karte kleiner | Führt das Modell aus, das jedes Wort im Moment des Sprechens platziert und das jeder Auftrag braucht, sowie die Modelle für Zuhören und Stimme, wenn Sie sie auf diesem Computer laufen lassen |
+| Etwa 160 weitere Bibliotheken | etwa 1 GB | Ein Video von einem Link herunterladen, mit der angebundenen KI sprechen, Zuhören, Synchronisation, der Telefon-Bot |
+
+Anschließend startet die Datei tarjim, trägt es bei den Programmen ein, die mit Windows starten,
+legt die Verknüpfung auf dem Desktop ab und öffnet die Seite. Sie ändert sonst nichts und braucht
+keine Administratorrechte.
+
+Die Einrichtungsseite lädt den Rest herunter, und zwar nur, was Ihre Auswahl braucht:
+
+| Von der Einrichtung geladen | Größe | Wann |
+|---|---|---|
+| Das Timing-Modell | 1.2 GB | Immer |
+| ffmpeg | 80 MB | Immer (es liest das Video und brennt die Untertitel ein) |
+| Das Modell fürs Zuhören | 6.3 GB | Nur, wenn Sie das Zuhören auf diesem Computer wählen |
+| Das Modell für die Sprecherstimme | 4.7 GB | Nur, wenn Sie mit der eigenen Stimme jedes Sprechers synchronisieren |
+
+Mit einer Cloud-KI (ein Gemini-Schlüssel oder ein Gemini-, Claude-, ChatGPT- oder Grok-Abonnement)
+sind nur die ersten beiden nötig: Auf Ihrem Computer läuft keine KI.
+
+So entfernen Sie tarjim: Führen Sie `uv tool uninstall tarjim` aus und löschen Sie dann den Ordner
+`.tarjim` in Ihrem Benutzerordner und die Verknüpfung.
+
+Getestet, indem die Datei auf einem Computer ohne uv ausgeführt wurde: Sie installierte uv und
+tarjim und startete die Engine. Windows 10 haben wir nicht getestet.
+
 ## Installation mit Ihrer KI (ein Schritt)
 
 In Claude Code:

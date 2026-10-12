@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.17 (2026-10-12)
+
+- **Install with one file.** Download tarjim from GitHub, unzip it and double-click `install`:
+  it installs everything, starts tarjim in the background with no window, makes it start with the
+  computer, puts a shortcut on the desktop and opens the page where setup continues. Nothing has
+  to be installed first, and no terminal is needed. Before, installing meant typing commands, and
+  the engine ran in a console window that had to stay open.
+- The README now says what the install downloads (about 4 GB), how much each part is and why it
+  is there, and what the setup page downloads afterwards for each choice.
+- Tested by running the file where the installer tool was missing: it installed it, installed
+  tarjim and started the engine. Not tested on Windows 10 by us.
+
 ## 1.0.16 (2026-10-11)
 
 - **A Gemini subscription can now listen.** If you are signed in to Google's Antigravity, pick

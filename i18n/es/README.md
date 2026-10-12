@@ -68,6 +68,54 @@ brevemente unos 11 GB de RAM antes de estabilizarse en 2.5 GB, y por eso pide 16
 (Python con la versión de PyTorch para tarjeta gráfica) ocupa unos 4 GB de las cifras de disco
 anteriores.
 
+## Instalación en Windows (un solo archivo)
+
+No necesitas tener nada instalado antes: ni Python, ni una herramienta de IA, ni terminal.
+
+1. En esta página pulsa **Code**, luego **Download ZIP**, y descomprime el archivo.
+2. Abre la carpeta y haz doble clic en **install** (`install.cmd`). Si Windows pregunta si quieres
+   ejecutarlo, permítelo (**Run**, o **More info** y después **Run anyway**).
+3. Deja la ventana abierta hasta que diga "Ready". Después la página de tarjim se abre en tu
+   navegador y la configuración sigue ahí: tu idioma, la IA que quieres usar y la extensión del
+   navegador.
+
+Después tarjim se ejecuta en segundo plano, sin ventana, y arranca con el ordenador. Un acceso
+directo **tarjim** en el escritorio abre su página.
+
+### Qué hace el archivo y qué descarga
+
+Descarga unos 4 GB, una sola vez. tarjim en sí pesa menos de 2 MB; el resto es lo que necesita para
+funcionar.
+
+| Qué se instala | Tamaño | Para qué |
+|---|---|---|
+| uv, una pequeña herramienta de instalación | 33 MB | Lleva Python y las bibliotecas a la propia carpeta de tarjim, así que no se toca nada más del ordenador |
+| Python 3.11, si el ordenador no lo tiene | pequeño | tarjim está escrito en Python; recibe su propia copia |
+| PyTorch | 2.8 GB con una tarjeta NVIDIA, menos sin ella | Ejecuta el modelo que coloca cada palabra en el momento en que se dice, que todo trabajo necesita, y los modelos de escucha y de voz si decides ejecutarlos en este ordenador |
+| Unas 160 bibliotecas más | alrededor de 1 GB | Descargar un vídeo desde un enlace, hablar con la IA que conectas, la escucha, el doblaje, el bot del teléfono |
+
+Luego el archivo inicia tarjim, lo añade a los programas que arrancan con Windows, pone el acceso
+directo en el escritorio y abre la página. No cambia nada más y no necesita derechos de
+administrador.
+
+La página de configuración descarga el resto, y solo lo que necesitan tus elecciones:
+
+| Descargado por la configuración | Tamaño | Cuándo |
+|---|---|---|
+| El modelo de sincronización | 1.2 GB | Siempre |
+| ffmpeg | 80 MB | Siempre (lee el vídeo y graba los subtítulos) |
+| El modelo de escucha | 6.3 GB | Solo si eliges la escucha en este ordenador |
+| El modelo de la voz del hablante | 4.7 GB | Solo si doblas con la voz propia de cada hablante |
+
+Con una IA en la nube (una clave de Gemini, o una suscripción de Gemini, Claude, ChatGPT o Grok)
+solo hacen falta los dos primeros: no se ejecuta ninguna IA en tu ordenador.
+
+Para quitar tarjim: ejecuta `uv tool uninstall tarjim`, y luego borra la carpeta `.tarjim` de tu
+carpeta de usuario y el acceso directo.
+
+Probado ejecutando el archivo donde uv no estaba instalado: instaló uv y tarjim e inició el motor.
+Windows 10 no lo hemos probado nosotros.
+
 ## Instalación con tu IA (un solo paso)
 
 En Claude Code:

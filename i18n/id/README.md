@@ -68,6 +68,54 @@ sekitar 3 detik per kalimat. Memuat model suara pembicara sesaat memakai sekitar
 turun ke 2.5 GB, itulah sebabnya diminta 16 GB. Mesinnya sendiri (Python dengan PyTorch versi kartu
 grafis) memakai sekitar 4 GB dari angka disk di atas.
 
+## Pasang di Windows (satu berkas)
+
+Anda tidak perlu memasang apa pun lebih dulu: tanpa Python, tanpa alat AI, tanpa terminal.
+
+1. Di halaman ini tekan **Code**, lalu **Download ZIP**, dan ekstrak berkasnya.
+2. Buka folder dan klik dua kali **install** (`install.cmd`). Jika Windows bertanya apakah berkas
+   ini boleh dijalankan, izinkan (**Run**, atau **More info** lalu **Run anyway**).
+3. Biarkan jendela tetap terbuka sampai muncul "Ready". Setelah itu halaman tarjim terbuka di
+   peramban Anda, dan penyiapan berlanjut di sana: bahasa Anda, AI yang ingin Anda pakai, dan
+   ekstensi peramban.
+
+Setelah itu tarjim berjalan di latar belakang tanpa jendela dan mulai bersama komputer. Pintasan
+**tarjim** di desktop membuka halamannya.
+
+### Apa yang dilakukan berkas ini, dan apa yang diunduhnya
+
+Berkas ini mengunduh sekitar 4 GB, sekali saja. tarjim sendiri kurang dari 2 MB; sisanya adalah apa
+yang dipakainya untuk berjalan.
+
+| Yang dipasang | Ukuran | Mengapa |
+|---|---|---|
+| uv, alat pemasang kecil | 33 MB | Membawa Python dan pustaka ke folder tarjim sendiri, sehingga tidak ada hal lain di komputer yang disentuh |
+| Python 3.11, bila komputer belum punya | kecil | tarjim ditulis dengan Python; ia mendapat salinannya sendiri |
+| PyTorch | 2.8 GB dengan kartu NVIDIA, lebih kecil tanpanya | Menjalankan model yang menempatkan setiap kata tepat saat diucapkan, yang dibutuhkan setiap pekerjaan, serta model mendengarkan dan model suara bila Anda memilih menjalankannya di komputer ini |
+| Sekitar 160 pustaka lain | sekitar 1 GB | Mengunduh video dari tautan, berbicara dengan AI yang Anda hubungkan, mendengarkan, sulih suara, bot ponsel |
+
+Lalu berkas ini menjalankan tarjim, menambahkannya ke program yang mulai bersama Windows, menaruh
+pintasan di desktop, dan membuka halaman. Ia tidak mengubah hal lain dan tidak memerlukan hak
+administrator.
+
+Halaman penyiapan mengunduh sisanya, dan hanya yang dibutuhkan pilihan Anda:
+
+| Diunduh oleh penyiapan | Ukuran | Kapan |
+|---|---|---|
+| Model waktu | 1.2 GB | Selalu |
+| ffmpeg | 80 MB | Selalu (membaca video dan menanamkan subtitle) |
+| Model mendengarkan | 6.3 GB | Hanya jika Anda memilih mendengarkan di komputer ini |
+| Model suara pembicara | 4.7 GB | Hanya jika Anda melakukan sulih suara dengan suara asli tiap pembicara |
+
+Dengan AI cloud (kunci Gemini, atau langganan Gemini, Claude, ChatGPT atau Grok) hanya dua yang
+pertama diperlukan: tidak ada AI yang berjalan di komputer Anda.
+
+Untuk menghapus tarjim: jalankan `uv tool uninstall tarjim`, lalu hapus folder `.tarjim` di folder
+pengguna Anda dan pintasannya.
+
+Diuji dengan menjalankan berkas ini di komputer yang belum terpasang uv: ia memasang uv dan tarjim
+lalu menjalankan mesin. Windows 10 tidak kami uji.
+
 ## Pasang dengan AI Anda (satu langkah)
 
 Di Claude Code:
