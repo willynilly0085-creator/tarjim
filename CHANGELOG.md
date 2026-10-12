@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.20 (2026-10-13)
+
+- **An account the AI company refuses is now named as that.** When a subscription answers that
+  the account is not eligible or must be verified first (Google Antigravity does this for some
+  accounts), tarjim said "an unexpected error". It now says the company refused the account,
+  that this is not on tarjim's side, and what to do: finish the company's verification, or
+  choose another AI. The company's own words still appear under it. On the page, in the
+  extension and in the phone bot, in the 14 languages.
+
 ## 1.0.19 (2026-10-12)
 
 - **A program you install after tarjim started is now found.** tarjim runs in the background and

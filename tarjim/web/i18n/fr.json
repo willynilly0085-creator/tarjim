@@ -380,6 +380,7 @@
   "versionLine": "Version {version}",
   "madeBy": "Développé par Indicators",
   "err_signin": "Votre abonnement IA demande une nouvelle connexion. Ouvrez tarjim, allez dans les Réglages, connectez-vous, puis réessayez.",
+  "err_account": "Le fournisseur d'IA a refusé ce compte : il le dit non éligible ou à vérifier d'abord. Cela vient du fournisseur, pas de tarjim. Ouvrez son programme ou son site et terminez la vérification demandée, ou choisissez une autre IA dans les Réglages (une clé Gemini gratuite fonctionne tout de suite).",
   "failedAt": "Arrêté à « {stage} ».",
   "errorDetail": "Détails : {detail}",
   "needSignIn": "Connectez-vous à {name} pour traduire avec votre abonnement, sans aucune clé.",

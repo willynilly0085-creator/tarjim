@@ -192,6 +192,8 @@ def test_an_expired_sign_in_is_named_and_every_failure_keeps_safe_evidence() -> 
                            "not be refreshed")
     assert classify(expired) == "signin"
     assert classify(RuntimeError("codex 1: Not logged in")) == "signin"
+    refused = "antigravity 1: Eligibility check failed: Your current account is not eligible"
+    assert classify(RuntimeError(refused)) == "account"
     task = Task(Order("https://example.com/v"), stage="failed", failed_at="translating",
                 error="request to https://api.x/bot123456:" + "A" * 35 + "/send failed\nmore")
     view = task.view()

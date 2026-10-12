@@ -372,6 +372,9 @@
   "errSignin": {
     "message": "Ihr KI-Abo erfordert eine erneute Anmeldung. Öffnen Sie tarjim, gehen Sie zu den Einstellungen, melden Sie sich an und versuchen Sie es erneut."
   },
+  "errAccount": {
+    "message": "Der KI-Anbieter hat dieses Konto abgelehnt: Es sei nicht berechtigt oder müsse erst bestätigt werden. Das liegt beim Anbieter, nicht bei tarjim. Öffnen Sie dessen Programm oder Website und schließen Sie die verlangte Bestätigung ab, oder wählen Sie in den Einstellungen eine andere KI (ein kostenloser Gemini-Schlüssel funktioniert sofort)."
+  },
   "failedAtLabel": {
     "message": "Angehalten bei"
   },

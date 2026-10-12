@@ -380,6 +380,7 @@
   "versionLine": "Versi {version}",
   "madeBy": "Dikembangkan oleh Indicators",
   "err_signin": "Langganan AI-mu perlu masuk lagi. Buka tarjim, buka Pengaturan, masuk, lalu coba lagi.",
+  "err_account": "Perusahaan AI menolak akun ini: katanya akun tidak memenuhi syarat atau harus diverifikasi dulu. Ini dari pihak perusahaan, bukan tarjim. Buka program atau situsnya dan selesaikan verifikasi yang diminta, atau pilih AI lain di Pengaturan (kunci Gemini gratis langsung bisa dipakai).",
   "failedAt": "Berhenti di “{stage}”.",
   "errorDetail": "Rincian: {detail}",
   "needSignIn": "Masuk ke {name} agar terjemahan memakai langgananmu, tanpa kunci apa pun.",

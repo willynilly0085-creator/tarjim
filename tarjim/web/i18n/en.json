@@ -380,6 +380,7 @@
   "versionLine": "Version {version}",
   "madeBy": "Developed by Indicators",
   "err_signin": "Your AI subscription needs you to sign in again. Open tarjim, go to Settings, sign in, then try again.",
+  "err_account": "The AI company refused this account: it says the account is not eligible or must be verified first. This is on the company's side, not tarjim's. Open its own program or site and finish the verification it asks for, or choose another AI in Settings (a free Gemini key works right away).",
   "failedAt": "Stopped at “{stage}”.",
   "errorDetail": "Details: {detail}",
   "needSignIn": "Sign in to {name} so it translates with your subscription, no key needed.",

@@ -380,6 +380,7 @@
   "versionLine": "Versão {version}",
   "madeBy": "Desenvolvido pela Indicators",
   "err_signin": "Sua assinatura de IA precisa que você entre de novo. Abra o tarjim, vá em Configurações, entre e tente outra vez.",
+  "err_account": "A empresa de IA recusou esta conta: diz que ela não é elegível ou precisa ser verificada antes. Isso é do lado da empresa, não do tarjim. Abra o programa ou o site dela e conclua a verificação pedida, ou escolha outra IA nas Configurações (uma chave gratuita do Gemini funciona na hora).",
   "failedAt": "Parou em “{stage}”.",
   "errorDetail": "Detalhes: {detail}",
   "needSignIn": "Entre no {name} para traduzir com a sua assinatura, sem nenhuma chave.",
