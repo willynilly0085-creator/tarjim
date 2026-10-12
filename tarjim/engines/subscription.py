@@ -1,7 +1,6 @@
 """Translate with an AI subscription the person already has, through the vendor's own program."""
 import json
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -9,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from tarjim.config import save, setting
-from tarjim.engines import own_node
+from tarjim.engines import own_node, programs
 from tarjim.engines.catalog import BY_ID, SUBSCRIPTION, of_method
 from tarjim.engines.web import EngineError, parse_json, unwrap, wrap
 
@@ -33,7 +32,7 @@ def own_folder(name: str) -> str | None:
 
 
 def launcher(name: str) -> list[str]:
-    found = shutil.which(f"{name}.cmd") or shutil.which(name) or own_folder(name)
+    found = programs.find(f"{name}.cmd") or programs.find(name) or own_folder(name)
     if not found or Path(found).suffix.lower() != ".cmd":
         return [found] if found else []
     targets = SHIM_TARGET.findall(Path(found).read_text(encoding="utf-8", errors="ignore"))
@@ -42,7 +41,7 @@ def launcher(name: str) -> list[str]:
     target = Path(found).parent / targets[-1]
     if target.suffix.lower() != ".js":
         return [str(target)]
-    node = shutil.which("node") or own_node.node()
+    node = programs.find("node") or own_node.node()
     return [node, str(target)] if node else []
 
 

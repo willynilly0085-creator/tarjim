@@ -49,7 +49,7 @@ def test_npm_launchers_run_the_real_program_not_cmd(tmp_path: Path,
     shim = tmp_path / "codex.cmd"
     shim.write_text('@echo off\r\n"%_prog%"  "%dp0%\\node_modules\\codex\\bin\\codex.js" %*\r\n')
     found: dict[str, Any] = {"codex.cmd": str(shim), "node": "C:/node.exe"}
-    monkeypatch.setattr(subscription.shutil, "which", found.get)
+    monkeypatch.setattr(subscription.programs, "find", found.get)
     assert subscription.launcher("codex") == ["C:/node.exe",
                                               str(tmp_path / "node_modules/codex/bin/codex.js")]
     assert subscription.launcher("claude") == []

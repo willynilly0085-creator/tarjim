@@ -4,14 +4,13 @@ has one, npm otherwise.
 Without Node.js there is no npm: tarjim then brings its own (see own_node), and only where it
 cannot does the page link to the Node.js download.
 """
-import shutil
 import subprocess
 import sys
 from pathlib import Path
 from typing import Any
 
 from tarjim.config import HOME
-from tarjim.engines import own_node
+from tarjim.engines import own_node, programs
 
 HIDDEN = 0x08000000 if sys.platform == "win32" else 0
 PACKAGES = {"claude": "@anthropic-ai/claude-code", "codex": "@openai/codex",
@@ -34,7 +33,7 @@ running: dict[str, subprocess.Popen[bytes]] = {}
 
 
 def npm() -> str:
-    return shutil.which("npm.cmd") or shutil.which("npm") or ""
+    return programs.find("npm.cmd") or programs.find("npm") or ""
 
 
 def start(provider: str) -> str:

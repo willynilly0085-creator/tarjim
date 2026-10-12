@@ -70,6 +70,6 @@ def test_without_node_tarjim_brings_its_own_for_npm_programs(
     assert app_install.command("copilot")[:4] == [own_node.npm(), "install", "-g", "--prefix"]
     shim = r'@"%dp0%\node.exe" "%dp0%\node_modules\codex\run.js" %*'
     (tmp_path / "node" / "codex.cmd").write_text(shim, encoding="utf-8")
-    monkeypatch.setattr(subscription.shutil, "which", lambda _name: None)
+    monkeypatch.setattr(subscription.programs, "find", lambda _name: None)
     found = subscription.launcher("codex")
     assert found[0] == own_node.node() and found[1].endswith("run.js")

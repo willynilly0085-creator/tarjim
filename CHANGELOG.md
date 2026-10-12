@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.19 (2026-10-12)
+
+- **A program you install after tarjim started is now found.** tarjim runs in the background and
+  kept looking for Claude Code, Codex, Node.js and the others on the PATH it was started with, so
+  a program installed afterwards was reported as missing until the computer restarted. It now
+  also reads the computer's current PATH from Windows on every look, and npm's own folder.
+- Shown on this computer: started with a PATH that had none of them, the old lookup found
+  nothing and the new one found Claude Code, Codex, Grok and npm. Not tested on another computer.
+
 ## 1.0.18 (2026-10-12)
 
 - **Choose any subscription in setup, installed or not.** The setup plan now lists every
