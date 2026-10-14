@@ -76,8 +76,32 @@ CREATE_OUTSIDE_JOB = "\n".join((
     "exit $r.ReturnValue"))
 
 
+def module_command(module: str, python: str = sys.executable) -> list[str]:
+    """-P keeps the current folder off the import path: tarjim often starts in a folder it did not
+    choose (the one a chat tool is open in), and a `tarjim` there must not stand in for tarjim."""
+    return [python, "-P", "-m", module]
+
+
+def safe_command(command: list[str]) -> list[str]:
+    """Start commands saved by older versions lack -P."""
+    return [command[0], "-P", *command[1:]] if command[1:2] == ["-m"] else command
+
+
+def import_path() -> str:
+    """PYTHONPATH without empty or relative entries, which also stand for the current folder."""
+    entries = os.environ.get("PYTHONPATH", "").split(os.pathsep)
+    return os.pathsep.join(entry for entry in entries if os.path.isabs(entry))
+
+
+def child_environment() -> dict[str, str]:
+    env = {**os.environ, "PYTHONPATH": import_path()}
+    return env if env["PYTHONPATH"] else {k: v for k, v in env.items() if k != "PYTHONPATH"}
+
+
 def windows_line(command: list[str], log: Path) -> str:
-    settings = "".join(f'set "{k}={os.environ[k]}"&& ' for k in KEEP_ENV if os.environ.get(k))
+    kept = {k: os.environ[k] for k in KEEP_ENV if os.environ.get(k)}
+    kept["PYTHONPATH"] = import_path()  # always set: empty clears one set for the whole computer
+    settings = "".join(f'set "{k}={v}"&& ' for k, v in kept.items())
     return f'cmd /d /s /c "{settings}{subprocess.list2cmdline(command)} >> "{log}" 2>&1"'
 
 
@@ -106,7 +130,8 @@ def start_detached(command: list[str], log: Path) -> None:
         for flags in (NO_WINDOW | DETACHED | BREAKAWAY, NO_WINDOW | DETACHED):
             try:
                 subprocess.Popen(command, stdout=out, stderr=out, stdin=subprocess.DEVNULL,
-                                 creationflags=flags, start_new_session=sys.platform != "win32")
+                                 cwd=log.parent, env=child_environment(), creationflags=flags,
+                                 start_new_session=sys.platform != "win32")
                 return
             except PermissionError:
                 continue

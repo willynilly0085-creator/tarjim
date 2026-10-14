@@ -4,6 +4,8 @@ import os
 import sys
 from pathlib import Path
 
+from tarjim.installer import module_command
+
 NAME = "tarjim"
 APPS = ("claude-desktop", "claude-code", "codex")
 
@@ -14,7 +16,7 @@ def python_for_chat() -> str:
 
 
 def server_entry() -> list[str]:
-    return [python_for_chat(), "-m", "tarjim.assistant"]
+    return module_command("tarjim.assistant", python_for_chat())
 
 
 def desktop_config() -> Path:
@@ -43,6 +45,8 @@ def link_program(program: str, extra: list[str]) -> tuple[bool, str]:
     base = launcher(program)
     if not base:
         return False, f"{program} is not installed"
+    # an entry an older version added is replaced, not kept
+    run([*base, "mcp", "remove", *extra, NAME], "", str(Path.home()))
     done = run([*base, "mcp", "add", *extra, NAME, "--", *server_entry()], "", str(Path.home()))
     text = (done.stdout + done.stderr).strip()[-300:]
     return done.returncode == 0 or "already exists" in text, text

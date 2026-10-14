@@ -22,7 +22,7 @@ def command() -> list[str]:
     uv = shutil.which("uv")
     if uv:
         return [uv, "pip", "install", "--python", sys.executable, "--no-deps", PACKAGE]
-    return [sys.executable, "-m", "pip", "install", "--no-deps", PACKAGE]
+    return [sys.executable, "-P", "-m", "pip", "install", "--no-deps", PACKAGE]
 
 
 def install() -> None:

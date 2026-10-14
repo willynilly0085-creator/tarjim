@@ -13,7 +13,7 @@
       "command": "uv",
       "args": ["run", "--quiet", "--no-project", "--python", "3.11",
                "--with", "mcp>=2.2", "--with", "keyring", "--with", "requests",
-               "python", "-m", "tarjim.assistant"],
+               "python", "-P", "-m", "tarjim.assistant"],
       "env": { "PYTHONPATH": "${CLAUDE_PLUGIN_ROOT}" }
     }
   }

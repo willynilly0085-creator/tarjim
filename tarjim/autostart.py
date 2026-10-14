@@ -29,20 +29,20 @@ def quiet_python() -> str:
 def windows_script(python: str) -> str:
     if not python.lower().endswith("pythonw.exe"):
         python = str(Path(python).with_name("pythonw.exe"))
-    return f'CreateObject("WScript.Shell").Run """{python}"" -m tarjim.server", 0, False\n'
+    return f'CreateObject("WScript.Shell").Run """{python}"" -P -m tarjim.server", 0, False\n'
 
 
 def mac_agent(python: str) -> str:
     return ('<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0"><dict>'
             "<key>Label</key><string>com.tarjim.server</string>"
             f"<key>ProgramArguments</key><array><string>{escape(python)}</string>"
-            "<string>-m</string>"
+            "<string>-P</string><string>-m</string>"
             "<string>tarjim.server</string></array><key>RunAtLoad</key><true/></dict></plist>\n")
 
 
 def linux_entry(python: str) -> str:
     return ("[Desktop Entry]\nType=Application\nName=tarjim\n"
-            f'Exec="{python}" -m tarjim.server\nNoDisplay=true\n'
+            f'Exec="{python}" -P -m tarjim.server\nNoDisplay=true\n'
             "X-GNOME-Autostart-enabled=true\n")
 
 

@@ -70,7 +70,7 @@ if ($LASTEXITCODE -ne 0) { Stop-With "the download or install stopped. Run insta
 
 Say "step 3 of 3: starting tarjim (it runs in the background, with no window)"
 $python = Join-Path (& uv tool dir) "tarjim\Scripts\pythonw.exe"
-Start-Process -FilePath $python -ArgumentList "-m", "tarjim.server", "--port", $Port -WindowStyle Hidden
+Start-Process -FilePath $python -ArgumentList "-P", "-m", "tarjim.server", "--port", $Port -WindowStyle Hidden
 foreach ($try in 1..45) {
     if (Test-Engine) { break }
     Start-Sleep -Seconds 2

@@ -2,7 +2,6 @@
 import json
 import os
 import shutil
-import sys
 import time
 import urllib.error
 import urllib.request
@@ -11,7 +10,7 @@ from typing import Any
 
 from tarjim.assistant_http import SERVER
 from tarjim.config import setting
-from tarjim.installer import HOME, STATE, alive, start_detached
+from tarjim.installer import HOME, STATE, alive, module_command, safe_command, start_detached
 
 OK = 200
 LAUNCH_GRACE = 120.0
@@ -35,7 +34,7 @@ def installing() -> dict[str, Any]:
 def server_command() -> list[str]:
     saved = setting("server_command")
     if saved:
-        return list(json.loads(saved))
+        return safe_command(list(json.loads(saved)))
     found = shutil.which("tarjim-serve")
     return [found] if found else []
 
@@ -74,7 +73,7 @@ def install() -> dict[str, Any]:
     HOME.mkdir(parents=True, exist_ok=True)
     STATE.write_text(json.dumps({"state": "installing", "detail": "starting the installer",
                                  "pid": 0, "at": time.time()}), encoding="utf-8")
-    command = [sys.executable, "-m", "tarjim.installer", source()]
+    command = [*module_command("tarjim.installer"), source()]
     start_detached(command, HOME / "installer-output.log")
     return {"engine": "installing", "detail": "This takes several minutes; ask for the status."}
 

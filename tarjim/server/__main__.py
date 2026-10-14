@@ -5,6 +5,7 @@ from pathlib import Path
 
 from tarjim.config import HOME, prepare_environment, private_home, save, setting, token
 from tarjim.fetch import is_url, resolve
+from tarjim.installer import module_command
 from tarjim.job import CHECKPOINT, PROGRESS, Job
 from tarjim.server.app import PORT, serve
 from tarjim.server.jobs import DUBBING, Board, Task
@@ -48,17 +49,19 @@ def start_up() -> None:
 
     hide_child_windows()
     attach_output()
-    save("server_command", json.dumps([sys.executable, "-m", "tarjim.server"]))
+    save("server_command", json.dumps(module_command("tarjim.server")))
     prepare_environment()
 
 
 def run_alongside(port: int) -> Board:
-    """The job board with what runs beside it: the phone bot and the watch for updates."""
+    """The job board with what runs beside it: the phone bot, the watch for updates, and the
+    replacement of chat entries older versions wrote."""
     import threading
 
     from tarjim.memory import release_models
     from tarjim.phone.service import service
     from tarjim.server.housekeeping import sweep
+    from tarjim.server.link_upgrade import refresh
     from tarjim.server.update_routes import watch
 
     downloads = Path(setting("downloads") or DOWNLOADS)
@@ -66,6 +69,7 @@ def run_alongside(port: int) -> Board:
     sweep([HOME / "uploads", HOME / "sources"])
     service.begin(board, HOME / "uploads")
     threading.Thread(target=watch, args=(board, port, threading.Event()), daemon=True).start()
+    threading.Thread(target=refresh, daemon=True).start()
     return board
 
 

@@ -78,7 +78,7 @@ def test_adding_to_the_claude_app_keeps_other_servers(tmp_path: Path,
     done, _ = assistant_link.link("claude-desktop")
     saved = json.loads(settings.read_text(encoding="utf-8"))
     assert done and saved["theme"] == "dark" and "other" in saved["mcpServers"]
-    assert saved["mcpServers"]["tarjim"]["args"] == ["-m", "tarjim.assistant"]
+    assert saved["mcpServers"]["tarjim"]["args"] == ["-P", "-m", "tarjim.assistant"]
 
 
 def test_an_install_that_died_is_reported_as_failed(tmp_path: Path,
@@ -101,11 +101,12 @@ def test_the_windows_launch_line_carries_the_settings_and_the_log(
         tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     from tarjim import installer
 
-    monkeypatch.setenv("PYTHONPATH", "C:/plugin")
+    plugin = str(tmp_path / "plugin")
+    monkeypatch.setenv("PYTHONPATH", plugin)
     monkeypatch.delenv("TARJIM_HOME", raising=False)
-    command = ["python", "-m", "tarjim.installer", "file:///x"]
+    command = ["python", "-P", "-m", "tarjim.installer", "file:///x"]
     line = installer.windows_line(command, tmp_path / "i.log")
-    assert line.startswith('cmd /d /s /c "set "PYTHONPATH=C:/plugin"&& python -m tarjim.installer')
+    assert line.startswith(f'cmd /d /s /c "set "PYTHONPATH={plugin}"&& python -P -m tarjim.')
     assert line.endswith(f'>> "{tmp_path / "i.log"}" 2>&1"')
 
 
