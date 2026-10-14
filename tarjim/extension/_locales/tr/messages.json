@@ -378,6 +378,9 @@
   "errMedia": {
     "message": "Bu dosya tarjim'in açabileceği bir video ya da ses dosyası değil. Oynatma listesi ya da bağlantı listesi değil, video dosyasının kendisini seçin."
   },
+  "errLong": {
+    "message": "Bu dosyada altı saatten uzun ses var; tarjim en fazla altı saatlik sesle çalışır. Dosyayı en fazla altı saatlik parçalara bölün ve her parçayı ayrı çevirin."
+  },
   "failedAtLabel": {
     "message": "Durduğu aşama:"
   },

@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from itertools import pairwise
 
+from tarjim.job import checkpoint
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.merge import Heard
 
@@ -41,8 +42,14 @@ def shift(utterances: list[Utterance], span: Span, tag: str) -> list[Utterance]:
             for u in utterances if u.start + start < end + OVERRUN]
 
 
+def listen_one(span: Span, listen_span: ListenSpan) -> Heard:
+    """Each chunk is a step of its own: the person's pause or cancel takes effect before it."""
+    checkpoint()
+    return listen_span(*span)
+
+
 def listen_in_chunks(duration: float, regions: list[Span], listen_span: ListenSpan) -> Heard:
-    pieces = [(span, listen_span(*span)) for span in spans(duration, regions)]
+    pieces = [(span, listen_one(span, listen_span)) for span in spans(duration, regions)]
     tags = [f"c{k}." if len(pieces) > 1 else "" for k in range(len(pieces))]
     utterances = [u for (span, heard), tag in zip(pieces, tags, strict=True)
                   for u in shift(heard.utterances, span, tag)]

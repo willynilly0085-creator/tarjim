@@ -21,10 +21,13 @@ def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcrip
     from tarjim.memory import free_for_listening
 
     free_for_listening()
-    audio = media.extract_audio(job.video, job.cache / "audio.wav")
-    transcript = listen_and_align(job, audio, report) or local_transcript(audio)
+    audio = job.cache / "audio.wav"
+    try:
+        media.extract_audio(job.video, audio)
+        transcript = listen_and_align(job, audio, report) or local_transcript(audio)
+    finally:
+        audio.unlink(missing_ok=True)
     transcript.save(cached)
-    audio.unlink(missing_ok=True)
     return transcript
 
 
@@ -60,7 +63,7 @@ def listen_with(provider: str, video: Path, audio: Path) -> Heard:
 
         language, utterances = listen_file(audio)
         return Heard(language, utterances, [utterances])
-    duration = media.probe(video).duration
+    duration = media.wav_seconds(audio)  # the file's header may claim any length it likes
     once = cloud_listener(provider)
 
     def listen_span(start: float, end: float) -> Heard:

@@ -2,6 +2,7 @@ import json
 import re
 import shutil
 import subprocess
+import wave
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -19,6 +20,11 @@ RUN_SECONDS = 6 * 3600
 CONTAINERS = "mov,matroska,avi,mp3,wav,flac,ogg,aac,mpegts,mpeg,flv,asf"
 OWN_FILE_ONLY = ["-protocol_whitelist", "file", "-format_whitelist", CONTAINERS]
 NOT_MEDIA = "not a video or sound file tarjim can open"
+# The most sound tarjim works on. A file of a few hundred bytes can decode to days of sound, so
+# the length is measured on what ffmpeg decoded, never taken from what the file says about itself.
+LONGEST = 6 * 3600.0
+TOO_LONG = "this file is longer than six hours of sound, the most tarjim works on"
+COUNT_RATE = 100
 
 
 @dataclass(frozen=True)
@@ -83,12 +89,46 @@ def video_kbps(video: Path) -> int:
     return next((int(rate) // 1000 for rate in stated if str(rate or "").isdigit()), 0)
 
 
+def sound_cap() -> list[str]:
+    """ffmpeg stops a second past LONGEST, so a longer file is seen as longer and refused."""
+    return ["-t", f"{LONGEST + 1:g}"]
+
+
 def extract_audio(video: Path, target: Path) -> Path:
+    """The sound as a wav that is later read whole into memory: never more than just past LONGEST,
+    on disk (-fs as well, in case the file's timestamps confuse -t) or in memory."""
+    most = int((LONGEST + 2) * SAMPLE_RATE * 2)
     done = run([tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", *source(video),
-                "-vn", "-ac", "1", "-ar", str(SAMPLE_RATE), str(target)])
+                "-vn", "-ac", "1", "-ar", str(SAMPLE_RATE), *sound_cap(), "-fs", str(most),
+                str(target)])
     if done.returncode != 0 or not target.is_file():
+        target.unlink(missing_ok=True)
         raise RuntimeError(f"this file has no sound that can be read: {done.stderr.strip()[-160:]}")
+    if wav_seconds(target) > LONGEST:
+        target.unlink()
+        raise RuntimeError(TOO_LONG)
     return target
+
+
+def wav_seconds(wav: Path) -> float:
+    """How much sound ffmpeg really extracted."""
+    try:
+        with wave.open(str(wav), "rb") as sound:
+            return sound.getnframes() / sound.getframerate()
+    except (wave.Error, EOFError) as error:
+        raise RuntimeError(f"this file has no sound that can be read: {error}") from None
+
+
+def sound_seconds(video: Path) -> float:
+    """How much sound the file really holds, decoded and counted (up to just past LONGEST)."""
+    try:
+        done = subprocess.run(
+            [tool("ffmpeg"), "-hide_banner", "-loglevel", "error", *source(video), "-vn", "-ac",
+             "1", "-ar", str(COUNT_RATE), *sound_cap(), "-f", "u8", "-"],
+            capture_output=True, check=False, timeout=RUN_SECONDS)
+    except subprocess.TimeoutExpired:
+        raise RuntimeError("ffmpeg did not finish within six hours") from None
+    return len(done.stdout) / COUNT_RATE
 
 
 def audio_bytes(video: Path, start: float = 0.0, end: float | None = None) -> bytes:

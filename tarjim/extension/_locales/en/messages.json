@@ -378,6 +378,9 @@
   "errMedia": {
     "message": "This file is not a video or sound file tarjim can open. Choose the video file itself, not a playlist or a list of links."
   },
+  "errLong": {
+    "message": "This file holds more than six hours of sound, the most tarjim works on. Cut it into parts of up to six hours and translate each part on its own."
+  },
   "failedAtLabel": {
     "message": "Stopped at"
   },

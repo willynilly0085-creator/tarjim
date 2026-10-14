@@ -2,7 +2,7 @@ import { $, api, post } from "./api.js";
 import { t } from "./i18n.js";
 
 const STAGES = ["downloading", "hearing", "timing", "translating", "writing", "burning", "dubbing"];
-const ERRORS = ["media", "account", "quota", "signin", "key", "download", "tools", "dub"];
+const ERRORS = ["media", "long", "account", "quota", "signin", "key", "download", "tools", "dub"];
 const rows = new Map();
 const seen = new Map();
 

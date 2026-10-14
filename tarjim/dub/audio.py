@@ -4,8 +4,8 @@ from pathlib import Path
 
 import numpy as np
 
+from tarjim.media import sound_cap, tool
 from tarjim.media import source as opened
-from tarjim.media import tool
 
 RATE = 44100
 MAX_SPEEDUP = 1.8
@@ -31,8 +31,8 @@ def ffmpeg(args: list[str], data: bytes | None = None) -> bytes:
 def decode(source: Path | bytes, channels: int = 1, rate: int = RATE) -> np.ndarray:
     feed = source if isinstance(source, bytes) else None
     given = ["-i", "-"] if isinstance(source, bytes) else opened(source)
-    raw = ffmpeg([*given, "-vn", "-ac", str(channels), "-ar", str(rate), "-f", "f32le", "-"],
-                 feed)
+    raw = ffmpeg([*given, "-vn", "-ac", str(channels), "-ar", str(rate), *sound_cap(), "-f",
+                  "f32le", "-"], feed)
     samples = np.frombuffer(raw, dtype=np.float32).copy()
     return samples.reshape(-1, channels) if channels > 1 else samples
 

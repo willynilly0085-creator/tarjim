@@ -4,6 +4,7 @@ from typing import Protocol
 
 import numpy as np
 
+from tarjim import media
 from tarjim.config import setting
 from tarjim.dub.audio import cut, write_wav
 from tarjim.dub.clone import LANGUAGES as CLONE_LANGUAGES
@@ -13,13 +14,11 @@ from tarjim.dub.separate import Stems, separate
 from tarjim.dub.studio import VOICES
 from tarjim.dub.voices import reference_spans
 from tarjim.job import Job, checkpoint
-from tarjim.media import probe
 from tarjim.memory import free_for_voice
 from tarjim.models import Cue, Word
 
 SAVED_VOICE = "fish:saved"
 FIRST_SECONDS = 10.0
-LONGEST = 6 * 3600.0
 SAFE = re.compile(r"[^\w.-]")
 NUMBER = re.compile(r"\d+")
 PLAIN_TEXT = ("gemini", "clone", "eleven", "speech")
@@ -153,9 +152,9 @@ def speak(engine: str, job: Job, samples: dict[str, Path], lines: list[Line]) ->
 
 def dub_video(job: Job, cues: list[Cue], words: list[Word], picture: Path) -> Path:
     engine = choose(job.dub, job.target)
-    length = probe(job.video).duration
-    if length > LONGEST:
-        raise RuntimeError("dubbing stops at six hours of sound")
+    length = media.sound_seconds(job.video)
+    if length > media.LONGEST:
+        raise RuntimeError(media.TOO_LONG)
     lines = spoken(lines_from(cues, length), engine, job)
     checkpoint()
     free_for_voice()

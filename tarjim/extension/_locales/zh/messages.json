@@ -378,6 +378,9 @@
   "errMedia": {
     "message": "这个文件不是 tarjim 能打开的视频或音频。请选择视频文件本身，而不是播放列表或链接列表。"
   },
+  "errLong": {
+    "message": "这个文件的声音超过六小时，而 tarjim 最多处理六小时。请把它分成每段不超过六小时的部分，再逐段翻译。"
+  },
   "failedAtLabel": {
     "message": "停在"
   },

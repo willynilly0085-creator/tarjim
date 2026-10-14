@@ -378,6 +378,9 @@
   "errMedia": {
     "message": "File ini bukan video atau audio yang bisa dibuka tarjim. Pilih file videonya sendiri, bukan playlist atau daftar tautan."
   },
+  "errLong": {
+    "message": "File ini berisi suara lebih dari enam jam, batas terlama yang dikerjakan tarjim. Potong menjadi bagian paling lama enam jam, lalu terjemahkan tiap bagian sendiri-sendiri."
+  },
   "failedAtLabel": {
     "message": "Berhenti di"
   },

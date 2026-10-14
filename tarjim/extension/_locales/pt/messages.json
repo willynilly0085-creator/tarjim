@@ -378,6 +378,9 @@
   "errMedia": {
     "message": "Este arquivo não é um vídeo nem um áudio que o tarjim consiga abrir. Escolha o próprio arquivo de vídeo, não uma playlist nem uma lista de links."
   },
+  "errLong": {
+    "message": "Este arquivo tem mais de seis horas de som, o máximo com que o tarjim trabalha. Divida-o em partes de no máximo seis horas e traduza cada parte separadamente."
+  },
   "failedAtLabel": {
     "message": "Parou em"
   },
