@@ -14,7 +14,10 @@ from tarjim.config import setting
 from tarjim.engines.subscription import HIDDEN, launcher, run, strict
 from tarjim.engines.web import EngineError, unwrap, wrap
 
-PLAIN = ("--tools", "", "--disable-web-search", "--no-subagents", "--no-plan", "--max-turns", "1")
+# `--tools ""` removes the built-in tools only; `--deny MCPTool` refuses the person's MCP servers
+# too (README of 1.0.50, "Permission Rules": a bare prefix matches every call of that kind).
+PLAIN = ("--tools", "", "--disable-web-search", "--no-subagents", "--no-plan", "--max-turns", "1",
+         "--deny", "MCPTool")
 LISTED = re.compile(r"^\s*[*-]\s+([\w.:-]+)(\s+\(default\))?\s*$", re.MULTILINE)
 LIST_SECONDS = 30
 

@@ -16,6 +16,14 @@ TIMEOUT = 900
 LONGEST_ARGUMENT = 24000
 SHIM_TARGET = re.compile(r'"%dp0%\\([^"]+)"')
 NOT_OFFERED = ("reserve", "review")
+# The transcript is a stranger's text and a translation needs no tool. Per `codex exec --help`
+# 0.162.1 the person's config.toml (MCP servers, plugins) and .rules files stay out while "auth
+# still uses `CODEX_HOME`"; the tools are switched off by the names `codex features list` gives.
+NO_TOOLS = ("shell_tool", "view_image", "apps", "plugins", "hooks", "computer_use", "browser_use",
+            "browser_use_external", "in_app_browser", "multi_agent", "image_generation",
+            "skill_mcp_dependency_install", "tool_suggest")
+ALONE = ("--ignore-user-config", "--ignore-rules",
+         *[part for name in NO_TOOLS for part in ("--disable", name)])
 REFUSED = "not supported"
 HIDDEN = 0x08000000 if sys.platform == "win32" else 0
 
@@ -125,7 +133,8 @@ class CodexAsker:
             shape.write_text(json.dumps(strict(wrap(schema))), encoding="utf-8")
             chosen = ["-m", model] if model else []
             command = [*launcher("codex"), "exec", *chosen, "--skip-git-repo-check", "--ephemeral",
-                       "-s", "read-only", "-c", "notify=[]", "-c", "model_reasoning_effort=medium",
+                       "-s", "read-only", *ALONE, "-c", "notify=[]",
+                       "-c", "model_reasoning_effort=medium",
                        "--output-schema", str(shape), "-o", str(reply), "-"]
             done = run(command, prompt, folder)
             return done, reply.read_text(encoding="utf-8") if reply.exists() else ""
