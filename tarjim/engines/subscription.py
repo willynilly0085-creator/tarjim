@@ -18,12 +18,14 @@ SHIM_TARGET = re.compile(r'"%dp0%\\([^"]+)"')
 NOT_OFFERED = ("reserve", "review")
 # The transcript is a stranger's text and a translation needs no tool. Per `codex exec --help`
 # 0.162.1 the person's config.toml (MCP servers, plugins) and .rules files stay out while "auth
-# still uses `CODEX_HOME`"; the tools are switched off by the names `codex features list` gives.
+# still uses `CODEX_HOME`". Tools are switched off as `-c features.<name>=false`, which a Codex
+# that lacks a name ignores (`--disable <name>` refuses it and would stop every translation).
 NO_TOOLS = ("shell_tool", "view_image", "apps", "plugins", "hooks", "computer_use", "browser_use",
             "browser_use_external", "in_app_browser", "multi_agent", "image_generation",
             "skill_mcp_dependency_install", "tool_suggest")
 ALONE = ("--ignore-user-config", "--ignore-rules",
-         *[part for name in NO_TOOLS for part in ("--disable", name)])
+         *[part for name in NO_TOOLS for part in ("-c", f"features.{name}=false")])
+TOO_OLD = "this Codex cannot run without its tools; update it: npm install -g @openai/codex"
 REFUSED = "not supported"
 HIDDEN = 0x08000000 if sys.platform == "win32" else 0
 
@@ -110,6 +112,12 @@ def codex_models() -> list[str]:
     return [saved, *[n for n in offered if n != saved]] if saved else offered or [""]
 
 
+def outdated(stderr: str) -> str:
+    """A Codex older than `--ignore-user-config` is told to update, never run with the
+    person's own tools and servers."""
+    return TOO_OLD if "unexpected argument '--ignore" in stderr else stderr[-400:]
+
+
 class CodexAsker:
     hears = False
 
@@ -121,7 +129,7 @@ class CodexAsker:
                 if model and model != setting("codex_model"):
                     save("codex_model", model)
                 return unwrap(parse_json(reply))
-            last = done.stderr[-400:]
+            last = outdated(done.stderr)
             if REFUSED not in done.stderr:
                 break
         raise EngineError("codex", 1, last)
