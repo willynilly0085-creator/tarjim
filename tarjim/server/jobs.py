@@ -20,8 +20,10 @@ SIGNED_OUT = ("Failed to authenticate", "OAuth session expired", "ot logged in",
 REFUSED_ACCOUNT = ("not eligible", "Eligibility check failed", "erify your account")
 NOT_MEDIA = ("not a video or sound file",)
 TOO_LONG = ("longer than six hours of sound",)
-REASONS = [("media", NOT_MEDIA), ("long", TOO_LONG), ("account", REFUSED_ACCOUNT),
-           ("quota", ("QuotaExhausted", "quota", " 429:")), ("signin", SIGNED_OUT),
+A_LIST = ("this link is a list of videos",)
+REASONS = [("media", NOT_MEDIA), ("long", TOO_LONG), ("list", A_LIST),
+           ("account", REFUSED_ACCOUNT), ("quota", ("QuotaExhausted", "quota", " 429:")),
+           ("signin", SIGNED_OUT),
            ("key", ("API key missing", "API key not valid", " 401:", " 403:")),
            ("download", ("DownloadError", "download")), ("tools", ("not found; install",)),
            ("dub", ("DubUnavailable", "VoiceError"))]

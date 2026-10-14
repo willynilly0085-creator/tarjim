@@ -385,6 +385,7 @@
   "err_account": "La empresa de IA rechazó esta cuenta: dice que no es apta o que primero debe verificarse. Depende de la empresa, no de tarjim. Abra su programa o su sitio y complete la verificación que pide, o elija otra IA en Ajustes (una clave gratuita de Gemini funciona al instante).",
   "err_media": "Este archivo no es un vídeo ni un audio que tarjim pueda abrir. Elija el propio archivo de vídeo, no una lista de reproducción ni una lista de enlaces.",
   "err_long": "Este archivo tiene más de seis horas de sonido, el máximo con el que trabaja tarjim. Divídalo en partes de seis horas como mucho y traduzca cada parte por separado.",
+  "err_list": "Este enlace es una lista de varios vídeos, como una lista de reproducción, un canal o un feed. tarjim trabaja con un vídeo cada vez: abra el vídeo que quiere y envíe su propio enlace.",
   "failedAt": "Se detuvo en «{stage}».",
   "errorDetail": "Detalles: {detail}",
   "needSignIn": "Inicia sesión en {name} para traducir con tu suscripción, sin ninguna clave.",

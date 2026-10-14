@@ -381,6 +381,9 @@
   "errLong": {
     "message": "Ce fichier contient plus de six heures de son, le maximum que tarjim traite. Découpez-le en parties de six heures au plus et traduisez chaque partie séparément."
   },
+  "errList": {
+    "message": "Ce lien est une liste de plusieurs vidéos, comme une playlist, une chaîne ou un flux. tarjim traite une vidéo à la fois : ouvrez la vidéo voulue et envoyez son propre lien."
+  },
   "failedAtLabel": {
     "message": "Arrêté à"
   },

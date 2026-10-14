@@ -381,6 +381,9 @@
   "errLong": {
     "message": "Diese Datei enthält mehr als sechs Stunden Ton, das Höchste, womit tarjim arbeitet. Teilen Sie sie in Abschnitte von höchstens sechs Stunden und übersetzen Sie jeden Abschnitt einzeln."
   },
+  "errList": {
+    "message": "Dieser Link ist eine Liste mehrerer Videos, etwa eine Playlist, ein Kanal oder ein Feed. tarjim bearbeitet jeweils ein Video: Öffnen Sie das gewünschte Video und senden Sie dessen eigenen Link."
+  },
   "failedAtLabel": {
     "message": "Angehalten bei"
   },

@@ -385,6 +385,7 @@
   "err_account": "Yapay zekâ şirketi bu hesabı reddetti: hesabın uygun olmadığını veya önce doğrulanması gerektiğini söylüyor. Bu şirket tarafındadır, tarjim'de değil. Şirketin programını veya sitesini açıp istenen doğrulamayı tamamlayın ya da Ayarlar'dan başka bir yapay zekâ seçin (ücretsiz Gemini anahtarı hemen çalışır).",
   "err_media": "Bu dosya tarjim'in açabileceği bir video ya da ses dosyası değil. Oynatma listesi ya da bağlantı listesi değil, video dosyasının kendisini seçin.",
   "err_long": "Bu dosyada altı saatten uzun ses var; tarjim en fazla altı saatlik sesle çalışır. Dosyayı en fazla altı saatlik parçalara bölün ve her parçayı ayrı çevirin.",
+  "err_list": "Bu bağlantı birden çok videodan oluşan bir liste: oynatma listesi, kanal ya da akış gibi. tarjim her seferinde tek bir videoyla çalışır: istediğiniz videoyu açın ve onun kendi bağlantısını gönderin.",
   "failedAt": "“{stage}” aşamasında durdu.",
   "errorDetail": "Ayrıntı: {detail}",
   "needSignIn": "Aboneliğinle, anahtar olmadan çevirmek için {name} oturumunu aç.",

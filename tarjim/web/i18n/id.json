@@ -385,6 +385,7 @@
   "err_account": "Perusahaan AI menolak akun ini: katanya akun tidak memenuhi syarat atau harus diverifikasi dulu. Ini dari pihak perusahaan, bukan tarjim. Buka program atau situsnya dan selesaikan verifikasi yang diminta, atau pilih AI lain di Pengaturan (kunci Gemini gratis langsung bisa dipakai).",
   "err_media": "File ini bukan video atau audio yang bisa dibuka tarjim. Pilih file videonya sendiri, bukan playlist atau daftar tautan.",
   "err_long": "File ini berisi suara lebih dari enam jam, batas terlama yang dikerjakan tarjim. Potong menjadi bagian paling lama enam jam, lalu terjemahkan tiap bagian sendiri-sendiri.",
+  "err_list": "Tautan ini adalah daftar beberapa video, seperti playlist, kanal, atau feed. tarjim mengerjakan satu video setiap kali: buka video yang Anda mau dan kirim tautan video itu sendiri.",
   "failedAt": "Berhenti di “{stage}”.",
   "errorDetail": "Rincian: {detail}",
   "needSignIn": "Masuk ke {name} agar terjemahan memakai langgananmu, tanpa kunci apa pun.",

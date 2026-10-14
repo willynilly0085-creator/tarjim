@@ -381,6 +381,9 @@
   "errLong": {
     "message": "Este archivo tiene más de seis horas de sonido, el máximo con el que trabaja tarjim. Divídalo en partes de seis horas como mucho y traduzca cada parte por separado."
   },
+  "errList": {
+    "message": "Este enlace es una lista de varios vídeos, como una lista de reproducción, un canal o un feed. tarjim trabaja con un vídeo cada vez: abra el vídeo que quiere y envíe su propio enlace."
+  },
   "failedAtLabel": {
     "message": "Se detuvo en"
   },

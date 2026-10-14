@@ -381,6 +381,9 @@
   "errLong": {
     "message": "File ini berisi suara lebih dari enam jam, batas terlama yang dikerjakan tarjim. Potong menjadi bagian paling lama enam jam, lalu terjemahkan tiap bagian sendiri-sendiri."
   },
+  "errList": {
+    "message": "Tautan ini adalah daftar beberapa video, seperti playlist, kanal, atau feed. tarjim mengerjakan satu video setiap kali: buka video yang Anda mau dan kirim tautan video itu sendiri."
+  },
   "failedAtLabel": {
     "message": "Berhenti di"
   },
