@@ -22,7 +22,7 @@ def perform(task: Task, downloads: Path) -> None:
     task.moved = (0, 0)
     downloads.mkdir(parents=True, exist_ok=True)
     job = Job(task.video, order.target, order.dialect, burn=order.mode != "srt",
-              dub=DUBBING.get(order.mode, ""), out_dir=downloads)
+              dub=DUBBING.get(order.mode, ""), out_dir=downloads, cache_dir=HOME / "cache")
 
     def report(stage: str) -> None:
         task.stage = stage
@@ -66,7 +66,7 @@ def run_alongside(port: int) -> Board:
 
     downloads = Path(setting("downloads") or DOWNLOADS)
     board = Board(lambda task: perform(task, downloads), idle=release_models)
-    sweep([HOME / "uploads", HOME / "sources"])
+    sweep([HOME / "uploads", HOME / "sources", HOME / "cache"])
     service.begin(board, HOME / "uploads")
     threading.Thread(target=watch, args=(board, port, threading.Event()), daemon=True).start()
     threading.Thread(target=refresh, daemon=True).start()

@@ -1,5 +1,6 @@
-"""Copies of videos that tarjim keeps to work on (uploads, downloads from links) are cleared a
-week after their last use. The results in the person's downloads folder are never touched."""
+"""Copies of videos that tarjim keeps to work on (uploads, downloads from links) and the work
+kept for them (sound, transcript, cues) are cleared a week after their last use. The results in
+the person's downloads folder are never touched."""
 import shutil
 import time
 from pathlib import Path

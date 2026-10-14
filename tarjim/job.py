@@ -34,6 +34,7 @@ class Job:
     font: str = ""
     dub: str = ""
     out_dir: Path | None = None
+    cache_dir: Path | None = None
 
     @property
     def language(self) -> Language:
@@ -49,7 +50,9 @@ class Job:
 
     @property
     def cache(self) -> Path:
-        folder = self.video.parent / ".tarjim" / self.video.stem
+        """The kept work: beside the video for the command line, where a re-run finds it; in
+        the folder the server gives, so a file named in chat gets nothing written beside it."""
+        folder = (self.cache_dir or self.video.parent / ".tarjim") / self.video.stem
         folder.mkdir(parents=True, exist_ok=True)
         return folder
 
