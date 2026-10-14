@@ -25,11 +25,15 @@
   </header>
 
   <aside class="pairing" id="pairing" hidden aria-live="polite">
-    <p data-t="pairAsk"></p>
-    <div class="row">
-      <button class="primary small" id="pair-allow" type="button" data-t="allow"></button>
+    <p id="pair-ask" data-t="pairAsk"></p>
+    <form class="row" id="pair-form" novalidate>
+      <label class="visually-hidden" for="pair-code" data-t="pairCode"></label>
+      <input class="text-input" id="pair-code" inputmode="numeric" maxlength="4" dir="ltr" autocomplete="off"
+             spellcheck="false" placeholder="0000" aria-describedby="pair-ask">
+      <button class="primary small" id="pair-allow" type="submit" data-t="allow"></button>
       <button class="button-quiet" id="pair-deny" type="button" data-t="deny"></button>
-    </div>
+    </form>
+    <p class="error" id="pair-error" role="alert" hidden data-t="pairWrongCode"></p>
   </aside>
 
   <main id="assistant" class="assistant" hidden></main>

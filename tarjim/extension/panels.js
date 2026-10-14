@@ -6,7 +6,8 @@ import { ApiError, api, remember, settings, t } from "./shared.js";
 window.addEventListener("unhandledrejection", (event) => {
   if (!(event.reason instanceof ApiError)) return;
   event.preventDefault();
-  show(event.reason.kind === "token" ? "pair" : "offline");
+  if (event.reason.kind === "token") showPair();
+  else show("offline");
 });
 
 async function pair(event, ready) {
@@ -21,6 +22,18 @@ async function pair(event, ready) {
   }
 }
 
+function showCode(code) {
+  $("pair-waiting").hidden = false;
+  $("pair-waiting").textContent = `${t("pairWaiting")} \u2066${code}\u2069`;
+}
+
+// The code stays on the pairing screen until the request is answered, even after the popup closed.
+export async function showPair() {
+  show("pair");
+  const { pairId, pairCode } = await chrome.storage.local.get(["pairId", "pairCode"]);
+  if (pairId && pairCode) showCode(pairCode);
+}
+
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const ATTEMPTS = 400;
 
@@ -28,8 +41,7 @@ export async function autoPair(ready) {
   show("pair");
   const asked = await askToPair();
   if (!asked?.id) return show("offline");
-  $("pair-waiting").hidden = false;
-  $("pair-waiting").textContent = `${t("pairWaiting")} (${asked.code})`;
+  showCode(asked.code);
   $("open-tarjim").hidden = false;
   chrome.tabs.create({ url: `${await serverBase()}/` });
   for (let i = 0; i < ATTEMPTS; i += 1) {

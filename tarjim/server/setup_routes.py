@@ -114,5 +114,6 @@ class SetupRoutes(OnboardRoutes, PhoneRoutes, UpdateRoutes, VoiceRoutes):
                          for r in self.pairing.pending()])
 
     def decide_pair(self, _query: Query, request_id: str, verdict: str) -> None:
-        done = self.pairing.decide(request_id, verdict == "allow")
+        code = str(self.read_json().get("code", "")).strip()
+        done = self.pairing.decide(request_id, verdict == "allow", code)
         self.reply(200 if done else 404, {"done": done})

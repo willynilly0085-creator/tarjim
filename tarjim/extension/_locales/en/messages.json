@@ -225,7 +225,7 @@
     "message": "Or paste the security token by hand:"
   },
   "pairWaiting": {
-    "message": "Open the tarjim page and allow the connection request that appears."
+    "message": "On the tarjim page, type this code and press Allow:"
   },
   "menuRootArabic": {
     "message": "Translate to Arabic"

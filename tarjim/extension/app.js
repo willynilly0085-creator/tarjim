@@ -4,7 +4,7 @@ import { downloadable } from "./posts.js";
 import { $, show } from "./dom.js";
 import { claimPending } from "./pairing.js";
 import { showLinkedVoices } from "./keys.js";
-import { autoPair, openSettings, wirePanels } from "./panels.js";
+import { autoPair, openSettings, showPair, wirePanels } from "./panels.js";
 import { isMedia, upload } from "./upload.js";
 
 const params = new URLSearchParams(location.search);
@@ -40,7 +40,7 @@ async function connect() {
   try {
     await api("/jobs");
   } catch (error) {
-    return show(error.kind === "token" ? "pair" : "offline");
+    return error.kind === "token" ? showPair() : show("offline");
   }
   const setup = await api("/setup").catch(() => ({}));
   if (setup.setup_done !== "yes") return show("setup");
@@ -138,7 +138,7 @@ async function submit(event) {
     $("notice").textContent = t("started");
     clearSource();
   } catch (error) {
-    return error.kind === "token" ? show("pair") : connect();
+    return error.kind === "token" ? showPair() : connect();
   } finally {
     $("go").textContent = t("translate");
     $("upload").hidden = true;

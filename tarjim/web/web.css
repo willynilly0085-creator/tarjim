@@ -150,8 +150,8 @@ h1 { margin: 0; font-size: var(--text-title); font-weight: 650; line-height: 1.2
 .how { display: grid; gap: var(--space-md); margin: 0; padding-inline-start: 1.25rem; }
 .path-row { display: flex; gap: var(--space-xs); align-items: center; margin-top: var(--space-xs); }
 .command { flex: 1; min-width: 0; overflow-wrap: anywhere; padding: var(--space-sm); border-radius: 8px; background: var(--raised); font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: var(--text-meta); }
-
 .pairing { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-sm); margin-bottom: var(--space-md); padding: var(--space-md); border: 1px solid var(--accent-line); border-radius: var(--radius); background: var(--raised); font-weight: 550; }
+.pairing .text-input { width: 6rem; min-height: 36px; text-align: center; letter-spacing: 0.1em; font-variant-numeric: tabular-nums; }
 
 .order { display: grid; gap: var(--space-md); }
 .drop-zone { display: grid; justify-items: center; gap: 6px; padding: var(--space-xl) var(--space-md); border: 1.5px dashed var(--line); border-radius: var(--radius); text-align: center; cursor: pointer; transition: border-color 180ms var(--ease), background-color 180ms var(--ease); }

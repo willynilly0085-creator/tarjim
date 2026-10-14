@@ -7,7 +7,7 @@ export async function serverBase() {
 export async function askToPair() {
   const reply = await fetch(`${await serverBase()}/pair`, { method: "POST" }).catch(() => null);
   const asked = reply?.ok ? await reply.json() : null;
-  if (asked?.id) await remember({ pairId: asked.id });
+  if (asked?.id) await remember({ pairId: asked.id, pairCode: asked.code });
   return asked;
 }
 
@@ -18,11 +18,11 @@ export async function claimPending() {
   if (!reply?.ok) return "waiting";
   const state = await reply.json();
   if (state.token) {
-    await remember({ token: state.token, pairId: "" });
+    await remember({ token: state.token, pairId: "", pairCode: "" });
     return "paired";
   }
   if (state.state === "pending") return "waiting";
-  await remember({ pairId: "" });
+  await remember({ pairId: "", pairCode: "" });
   return state.state === "denied" ? "denied" : "none";
 }
 

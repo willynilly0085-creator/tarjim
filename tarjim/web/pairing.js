@@ -1,36 +1,52 @@
 import { $, api, post } from "./api.js";
 import { t } from "./i18n.js";
 
-let current = null;
+const DONE_MS = 5000;
+let pending = [];
+
+// Digits typed on an Arabic or Persian keyboard count the same as 0-9.
+const digits = (text) => text.trim().replace(/[٠-٩۰-۹]/g, (d) => String(d.charCodeAt(0) & 0xf));
 
 async function check() {
-  if ($("pairing").querySelector(".row").hidden) return;
-  const pending = await api("/pairs").catch(() => []);
-  current = pending[0]?.id ?? null;
-  $("pairing").hidden = !current;
-  if (current) $("pairing").querySelector("p").textContent = `${t("pairAsk")} (${pending[0].code})`;
+  if ($("pair-form").hidden) return;
+  pending = await api("/pairs").catch(() => []);
+  $("pairing").hidden = !pending.length;
 }
 
-async function decide(verdict) {
-  if (!current) return;
-  await post(`/pairs/${current}/${verdict}`);
-  current = null;
-  if (verdict !== "allow") {
-    $("pairing").hidden = true;
-    return;
-  }
-  $("pairing").querySelector("p").textContent = t("paired");
-  $("pairing").querySelector(".row").hidden = true;
+function showDone() {
+  $("pair-code").value = "";
+  $("pair-ask").textContent = t("paired");
+  $("pair-form").hidden = true;
   setTimeout(() => {
     $("pairing").hidden = true;
-    $("pairing").querySelector("p").textContent = t("pairAsk");
-    $("pairing").querySelector(".row").hidden = false;
-  }, 5000);
+    $("pair-ask").textContent = t("pairAsk");
+    $("pair-form").hidden = false;
+  }, DONE_MS);
+}
+
+// Only the request showing the code the person typed is allowed, and the engine checks the code too.
+async function allow(event) {
+  event.preventDefault();
+  const code = digits($("pair-code").value);
+  const match = pending.find((r) => r.code === code);
+  const done = match ? await post(`/pairs/${match.id}/allow`, { code }).then(() => true, () => false) : false;
+  $("pair-error").hidden = done;
+  if (done) return showDone();
+  $("pair-code").select();
+}
+
+async function denyAll() {
+  await Promise.all(pending.map((r) => post(`/pairs/${r.id}/deny`).catch(() => null)));
+  pending = [];
+  $("pair-code").value = "";
+  $("pair-error").hidden = true;
+  $("pairing").hidden = true;
 }
 
 export function watchPairing() {
-  $("pair-allow").addEventListener("click", () => decide("allow"));
-  $("pair-deny").addEventListener("click", () => decide("deny"));
+  $("pair-form").addEventListener("submit", allow);
+  $("pair-deny").addEventListener("click", denyAll);
+  $("pair-code").addEventListener("input", () => { $("pair-error").hidden = true; });
   check();
   setInterval(check, 3000);
 }
