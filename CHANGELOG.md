@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.21 (2026-10-14)
+
+- **Security hardening after a full scan.** A complete security scan of tarjim, run offline the way
+  Anthropic's OSS Scanner works, found eight problems; all are fixed, each guarded by tests:
+  pairing a browser extension now needs the code that extension shows, typed on tarjim's page;
+  tarjim starts itself so a folder named `tarjim` in the open project can never stand in for it;
+  Codex and Grok translate with every tool switched off; a file is opened by ffmpeg as itself
+  only, so a playlist named like a video, a network-share path or a Windows device name is
+  refused; a file's length is the sound it really holds, at most six hours, and cancel works
+  while listening; a link to a list of videos is refused before anything is downloaded; and work
+  for a file translated from a chat is kept under tarjim's own folder and cleared weekly.
+
 ## 1.0.20 (2026-10-13)
 
 - **An account the AI company refuses is now named as that.** When a subscription answers that
