@@ -28,7 +28,7 @@ def video_kbps(seconds: float) -> int:
 
 def phone_copy(video: Path) -> Path | None:
     """The video itself when it is small, otherwise a phone copy; None when none can fit."""
-    from tarjim.media import probe, run, tool
+    from tarjim.media import probe, run, source, tool
 
     if video.stat().st_size <= DIRECT:
         return video
@@ -36,7 +36,7 @@ def phone_copy(video: Path) -> Path | None:
     if rate < LOWEST_VIDEO_KBPS:
         return None
     smaller = video.with_name(f"{video.stem}.phone.mp4")
-    run([tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", "-i", str(video),
+    run([tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", *source(video),
          "-vf", "scale='min(1280,iw)':-2", "-c:v", "libx264", "-preset", "veryfast",
          "-b:v", f"{rate}k", "-maxrate", f"{rate}k", "-bufsize", f"{2 * rate}k",
          "-c:a", "aac", "-b:a", f"{AUDIO_KBPS}k", "-movflags", "+faststart", str(smaller)])

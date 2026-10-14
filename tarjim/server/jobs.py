@@ -18,8 +18,9 @@ CONTROLS = {"pause": "paused", "resume": "run", "cancel": "cancelled"}
 SIGNED_OUT = ("Failed to authenticate", "OAuth session expired", "ot logged in", "run /login",
               "login required", "ign in again")
 REFUSED_ACCOUNT = ("not eligible", "Eligibility check failed", "erify your account")
-REASONS = [("account", REFUSED_ACCOUNT), ("quota", ("QuotaExhausted", "quota", " 429:")),
-           ("signin", SIGNED_OUT),
+NOT_MEDIA = ("not a video or sound file",)
+REASONS = [("media", NOT_MEDIA), ("account", REFUSED_ACCOUNT),
+           ("quota", ("QuotaExhausted", "quota", " 429:")), ("signin", SIGNED_OUT),
            ("key", ("API key missing", "API key not valid", " 401:", " 403:")),
            ("download", ("DownloadError", "download")), ("tools", ("not found; install",)),
            ("dub", ("DubUnavailable", "VoiceError"))]

@@ -6,7 +6,7 @@ const STAGE_KEYS = {
   translating: "stageTranslating", writing: "stageWriting", burning: "stageBurning", dubbing: "stageDubbing",
   done: "stageDone", failed: "stageFailed", cancelled: "stageCancelled",
 };
-const ERROR_KEYS = { quota: "errQuota", account: "errAccount", signin: "errSignin", key: "errKey", download: "errDownload", tools: "errTools", dub: "errDub" };
+const ERROR_KEYS = { quota: "errQuota", account: "errAccount", media: "errMedia", signin: "errSignin", key: "errKey", download: "errDownload", tools: "errTools", dub: "errDub" };
 
 const RTL = new Set(["ar", "fa", "ur", "he"]);
 const LOCALES = new Set(["ar", "en", "es", "fr", "pt", "de", "ru", "tr", "hi", "ur", "id", "ja", "zh", "ko"]);

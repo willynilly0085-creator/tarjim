@@ -10,7 +10,7 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from tarjim.media import run, tool, video_kbps
+from tarjim.media import run, source, tool, video_kbps
 
 ENCODERS = [
     ["-c:v", "h264_nvenc", "-preset", "p5", "-rc", "vbr", "-cq", "21", "-b:v", "0"],
@@ -32,7 +32,7 @@ def ceiling(video: Path) -> list[str]:
 
 
 def encode(video: Path, target: Path, folder: Path) -> Path:
-    base = [tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", "-i", str(video),
+    base = [tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", *source(video),
             "-vf", f"ass={PLAIN}", "-c:a", "copy", "-movflags", "+faststart"]
     errors, limit = [], ceiling(video)
     for encoder in ENCODERS:

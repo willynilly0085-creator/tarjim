@@ -102,7 +102,7 @@ class Inbox:
             bot.say(chat, say("phone_file_huge" if large.ready() else "phone_file_big"))
             return
         named = safe_name(str(video.get("file_name") or "")) or "telegram-video.mp4"
-        name = SAFE.sub("_", named)[-80:]
+        name = safe_name(SAFE.sub("_", named)[-80:]) or "telegram-video.mp4"
         self.ask(bot, chat, {"file_id": str(video["file_id"]), "name": name, "chat": chat,
                              "message": video["message"] if big else 0})
 

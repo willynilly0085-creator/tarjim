@@ -12,6 +12,13 @@ MIN_CUT_SPACING = 0.2
 SAMPLE_RATE = 16000
 PTS = re.compile(r"pts_time:([\d.]+)")
 RUN_SECONDS = 6 * 3600
+# Containers that hold their own picture and sound. A playlist or manifest (HLS, DASH, concat and
+# the like) opens the files it names instead, so a stranger's "video" could make ffmpeg read any
+# media file on this computer or a network share; ffmpeg refuses every other format before it
+# reads anything past the file's first bytes.
+CONTAINERS = "mov,matroska,avi,mp3,wav,flac,ogg,aac,mpegts,mpeg,flv,asf"
+OWN_FILE_ONLY = ["-protocol_whitelist", "file", "-format_whitelist", CONTAINERS]
+NOT_MEDIA = "not a video or sound file tarjim can open"
 
 
 @dataclass(frozen=True)
@@ -40,10 +47,23 @@ def run(args: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess
         raise RuntimeError(f"{Path(args[0]).stem} did not finish within six hours") from None
 
 
+def source(video: Path) -> list[str]:
+    """How ffmpeg and ffprobe are handed a file that may come from a stranger."""
+    return [*OWN_FILE_ONLY, "-i", str(video)]
+
+
+def check_readable(video: Path) -> None:
+    """Before any work: the file is a video or sound file itself, not a list of other files."""
+    done = run([tool("ffprobe"), "-v", "error", "-show_entries", "format=format_name",
+                "-of", "csv=p=0", *source(video)])
+    if done.returncode != 0 or not done.stdout.strip():
+        raise RuntimeError(f"{NOT_MEDIA}: {done.stderr.strip()[-160:]}")
+
+
 def probe(video: Path) -> VideoInfo:
     out = run([tool("ffprobe"), "-v", "error", "-select_streams", "v:0", "-show_entries",
                "stream=width,height:stream_disposition=attached_pic:format=duration",
-               "-of", "json", str(video)])
+               "-of", "json", *source(video)])
     data = json.loads(out.stdout or "{}")
     stream = (data.get("streams") or [{}])[0]
     cover = bool(stream.get("disposition", {}).get("attached_pic"))
@@ -56,7 +76,7 @@ def probe(video: Path) -> VideoInfo:
 def video_kbps(video: Path) -> int:
     """How many kilobits a second the picture takes in this file; 0 when the file does not say."""
     out = run([tool("ffprobe"), "-v", "error", "-select_streams", "v:0", "-show_entries",
-               "stream=bit_rate:format=bit_rate", "-of", "json", str(video)])
+               "stream=bit_rate:format=bit_rate", "-of", "json", *source(video)])
     data = json.loads(out.stdout or "{}")
     stated = [(data.get("streams") or [{}])[0].get("bit_rate"), data.get("format", {}).get(
         "bit_rate")]
@@ -64,7 +84,7 @@ def video_kbps(video: Path) -> int:
 
 
 def extract_audio(video: Path, target: Path) -> Path:
-    done = run([tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", "-i", str(video),
+    done = run([tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", *source(video),
                 "-vn", "-ac", "1", "-ar", str(SAMPLE_RATE), str(target)])
     if done.returncode != 0 or not target.is_file():
         raise RuntimeError(f"this file has no sound that can be read: {done.stderr.strip()[-160:]}")
@@ -74,7 +94,7 @@ def extract_audio(video: Path, target: Path) -> Path:
 def audio_bytes(video: Path, start: float = 0.0, end: float | None = None) -> bytes:
     window = ["-ss", f"{start:.3f}"] + (["-to", f"{end:.3f}"] if end is not None else [])
     result = subprocess.run(
-        [tool("ffmpeg"), "-hide_banner", "-loglevel", "error", *window, "-i", str(video), "-vn",
+        [tool("ffmpeg"), "-hide_banner", "-loglevel", "error", *window, *source(video), "-vn",
          "-ac", "1", "-ar", str(SAMPLE_RATE), "-b:a", "48k", "-f", "mp3", "-"],
         capture_output=True, check=False)
     return result.stdout
@@ -82,7 +102,7 @@ def audio_bytes(video: Path, start: float = 0.0, end: float | None = None) -> by
 
 def scene_cuts(video: Path, threshold: float = SCENE_THRESHOLD) -> list[float] | None:
     """Where the picture cuts; None when the scan itself failed, so the miss is not kept."""
-    out = run([tool("ffmpeg"), "-hide_banner", "-i", str(video), "-an",
+    out = run([tool("ffmpeg"), "-hide_banner", *source(video), "-an",
                "-vf", f"select='gt(scene,{threshold})',showinfo", "-f", "null", "-"])
     if out.returncode != 0:
         return None
@@ -102,6 +122,6 @@ def mean_brightness(report: str) -> float:
 
 
 def bright_bottom(video: Path) -> bool:
-    done = run([tool("ffmpeg"), "-hide_banner", "-i", str(video), "-vf", BOTTOM_STRIP, "-an",
+    done = run([tool("ffmpeg"), "-hide_banner", *source(video), "-vf", BOTTOM_STRIP, "-an",
                 "-f", "null", "-"])
     return mean_brightness(done.stderr) > BRIGHT

@@ -375,6 +375,9 @@
   "errAccount": {
     "message": "Yapay zekâ şirketi bu hesabı reddetti: hesabın uygun olmadığını veya önce doğrulanması gerektiğini söylüyor. Bu şirket tarafındadır, tarjim'de değil. Şirketin programını veya sitesini açıp istenen doğrulamayı tamamlayın ya da Ayarlar'dan başka bir yapay zekâ seçin (ücretsiz Gemini anahtarı hemen çalışır)."
   },
+  "errMedia": {
+    "message": "Bu dosya tarjim'in açabileceği bir video ya da ses dosyası değil. Oynatma listesi ya da bağlantı listesi değil, video dosyasının kendisini seçin."
+  },
   "failedAtLabel": {
     "message": "Durduğu aşama:"
   },

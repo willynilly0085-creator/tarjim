@@ -87,6 +87,7 @@ def write_outputs(job: Job, cues: list[Cue], words: list[Word], report: Report) 
 
 def run(job: Job, report: Report = quiet) -> tuple[list[Cue], list[Issue]]:
     job.claim_cache()
+    media.check_readable(job.video)
     report("hearing")
     words = transcript_for(job, report).words
     cues = build_cues(words, cuts_for(job))

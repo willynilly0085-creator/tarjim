@@ -4,6 +4,7 @@ from pathlib import Path
 
 import numpy as np
 
+from tarjim.media import source as opened
 from tarjim.media import tool
 
 RATE = 44100
@@ -29,8 +30,8 @@ def ffmpeg(args: list[str], data: bytes | None = None) -> bytes:
 
 def decode(source: Path | bytes, channels: int = 1, rate: int = RATE) -> np.ndarray:
     feed = source if isinstance(source, bytes) else None
-    target = "-" if feed is not None else str(source)
-    raw = ffmpeg(["-i", target, "-vn", "-ac", str(channels), "-ar", str(rate), "-f", "f32le", "-"],
+    given = ["-i", "-"] if isinstance(source, bytes) else opened(source)
+    raw = ffmpeg([*given, "-vn", "-ac", str(channels), "-ar", str(rate), "-f", "f32le", "-"],
                  feed)
     samples = np.frombuffer(raw, dtype=np.float32).copy()
     return samples.reshape(-1, channels) if channels > 1 else samples

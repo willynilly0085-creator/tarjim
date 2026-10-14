@@ -375,6 +375,9 @@
   "errAccount": {
     "message": "Der KI-Anbieter hat dieses Konto abgelehnt: Es sei nicht berechtigt oder müsse erst bestätigt werden. Das liegt beim Anbieter, nicht bei tarjim. Öffnen Sie dessen Programm oder Website und schließen Sie die verlangte Bestätigung ab, oder wählen Sie in den Einstellungen eine andere KI (ein kostenloser Gemini-Schlüssel funktioniert sofort)."
   },
+  "errMedia": {
+    "message": "Diese Datei ist kein Video und keine Audiodatei, die tarjim öffnen kann. Wählen Sie die Videodatei selbst, keine Playlist und keine Linkliste."
+  },
   "failedAtLabel": {
     "message": "Angehalten bei"
   },

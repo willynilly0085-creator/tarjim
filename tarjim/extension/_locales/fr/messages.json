@@ -375,6 +375,9 @@
   "errAccount": {
     "message": "Le fournisseur d'IA a refusé ce compte : il le dit non éligible ou à vérifier d'abord. Cela vient du fournisseur, pas de tarjim. Ouvrez son programme ou son site et terminez la vérification demandée, ou choisissez une autre IA dans les Réglages (une clé Gemini gratuite fonctionne tout de suite)."
   },
+  "errMedia": {
+    "message": "Ce fichier n'est ni une vidéo ni un son que tarjim peut ouvrir. Choisissez le fichier vidéo lui-même, pas une playlist ni une liste de liens."
+  },
   "failedAtLabel": {
     "message": "Arrêté à"
   },

@@ -10,6 +10,8 @@ MEDIA_SUFFIXES = {".mp4", ".mkv", ".webm", ".mov", ".avi", ".m4v", ".mp3", ".m4a
                   ".flac", ".ogg", ".opus", ".aac"}
 UNSAFE = re.compile(r"[^\w\s.\-\[\]()]", re.UNICODE)
 MAX_NAME = 80
+# Names Windows gives to devices, whatever follows the first dot: a file so named is not a file.
+DEVICE = re.compile(r"(con|prn|aux|nul|(com|lpt)[0-9¹²³])", re.IGNORECASE)
 COOKIE = "tarjim"
 
 
@@ -31,6 +33,8 @@ def safe_name(name: str) -> str | None:
     if suffix not in MEDIA_SUFFIXES:
         return None
     clean = UNSAFE.sub("_", stem).strip(" .")[:MAX_NAME] or "video"
+    if DEVICE.fullmatch(clean.split(".")[0].rstrip()):
+        clean = f"_{clean}"
     return clean + suffix
 
 

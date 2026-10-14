@@ -4,6 +4,7 @@ import numpy as np
 
 from tarjim.dub.audio import RATE, ffmpeg, fit, speed_up, trim
 from tarjim.dub.lines import Line
+from tarjim.media import source
 
 HEADROOM = 0.97
 VOICE_GAIN = 1.0
@@ -33,7 +34,7 @@ def mix(lines: list[Line], speech: list[np.ndarray], background: np.ndarray) -> 
 
 
 def mux(picture: Path, sound: Path, target: Path) -> Path:
-    ffmpeg(["-y", "-i", str(picture), "-i", str(sound), "-map", "0:v:0", "-map", "1:a:0",
+    ffmpeg(["-y", *source(picture), *source(sound), "-map", "0:v:0", "-map", "1:a:0",
             "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart",
             "-shortest", str(target)])
     return target

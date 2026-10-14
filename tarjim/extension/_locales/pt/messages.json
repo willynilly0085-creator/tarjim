@@ -375,6 +375,9 @@
   "errAccount": {
     "message": "A empresa de IA recusou esta conta: diz que ela não é elegível ou precisa ser verificada antes. Isso é do lado da empresa, não do tarjim. Abra o programa ou o site dela e conclua a verificação pedida, ou escolha outra IA nas Configurações (uma chave gratuita do Gemini funciona na hora)."
   },
+  "errMedia": {
+    "message": "Este arquivo não é um vídeo nem um áudio que o tarjim consiga abrir. Escolha o próprio arquivo de vídeo, não uma playlist nem uma lista de links."
+  },
   "failedAtLabel": {
     "message": "Parou em"
   },
