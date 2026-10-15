@@ -30,8 +30,10 @@ Issues = "https://github.com/willynilly0085-creator/tarjim/issues"
 Developer = "https://indicators.sa/"
 
 [project.optional-dependencies]
-dub = ["torchcodec", "demucs", "catt-tashkeel", "edge-tts", "fish-audio-sdk", "num2words", "librosa",
-       "einops", "soundfile"]
+# torchaudio: VoxCPM imports it on load. catt-tashkeel needs onnxruntime-gpu, which has no macOS
+# build; without it the voice gets the text without vowel marks, as when the model fails.
+dub = ["torchcodec", "torchaudio", "demucs", "catt-tashkeel; sys_platform != 'darwin'", "edge-tts",
+       "fish-audio-sdk", "num2words", "librosa", "einops", "soundfile"]
 dev = ["pytest", "pytest-cov", "ruff", "mypy", "num2words"]
 
 [project.scripts]
