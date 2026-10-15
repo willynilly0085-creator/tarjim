@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.27 (2026-10-15)
+
+- **Remove a translation from the list.** A finished, failed or cancelled translation has a
+  "Remove from list" button, on the page and in the extension. The video and subtitle files stay
+  in your folder; a finished one asks once before it goes.
+- **Change the translating AI and its model without redoing setup.** A short line above
+  Translate shows which AI and model translate ("Translating with Gemini · 3.8 Flash"). Change
+  opens a list of the AIs that are ready now and that AI's text models; the choice is saved at
+  once and the next translation uses it. On the page and in the extension.
+
 ## 1.0.26 (2026-10-15)
 
 - **Translation by Gemini key takes seconds again, not minutes.** When Google's busiest models
