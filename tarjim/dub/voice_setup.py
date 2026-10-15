@@ -2,7 +2,8 @@
 
 The package is installed without its own dependency list: that list pulls in a web interface,
 speech recognition, dataset tools and cloud SDKs (41 packages) that dubbing never loads. What
-dubbing does load (torch, transformers, einops, librosa, soundfile) comes with tarjim's dub extra.
+dubbing does load (LOADS, read from voxcpm's own imports) comes with tarjim and its dub extra; a
+test holds the two together, since nothing else would bring them.
 """
 import importlib.util
 import shutil
@@ -12,6 +13,10 @@ import sys
 from tarjim.dub.clone import PACKAGE
 
 MINUTES = 600
+# What voxcpm imports on the way to speaking (its training, command line, web page, denoiser and
+# text normaliser are never loaded). triton is optional: without it the model runs unoptimized.
+LOADS = ("torch", "torchaudio", "transformers", "huggingface-hub", "safetensors", "einops",
+         "pydantic", "tqdm", "librosa", "numpy")
 
 
 def ready() -> bool:
