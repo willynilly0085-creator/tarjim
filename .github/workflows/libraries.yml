@@ -30,7 +30,7 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - run: python scripts/pins.py --upgrade
       - run: git diff --stat -- tarjim/constraints.txt tarjim/overrides.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: constraints
           path: |
@@ -88,7 +88,7 @@ jobs:
             -f json -o full.json || true
           python scripts/advisories.py full.json advisories.md
       - if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: audit
           path: |
