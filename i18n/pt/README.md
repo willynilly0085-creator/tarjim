@@ -221,6 +221,20 @@ andamento, e o tarjim volta sozinho em alguns minutos; a extensão do navegador 
 para acompanhar. Com a opção desativada, a página mostra um aviso e um botão **Atualizar agora**.
 Uma cópia que você executa a partir do código-fonte é atualizada com `git pull`.
 
+### Como suas partes se mantêm atualizadas
+
+- O **yt-dlp**, a parte que baixa dos sites de vídeo, se atualiza sozinho: os sites mudam a cada
+  poucas semanas e uma cópia antiga para de funcionar com eles. Uma vez por dia o motor pergunta ao
+  PyPI pela versão mais recente (uma requisição, nada sobre você) e instala uma mais nova enquanto
+  nada está sendo baixado.
+- **Todas as outras bibliotecas** são instaladas na versão testada com a sua versão do tarjim, e só
+  mudam com a próxima versão. Toda semana versões mais novas são testadas e verificadas contra
+  vulnerabilidades conhecidas antes que uma versão as adote. O PyTorch segue o build que o uv
+  escolhe para a sua placa de vídeo.
+
+Desativar **Atualizar o tarjim automaticamente** interrompe as duas coisas. Uma cópia executada a
+partir do código-fonte recebe as versões testadas com `pip install -c tarjim/constraints.txt -e ".[dub]"`.
+
 ## Privacidade e segurança
 
 - **As chaves** ficam guardadas no cofre criptografado do seu sistema operacional (Gerenciador de

@@ -232,6 +232,20 @@ passend dazu neu. Ist die Option ausgeschaltet, zeigt die Seite einen Hinweis un
 **Jetzt aktualisieren**. Eine Kopie, die Sie aus dem Quellcode ausführen, aktualisieren Sie mit
 `git pull`.
 
+### Wie seine Bestandteile aktuell bleiben
+
+- **yt-dlp**, der Teil, der von Videoseiten herunterlädt, aktualisiert sich selbst: Die Seiten
+  ändern sich alle paar Wochen, und eine alte Version lädt dort nicht mehr. Einmal am Tag fragt die
+  Engine bei PyPI nach der neuesten Version (eine Anfrage, nichts über Sie) und installiert eine
+  neuere, solange nichts heruntergeladen wird.
+- **Alle anderen Bibliotheken** werden in der Version installiert, die mit Ihrer tarjim-Version
+  getestet wurde, und ändern sich erst mit der nächsten Version. Jede Woche werden neuere Versionen
+  getestet und auf bekannte Schwachstellen geprüft, bevor eine Version sie übernimmt. PyTorch folgt
+  dem Build, den uv für Ihre Grafikkarte wählt.
+
+Wenn Sie **tarjim automatisch aktualisieren** ausschalten, stoppt beides. Eine Kopie aus dem
+Quellcode erhält die getesteten Versionen mit `pip install -c tarjim/constraints.txt -e ".[dub]"`.
+
 ## Datenschutz und Sicherheit
 
 - **Schlüssel** werden im verschlüsselten Tresor Ihres Betriebssystems gespeichert (Windows

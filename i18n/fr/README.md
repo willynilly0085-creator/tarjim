@@ -221,6 +221,20 @@ en cours, et tarjim revient tout seul en quelques minutes ; l'extension du navig
 d'elle-même pour rester alignée. Lorsque l'option est désactivée, la page affiche un avis et un
 bouton **Mettre à jour**. Une copie lancée depuis le code source se met à jour avec `git pull`.
 
+### Comment ses composants restent à jour
+
+- **yt-dlp**, la partie qui télécharge depuis les sites de vidéos, se met à jour toute seule : les
+  sites changent toutes les quelques semaines et une ancienne copie cesse de fonctionner avec eux.
+  Une fois par jour, le moteur demande à PyPI sa dernière version (une requête, rien sur vous) et
+  installe une version plus récente quand aucun téléchargement n'est en cours.
+- **Toutes les autres bibliothèques** sont installées dans la version testée avec votre version de
+  tarjim, et ne changent qu'avec la version suivante. Chaque semaine, les versions plus récentes
+  sont testées et vérifiées contre les vulnérabilités connues avant qu'une version ne les adopte.
+  PyTorch suit la variante que uv choisit pour votre carte graphique.
+
+Désactiver **Mettre tarjim à jour automatiquement** arrête les deux. Une copie lancée depuis le
+code source obtient les versions testées avec `pip install -c tarjim/constraints.txt -e ".[dub]"`.
+
 ## Confidentialité et sécurité
 
 - **Les clés** sont stockées dans le coffre chiffré de votre système d'exploitation (Gestionnaire

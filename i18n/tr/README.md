@@ -220,6 +220,19 @@ kendiliğinden geri gelir; tarayıcı eklentisi de buna uymak için kendini yeni
 bir uyarı ve bir **Şimdi güncelle** düğmesi gösterir. Kaynaktan çalıştırdığınız kopya `git pull` ile
 güncellenir.
 
+### Parçaları nasıl güncel kalır
+
+- Video sitelerinden indiren parça olan **yt-dlp** kendini günceller: siteler birkaç haftada bir
+  değişir ve eski bir kopya onlarla çalışmayı bırakır. Motor günde bir kez PyPI'a en son sürümünü
+  sorar (tek istek, sizinle ilgili hiçbir şey yok) ve hiçbir şey inmezken daha yeni sürümü kurar.
+- **Diğer tüm kütüphaneler**, tarjim sürümünüzle birlikte test edilen sürümde kurulur ve yalnızca
+  bir sonraki sürümle değişir. Her hafta daha yeni sürümler test edilir ve bilinen güvenlik
+  açıklarına karşı denetlenir, ancak ondan sonra bir sürüme girer. PyTorch, uv'nin ekran kartınız
+  için seçtiği derlemeyi izler.
+
+**Yeni sürüm çıkınca tarjim'i otomatik güncelle** kapatıldığında ikisi de durur. Kaynaktan
+çalıştırdığınız kopya test edilen sürümleri `pip install -c tarjim/constraints.txt -e ".[dub]"` ile alır.
+
 ## Gizlilik ve güvenlik
 
 - **Anahtarlar** işletim sisteminizin şifreli kasasında saklanır (Windows Credential Manager, macOS

@@ -207,6 +207,19 @@ in the background while no job is running, and tarjim comes back by itself in a 
 browser extension reloads itself to match. With it off, the page shows a notice and an **Update
 now** button. A copy you run from source is updated with `git pull`.
 
+### How its parts stay current
+
+- **yt-dlp**, the part that downloads from video sites, updates itself: sites change every few
+  weeks and an old copy stops working with them. Once a day the engine asks PyPI for its latest
+  version (one request, nothing about you) and installs a newer one while nothing is downloading.
+- **Every other library** is installed at the version tested with your tarjim release, and moves
+  only with the next release. Each week newer versions are tested and checked for known
+  vulnerabilities before a release takes them. PyTorch follows the build uv picks for your
+  graphics card.
+
+Turning **Update tarjim automatically** off stops both. A copy you run from source gets the tested
+versions with `pip install -c tarjim/constraints.txt -e ".[dub]"`.
+
 ## Privacy and security
 
 - **Keys** are stored in your operating system's encrypted vault (Windows Credential Manager,

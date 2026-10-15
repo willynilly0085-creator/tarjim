@@ -215,6 +215,20 @@ dalam beberapa menit; ekstensi browser memuat ulang dirinya agar sesuai. Saat no
 menampilkan pemberitahuan dan tombol **Perbarui sekarang**. Salinan yang Anda jalankan dari kode
 sumber diperbarui dengan `git pull`.
 
+### Cara bagian-bagiannya tetap terbaru
+
+- **yt-dlp**, bagian yang mengunduh dari situs video, memperbarui dirinya sendiri: situs berubah
+  setiap beberapa minggu dan salinan lama berhenti bekerja dengannya. Sekali sehari mesin
+  menanyakan versi terbarunya ke PyPI (satu permintaan, tidak ada apa pun tentang Anda) dan
+  memasang versi yang lebih baru saat tidak ada yang sedang diunduh.
+- **Semua pustaka lain** dipasang pada versi yang diuji bersama rilis tarjim Anda, dan hanya
+  berubah bersama rilis berikutnya. Setiap minggu versi yang lebih baru diuji dan diperiksa dari
+  kerentanan yang diketahui sebelum sebuah rilis memakainya. PyTorch mengikuti build yang dipilih
+  uv untuk kartu grafis Anda.
+
+Mematikan **Perbarui tarjim otomatis** menghentikan keduanya. Salinan yang Anda jalankan dari kode
+sumber mendapat versi yang diuji dengan `pip install -c tarjim/constraints.txt -e ".[dub]"`.
+
 ## Privasi dan keamanan
 
 - **Kunci** disimpan di brankas terenkripsi sistem operasi Anda (Windows Credential Manager,
