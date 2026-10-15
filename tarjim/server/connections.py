@@ -1,5 +1,6 @@
 """The connections screen: API keys, subscriptions and AI on this computer, in one view."""
 import re
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 from tarjim.config import save, setting
@@ -57,12 +58,14 @@ def overview() -> dict[str, Any]:
     from tarjim.engines.listening import listening_overview
     from tarjim.onboarding.scan import section
 
-    signed = {a["id"]: a["signed_in"] for a in section("subscriptions")["apps"]}
-    subscriptions = [{**subscription_view(p), "signed_in": signed.get(p.id, False)}
-                     for p in of_method(SUBSCRIPTION)]
+    with ThreadPoolExecutor() as pool:  # each program is asked at the same time, not in turn
+        local, apps = pool.submit(local_view), pool.submit(section, "subscriptions")
+        views = list(pool.map(subscription_view, of_method(SUBSCRIPTION)))
+    signed = {a["id"]: a["signed_in"] for a in apps.result()["apps"]}
+    subscriptions = [{**view, "signed_in": signed.get(view["id"], False)} for view in views]
     return {"api": [api_view(p) for p in of_method(API)], "listening": listening_overview(signed),
             "subscription": subscriptions,
-            "local": local_view(),
+            "local": local.result(),
             "chosen": {"listen": chosen("listen"), "translate": chosen("translate")}}
 
 

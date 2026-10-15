@@ -5,6 +5,7 @@ Gemini and Anthropic return display names from their model endpoints; OpenAI-com
 return ids (OpenRouter adds names). Claude's subscription list comes from subscription_models.
 """
 import json
+import time
 from pathlib import Path
 from typing import Any
 
@@ -96,6 +97,23 @@ def antigravity_list() -> list[Model]:
 
 OWN_LISTS = {"claude": claude_list, "codex": lambda: describe(codex_rows(), keep_order=True),
              "grok": grok_list, "antigravity": antigravity_list}
+KEEP_SECONDS = 300.0
+KEPT: dict[str, tuple[float, list[Model]]] = {}
+
+
+def own_list(provider: str) -> list[Model]:
+    """Asking a program for its models starts it (about two seconds for Antigravity), so its
+    answer is kept for five minutes; a fresh scan or a sign-in asks again."""
+    kept = KEPT.get(provider)
+    if kept and time.monotonic() - kept[0] < KEEP_SECONDS:
+        return kept[1]
+    models = OWN_LISTS[provider]()
+    KEPT[provider] = (time.monotonic(), models)
+    return models
+
+
+def forget() -> None:
+    KEPT.clear()
 
 
 def model_in_use(provider: str, default: str = "") -> str:
@@ -118,7 +136,7 @@ def models_for(provider: str) -> list[Model]:
     if found is None:
         return []
     if provider in OWN_LISTS:
-        return OWN_LISTS[provider]()
+        return own_list(provider)
     if found.method == SUBSCRIPTION:
         return describe([(m, "", "") for m in found.models], keep_order=True)
     try:

@@ -77,6 +77,10 @@ def section(name: str, fresh: bool = False) -> dict[str, Any]:
 
 
 def everything(fresh: bool = False) -> dict[str, Any]:
+    if fresh:  # after a sign-in or an install, the programs' model lists are asked again
+        from tarjim.engines.provider_models import forget
+
+        forget()
     with ThreadPoolExecutor(max_workers=len(SECTIONS)) as pool:
         answers = pool.map(lambda name: (name, section(name, fresh)), SECTIONS)
         return dict(answers)

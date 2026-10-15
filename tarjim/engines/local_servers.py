@@ -1,4 +1,5 @@
 """Find AI programs already running on this computer and the models each one has."""
+import socket
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 
@@ -13,6 +14,7 @@ KNOWN = (("ollama", "Ollama", "http://127.0.0.1:11434"),
          ("koboldcpp", "KoboldCpp", "http://127.0.0.1:5001"))
 BY_ID = {server: (name, url) for server, name, url in KNOWN}
 OLLAMA = "ollama"
+QUICK = 0.3
 
 
 @dataclass
@@ -31,10 +33,24 @@ def models_of(server: str, url: str) -> list[str]:
     return list_models(f"{url}/v1")
 
 
+def answering(url: str) -> bool:
+    """Whether anything listens there. A program on this computer accepts in milliseconds; on
+    Windows a closed port is only refused after two seconds, so waiting longer tells nothing."""
+    from urllib.parse import urlsplit
+
+    parts = urlsplit(url)
+    try:
+        socket.create_connection((parts.hostname or "", parts.port or 80), QUICK).close()
+    except OSError:
+        return False
+    return True
+
+
 def alive(server: str, url: str) -> bool:
     from tarjim.engines.web import reachable
 
-    return reachable(f"{url}/api/tags" if server == OLLAMA else f"{url}/v1/models", {})
+    path = f"{url}/api/tags" if server == OLLAMA else f"{url}/v1/models"
+    return answering(url) and reachable(path, {})
 
 
 def discover() -> list[LocalServer]:
