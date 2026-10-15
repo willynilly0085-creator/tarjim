@@ -18,6 +18,7 @@ DAILY_TEXT = "{'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', '
 def bare_client(outcomes: dict[str, Any]) -> GeminiClient:
     client = GeminiClient.__new__(GeminiClient)
     client.spent, client.model_used, client.cooling = set(), "", {}
+    client.models, client.slow = list(MODELS), set()
 
     def call(model: str, *_: Any) -> Any:
         outcome = outcomes.get(model, Refusal(DAILY_TEXT))
@@ -89,3 +90,55 @@ def test_a_request_that_never_answers_gives_up_instead_of_hanging(
     monkeypatch.setattr(genai, "Client", lambda **options: made.update(options))
     GeminiClient(api_key="AIzaSyA1234567890abcdefghij")
     assert made["http_options"].timeout == gemini_client.REQUEST_MS
+
+
+class Busy(Exception):
+    code = 503
+
+
+class Bad(Exception):
+    code = 400
+
+
+class ReadTimeout(Exception):
+    pass
+
+
+def test_the_model_the_person_picked_is_asked_first(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(gemini_client, "setting", lambda _name: "gemini-3.5-flash")
+    assert gemini_client.chosen_first()[:2] == ["gemini-3.5-flash", MODELS[0]]
+    monkeypatch.setattr(gemini_client, "setting", lambda _name: "")
+    assert gemini_client.chosen_first() == MODELS
+
+
+def test_a_picked_model_that_cannot_answer_gives_way_to_the_usual_ones(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(gemini_client.time, "sleep", lambda _s: None)
+    client = bare_client({"picked-image-model": Bad("not a text model"), MODELS[0]: ["ok"]})
+    client.models = ["picked-image-model", *MODELS]
+    assert client.ask("p", None, {}) == ["ok"]
+
+
+def test_an_overloaded_or_slow_model_is_left_for_the_next_one_at_once(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(gemini_client.time, "sleep", lambda _s: pytest.fail("should not wait"))
+    asked: list[str] = []
+    outcomes = {MODELS[0]: ReadTimeout(), MODELS[1]: Busy(), MODELS[2]: ["ok"]}
+    client = bare_client(outcomes)
+    real_call = client.call
+    client.call = lambda model, *rest: asked.append(model) or real_call(model, *rest)  # type: ignore[method-assign]
+    assert client.ask("p", None, {}) == ["ok"]
+    assert asked == MODELS[:3] and client.slow == {MODELS[0]}
+
+
+def test_text_is_translated_with_short_thinking_and_no_silent_retries(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    from google import genai
+
+    made: dict[str, Any] = {}
+    monkeypatch.setattr(genai, "Client", lambda **options: made.update(options))
+    GeminiClient(api_key="AIzaSyA1234567890abcdefghij")
+    assert made["http_options"].retry_options.attempts == 1
+    assert gemini_client.thinking("gemini-3.8-flash", None) is not None
+    assert gemini_client.thinking("gemini-3.8-flash", b"sound") is None
+    assert gemini_client.thinking("gemini-2.5-flash", None) is None

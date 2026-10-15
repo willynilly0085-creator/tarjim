@@ -41,3 +41,14 @@ def test_a_listening_local_program_is_found() -> None:
         server.bind(("127.0.0.1", 0))
         server.listen()
         assert local_servers.answering(f"http://127.0.0.1:{server.getsockname()[1]}")
+
+
+def test_the_gemini_list_shows_text_models_only() -> None:
+    from tarjim.engines.model_catalog import describe
+
+    rows = [("gemini-3.8-flash", "Gemini 3.8 Flash", ""), ("lyria-3.5", "Lyria 3.5", ""),
+            ("gemini-nano-banana-2.1", "Nano Banana 2.1", ""),
+            ("gemini-robotics-er-2-preview", "Gemini Robotics-ER 2", ""),
+            ("antigravity-preview-latest", "Antigravity Agent", ""),
+            ("gemini-3.1-pro-preview-customtools", "Gemini 3.1 Pro Custom Tools", "")]
+    assert [m["id"] for m in describe(rows)] == ["gemini-3.8-flash"]

@@ -10,7 +10,8 @@ LIGHT = ("haiku", "flash", "mini", "lite", "small", "instant", "nano", "turbo", 
          "affordable", "fast", "efficient")
 NOT_TEXT = ("embed", "tts", "audio", "image", "imagen", "whisper", "dall-e", "moderation",
             "realtime", "transcribe", "search", "guard", "rerank", "speech", "veo", "live",
-            "computer-use", "codex-auto")
+            "computer-use", "codex-auto", "lyria", "banana", "robotics", "antigravity",
+            "customtools")  # music, pictures, robots, an agent and a tool-calling variant
 OLDER = ("older", "legacy", "previous", "deprecated")
 WORDS = {"gpt": "GPT", "deepseek": "DeepSeek", "openai": "OpenAI", "qwen": "Qwen", "glm": "GLM",
          "llama": "Llama", "xai": "xAI", "ai": "AI"}

@@ -104,3 +104,10 @@ def test_grok_denies_mcp_tools_as_well(monkeypatch: pytest.MonkeyPatch) -> None:
     command = seen[0]
     assert command[command.index("--tools") + 1] == ""
     assert command[command.index("--deny") + 1] == "MCPTool"
+
+
+def test_grok_gets_turns_to_answer_after_a_refused_tool() -> None:
+    from tarjim.engines import grok
+
+    turns = grok.PLAIN[grok.PLAIN.index("--max-turns") + 1]
+    assert int(turns) >= 2 and grok.PLAIN[grok.PLAIN.index("--deny") + 1] == "MCPTool"

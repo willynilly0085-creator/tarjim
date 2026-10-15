@@ -16,7 +16,9 @@ from tarjim.engines.web import EngineError, unwrap, wrap
 
 # `--tools ""` removes the built-in tools only; `--deny MCPTool` refuses the person's MCP servers
 # too (README of 1.0.50, "Permission Rules": a bare prefix matches every call of that kind).
-PLAIN = ("--tools", "", "--disable-web-search", "--no-subagents", "--no-plan", "--max-turns", "1",
+# Three turns, not one: a model that still tries a refused tool spends a turn on it, and with one
+# turn the answer never came ("max turns reached", seen with grok-4.7-build-fast).
+PLAIN = ("--tools", "", "--disable-web-search", "--no-subagents", "--no-plan", "--max-turns", "3",
          "--deny", "MCPTool")
 LISTED = re.compile(r"^\s*[*-]\s+([\w.:-]+)(\s+\(default\))?\s*$", re.MULTILINE)
 LIST_SECONDS = 30
