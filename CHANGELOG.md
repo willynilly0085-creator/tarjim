@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.28 (2026-10-15)
+
+- **Antigravity translates in seconds and no longer stops with "no output produced".** Its
+  heavier models (Medium, High) took minutes for the same translation and sometimes reached for a
+  terminal command, which Antigravity refuses without asking, and then answered nothing.
+  Translation now uses the light variant of the model you chose and is told to answer directly
+  without any tool. Measured on the same clip: High failed after 209 seconds before, 20 seconds
+  now, with the same Saudi translation.
+
 ## 1.0.27 (2026-10-15)
 
 - **Remove a translation from the list.** A finished, failed or cancelled translation has a
