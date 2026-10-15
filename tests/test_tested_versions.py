@@ -94,7 +94,7 @@ def test_without_the_tested_versions_the_install_still_happens_as_before(
         home: Path, monkeypatch: pytest.MonkeyPatch, body: str | Exception) -> None:
     serve(monkeypatch, body)
     assert release_pins.tested_versions(RELEASE, home) is None
-    assert "installing without them" in (home / "install.log").read_text(encoding="utf-8")
+    assert "installing without it" in (home / "install.log").read_text(encoding="utf-8")
 
 
 def test_the_tested_versions_are_saved_for_uv(home: Path, monkeypatch: pytest.MonkeyPatch) -> None:

@@ -16,7 +16,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install --extra-index-url https://download.pytorch.org/whl/cpu -c tarjim/constraints.txt -e ".[dev]"
+      - uses: astral-sh/setup-uv@v6
+      # uv applies tarjim/overrides.txt; pip cannot.
+      - run: uv pip install --system -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dev]"
       - run: ruff check tarjim tests
       - run: mypy tarjim
       - run: pytest -q

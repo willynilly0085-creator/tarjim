@@ -47,7 +47,8 @@ build-backend = "setuptools.build_meta"
 include = ["tarjim*"]
 
 [tool.setuptools.package-data]
-tarjim = ["web/*", "web/**/*", "extension/*", "extension/**/*", "constraints.txt"]
+tarjim = ["web/*", "web/**/*", "extension/*", "extension/**/*", "constraints.txt", "overrides.txt",
+          "known_issues.json"]
 
 [tool.ruff]
 line-length = 100

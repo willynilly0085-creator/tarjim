@@ -67,6 +67,7 @@ def command(uv: str, version: str) -> list[str]:
     if not release(version):
         raise ValueError(f"not a yt-dlp version: {version!r}")
     tested = ["-c", str(pins.FILE)] if pins.FILE.is_file() else []
+    tested += ["--overrides", str(pins.OVERRIDES)] if tested and pins.OVERRIDES.is_file() else []
     return [uv, "pip", "install", "--python", sys.prefix, *tested, f"yt-dlp=={version}"]
 
 

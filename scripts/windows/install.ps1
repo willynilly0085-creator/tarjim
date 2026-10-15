@@ -38,15 +38,16 @@ function Get-Source {
 }
 
 # The versions of tarjim's libraries tested with this release (tarjim/release_pins.py does the
-# same for the engine's own installer). Without them the install still happens, as before.
-function Get-Pins($source) {
-    $file = Join-Path $env:TEMP "tarjim-constraints.txt"
+# same for the engine's own installer): constraints.txt, and overrides.txt for the few that lift
+# another package's exact pin. Without them the install still happens, as before.
+function Get-Pins($source, $name) {
+    $file = Join-Path $env:TEMP "tarjim-$name"
     try {
         if ($source -match "^https://github\.com/$Repo/archive/refs/tags/(v?\d+\.\d+\.\d+)\.zip$") {
-            $address = "https://raw.githubusercontent.com/$Repo/$($Matches[1])/tarjim/constraints.txt"
+            $address = "https://raw.githubusercontent.com/$Repo/$($Matches[1])/tarjim/$name"
             Invoke-WebRequest $address -OutFile $file -UseBasicParsing
         } else {
-            Copy-Item (Join-Path $source "tarjim\constraints.txt") $file
+            Copy-Item (Join-Path $source "tarjim\$name") $file
         }
         $pinned = @(Get-Content $file | Where-Object { $_.Trim() -and -not $_.StartsWith("#") })
     } catch {
@@ -85,8 +86,10 @@ if (-not (Find-Uv)) {
 $source = Get-Source
 Say "step 2 of 3: downloading and installing. This takes several minutes; keep this window open."
 if (Test-Engine) { Stop-Engine }
-$pins = Get-Pins $source
+$pins = Get-Pins $source "constraints.txt"
 $tested = if ($pins) { @("--upgrade", "-c", $pins) } else { @() }
+$lifted = if ($pins) { Get-Pins $source "overrides.txt" } else { $null }
+if ($lifted) { $tested += @("--overrides", $lifted) }
 & uv tool install --force --python 3.11 --torch-backend auto @tested "tarjim[dub] @ $source"
 if ($LASTEXITCODE -ne 0 -and $pins) {
     Say "trying again without the tested library versions"

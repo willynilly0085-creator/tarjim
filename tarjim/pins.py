@@ -3,12 +3,15 @@
 They ship inside the package (constraints.txt, written by scripts/pins.py) so the engine can
 compare them with what is installed without asking anyone. yt-dlp keeps itself current, and the
 PyTorch family follows the build uv picks for the graphics card, so neither is pinned.
+overrides.txt holds the few libraries whose exact pin in another package is replaced (uv's
+--overrides); constraints.txt already lists them at the same versions.
 """
 import re
 from importlib import metadata
 from pathlib import Path
 
 FILE = Path(__file__).with_name("constraints.txt")
+OVERRIDES = Path(__file__).with_name("overrides.txt")
 # sympy is here because some PyTorch builds ask for one exact sympy.
 FLOATING = {"yt-dlp", "torch", "torchaudio", "torchvision", "torchcodec", "triton", "sympy"}
 FLOATING_FAMILIES = ("nvidia-", "cuda-", "pytorch-triton")
