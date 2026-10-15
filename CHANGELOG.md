@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.0.26 (2026-10-15)
+
+- **Translation by Gemini key takes seconds again, not minutes.** When Google's busiest models
+  were under load, Google's own library retried them in silence for minutes; now a busy model
+  gives way to the next one at once, and one that has not answered in 90 seconds is left for the
+  rest of the job. The model you pick is now really used (before, a fixed list was), and Gemini 3
+  translates with short thinking. Measured on the same clip: 3 to 4 minutes before, 14 seconds now.
+- **The Gemini model list shows text models only.** Music, image, video, robotics and agent
+  models are no longer offered for translation.
+- **Grok no longer stops with "max turns reached".** It gets three turns instead of one.
+- **Antigravity tries a translation again** when Google drops its answer halfway.
+- **The setup plan opens quickly.** About 2.5 seconds the first time and at once after that
+  (5 to 6 seconds every time before).
+- **No more "cannot import name" after an update from source.** A running tarjim keeps the code
+  it started with, and when its files change it restarts into the new code by itself once no job
+  is running; your job list is kept.
+
 ## 1.0.25 (2026-10-15)
 
 - **One library vulnerability closed, the rest disclosed and blocked.** accelerate now installs at
