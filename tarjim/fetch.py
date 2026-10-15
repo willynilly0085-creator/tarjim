@@ -13,6 +13,7 @@ LARGEST = 8 * 1024 ** 3
 # several videos is still a list, and every entry would be downloaded.
 LISTS = ("playlist", "multi_video")
 A_LIST = "download refused: this link is a list of videos; send the link of one video"
+TOO_BIG = "the download passed 8 GB and was stopped"
 
 
 def is_url(text: str) -> bool:
@@ -22,19 +23,35 @@ def is_url(text: str) -> bool:
 def told(state: dict[str, Any]) -> None:
     """Pass the downloader's own count of bytes on to the job."""
     total = state.get("total_bytes") or state.get("total_bytes_estimate") or 0
-    done = int(state.get("downloaded_bytes") or 0)
-    if done > LARGEST:
-        raise RuntimeError("the download passed 8 GB and was stopped")
     checkpoint()
-    progress(done, int(total))
+    progress(int(state.get("downloaded_bytes") or 0), int(total))
+
+
+class Budget:
+    """The 8 GB is for the whole link, not for each piece: a video and its sound are two
+    downloads. Some streams are handed to ffmpeg, which reports nothing while it runs, so ffmpeg
+    is told to stop where what is left of the 8 GB runs out."""
+
+    def __init__(self) -> None:
+        self.pieces: dict[str, int] = {}
+        self.ffmpeg = ["-fs", str(LARGEST)]
+
+    def __call__(self, state: dict[str, Any]) -> None:
+        self.pieces[str(state.get("filename"))] = int(state.get("downloaded_bytes") or 0)
+        left = LARGEST - sum(self.pieces.values())
+        if left < 0:
+            raise RuntimeError(TOO_BIG)
+        self.ffmpeg[1] = str(left)
 
 
 def options(folder: Path) -> dict[str, Any]:
     from yt_dlp.utils import match_filter_func
 
+    budget = Budget()
     return {"format": FORMAT, "outtmpl": str(folder / NAME), "merge_output_format": "mp4",
             "ffmpeg_location": tool("ffmpeg"), "noplaylist": True, "quiet": True,
-            "no_warnings": True, "progress_hooks": [told], "max_filesize": LARGEST,
+            "no_warnings": True, "progress_hooks": [budget, told], "max_filesize": LARGEST,
+            "external_downloader_args": {"ffmpeg_o": budget.ffmpeg},
             "match_filter": match_filter_func("!is_live"), "extract_flat": "in_playlist"}
 
 
@@ -63,13 +80,22 @@ def download(url: str, folder: Path) -> Path:
         path = Path(ydl.prepare_filename(info))
         try:
             ydl.process_ie_result(info, download=True)
+            return media(path, url)
         except BaseException:
             clear(folder, path.stem, before)
             raise
+
+
+def media(path: Path, url: str) -> Path:
+    """The file the link gave, checked once more against the limit: what ffmpeg wrote was never
+    counted while it ran."""
     found = [path.with_suffix(s) for s in MEDIA_SUFFIXES if path.with_suffix(s).is_file()]
     if not found and not path.is_file():
         raise FileNotFoundError(f"download produced no media file for {url}")
-    return found[0] if found else path
+    video = found[0] if found else path
+    if video.stat().st_size > LARGEST:
+        raise RuntimeError(TOO_BIG)
+    return video
 
 
 def resolve(source: str, folder: Path) -> Path:
