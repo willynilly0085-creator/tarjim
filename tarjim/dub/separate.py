@@ -16,9 +16,12 @@ class Stems:
 
 
 def separate(video: Path) -> Stems:
+    from tarjim.memory import heavy
+
     mixture = decode(video, channels=2)
     try:
-        voices, background = split_voices(mixture)
+        with heavy():
+            voices, background = split_voices(mixture)
     except (ImportError, RuntimeError, OSError) as error:
         print(f"dubbing: voices not separated from the background ({type(error).__name__}); "
               "the original sound is kept quietly under the new voices", flush=True)

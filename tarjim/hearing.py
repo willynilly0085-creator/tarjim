@@ -6,7 +6,7 @@ from pathlib import Path
 from tarjim import media
 from tarjim.asr.base import Transcript
 from tarjim.gemini_client import QuotaExhausted
-from tarjim.job import Job
+from tarjim.job import Job, checkpoint
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.merge import Heard
 from tarjim.models import Word
@@ -48,6 +48,7 @@ def listen_video(video: Path, audio: Path) -> Heard:
 
     failures: list[Exception] = []
     for provider in chain("listen"):
+        checkpoint()  # a backup engine is never started for a job that was cancelled
         try:
             return listen_with(provider, video, audio)
         except (RuntimeError, OSError) as error:
@@ -107,6 +108,7 @@ def listen_and_align(job: Job, audio: Path,
 
     from tarjim.asr.align import shared_aligner
     from tarjim.asr.fuse import fuse
+    from tarjim.memory import heavy
 
     try:
         language, utterances = heard_for(job, audio)
@@ -118,7 +120,8 @@ def listen_and_align(job: Job, audio: Path,
         return None
     report("timing")
     wav, _ = soundfile.read(str(audio), dtype="float32")
-    words = shared_aligner().align(wav, utterances, language)
+    with heavy():
+        words = shared_aligner().align(wav, utterances, language)
     words = fuse(words, utterances, second_opinion(audio))
     return Transcript(language=language, text=" ".join(u.text for u in utterances), words=words)
 
@@ -141,5 +144,7 @@ def local_transcript(audio: Path) -> Transcript:
 
 def qwen_transcript(audio: Path) -> Transcript:
     from tarjim.asr.qwen import shared_engine
+    from tarjim.memory import heavy
 
-    return shared_engine().transcribe(str(audio))
+    with heavy():
+        return shared_engine().transcribe(str(audio))

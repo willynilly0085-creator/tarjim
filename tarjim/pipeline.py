@@ -3,7 +3,7 @@ from collections.abc import Callable
 
 from tarjim import media
 from tarjim.hearing import transcript_for
-from tarjim.job import Job
+from tarjim.job import Job, checkpoint
 from tarjim.models import Cue, Word
 from tarjim.qa import Issue, check
 from tarjim.render.ass import Canvas, render_ass
@@ -52,6 +52,7 @@ def translate(job: Job, cues: list[Cue]) -> list[Cue]:
     brief = Brief(job.language, job.dialect, job.rules, glossary=current(job.target))
     failures: list[Exception] = []
     for provider in chain("translate"):
+        checkpoint()  # a backup engine is never started for a job that was cancelled
         try:
             return Translator(asker(provider)).translate(cues, audio, brief)
         except BAD_REPLY as error:

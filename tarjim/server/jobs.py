@@ -6,6 +6,8 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 from queue import Empty, Queue
 
+from tarjim.children import Family, watch
+
 DUBBING = {"dub-gemini": "gemini", "dub-clone": "clone", "dub-studio": "studio", "dub-fish": "fish",
            "dub-fishvoice": "fish:saved", "dub-eleven": "eleven", "dub-elevenclone": "eleven:clone",
            "dub-speech": "speech"}
@@ -60,6 +62,22 @@ class Task:
     created: float = field(default_factory=time.time)
     control: str = "run"
     moved: tuple[int, int] = (0, 0)
+    family: Family = field(default_factory=Family, repr=False, compare=False)
+    undo: list[Callable[[], None]] = field(default_factory=list, repr=False, compare=False)
+
+    def __setattr__(self, name: str, value: object) -> None:
+        """Once the board marked a job cancelled, a thread still finishing it (a web request
+        that could not be interrupted) changes nothing the person sees."""
+        if getattr(self, "stage", "") != "cancelled":
+            super().__setattr__(name, value)
+
+    def take_back(self) -> None:
+        """What this run made and a cancel removes: pieces, results, work."""
+        for step in list(self.undo):
+            try:
+                step()
+            except OSError:
+                continue
 
     @property
     def finished(self) -> bool:
@@ -91,13 +109,17 @@ Worker = Callable[[Task], None]
 
 
 class Board:
-    def __init__(self, work: Worker, idle: Callable[[], None] | None = None,
+    """One job at a time, each in a thread of its own (see carry.py), so a cancel never waits
+    for the job to reach its next step."""
+
+    def __init__(self, work: Worker, idle: Callable[[], object] | None = None,
                  idle_after: float = IDLE_SECONDS) -> None:
         self.tasks: dict[str, Task] = {}
         self.queue: Queue[Task] = Queue()
         self.work = work
         self.idle, self.idle_after, self.busy_since_idle = idle, idle_after, False
         self.lock = threading.Lock()
+        watch()
         threading.Thread(target=self.loop, daemon=True).start()
 
     def submit(self, order: Order) -> Task:
@@ -144,20 +166,19 @@ class Board:
                 return self.queue.get(timeout=self.idle_after)
             except Empty:
                 if self.idle and self.busy_since_idle:
-                    self.busy_since_idle = False
-                    self.idle()
+                    self.busy_since_idle = self.idle() is False  # a model still in use
+
+    def may_undo(self, task: Task) -> bool:
+        """A job left behind takes back what it wrote late, unless the same video is being
+        worked on again (a Retry), whose files would be the same."""
+        same = task.order.source
+        return not any(t is not task and not t.finished and t.order.source == same
+                       for t in self.recent())
 
     def loop(self) -> None:
+        from tarjim.server.carry import carry
+
         while True:
             task = self.next_task()
             self.busy_since_idle = True
-            try:
-                task.checkpoint()
-                self.work(task)
-                task.stage = "done"
-            except Stopped:
-                task.stage = "cancelled"
-            except Exception as error:
-                task.failed_at = task.stage
-                task.stage, task.error = "failed", str(error)[:300]
-                task.error_code = classify(error)
+            carry(task, self.work, self.may_undo)

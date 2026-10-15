@@ -3,6 +3,7 @@ from dataclasses import replace
 
 from tarjim.engines.choice import Asker
 from tarjim.gemini_client import GeminiClient
+from tarjim.job import checkpoint
 from tarjim.models import Cue
 from tarjim.translate.clean import map_results
 from tarjim.translate.prompt import Brief, build_prompt, has_speakers
@@ -38,6 +39,7 @@ class Translator:
 
     def translate(self, cues: list[Cue], audio: AudioSlice, brief: Brief) -> list[Cue]:
         for batch in batches(cues):
+            checkpoint()  # each part is a step: pause and cancel take effect between them
             start = max(0.0, batch[0].start - PAD)
             sound = audio(start, batch[-1].end + PAD) if self.client.hears else None
             self.fill_twice(batch, sound, replace(brief, offset=start, hears=self.client.hears))

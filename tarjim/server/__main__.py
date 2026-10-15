@@ -8,9 +8,18 @@ from tarjim.fetch import is_url, resolve
 from tarjim.installer import module_command
 from tarjim.job import CHECKPOINT, PROGRESS, Job
 from tarjim.server.app import PORT, serve
+from tarjim.server.housekeeping import Undo
 from tarjim.server.jobs import DUBBING, Board, Task
 
 DOWNLOADS = Path.home() / "Downloads" / "tarjim"
+
+
+def undo_for(job: Job) -> list[Undo]:
+    """A cancel takes back the job's results and its work folder, as far as this run made
+    them; inside the folder first, then the folder itself when this run created it."""
+    stem, results, work = job.video.stem, job.output(""), HOME / "cache"
+    return [Undo(results.parent, lambda name: name.startswith(results.name)),
+            Undo(work / stem), Undo(work, lambda name: name == stem)]
 
 
 def perform(task: Task, downloads: Path) -> None:
@@ -18,11 +27,14 @@ def perform(task: Task, downloads: Path) -> None:
     CHECKPOINT.set(task.checkpoint)
     PROGRESS.set(lambda done, total: setattr(task, "moved", (done, total)))
     task.stage = "downloading" if is_url(order.source) else "hearing"
+    task.undo.append(Undo(HOME / "sources", keep=lambda: task.video))
     task.video = resolve(order.source, HOME / "sources")
+    task.checkpoint()
     task.moved = (0, 0)
     downloads.mkdir(parents=True, exist_ok=True)
     job = Job(task.video, order.target, order.dialect, burn=order.mode != "srt",
               dub=DUBBING.get(order.mode, ""), out_dir=downloads, cache_dir=HOME / "cache")
+    task.undo.extend(undo_for(job))
 
     def report(stage: str) -> None:
         task.stage = stage

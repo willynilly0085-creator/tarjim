@@ -20,11 +20,13 @@ def line_ends(words: list[tuple[float, float]], counts: list[int]) -> list[float
 def word_times(wav: np.ndarray, texts: list[str], language: str) -> list[tuple[float, float]]:
     from tarjim.asr.align import shared_aligner
     from tarjim.listen.gemini_listen import Utterance
+    from tarjim.memory import heavy
 
     heard = resample(wav, RATE, ALIGN_RATE)
     total = heard.size / ALIGN_RATE
     utterances = [Utterance(0.0, total, "", text) for text in texts]
-    return [(w.start, w.end) for w in shared_aligner().align(heard, utterances, language)]
+    with heavy():
+        return [(w.start, w.end) for w in shared_aligner().align(heard, utterances, language)]
 
 
 def split_lines(wav: np.ndarray, texts: list[str], language: str) -> list[np.ndarray]:

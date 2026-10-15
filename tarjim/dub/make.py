@@ -1,4 +1,5 @@
 import re
+from contextlib import nullcontext
 from pathlib import Path
 from typing import Protocol
 
@@ -14,7 +15,7 @@ from tarjim.dub.separate import Stems, separate
 from tarjim.dub.studio import VOICES
 from tarjim.dub.voices import reference_spans
 from tarjim.job import Job, checkpoint
-from tarjim.memory import free_for_voice
+from tarjim.memory import free_for_voice, heavy
 from tarjim.models import Cue, Word
 
 SAVED_VOICE = "fish:saved"
@@ -141,13 +142,15 @@ def speak(engine: str, job: Job, samples: dict[str, Path], lines: list[Line]) ->
     """A natural voice that fails is replaced by the voice on this computer, when there is one;
     otherwise the person sees why the natural voice failed."""
     try:
-        return voices_for(engine, job.dub, job, samples).speak_all(lines)
+        with heavy() if engine == "clone" else nullcontext():
+            return voices_for(engine, job.dub, job, samples).speak_all(lines)
     except RuntimeError:
         if engine != "gemini" or job.target not in CLONE_LANGUAGES or not clone_installed():
             raise
     backup = "clone"
-    return voices_for(backup, backup, job, samples).speak_all(
-        fallback_spoken(lines, backup, job.target))
+    with heavy():
+        return voices_for(backup, backup, job, samples).speak_all(
+            fallback_spoken(lines, backup, job.target))
 
 
 def dub_video(job: Job, cues: list[Cue], words: list[Word], picture: Path) -> Path:

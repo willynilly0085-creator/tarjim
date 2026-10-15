@@ -21,6 +21,7 @@ dependencies = [
     "huggingface_hub",
     "telethon",
     "cryptg",
+    "psutil",
 ]
 
 [project.urls]

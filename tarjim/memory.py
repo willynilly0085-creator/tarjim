@@ -3,10 +3,33 @@
 A job listens, then translates, then dubs, one after the other. Without freeing the earlier models,
 a local-listening, local-translation, own-voice job would hold all three on the card at once
 (about 18 GB); freeing them first keeps the peak at the largest single model (about 6 GB).
+
+A model on this computer cannot be stopped halfway, so a cancelled job may still be inside one
+while the next job runs. Each heavy model is used inside `heavy()`, one at a time in the whole
+program: the next job waits there (its own pause and cancel still work) until the old one has
+left, and nothing frees a model while another job is using it.
 """
 import gc
+import threading
+from collections.abc import Iterator
+from contextlib import contextmanager
 
 UNLOAD_SECONDS = 5
+WAIT_SECONDS = 0.25
+HEAVY = threading.RLock()
+
+
+@contextmanager
+def heavy() -> Iterator[None]:
+    from tarjim.job import checkpoint
+
+    while not HEAVY.acquire(timeout=WAIT_SECONDS):
+        checkpoint()
+    try:
+        checkpoint()
+        yield
+    finally:
+        HEAVY.release()
 
 
 def empty_card() -> None:
@@ -45,23 +68,32 @@ def release_local_translator() -> None:
 
 
 def free_for_voice() -> None:
-    release_listening()
-    release_local_translator()
-    empty_card()
+    with heavy():
+        release_listening()
+        release_local_translator()
+        empty_card()
 
 
 def free_for_listening() -> None:
     """A new job starts by listening: the voice of the job before it leaves the card first."""
     from tarjim.dub.clone import voice_model
 
-    if voice_model.cache_info().currsize:
-        voice_model.cache_clear()
-        empty_card()
+    with heavy():
+        if voice_model.cache_info().currsize:
+            voice_model.cache_clear()
+            empty_card()
 
 
-def release_models() -> None:
+def release_models() -> bool:
+    """When tarjim is idle; False when a job left behind is still using a model."""
     from tarjim.dub.clone import voice_model
 
-    release_listening()
-    voice_model.cache_clear()
-    empty_card()
+    if not HEAVY.acquire(blocking=False):
+        return False
+    try:
+        release_listening()
+        voice_model.cache_clear()
+        empty_card()
+    finally:
+        HEAVY.release()
+    return True
