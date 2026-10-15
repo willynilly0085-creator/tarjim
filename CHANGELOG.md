@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.24 (2026-10-15)
+
+- **yt-dlp, the downloader, keeps itself current.** Sites change every few weeks and an old
+  downloader stops working. With automatic updates on, tarjim asks once a day for the latest
+  yt-dlp and installs it while nothing is downloading; the next download uses it, with no
+  restart. A failed try keeps the old one and is tried again the next day.
+- **Every other library is installed at the versions tested with the release.** Each update
+  rebuilt tarjim's environment with the newest version of every library that day, untested.
+  Now the release carries the list of tested versions and the install follows it. An existing
+  install is brought onto them once, by itself, a minute after this version starts (when no job
+  is running). A weekly check on GitHub tries the newest versions against tarjim's tests and
+  known vulnerabilities before they reach anyone.
+
 ## 1.0.23 (2026-10-15)
 
 - **Cancel stops a job at once, and the next one starts.** Cancel only took effect between steps,
