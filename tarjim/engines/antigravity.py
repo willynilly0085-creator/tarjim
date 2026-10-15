@@ -41,15 +41,19 @@ class AntigravityAsker:
     def ask(self, prompt: str, audio: bytes | None, schema: dict[str, Any]) -> Any:
         """With audio, the program is shown the sound as a file: Gemini hears what it opens.
         Hearing uses the lightest model (measured on 94 s of speech: 16 s, against 446 s for the
-        program's default) and is tried again once, since the service sometimes answers 503."""
+        program's default). Either is tried again once, since the service sometimes answers 503
+        or drops the answer halfway ("The stream was interrupted")."""
         if not audio:
-            return self.once(prompt, None, schema, setting("antigravity_model"))
+            return self.twice(prompt, None, schema, setting("antigravity_model"))
+        return self.twice(HEAR + prompt, audio, schema, hearing_model())
+
+    def twice(self, prompt: str, audio: bytes | None, schema: dict[str, Any], model: str) -> Any:
         try:
-            return self.once(HEAR + prompt, audio, schema, hearing_model())
+            return self.once(prompt, audio, schema, model)
         except EngineError as error:
             if NOT_SIGNED_IN in str(error):
                 raise
-            return self.once(HEAR + prompt, audio, schema, hearing_model())
+            return self.once(prompt, audio, schema, model)
 
     def once(self, prompt: str, audio: bytes | None, schema: dict[str, Any], model: str) -> Any:
         command = [*launcher("agy"), "--print", prompt, "--output-format", "json",

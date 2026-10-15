@@ -50,6 +50,23 @@ def test_antigravity_is_asked_once_in_plan_mode_and_its_structured_answer_is_use
     assert "--dangerously-skip-permissions" not in command
 
 
+DROPPED = json.dumps({"status": "ERROR", "error": "The stream was interrupted. Please continue."})
+
+
+def test_a_translation_the_service_drops_halfway_is_asked_once_more(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    replies = [DROPPED, json.dumps({"status": "SUCCESS", "structured_output": {"result": GOOD}})]
+
+    def fake_run(command: list[str], _prompt: str, _folder: str) -> Any:
+        code = 3 if len(replies) == 2 else 0
+        return subprocess.CompletedProcess(command, code, replies.pop(0), "")
+
+    monkeypatch.setattr(antigravity, "launcher", lambda _name: ["agy"])
+    monkeypatch.setattr(antigravity, "run", fake_run)
+    assert antigravity.AntigravityAsker().ask("Translate.", None, SCHEMA) == GOOD
+    assert replies == []
+
+
 SIGNED_OUT = ("Fetching available models...\nError: Please sign in to view available models. "
               "Launch the CLI without arguments to sign in.\n")
 
