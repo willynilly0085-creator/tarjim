@@ -52,6 +52,7 @@ def written(folder: Path) -> list[str]:
     return sorted(p.name for p in folder.rglob("*")) if folder.exists() else []
 
 
+@pytest.mark.skipif(not FFMPEG, reason="needs ffmpeg to merge the two pieces")
 def test_a_video_and_its_sound_share_one_limit(
         site: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     def video(ie: Any, url: str) -> dict[str, Any]:

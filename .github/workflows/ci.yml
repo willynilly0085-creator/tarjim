@@ -16,6 +16,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      # ffmpeg, so the download tests that merge or record streams run here too.
+      - if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+      - if: runner.os == 'Windows'
+        run: choco install ffmpeg -y --no-progress
       # The tested versions (tarjim/constraints.txt) are the ones people get.
       - run: pip install --extra-index-url https://download.pytorch.org/whl/cpu -c tarjim/constraints.txt -e ".[dev]"
       - run: ruff check tarjim tests
