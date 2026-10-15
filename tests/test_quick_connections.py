@@ -50,5 +50,6 @@ def test_the_gemini_list_shows_text_models_only() -> None:
             ("gemini-nano-banana-2.1", "Nano Banana 2.1", ""),
             ("gemini-robotics-er-2-preview", "Gemini Robotics-ER 2", ""),
             ("antigravity-preview-latest", "Antigravity Agent", ""),
-            ("gemini-3.1-pro-preview-customtools", "Gemini 3.1 Pro Custom Tools", "")]
+            ("gemini-3.1-pro-preview-customtools", "Gemini 3.1 Pro Custom Tools", ""),
+            ("gemini-omni-1.1-flash", "Gemini Omni 1.1 Flash", "")]
     assert [m["id"] for m in describe(rows)] == ["gemini-3.8-flash"]
