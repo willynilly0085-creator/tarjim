@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.23 (2026-10-15)
+
+- **Cancel stops a job at once, and the next one starts.** Cancel only took effect between steps,
+  so a download handed to ffmpeg, a burn, or an AI program working on a translation kept running
+  after the button was pressed, its partial file kept growing, and the next job waited. Now
+  cancel stops every program the job started, the next job starts within about two seconds, and
+  what the cancelled job left half-done is deleted (a fully received file stays for Retry).
+  Two heavy local models are never loaded at once, even right after a cancel. Pause now also
+  holds ffmpeg while it works on a file on this computer. Checked by hand on Windows.
+
 ## 1.0.22 (2026-10-15)
 
 - **One size limit for the whole download.** A link's 8 GB limit now covers all of its pieces
