@@ -1,0 +1,8 @@
+# The actions the workflows use. Python libraries are moved by the weekly libraries workflow,
+# which tests them before proposing the change.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

@@ -1,0 +1,139 @@
+name: libraries
+
+# Once a week: move the tested library versions (tarjim/constraints.txt) to the newest releases,
+# run the checks against them on Windows and Linux, look for known vulnerabilities, and propose
+# the change as a pull request with the results. When the repository does not let workflows open
+# pull requests, the same report is opened as an issue. Nothing reaches people until a release.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: astral-sh/setup-uv@v6
+      - run: python scripts/pins.py --upgrade
+      - run: git diff --stat -- tarjim/constraints.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: constraints
+          path: tarjim/constraints.txt
+
+  gates:
+    needs: compile
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: constraints
+          path: tarjim
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install --extra-index-url https://download.pytorch.org/whl/cpu -c tarjim/constraints.txt -e ".[dev]"
+      - run: ruff check tarjim tests
+      - run: mypy tarjim
+      - run: pytest -q
+
+  audit:
+    needs: compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: constraints
+          path: tarjim
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pip-audit
+      - shell: bash
+        run: |
+          set -o pipefail
+          known=$(sed -n 's/^\([A-Z][A-Z0-9-]*\) .*/--ignore-vuln \1/p' .github/audit-known.txt)
+          pip-audit --disable-pip --no-deps --progress-spinner off -r tarjim/constraints.txt \
+            $known 2>&1 | tee audit.txt
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit
+          path: audit.txt
+
+  propose:
+    needs: [compile, gates, audit]
+    if: always() && needs.compile.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: constraints
+          path: tarjim
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: audit
+          path: report
+      - name: Open a pull request, or an issue when pull requests are not allowed
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE: ${{ github.event.repository.default_branch }}
+          GATES: ${{ needs.gates.result }}
+          AUDIT: ${{ needs.audit.result }}
+        run: |
+          if git diff --quiet -- tarjim/constraints.txt; then
+            echo "No library moved this week."
+            exit 0
+          fi
+          day=$(date -u +%Y-%m-%d)
+          branch="libraries/$day"
+          title="Tested library versions, week of $day"
+          {
+            echo "The weekly move of tarjim's tested library versions (tarjim/constraints.txt)."
+            echo
+            echo "- ruff, mypy and pytest on Windows and Linux: **$GATES**"
+            echo "- known vulnerabilities (pip-audit): **$AUDIT**"
+            echo
+            echo "Details: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo
+            echo '```diff'
+            git diff -U0 -- tarjim/constraints.txt | grep '^[-+][^-+]' | head -n 400
+            echo '```'
+            echo
+            echo '<details><summary>pip-audit</summary>'
+            echo
+            echo '```'
+            head -c 20000 report/audit.txt 2>/dev/null || echo "no report"
+            echo '```'
+            echo '</details>'
+          } > body.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git commit -m "Move the tested library versions to this week's releases" -- tarjim/constraints.txt
+          if git push --force origin "$branch" &&
+             gh pr create --base "$BASE" --head "$branch" --title "$title" --body-file body.md; then
+            exit 0
+          fi
+          echo "A pull request could not be opened; opening an issue with the same report."
+          gh issue create --title "$title" --body-file body.md

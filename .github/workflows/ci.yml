@@ -16,7 +16,22 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install --extra-index-url https://download.pytorch.org/whl/cpu -e ".[dev]"
+      # The tested versions (tarjim/constraints.txt) are the ones people get.
+      - run: pip install --extra-index-url https://download.pytorch.org/whl/cpu -c tarjim/constraints.txt -e ".[dev]"
       - run: ruff check tarjim tests
       - run: mypy tarjim
       - run: pytest -q
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pip-audit
+      # Known vulnerabilities in the tested versions; the ones listed, with reasons, in
+      # .github/audit-known.txt are reported but do not fail the check.
+      - run: >-
+          pip-audit --disable-pip --no-deps --progress-spinner off -r tarjim/constraints.txt
+          $(sed -n 's/^\([A-Z][A-Z0-9-]*\) .*/--ignore-vuln \1/p' .github/audit-known.txt)

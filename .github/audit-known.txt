@@ -1,0 +1,14 @@
+# Known vulnerabilities that the tested versions cannot avoid yet. CI fails on any other one.
+# Each line: the advisory ID, then why it stays. Remove a line as soon as a fixed version installs.
+#
+# qwen-asr 0.0.6 (the listening engine) requires transformers==4.57.6 and accelerate==1.12.0
+# exactly, so no newer release of either can be installed beside it. These advisories concern
+# loading untrusted checkpoints, model repositories or training state, or saving to paths a
+# stranger names; tarjim loads only the models it names itself. Reviewed 2026-10-15.
+PYSEC-2026-3804 accelerate 1.12.0, path traversal in sharded checkpoint loading; no fixed release
+PYSEC-2025-217 transformers 4.57.6, X-CLIP checkpoint conversion; no fixed release
+PYSEC-2026-2288 transformers 4.57.6, Trainer state loading; fixed in 5.0.0
+PYSEC-2026-2289 transformers 4.57.6, crafted config.json in a model repository; fixed in 5.3.0
+PYSEC-2026-2290 transformers 4.57.6, LightGlue remote code; fixed in 5.5.0
+PYSEC-2026-3929 transformers 4.57.6, save_pretrained path traversal; fixed in 5.10.0
+PYSEC-2026-4174 transformers 4.57.6, load_custom_generate writes remote files; no fixed release
