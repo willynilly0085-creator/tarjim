@@ -15,6 +15,7 @@ file viewer, with no terminal command (measured: six minutes of English and Arab
 the last second in 48 s). Grok Build, Codex and Claude Code were given the same file and cannot.
 """
 import json
+import re
 import subprocess
 import tempfile
 from functools import lru_cache
@@ -26,6 +27,14 @@ from tarjim.engines.subscription import HIDDEN, launcher, run, strict
 from tarjim.engines.web import EngineError, unwrap, wrap
 
 PLAIN = ("--sandbox", "--disable-slash-commands")
+# The effort is part of the model's id here. On a 24-line clip Flash (Low) took 10 s, (Medium)
+# 88 s and (High) failed after 209 s, for the same Saudi translation: text is translated with the
+# low variant of the chosen model whenever the account has one.
+EFFORT = re.compile(r"-(medium|high|xhigh|max)$")
+# An agent left to itself sometimes reaches for a terminal command, which headless mode refuses,
+# and then answers nothing ("no output produced"); it is told plainly that none is needed.
+DIRECT = ("Answer directly with the JSON asked for. Do not use any tool, file or terminal "
+          "command: everything you need is in this message.\n\n")
 LIGHTEST = ("flash", "-low")
 LIST_SECONDS = 40
 SIGN_IN = "sign in"
@@ -44,7 +53,8 @@ class AntigravityAsker:
         program's default). Either is tried again once, since the service sometimes answers 503
         or drops the answer halfway ("The stream was interrupted")."""
         if not audio:
-            return self.twice(prompt, None, schema, setting("antigravity_model"))
+            model = light_variant(setting("antigravity_model"))
+            return self.twice(DIRECT + prompt, None, schema, model)
         return self.twice(HEAR + prompt, audio, schema, hearing_model())
 
     def twice(self, prompt: str, audio: bytes | None, schema: dict[str, Any], model: str) -> Any:
@@ -64,6 +74,13 @@ class AntigravityAsker:
                 (Path(folder) / SOUND).write_bytes(audio)
             done = run(command, "", folder)
         return unwrap(answer_of(done.returncode, done.stdout, done.stderr))
+
+
+@lru_cache(maxsize=8)
+def light_variant(model: str) -> str:
+    lighter = EFFORT.sub("-low", model)
+    listed = {slug for slug, _name, _note in rows(listing())} if lighter != model else set()
+    return lighter if lighter in listed else model
 
 
 @lru_cache(maxsize=1)

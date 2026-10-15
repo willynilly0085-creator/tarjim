@@ -44,7 +44,8 @@ def test_antigravity_is_asked_once_in_plan_mode_and_its_structured_answer_is_use
     monkeypatch.setattr(antigravity, "run", fake_run)
     assert antigravity.AntigravityAsker().ask("Translate.", None, SCHEMA) == GOOD
     command = seen["command"]
-    assert command[:3] == ["agy", "--print", "Translate."] and seen["stdin"] == ""
+    assert command[:2] == ["agy", "--print"] and command[2].endswith("Translate.")
+    assert seen["stdin"] == ""
     assert "--sandbox" in command and "--mode" not in command
     assert command[-2:] == ["--model", "gemini-3-flash"]
     assert "--dangerously-skip-permissions" not in command
@@ -139,3 +140,24 @@ def test_a_key_without_a_chosen_model_uses_the_one_the_provider_suggests(
     assert provider_models.model_in_use("deepseek") == "deepseek-chat"
     assert config.setting("deepseek_model") == "deepseek-chat"
     assert compatible.api_asker("deepseek").model == "deepseek-chat"
+
+
+def test_antigravity_translates_with_the_light_variant_and_no_tools(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    seen: dict[str, Any] = {}
+
+    def fake_run(command: list[str], _prompt: str, _folder: str) -> Any:
+        seen["command"] = command
+        envelope = {"status": "SUCCESS", "structured_output": {"result": GOOD}}
+        return subprocess.CompletedProcess(command, 0, json.dumps(envelope), "")
+
+    config.save("antigravity_model", "gemini-3.8-flash-high")
+    antigravity.light_variant.cache_clear()
+    monkeypatch.setattr(antigravity, "listing", lambda: LISTING)
+    monkeypatch.setattr(antigravity, "launcher", lambda _name: ["agy"])
+    monkeypatch.setattr(antigravity, "run", fake_run)
+    assert antigravity.AntigravityAsker().ask("Translate.", None, SCHEMA) == GOOD
+    command = seen["command"]
+    assert command[-2:] == ["--model", "gemini-3.8-flash-low"]
+    assert "Do not use any tool" in command[2] and command[2].endswith("Translate.")
+    assert antigravity.light_variant("claude-sonnet-4-6") == "claude-sonnet-4-6"
