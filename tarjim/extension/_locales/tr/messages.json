@@ -384,6 +384,9 @@
   "errList": {
     "message": "Bu bağlantı birden çok videodan oluşan bir liste: oynatma listesi, kanal ya da akış gibi. tarjim her seferinde tek bir videoyla çalışır: istediğiniz videoyu açın ve onun kendi bağlantısını gönderin."
   },
+  "errUpdated": {
+    "message": "tarjim çalışırken güncellendi ve birazdan kendiliğinden yeniden başlayacak. Ardından “Tekrar dene”ye basın."
+  },
   "failedAtLabel": {
     "message": "Durduğu aşama:"
   },

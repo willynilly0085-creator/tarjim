@@ -384,6 +384,9 @@
   "errList": {
     "message": "This link is a list of several videos, such as a playlist, a channel or a feed. tarjim works on one video at a time: open the video you want and send its own link."
   },
+  "errUpdated": {
+    "message": "tarjim was updated while it was running and restarts by itself in a moment. Then press “Try again”."
+  },
   "failedAtLabel": {
     "message": "Stopped at"
   },

@@ -393,6 +393,7 @@
   "err_media": "This file is not a video or sound file tarjim can open. Choose the video file itself, not a playlist or a list of links.",
   "err_long": "This file holds more than six hours of sound, the most tarjim works on. Cut it into parts of up to six hours and translate each part on its own.",
   "err_list": "This link is a list of several videos, such as a playlist, a channel or a feed. tarjim works on one video at a time: open the video you want and send its own link.",
+  "err_updated": "tarjim was updated while it was running and restarts by itself in a moment. Then press “Try again”.",
   "failedAt": "Stopped at “{stage}”.",
   "errorDetail": "Details: {detail}",
   "needSignIn": "Sign in to {name} so it translates with your subscription, no key needed.",

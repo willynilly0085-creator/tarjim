@@ -23,11 +23,10 @@ HOME = Path(os.environ.get("TARJIM_HOME", Path.home() / ".tarjim"))
 STATE = HOME / "install.json"
 UPDATE_STATE = HOME / "update.json"
 LOG = HOME / "install.log"
-EXIT_WAIT = 90
 NO_WINDOW = 0x08000000 if sys.platform == "win32" else 0
 DETACHED = 0x00000008 if sys.platform == "win32" else 0
 BREAKAWAY = 0x01000000 if sys.platform == "win32" else 0
-STILL_ACTIVE = 259
+EXIT_WAIT, STILL_ACTIVE = 90, 259
 
 
 def record(state: str, detail: str = "", target: Path = STATE) -> None:
@@ -133,19 +132,20 @@ def spawn_outside_job(command: list[str], log: Path) -> bool:
     return done.returncode == 0
 
 
-def start_detached(command: list[str], log: Path) -> None:
-    """Start a program that outlives the chat session that asked for it."""
-    if sys.platform == "win32" and spawn_outside_job(command, log):
-        return
+def start_detached(command: list[str], log: Path, here: Path | None = None) -> bool:
+    """Start a program that outlives the chat session; `here`: in this folder and environment."""
+    if sys.platform == "win32" and not here and spawn_outside_job(command, log):
+        return True
     with log.open("ab") as out:
         for flags in (NO_WINDOW | DETACHED | BREAKAWAY, NO_WINDOW | DETACHED):
             try:
                 subprocess.Popen(command, stdout=out, stderr=out, stdin=subprocess.DEVNULL,
-                                 cwd=log.parent, env=child_environment(), creationflags=flags,
-                                 start_new_session=sys.platform != "win32")
-                return
+                                 cwd=here or log.parent, env=child_environment(),
+                                 creationflags=flags, start_new_session=sys.platform != "win32")
+                return True
             except PermissionError:
                 continue
+    return False
 
 
 def wait_for_exit(pid: int) -> None:

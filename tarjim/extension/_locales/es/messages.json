@@ -384,6 +384,9 @@
   "errList": {
     "message": "Este enlace es una lista de varios vídeos, como una lista de reproducción, un canal o un feed. tarjim trabaja con un vídeo cada vez: abra el vídeo que quiere y envíe su propio enlace."
   },
+  "errUpdated": {
+    "message": "tarjim se actualizó mientras estaba en marcha y se reinicia solo en un momento. Después pulse «Reintentar»."
+  },
   "failedAtLabel": {
     "message": "Se detuvo en"
   },

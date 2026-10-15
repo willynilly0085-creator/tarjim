@@ -1,16 +1,18 @@
 """Updates from the page and by themselves: what version this is, whether a newer one is out, and
 the background watch that, with automatic updates on and nothing running, installs it, brings
-the libraries onto the versions tested with this release, and keeps yt-dlp current."""
+the libraries onto the versions tested with this release, and keeps yt-dlp current; and, once a
+minute, restarts the engine into its own code when that changed on disk (renew.py)."""
 import os
 import threading
 from typing import Any, ClassVar
 
-from tarjim import downloader, update
+from tarjim import downloader, same_code, update
 from tarjim.server.jobs import Board
+from tarjim.server.renew import Renewal
 
 Query = dict[str, list[str]]
-FIRST_LOOK = 60.0
-LOOK_EVERY = 3600.0
+TICK = 60.0
+LOOK_EVERY = 60  # ticks: an hour, the first a minute after the start
 CLOSE_AFTER = 1.5
 
 
@@ -51,15 +53,22 @@ def settle_after_update() -> None:
     repair()
 
 
+def tick(board: Board, port: int, renewal: Renewal, count: int) -> None:
+    if idle(board) and renewal.due() and idle(board):
+        close_soon(renewal.restart(board))
+    elif count % LOOK_EVERY == 0:
+        look(board, port)
+
+
 def watch(board: Board, port: int, stop: threading.Event) -> None:
     settle_after_update()
-    wait = FIRST_LOOK
-    while not stop.wait(wait):
-        wait = LOOK_EVERY
+    renewal, count = Renewal(next(iter(same_code.KEPT), None)), 0
+    while not stop.wait(TICK):
         try:
-            look(board, port)
+            tick(board, port, renewal, count)
         except Exception as error:
             print(f"update watch: {type(error).__name__}: {error}", flush=True)
+        count += 1
 
 
 class UpdateRoutes:

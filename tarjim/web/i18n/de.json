@@ -393,6 +393,7 @@
   "err_media": "Diese Datei ist kein Video und keine Audiodatei, die tarjim öffnen kann. Wählen Sie die Videodatei selbst, keine Playlist und keine Linkliste.",
   "err_long": "Diese Datei enthält mehr als sechs Stunden Ton, das Höchste, womit tarjim arbeitet. Teilen Sie sie in Abschnitte von höchstens sechs Stunden und übersetzen Sie jeden Abschnitt einzeln.",
   "err_list": "Dieser Link ist eine Liste mehrerer Videos, etwa eine Playlist, ein Kanal oder ein Feed. tarjim bearbeitet jeweils ein Video: Öffnen Sie das gewünschte Video und senden Sie dessen eigenen Link.",
+  "err_updated": "tarjim wurde während der Arbeit aktualisiert und startet gleich von selbst neu. Drücken Sie danach „Erneut versuchen“.",
   "failedAt": "Angehalten bei „{stage}“.",
   "errorDetail": "Details: {detail}",
   "needSignIn": "Melden Sie sich bei {name} an, damit mit Ihrem Abo übersetzt wird, ganz ohne Schlüssel.",

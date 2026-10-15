@@ -23,7 +23,8 @@ REFUSED_ACCOUNT = ("not eligible", "Eligibility check failed", "erify your accou
 NOT_MEDIA = ("not a video or sound file",)
 TOO_LONG = ("longer than six hours of sound",)
 A_LIST = ("this link is a list of videos",)
-REASONS = [("media", NOT_MEDIA), ("long", TOO_LONG), ("list", A_LIST),
+UPDATED = ("from 'tarjim.", "named 'tarjim.")  # its code changed on disk while it ran
+REASONS = [("updated", UPDATED), ("media", NOT_MEDIA), ("long", TOO_LONG), ("list", A_LIST),
            ("account", REFUSED_ACCOUNT), ("quota", ("QuotaExhausted", "quota", " 429:")),
            ("signin", SIGNED_OUT),
            ("key", ("API key missing", "API key not valid", " 401:", " 403:")),

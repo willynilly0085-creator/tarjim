@@ -384,6 +384,9 @@
   "errList": {
     "message": "这个链接是包含多个视频的列表，比如播放列表、频道或订阅源。tarjim 一次只处理一个视频：请打开你想要的视频，发送它自己的链接。"
   },
+  "errUpdated": {
+    "message": "tarjim 在运行时被更新了，马上会自动重启。之后请点“重试”。"
+  },
   "failedAtLabel": {
     "message": "停在"
   },

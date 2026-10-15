@@ -393,6 +393,7 @@
   "err_media": "Ce fichier n'est ni une vidéo ni un son que tarjim peut ouvrir. Choisissez le fichier vidéo lui-même, pas une playlist ni une liste de liens.",
   "err_long": "Ce fichier contient plus de six heures de son, le maximum que tarjim traite. Découpez-le en parties de six heures au plus et traduisez chaque partie séparément.",
   "err_list": "Ce lien est une liste de plusieurs vidéos, comme une playlist, une chaîne ou un flux. tarjim traite une vidéo à la fois : ouvrez la vidéo voulue et envoyez son propre lien.",
+  "err_updated": "tarjim a été mis à jour pendant qu'il tournait et redémarre tout seul dans un instant. Appuyez ensuite sur « Réessayer ».",
   "failedAt": "Arrêté à « {stage} ».",
   "errorDetail": "Détails : {detail}",
   "needSignIn": "Connectez-vous à {name} pour traduire avec votre abonnement, sans aucune clé.",

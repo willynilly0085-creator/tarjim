@@ -3,9 +3,10 @@ import json
 import sys
 from pathlib import Path
 
+from tarjim import same_code
 from tarjim.config import HOME, prepare_environment, private_home, save, setting, token
 from tarjim.fetch import is_url, resolve
-from tarjim.installer import module_command
+from tarjim.installer import module_command, wait_for_exit
 from tarjim.job import CHECKPOINT, PROGRESS, Job
 from tarjim.server.app import PORT, serve
 from tarjim.server.housekeeping import Undo
@@ -74,10 +75,12 @@ def run_alongside(port: int) -> Board:
     from tarjim.phone.service import service
     from tarjim.server.housekeeping import sweep
     from tarjim.server.link_upgrade import refresh
+    from tarjim.server.renew import restore
     from tarjim.server.update_routes import watch
 
     downloads = Path(setting("downloads") or DOWNLOADS)
     board = Board(lambda task: perform(task, downloads), idle=release_models)
+    restore(board)
     sweep([HOME / "uploads", HOME / "sources", HOME / "cache"])
     service.begin(board, HOME / "uploads")
     threading.Thread(target=watch, args=(board, port, threading.Event()), daemon=True).start()
@@ -86,12 +89,14 @@ def run_alongside(port: int) -> Board:
 
 
 def main(argv: list[str] | None = None) -> int:
+    same_code.hold()  # first: every module imported later comes from the code read now
     start_up()
     parser = argparse.ArgumentParser(prog="tarjim-serve", description="Local server for "
                                      "the tarjim browser extension")
     parser.add_argument("--port", type=int, default=PORT)
     parser.add_argument("--show-token", action="store_true")
     parser.add_argument("--gemini-key", default="", help="save your Gemini API key")
+    parser.add_argument("--after", type=int, default=0, help=argparse.SUPPRESS)
     args = parser.parse_args(sys.argv[1:] if argv is None else argv)
     if args.gemini_key:
         save("gemini_api_key", args.gemini_key.strip())
@@ -101,6 +106,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.show_token:
         print(secret)
         return 0
+    wait_for_exit(args.after)  # the engine this one replaces lets go of the port
     board = run_alongside(args.port)
     print(f"tarjim server on http://127.0.0.1:{args.port}", flush=True)
     serve(board, secret, HOME / "uploads", args.port)

@@ -384,6 +384,9 @@
   "errList": {
     "message": "Dieser Link ist eine Liste mehrerer Videos, etwa eine Playlist, ein Kanal oder ein Feed. tarjim bearbeitet jeweils ein Video: Öffnen Sie das gewünschte Video und senden Sie dessen eigenen Link."
   },
+  "errUpdated": {
+    "message": "tarjim wurde während der Arbeit aktualisiert und startet gleich von selbst neu. Drücken Sie danach „Erneut versuchen“."
+  },
   "failedAtLabel": {
     "message": "Angehalten bei"
   },

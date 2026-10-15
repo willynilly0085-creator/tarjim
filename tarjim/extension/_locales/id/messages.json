@@ -384,6 +384,9 @@
   "errList": {
     "message": "Tautan ini adalah daftar beberapa video, seperti playlist, kanal, atau feed. tarjim mengerjakan satu video setiap kali: buka video yang Anda mau dan kirim tautan video itu sendiri."
   },
+  "errUpdated": {
+    "message": "tarjim diperbarui saat sedang berjalan dan sebentar lagi memulai ulang sendiri. Setelah itu tekan “Coba lagi”."
+  },
   "failedAtLabel": {
     "message": "Berhenti di"
   },
