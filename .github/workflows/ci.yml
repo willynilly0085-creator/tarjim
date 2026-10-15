@@ -21,7 +21,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
       - if: runner.os == 'Windows'
         run: choco install ffmpeg -y --no-progress
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v7
       # The tested versions (tarjim/constraints.txt, with the pins tarjim/overrides.txt lifts)
       # are the ones people get; uv applies the overrides, pip cannot.
       - run: uv pip install --system --torch-backend cpu -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dev]"
