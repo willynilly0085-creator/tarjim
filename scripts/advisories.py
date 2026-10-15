@@ -66,7 +66,8 @@ def report(seen: dict[str, str]) -> tuple[str, int]:
     new = sorted(set(seen) - accepted())
     lines, problems = rows(seen, known)
     text = ["Accepted advisories against the newest tested versions:", "",
-            "| Advisory | Affected | Still found | Fixed version installable |", "|---|---|---|---|",
+            "| Advisory | Affected | Still found | Fixed version installable |",
+            "|---|---|---|---|",
             *lines, ""]
     text += [f"New, not accepted: {name} ({seen[name]})" for name in new] or ["Nothing new."]
     return "\n".join(text) + "\n", problems + len(new)
