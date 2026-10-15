@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.22 (2026-10-15)
+
+- **One size limit for the whole download.** A link's 8 GB limit now covers all of its pieces
+  together (a video and its sound were each allowed 8 GB), and it also holds when the download is
+  handed to ffmpeg, which before had no limit at all. Found by checking the previous release
+  once more.
+
 ## 1.0.21 (2026-10-14)
 
 - **Security hardening after a full scan.** A complete security scan of tarjim, run offline the way
