@@ -37,6 +37,26 @@ function Get-Source {
     return "https://github.com/$Repo/archive/refs/tags/$tag.zip"
 }
 
+# The versions of tarjim's libraries tested with this release (tarjim/release_pins.py does the
+# same for the engine's own installer). Without them the install still happens, as before.
+function Get-Pins($source) {
+    $file = Join-Path $env:TEMP "tarjim-constraints.txt"
+    try {
+        if ($source -match "^https://github\.com/$Repo/archive/refs/tags/(v?\d+\.\d+\.\d+)\.zip$") {
+            $address = "https://raw.githubusercontent.com/$Repo/$($Matches[1])/tarjim/constraints.txt"
+            Invoke-WebRequest $address -OutFile $file -UseBasicParsing
+        } else {
+            Copy-Item (Join-Path $source "tarjim\constraints.txt") $file
+        }
+        $pinned = @(Get-Content $file | Where-Object { $_.Trim() -and -not $_.StartsWith("#") })
+    } catch {
+        return $null
+    }
+    $other = $pinned | Where-Object { $_ -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*==[A-Za-z0-9.+!_-]+( *;[ -~]*)?$' }
+    if ($pinned.Count -eq 0 -or $other) { return $null }
+    return $file
+}
+
 function Test-Engine {
     try { return (Invoke-RestMethod "$Page/ping" -TimeoutSec 3).app -eq "tarjim" } catch { return $false }
 }
@@ -65,7 +85,13 @@ if (-not (Find-Uv)) {
 $source = Get-Source
 Say "step 2 of 3: downloading and installing. This takes several minutes; keep this window open."
 if (Test-Engine) { Stop-Engine }
-& uv tool install --force --python 3.11 --torch-backend auto "tarjim[dub] @ $source"
+$pins = Get-Pins $source
+$tested = if ($pins) { @("--upgrade", "-c", $pins) } else { @() }
+& uv tool install --force --python 3.11 --torch-backend auto @tested "tarjim[dub] @ $source"
+if ($LASTEXITCODE -ne 0 -and $pins) {
+    Say "trying again without the tested library versions"
+    & uv tool install --force --python 3.11 --torch-backend auto "tarjim[dub] @ $source"
+}
 if ($LASTEXITCODE -ne 0) { Stop-With "the download or install stopped. Run install again; it continues where it stopped." }
 
 Say "step 3 of 3: starting tarjim (it runs in the background, with no window)"

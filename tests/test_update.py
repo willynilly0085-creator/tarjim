@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from tarjim import config, installer, update
+from tarjim import config, installer, release_pins, update
 
 
 @pytest.fixture
@@ -69,8 +69,10 @@ def test_the_installer_is_handed_the_release_archive_and_this_engines_process(
     assert update.start("v1.3.0", 17700)
     command = started[0]
     assert command[-5:-4] == [update.archive("v1.3.0")] and command[-2:] == ["--port", "17700"]
-    assert Path(command[command.index("python") + 1]).read_bytes() == Path(
-        installer.__file__).read_bytes()
+    copy = Path(command[command.index("python") + 1])
+    assert copy.read_bytes() == Path(installer.__file__).read_bytes()
+    assert (copy.parent / "release_pins.py").read_bytes() == Path(
+        release_pins.__file__).read_bytes()  # the copy imports it from beside itself
     assert not update.start("not-a-tag; rm -rf", 17700)
 
 
@@ -88,3 +90,16 @@ def test_every_part_of_tarjim_carries_the_same_version() -> None:
     versions = {project["project"]["version"], plugin["version"], extension["version"],
                 tarjim.__version__}
     assert len(versions) == 1
+
+
+def test_the_installer_copy_runs_outside_the_package(tmp_path: Path) -> None:
+    import shutil
+    import subprocess
+    import sys
+
+    copy = tmp_path / "updater.py"
+    shutil.copyfile(installer.__file__, copy)
+    shutil.copyfile(release_pins.__file__, tmp_path / "release_pins.py")
+    done = subprocess.run([sys.executable, str(copy), "--help"], cwd=tmp_path, capture_output=True,
+                          text=True, check=False)
+    assert done.returncode == 0, done.stderr

@@ -14,6 +14,11 @@ import sys
 import time
 from pathlib import Path
 
+if __package__:
+    from tarjim import release_pins
+else:  # the copy in ~/.tarjim, beside its own copy of release_pins
+    import release_pins  # type: ignore[no-redef]
+
 HOME = Path(os.environ.get("TARJIM_HOME", Path.home() / ".tarjim"))
 STATE = HOME / "install.json"
 UPDATE_STATE = HOME / "update.json"
@@ -49,10 +54,13 @@ def alive(pid: int) -> bool:
     return code.value == STILL_ACTIVE
 
 
-def install_command(uv: str, source: str) -> list[str]:
-    """uv picks the PyTorch build for the graphics card it finds (CPU when there is none)."""
+def install_command(uv: str, source: str, pins: Path | None = None) -> list[str]:
+    """uv picks the PyTorch build for the graphics card it finds (CPU when there is none). With
+    the release's tested versions every other library moves to them, and yt-dlp and the PyTorch
+    family to their newest; without them, uv takes the newest of each, as it did before."""
+    tested = ["--upgrade", "-c", str(pins)] if pins else []
     return [uv, "tool", "install", "--force", "--python", "3.11", "--torch-backend", "auto",
-            f"tarjim[dub] @ {source}"]
+            *tested, f"tarjim[dub] @ {source}"]
 
 
 def tool_bin(uv: str) -> Path:
@@ -144,6 +152,23 @@ def wait_for_exit(pid: int) -> None:
         time.sleep(1)
 
 
+def run_install(command: list[str]) -> int:
+    with LOG.open("ab") as out:
+        return subprocess.run(command, stdout=out, stderr=out, creationflags=NO_WINDOW,
+                              check=False).returncode
+
+
+def install(uv: str, source: str) -> int:
+    """Tested versions this computer cannot meet (an older graphics card's PyTorch, say): the
+    install is tried again the way it was before them."""
+    pins = release_pins.tested_versions(source, HOME)
+    code = run_install(install_command(uv, source, pins))
+    if code and pins:
+        release_pins.note(HOME, "the install with tested versions failed; trying without them")
+        code = run_install(install_command(uv, source, None))
+    return code
+
+
 def main(source: str, after: int = 0, port: int = 0) -> int:
     state = UPDATE_STATE if after else STATE
     uv = shutil.which("uv")
@@ -152,12 +177,10 @@ def main(source: str, after: int = 0, port: int = 0) -> int:
         return 1
     wait_for_exit(after)
     record("installing", "downloading the engine and its models' libraries", state)
-    with LOG.open("ab") as out:
-        done = subprocess.run(install_command(uv, source), stdout=out, stderr=out,
-                              creationflags=NO_WINDOW, check=False)
+    done = install(uv, source)
     start_detached([server_program(uv), *(["--port", str(port)] if port else [])],
                    HOME / "server.log")
-    if done.returncode != 0:
+    if done != 0:
         record("failed", f"install failed, see {LOG}", state)
         return 1
     record("done", "the engine is installed and starting", state)

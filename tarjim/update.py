@@ -14,9 +14,9 @@ import time
 from pathlib import Path
 from typing import Any
 
-from tarjim import __version__, config
+from tarjim import __version__, config, pins
+from tarjim.release_pins import REPO
 
-REPO = "willynilly0085-creator/tarjim"
 RELEASES = os.environ.get("TARJIM_RELEASES", f"https://api.github.com/repos/{REPO}/releases/latest")
 ARCHIVE = os.environ.get("TARJIM_ARCHIVE", f"https://github.com/{REPO}/archive/refs/tags/{{tag}}.zip")
 CHECK_EVERY = 24 * 3600
@@ -85,10 +85,12 @@ def extension_version() -> str:
 
 def view() -> dict[str, Any]:
     found = latest()
+    from tarjim import downloader
+
     return {"current": __version__, "latest": found.lstrip("v"), "available": newer(found),
             "automatic": automatic(), "can_install": installed_by_uv(),
             "failed": newer(found) and progress().get("state") == "failed",
-            "extension": extension_version()}
+            "extension": extension_version(), "downloader": downloader.view()}
 
 
 def archive(tag: str) -> str:
@@ -98,15 +100,28 @@ def archive(tag: str) -> str:
 def start(tag: str, port: int) -> bool:
     """Hand over to a copy of the installer that runs outside this engine's folder. The caller
     must then close the engine: the installer waits for that before replacing its files."""
-    from tarjim import installer
+    from tarjim import installer, release_pins
 
     uv = shutil.which("uv")
     if not uv or not installed_by_uv() or not number(tag):
         return False
     copy = config.HOME / "updater.py"
+    shutil.copyfile(release_pins.__file__, config.HOME / "release_pins.py")
     shutil.copyfile(installer.__file__, copy)
     installer.record("starting", tag, installer.UPDATE_STATE)
     command = [uv, "run", "--quiet", "--no-project", "--python", "3.11", "python", str(copy),
                archive(tag), "--after", str(os.getpid()), "--port", str(port)]
     installer.start_detached(command, config.HOME / "update.log")
     return True
+
+
+def repair_due() -> bool:
+    """An engine whose update was installed by an older installer kept the libraries it had;
+    it is brought onto the versions tested with it, once per version."""
+    return (automatic() and installed_by_uv() and config.setting("repaired_for") != __version__
+            and bool(pins.drift()))
+
+
+def repair(port: int) -> bool:
+    config.save("repaired_for", __version__)
+    return start(f"v{__version__}", port)

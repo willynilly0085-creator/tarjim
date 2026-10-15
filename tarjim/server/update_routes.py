@@ -1,11 +1,11 @@
 """Updates from the page and by themselves: what version this is, whether a newer one is out, and
-the background watch that installs it when automatic updates are on and nothing is running."""
+the background watch that, with automatic updates on and nothing running, installs it, brings
+the libraries onto the versions tested with this release, and keeps yt-dlp current."""
 import os
 import threading
 from typing import Any, ClassVar
 
-from tarjim import update
-from tarjim.config import setting
+from tarjim import downloader, update
 from tarjim.server.jobs import Board
 
 Query = dict[str, list[str]]
@@ -18,12 +18,28 @@ def idle(board: Board) -> bool:
     return all(task.finished for task in board.recent())
 
 
+def close_soon(started: bool) -> bool:
+    """The installer started waits for this engine to close before it replaces it."""
+    if started:
+        threading.Timer(CLOSE_AFTER, os._exit, (0,)).start()
+    return started
+
+
 def replace_engine(port: int) -> bool:
     """Start the installer for the latest release, then close this engine so it can be replaced."""
-    if not update.start(setting("update_latest"), port):
-        return False
-    threading.Timer(CLOSE_AFTER, os._exit, (0,)).start()
-    return True
+    return close_soon(update.start(update.latest(), port))
+
+
+def look(board: Board, port: int) -> None:
+    if not idle(board):
+        return
+    state = update.view()
+    if state["available"] and state["automatic"] and state["can_install"]:
+        replace_engine(port)
+    elif update.repair_due():
+        close_soon(update.repair(port))
+    else:
+        downloader.refresh(idle=True)
 
 
 def settle_after_update() -> None:
@@ -41,9 +57,7 @@ def watch(board: Board, port: int, stop: threading.Event) -> None:
     while not stop.wait(wait):
         wait = LOOK_EVERY
         try:
-            state = update.view()
-            if state["available"] and state["automatic"] and state["can_install"] and idle(board):
-                replace_engine(port)
+            look(board, port)
         except Exception as error:
             print(f"update watch: {type(error).__name__}: {error}", flush=True)
 

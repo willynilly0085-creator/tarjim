@@ -1,3 +1,4 @@
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +15,8 @@ LARGEST = 8 * 1024 ** 3
 LISTS = ("playlist", "multi_video")
 A_LIST = "download refused: this link is a list of videos; send the link of one video"
 TOO_BIG = "the download passed 8 GB and was stopped"
+# Held while yt-dlp downloads, and while a newer yt-dlp replaces it (tarjim/downloader.py).
+IN_USE = threading.Lock()
 
 
 def is_url(text: str) -> bool:
@@ -71,6 +74,11 @@ def clear(folder: Path, name: str, before: set[Path]) -> None:
 
 
 def download(url: str, folder: Path) -> Path:
+    with IN_USE:
+        return download_now(url, folder)
+
+
+def download_now(url: str, folder: Path) -> Path:
     from yt_dlp import YoutubeDL
 
     folder.mkdir(parents=True, exist_ok=True)
