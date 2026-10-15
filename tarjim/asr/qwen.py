@@ -13,14 +13,12 @@ MAX_TOKENS = 2048
 CORE = re.compile(r"\w+", re.UNICODE)
 
 
-def keep_fast_tokenizer(repo: str, processor: Any) -> None:
-    from huggingface_hub import snapshot_download
-
+def keep_fast_tokenizer(folder: Path, processor: Any) -> None:
     backend = getattr(getattr(processor, "tokenizer", None), "backend_tokenizer", None)
     if backend is None:
         return
     try:
-        target = Path(snapshot_download(repo, local_files_only=True)) / "tokenizer.json"
+        target = folder / "tokenizer.json"
         if not target.exists():
             backend.save(str(target))
     except (OSError, ValueError):
@@ -38,15 +36,18 @@ class QwenEngine:
         from qwen_asr import Qwen3ASRModel
 
         from tarjim.device import best_device, precision
+        from tarjim.model_pins import folder
 
         device = device or best_device()
-        options = {"dtype": precision(device, torch.bfloat16), "device_map": device}
+        options = {"dtype": precision(device, torch.bfloat16), "device_map": device,
+                   "use_safetensors": True}
+        asr, aligner = folder(ASR_MODEL), folder(ALIGNER_MODEL)
         self.model = Qwen3ASRModel.from_pretrained(
-            ASR_MODEL, forced_aligner=ALIGNER_MODEL, forced_aligner_kwargs=options,
+            str(asr), forced_aligner=str(aligner), forced_aligner_kwargs=options,
             max_inference_batch_size=BATCH, max_new_tokens=MAX_TOKENS, **options,
         )
-        keep_fast_tokenizer(ASR_MODEL, self.model.processor)
-        keep_fast_tokenizer(ALIGNER_MODEL, getattr(self.model.forced_aligner, "processor", None))
+        keep_fast_tokenizer(asr, self.model.processor)
+        keep_fast_tokenizer(aligner, getattr(self.model.forced_aligner, "processor", None))
 
     def transcribe(self, audio_path: str) -> Transcript:
         result = self.model.transcribe(audio=audio_path, return_time_stamps=True)[0]

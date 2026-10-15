@@ -39,9 +39,9 @@ def add_vowels(texts: list[str], model: Any = None) -> list[str]:
         return texts
     try:
         if model is None:
-            from catt_tashkeel import CATTEncoderOnly
+            from tarjim.dub.catt_files import model as checked_model
 
-            model = CATTEncoderOnly()
+            model = checked_model()
         voweled = iter(model.do_tashkeel_batch(batch, verbose=False))
     except Exception:
         return texts

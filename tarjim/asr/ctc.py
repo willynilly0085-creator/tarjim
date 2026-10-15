@@ -91,13 +91,16 @@ class Emitter:
         from transformers import AutoModelForCTC, AutoTokenizer
 
         from tarjim.device import best_device, precision
+        from tarjim.model_pins import folder
 
         self.torch = torch
         self.device = device or best_device()
         self.dtype = precision(self.device, torch.float16)
-        self.model = AutoModelForCTC.from_pretrained(self.MODEL, torch_dtype=self.dtype)
+        where = folder(self.MODEL)
+        self.model = AutoModelForCTC.from_pretrained(where, torch_dtype=self.dtype,
+                                                     use_safetensors=True)
         self.model = self.model.to(self.device).eval()
-        tokenizer = AutoTokenizer.from_pretrained(self.MODEL)  # type: ignore[no-untyped-call]
+        tokenizer = AutoTokenizer.from_pretrained(where)  # type: ignore[no-untyped-call]
         self.vocab: dict[str, int] = tokenizer.get_vocab()
 
     def emissions(self, wav: Any) -> np.ndarray:

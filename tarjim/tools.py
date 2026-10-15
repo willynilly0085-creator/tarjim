@@ -10,7 +10,6 @@ from tarjim.retry import patiently
 from tarjim.server.evidence import evidence
 
 VOICE_REPO = "openbmb/VoxCPM2"
-DUPLICATE_WEIGHTS = ["*.bin"]
 ONLINE = threading.Lock()
 DOWNLOADING: list[bool] = []
 
@@ -58,13 +57,10 @@ class Progress:
 
 
 def hub_ready(repo: str) -> bool:
-    from huggingface_hub import snapshot_download
+    """The model at the commit tarjim pinned (tarjim/model_pins.py) is on this computer."""
+    from tarjim.model_pins import ready
 
-    try:
-        snapshot_download(repo, local_files_only=True)
-    except Exception:
-        return False
-    return True
+    return ready(repo)
 
 
 def ollama_ready(model: str) -> bool:
@@ -137,7 +133,7 @@ def fetch(tool: Tool) -> None:
 
 
 def download(tool: Tool) -> None:
-    from huggingface_hub import snapshot_download
+    from tarjim import model_pins
 
     if tool.kind == "ffmpeg":
         from tarjim.ffmpeg_setup import install_ffmpeg
@@ -147,7 +143,7 @@ def download(tool: Tool) -> None:
         from tarjim.dub.voice_setup import install
 
         install()
-        snapshot_download(VOICE_REPO)
+        model_pins.download(VOICE_REPO)
     elif tool.kind == "ollama":
         from tarjim.engines.ollama import base_url
         from tarjim.engines.web import post
@@ -156,7 +152,7 @@ def download(tool: Tool) -> None:
             post("local", f"{base_url()}/api/pull", {}, json={"name": model, "stream": False})
     else:
         for repo in tool.sources:
-            snapshot_download(repo, ignore_patterns=DUPLICATE_WEIGHTS)
+            model_pins.download(repo)
 
 
 class Shelf:

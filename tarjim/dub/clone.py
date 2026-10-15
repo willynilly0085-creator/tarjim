@@ -47,10 +47,13 @@ def plausible(text: str) -> float:
 
 
 def load(optimize: bool) -> Any:
+    """From the pinned copy's folder (tarjim/model_pins.py), never by name."""
     from voxcpm import VoxCPM
 
-    return VoxCPM.from_pretrained(REPO, load_denoiser=False, local_files_only=True,
-                                  optimize=optimize)
+    from tarjim.model_pins import folder
+
+    return VoxCPM.from_pretrained(str(folder(REPO)), load_denoiser=False,
+                                  local_files_only=True, optimize=optimize)
 
 
 @lru_cache(maxsize=1)
