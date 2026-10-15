@@ -244,7 +244,11 @@ passend dazu neu. Ist die Option ausgeschaltet, zeigt die Seite einen Hinweis un
   dem Build, den uv für Ihre Grafikkarte wählt.
 
 Wenn Sie **tarjim automatisch aktualisieren** ausschalten, stoppt beides. Eine Kopie aus dem
-Quellcode erhält die getesteten Versionen mit `pip install -c tarjim/constraints.txt -e ".[dub]"`.
+Quellcode erhält die getesteten Versionen mit `uv pip install -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dub]"`.
+
+### Bekannte Probleme in Bibliotheken
+
+Für einige Bibliotheken, die tarjim installiert, wurden Sicherheitslücken veröffentlicht, die noch keine getestete Version vermeiden kann: transformers bleibt auf 4.57.6, weil qwen-asr, die lokale Hör-Engine, genau diese Version verlangt. Die Art, wie tarjim die Bibliothek nutzt, erreicht keine davon, und jedes Modell wird aus einer festen, von tarjim geprüften Version geladen. **Einstellungen** zeigt die, die auf deinem Computer noch zutreffen; installiert ein Update eine behobene Version, verschwindet der Hinweis von selbst. [SECURITY.md](SECURITY.md) listet jede einzeln auf, was sie ist und was tarjim dagegen tut.
 
 ## Datenschutz und Sicherheit
 

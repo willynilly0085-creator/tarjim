@@ -44,10 +44,28 @@ def launching(progress: dict[str, Any]) -> bool:
     return not progress.get("pid") and time.time() - started < LAUNCH_GRACE
 
 
+KNOWN_ISSUES_NOTE = ("Published security issues in libraries installed with tarjim that still "
+                     "apply to this install. Tell the person calmly, in their language: none is "
+                     "reached by the way tarjim uses these libraries, and each one goes away by "
+                     "itself when an update installs the fixed version.")
+
+
+def library_issues() -> dict[str, Any]:
+    """What the engine reports for its own installed versions (it alone can see them)."""
+    from tarjim.assistant_http import call
+
+    found = call("/update")
+    issues = found.get("known_issues") if isinstance(found, dict) else None
+    if not issues:
+        return {}
+    return {"known_library_issues": issues, "known_library_issues_note": KNOWN_ISSUES_NOTE,
+            "known_library_issues_details": found.get("known_issues_details", "")}
+
+
 def status() -> dict[str, Any]:
     page = f"{setting('server') or SERVER}/"
     if running():
-        return {"engine": "running", "page": page}
+        return {"engine": "running", "page": page, **library_issues()}
     progress = installing()
     if progress.get("state") == "installing":
         if alive(int(progress.get("pid", 0))) or launching(progress):

@@ -231,7 +231,11 @@ güncellenir.
   için seçtiği derlemeyi izler.
 
 **Yeni sürüm çıkınca tarjim'i otomatik güncelle** kapatıldığında ikisi de durur. Kaynaktan
-çalıştırdığınız kopya test edilen sürümleri `pip install -c tarjim/constraints.txt -e ".[dub]"` ile alır.
+çalıştırdığınız kopya test edilen sürümleri `uv pip install -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dub]"` ile alır.
+
+### Kitaplıklardaki bilinen sorunlar
+
+tarjim'in kurduğu birkaç kitaplık için, test edilmiş hiçbir sürümün henüz önleyemediği güvenlik açıkları yayımlandı: transformers 4.57.6'da kalıyor, çünkü yerel dinleme motoru qwen-asr tam olarak bu sürümü istiyor. tarjim'in kitaplığı kullanma biçimi bunların hiçbirine ulaşmıyor ve her model, tarjim'in kontrol ettiği sabit bir sürümden yükleniyor. **Ayarlar**, bilgisayarınızda hâlâ geçerli olanları gösterir; bir güncelleme düzeltilmiş sürümü kurduğunda bu uyarı kendiliğinden kaybolur. [SECURITY.md](SECURITY.md) her birini, ne olduğunu ve tarjim'in ne yaptığını listeler.
 
 ## Gizlilik ve güvenlik
 

@@ -227,7 +227,11 @@ sumber diperbarui dengan `git pull`.
   uv untuk kartu grafis Anda.
 
 Mematikan **Perbarui tarjim otomatis** menghentikan keduanya. Salinan yang Anda jalankan dari kode
-sumber mendapat versi yang diuji dengan `pip install -c tarjim/constraints.txt -e ".[dub]"`.
+sumber mendapat versi yang diuji dengan `uv pip install -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dub]"`.
+
+### Masalah yang diketahui di pustaka
+
+Beberapa pustaka yang dipasang tarjim punya celah keamanan yang sudah diumumkan dan belum bisa dihindari versi uji mana pun: transformers tetap di 4.57.6 karena qwen-asr, mesin pendengar lokal, meminta tepat versi itu. Cara tarjim memakai pustaka itu tidak menyentuh satu pun di antaranya, dan setiap model dimuat dari versi tetap yang sudah diperiksa tarjim. **Pengaturan** menampilkan yang masih berlaku di komputer Anda; begitu pembaruan memasang versi yang sudah diperbaiki, pemberitahuan itu hilang dengan sendirinya. [SECURITY.md](SECURITY.md) mencantumkan masing-masing, apa itu, dan apa yang dilakukan tarjim.
 
 ## Privasi dan keamanan
 

@@ -233,7 +233,11 @@ Uma cópia que você executa a partir do código-fonte é atualizada com `git pu
   escolhe para a sua placa de vídeo.
 
 Desativar **Atualizar o tarjim automaticamente** interrompe as duas coisas. Uma cópia executada a
-partir do código-fonte recebe as versões testadas com `pip install -c tarjim/constraints.txt -e ".[dub]"`.
+partir do código-fonte recebe as versões testadas com `uv pip install -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dub]"`.
+
+### Problemas conhecidos nas bibliotecas
+
+Algumas bibliotecas que o tarjim instala têm falhas de segurança publicadas que nenhuma versão testada consegue evitar ainda: o transformers fica na 4.57.6 porque o qwen-asr, o motor de escuta local, exige exatamente essa versão. A forma como o tarjim usa a biblioteca não chega a nenhuma delas, e cada modelo é carregado de uma versão fixa que o tarjim verificou. **Configurações** mostra as que ainda se aplicam ao seu computador; quando uma atualização instala uma versão corrigida, esse aviso desaparece sozinho. O [SECURITY.md](SECURITY.md) lista cada uma, o que é e o que o tarjim faz a respeito.
 
 ## Privacidade e segurança
 

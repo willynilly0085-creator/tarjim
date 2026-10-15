@@ -233,7 +233,11 @@ bouton **Mettre à jour**. Une copie lancée depuis le code source se met à jou
   PyTorch suit la variante que uv choisit pour votre carte graphique.
 
 Désactiver **Mettre tarjim à jour automatiquement** arrête les deux. Une copie lancée depuis le
-code source obtient les versions testées avec `pip install -c tarjim/constraints.txt -e ".[dub]"`.
+code source obtient les versions testées avec `uv pip install -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dub]"`.
+
+### Problèmes connus dans les bibliothèques
+
+Quelques bibliothèques installées par tarjim ont des failles de sécurité publiées qu'aucune version testée ne peut encore éviter : transformers reste en 4.57.6, car qwen-asr, le moteur d'écoute local, exige exactement cette version. La façon dont tarjim utilise la bibliothèque n'en atteint aucune, et chaque modèle se charge depuis une version fixe que tarjim a vérifiée. **Réglages** montre celles qui concernent encore votre ordinateur ; quand une mise à jour installe une version corrigée, cet avis disparaît de lui-même. [SECURITY.md](SECURITY.md) les liste une par une, avec ce qu'elles sont et ce que fait tarjim.
 
 ## Confidentialité et sécurité
 

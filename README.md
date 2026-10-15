@@ -218,7 +218,11 @@ now** button. A copy you run from source is updated with `git pull`.
   graphics card.
 
 Turning **Update tarjim automatically** off stops both. A copy you run from source gets the tested
-versions with `pip install -c tarjim/constraints.txt -e ".[dub]"`.
+versions with `uv pip install -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dub]"`.
+
+### Known library issues
+
+A few libraries tarjim installs have published security issues that no tested version can avoid yet: transformers stays at 4.57.6 because qwen-asr, the local listening engine, requires exactly that version. None of them is reached by the way tarjim uses the library, and every model loads from a fixed version tarjim has checked. **Settings** shows the ones that still apply on your computer; when an update installs a fixed version, that notice goes away by itself. [SECURITY.md](SECURITY.md#known-library-issues) lists each one, what it is and what tarjim does about it.
 
 ## Privacy and security
 

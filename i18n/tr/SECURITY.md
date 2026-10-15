@@ -31,3 +31,18 @@ Bildirimler en kısa sürede okunur ve yanıtlanır.
 - Bilgisayarınızda sizin kullanıcı hesabınızla program çalıştırabilen herkes kasayı ve belirteci
   okuyabilir. tarjim, ele geçirilmiş bir hesaba karşı koruma sağlamaz.
 - Seçtiğiniz bulut sağlayıcıları, işledikleri sesi veya metni kendi koşulları çerçevesinde alır.
+
+## Kitaplıklardaki bilinen sorunlar
+
+tarjim'in kurduğu kitaplıklarda yayımlanmış ve test edilmiş hiçbir sürümün henüz önleyemediği güvenlik açıkları: qwen-asr (yerel dinleme motoru) tam olarak transformers 4.57.6 istiyor ve herhangi bir 5 sürümüyle çalışmıyor. tarjim'in kitaplığı kullanma biçimi bunların hiçbirine ulaşmıyor: Hugging Face'teki her model, tarjim'in kontrol ettiği sabit bir sürümden yalnızca ayar ve ağırlık dosyalarıyla (asla kod değil) indirilir ve bilgisayardaki klasöründen çevrimdışı yüklenir. Ayarlar bilgisayarınızda geçerli olanları gösterir; bir güncelleme düzeltilmiş sürümü kurduğunda her biri kendiliğinden kaybolur.
+
+| Uyarı | Kitaplık | Etkilenen sürümler | Düzeltildiği sürüm |
+|---|---|---|---|
+| PYSEC-2025-217 | transformers | `<=5.0.0rc0` | 5.0.0 |
+| PYSEC-2026-2288 | transformers | `<5.0.0` | 5.0.0 |
+| PYSEC-2026-2289 | transformers | `<5.3.0` | 5.3.0 |
+| PYSEC-2026-2290 | transformers | `<5.5.0` | 5.5.0 |
+| PYSEC-2026-3929 | transformers | `<5.10.0` | 5.10.0 |
+| PYSEC-2026-4174 | transformers | `>=4.49.0,<=5.8.1` | 5.9.0 |
+
+Ayrıntılar (İngilizce): [SECURITY.md](../../SECURITY.md#known-library-issues).

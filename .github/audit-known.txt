@@ -1,14 +1,17 @@
 # Known vulnerabilities that the tested versions cannot avoid yet. CI fails on any other one.
-# Each line: the advisory ID, then why it stays. Remove a line as soon as a fixed version installs.
+# Each line: the advisory ID, then why it stays. tarjim/known_issues.json holds the same IDs with
+# what each one is and what tarjim does about it (people see the ones that apply in Settings);
+# a test keeps the two lists equal. The weekly libraries workflow flags a line that can go.
 #
-# qwen-asr 0.0.6 (the listening engine) requires transformers==4.57.6 and accelerate==1.12.0
-# exactly, so no newer release of either can be installed beside it. These advisories concern
-# loading untrusted checkpoints, model repositories or training state, or saving to paths a
-# stranger names; tarjim loads only the models it names itself. Reviewed 2026-10-15.
-PYSEC-2026-3804 accelerate 1.12.0, path traversal in sharded checkpoint loading; no fixed release
-PYSEC-2025-217 transformers 4.57.6, X-CLIP checkpoint conversion; no fixed release
+# qwen-asr 0.0.6 (the listening engine) requires transformers==4.57.6 exactly, and every
+# transformers 5.x release stops it from loading (checked 2026-10-15). accelerate, also pinned
+# exactly by qwen-asr, is lifted to 1.15.0 by tarjim/overrides.txt, which closed PYSEC-2026-3804.
+# These concern loading untrusted checkpoints or model repositories, training state, or saving to
+# paths a stranger names; tarjim loads only its own models, each at a fixed commit, from a folder
+# on the computer. Reviewed 2026-10-15.
+PYSEC-2025-217 transformers 4.57.6, X-CLIP checkpoint conversion; fixed in 5.0.0
 PYSEC-2026-2288 transformers 4.57.6, Trainer state loading; fixed in 5.0.0
 PYSEC-2026-2289 transformers 4.57.6, crafted config.json in a model repository; fixed in 5.3.0
 PYSEC-2026-2290 transformers 4.57.6, LightGlue remote code; fixed in 5.5.0
 PYSEC-2026-3929 transformers 4.57.6, save_pretrained path traversal; fixed in 5.10.0
-PYSEC-2026-4174 transformers 4.57.6, load_custom_generate writes remote files; no fixed release
+PYSEC-2026-4174 transformers 4.57.6, load_custom_generate writes remote files; fixed in 5.9.0

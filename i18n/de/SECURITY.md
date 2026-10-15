@@ -34,3 +34,18 @@ es jemandem ermöglicht. Meldungen werden so schnell wie möglich gelesen und be
   das Token lesen. tarjim schützt nicht vor einem kompromittierten Konto.
 - Von Ihnen gewählte Cloud-Anbieter erhalten den Ton oder Text, den sie verarbeiten, zu ihren
   eigenen Bedingungen.
+
+## Bekannte Probleme in Bibliotheken
+
+Veröffentlichte Sicherheitslücken in Bibliotheken, die tarjim installiert, und die noch keine getestete Version vermeiden kann, weil qwen-asr (die lokale Hör-Engine) genau transformers 4.57.6 verlangt und mit jeder Version 5 nicht mehr läuft. Die Art, wie tarjim die Bibliothek nutzt, erreicht keine davon: Jedes Modell von Hugging Face wird aus einer festen, von tarjim geprüften Version geladen, nur mit Einstellungs- und Gewichtsdateien (nie Code), und offline aus seinem Ordner auf dem Computer genutzt. Die Einstellungen zeigen die, die auf deinem Computer zutreffen, und jede verschwindet von selbst, sobald ein Update eine behobene Version installiert.
+
+| Hinweis | Bibliothek | Betroffene Versionen | Behoben in |
+|---|---|---|---|
+| PYSEC-2025-217 | transformers | `<=5.0.0rc0` | 5.0.0 |
+| PYSEC-2026-2288 | transformers | `<5.0.0` | 5.0.0 |
+| PYSEC-2026-2289 | transformers | `<5.3.0` | 5.3.0 |
+| PYSEC-2026-2290 | transformers | `<5.5.0` | 5.5.0 |
+| PYSEC-2026-3929 | transformers | `<5.10.0` | 5.10.0 |
+| PYSEC-2026-4174 | transformers | `>=4.49.0,<=5.8.1` | 5.9.0 |
+
+Details (auf Englisch): [SECURITY.md](../../SECURITY.md#known-library-issues).

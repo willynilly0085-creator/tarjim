@@ -1,0 +1,74 @@
+[
+  {
+    "id": "PYSEC-2025-217",
+    "aliases": ["CVE-2025-14929"],
+    "package": "transformers",
+    "affected": "<=5.0.0rc0",
+    "what": "A tool that converts X-CLIP model checkpoints could run code hidden in a checkpoint file.",
+    "reached": false,
+    "reach": "unused",
+    "tarjim": "tarjim never converts checkpoints and never loads X-CLIP models.",
+    "fix": "transformers 5.0.0. tarjim installs it once qwen-asr, its listening engine, allows transformers 5 (qwen-asr 0.0.6 requires 4.57.6 exactly, and stops loading with any 5.x release).",
+    "fixed_by": ">=5.0.0"
+  },
+  {
+    "id": "PYSEC-2026-2288",
+    "aliases": ["CVE-2026-1839", "GHSA-69w3-r845-3855"],
+    "package": "transformers",
+    "affected": "<5.0.0",
+    "what": "Resuming a training run from a crafted checkpoint could run code, when PyTorch is older than 2.6.",
+    "reached": false,
+    "reach": "unused",
+    "tarjim": "tarjim never trains models, so it never resumes from a checkpoint.",
+    "fix": "transformers 5.0.0. tarjim installs it once qwen-asr, its listening engine, allows transformers 5 (qwen-asr 0.0.6 requires 4.57.6 exactly, and stops loading with any 5.x release).",
+    "fixed_by": ">=5.0.0"
+  },
+  {
+    "id": "PYSEC-2026-2289",
+    "aliases": ["CVE-2026-4372", "GHSA-29pf-2h5f-8g72"],
+    "package": "transformers",
+    "affected": "<5.3.0",
+    "what": "A model whose config.json was written by an attacker could make transformers fetch and run code from another repository.",
+    "reached": false,
+    "reach": "model",
+    "tarjim": "tarjim loads only its own models, each from one fixed commit it checked, from a folder on this computer and offline, so a changed config.json never reaches it; the kernels package this needs is not installed either.",
+    "fix": "transformers 5.3.0. tarjim installs it once qwen-asr, its listening engine, allows transformers 5 (qwen-asr 0.0.6 requires 4.57.6 exactly, and stops loading with any 5.x release).",
+    "fixed_by": ">=5.3.0"
+  },
+  {
+    "id": "PYSEC-2026-2290",
+    "aliases": ["CVE-2026-5241", "GHSA-fgcw-684q-jj6r"],
+    "package": "transformers",
+    "affected": "<5.5.0",
+    "what": "Loading a LightGlue model from an attacker's repository could run its code even with remote code switched off.",
+    "reached": false,
+    "reach": "unused",
+    "tarjim": "tarjim never loads LightGlue models; its own models come from fixed commits it checked.",
+    "fix": "transformers 5.5.0. tarjim installs it once qwen-asr, its listening engine, allows transformers 5 (qwen-asr 0.0.6 requires 4.57.6 exactly, and stops loading with any 5.x release).",
+    "fixed_by": ">=5.5.0"
+  },
+  {
+    "id": "PYSEC-2026-3929",
+    "aliases": ["CVE-2026-9856", "GHSA-xrqw-3rrv-vx5w"],
+    "package": "transformers",
+    "affected": "<5.10.0",
+    "what": "Saving a tokenizer that came from a crafted repository could write files outside the chosen folder.",
+    "reached": false,
+    "reach": "unused",
+    "tarjim": "tarjim never saves a tokenizer or processor that way (save_pretrained), and its models come from fixed commits it checked.",
+    "fix": "transformers 5.10.0. tarjim installs it once qwen-asr, its listening engine, allows transformers 5 (qwen-asr 0.0.6 requires 4.57.6 exactly, and stops loading with any 5.x release).",
+    "fixed_by": ">=5.10.0"
+  },
+  {
+    "id": "PYSEC-2026-4174",
+    "aliases": ["CVE-2026-80047", "GHSA-x9r9-c232-4q39"],
+    "package": "transformers",
+    "affected": ">=4.49.0,<=5.8.1",
+    "what": "Loading a model from a repository that carries custom generation code saves that code to disk before asking for permission; it is not run.",
+    "reached": false,
+    "reach": "model",
+    "tarjim": "tarjim downloads only the model files it needs, never code, from fixed commits it checked, and loads them from a folder on this computer, so no such code is fetched.",
+    "fix": "transformers 5.9.0. tarjim installs it once qwen-asr, its listening engine, allows transformers 5 (qwen-asr 0.0.6 requires 4.57.6 exactly, and stops loading with any 5.x release).",
+    "fixed_by": ">=5.9.0"
+  }
+]

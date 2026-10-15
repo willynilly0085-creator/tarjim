@@ -232,7 +232,11 @@ Una copia que ejecutas desde el código fuente se actualiza con `git pull`.
   compilación que uv elige para tu tarjeta gráfica.
 
 Desactivar **Actualizar tarjim automáticamente** detiene ambas cosas. Una copia que ejecutas desde
-el código fuente obtiene las versiones probadas con `pip install -c tarjim/constraints.txt -e ".[dub]"`.
+el código fuente obtiene las versiones probadas con `uv pip install -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dub]"`.
+
+### Problemas conocidos en las bibliotecas
+
+Algunas bibliotecas que instala tarjim tienen fallos de seguridad publicados que ninguna versión probada puede evitar todavía: transformers sigue en 4.57.6 porque qwen-asr, el motor de escucha local, exige exactamente esa versión. La forma en que tarjim usa la biblioteca no llega a ninguno de ellos, y cada modelo se carga desde una versión fija que tarjim ha revisado. **Ajustes** muestra los que aún afectan a tu equipo; cuando una actualización instala una versión corregida, ese aviso desaparece solo. [SECURITY.md](SECURITY.md) recoge cada uno, qué es y qué hace tarjim al respecto.
 
 ## Privacidad y seguridad
 

@@ -28,3 +28,18 @@ yang dapat dilakukan seseorang dengannya. Laporan dibaca dan ditanggapi secepat 
 - Siapa pun yang dapat menjalankan program sebagai pengguna Anda di komputer Anda dapat membaca brankas dan token.
   tarjim tidak melindungi dari akun yang telah disusupi.
 - Penyedia cloud yang Anda pilih menerima audio atau teks yang mereka proses, di bawah ketentuan mereka sendiri.
+
+## Masalah yang diketahui di pustaka
+
+Celah keamanan yang sudah diumumkan di pustaka yang dipasang tarjim dan belum bisa dihindari versi uji mana pun, karena qwen-asr (mesin pendengar lokal) meminta tepat transformers 4.57.6 dan berhenti bekerja dengan versi 5 mana pun. Cara tarjim memakai pustaka itu tidak menyentuh satu pun di antaranya: setiap model dari Hugging Face diunduh dari versi tetap yang sudah diperiksa tarjim, hanya berkas pengaturan dan bobotnya (tanpa kode), lalu dimuat dari foldernya di komputer tanpa internet. Pengaturan menampilkan yang berlaku di komputer Anda, dan masing-masing hilang dengan sendirinya saat pembaruan memasang versi yang sudah diperbaiki.
+
+| Peringatan | Pustaka | Versi terdampak | Diperbaiki di |
+|---|---|---|---|
+| PYSEC-2025-217 | transformers | `<=5.0.0rc0` | 5.0.0 |
+| PYSEC-2026-2288 | transformers | `<5.0.0` | 5.0.0 |
+| PYSEC-2026-2289 | transformers | `<5.3.0` | 5.3.0 |
+| PYSEC-2026-2290 | transformers | `<5.5.0` | 5.5.0 |
+| PYSEC-2026-3929 | transformers | `<5.10.0` | 5.10.0 |
+| PYSEC-2026-4174 | transformers | `>=4.49.0,<=5.8.1` | 5.9.0 |
+
+Rincian (bahasa Inggris): [SECURITY.md](../../SECURITY.md#known-library-issues).

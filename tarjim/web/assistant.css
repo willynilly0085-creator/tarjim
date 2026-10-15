@@ -47,3 +47,15 @@
 
 .check-option { display: flex; align-items: center; gap: var(--space-sm); cursor: pointer; }
 .check-option input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+/* Published library vulnerabilities that still apply here: quiet, never alarming. */
+.known-issues { display: grid; gap: var(--space-xs); max-width: 60ch; padding: var(--space-md); border: 1px solid var(--line); border-radius: var(--radius); }
+.known-issues h2 { margin: 0; font-size: var(--text-body); font-weight: 650; }
+.known-issues ul { display: grid; gap: var(--space-sm); margin: var(--space-xs) 0; padding: 0; list-style: none; }
+.known-issues li { display: grid; gap: var(--space-xs); }
+.known-issues-reason { display: grid; gap: 2px; }
+.known-issues-library { font-weight: 600; unicode-bidi: isolate; justify-self: start; }
+.known-issues-ids { unicode-bidi: isolate; justify-self: start; }
+.known-issues-id { white-space: nowrap; }
+.known-issues a { color: inherit; text-decoration-color: var(--accent-line); text-underline-offset: 3px; }
+.known-issues a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 2px; }

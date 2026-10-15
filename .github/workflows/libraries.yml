@@ -1,9 +1,16 @@
 name: libraries
 
-# Once a week: move the tested library versions (tarjim/constraints.txt) to the newest releases,
-# run the checks against them on Windows and Linux, look for known vulnerabilities, and propose
-# the change as a pull request with the results. When the repository does not let workflows open
-# pull requests, the same report is opened as an issue. Nothing reaches people until a release.
+# Once a week: move the tested library versions (tarjim/constraints.txt, and the exact pins of
+# other packages that tarjim/overrides.txt lifts) to the newest releases, run the checks against
+# them on Windows and Linux, look for known vulnerabilities, and propose the change as a pull
+# request with the results. When the repository does not let workflows open pull requests, the
+# same report is opened as an issue. Nothing reaches people until a release.
+#
+# The audit runs twice: with the accepted list (.github/audit-known.txt), as CI does, and without
+# it, through scripts/advisories.py, which fails this workflow when an accepted advisory is no
+# longer found or a fixed version of it can now be installed, so its line is removed and the fix
+# ships. When qwen-asr releases a version that allows a fixed transformers, --upgrade below takes
+# it and the pull request carries it.
 on:
   workflow_dispatch:
   schedule:
@@ -22,11 +29,13 @@ jobs:
           python-version: "3.11"
       - uses: astral-sh/setup-uv@v6
       - run: python scripts/pins.py --upgrade
-      - run: git diff --stat -- tarjim/constraints.txt
+      - run: git diff --stat -- tarjim/constraints.txt tarjim/overrides.txt
       - uses: actions/upload-artifact@v4
         with:
           name: constraints
-          path: tarjim/constraints.txt
+          path: |
+            tarjim/constraints.txt
+            tarjim/overrides.txt
 
   gates:
     needs: compile
@@ -44,7 +53,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install --extra-index-url https://download.pytorch.org/whl/cpu -c tarjim/constraints.txt -e ".[dev]"
+      - uses: astral-sh/setup-uv@v6
+      - run: uv pip install --system --torch-backend cpu -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dev]"
       - run: ruff check tarjim tests
       - run: mypy tarjim
       - run: pytest -q
@@ -61,18 +71,29 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - uses: astral-sh/setup-uv@v6
       - run: pip install pip-audit
-      - shell: bash
+      - name: Audit with the accepted list, as CI does
+        shell: bash
         run: |
           set -o pipefail
           known=$(sed -n 's/^\([A-Z][A-Z0-9-]*\) .*/--ignore-vuln \1/p' .github/audit-known.txt)
           pip-audit --disable-pip --no-deps --progress-spinner off -r tarjim/constraints.txt \
             $known 2>&1 | tee audit.txt
+      - name: Audit without it, and say which accepted advisories can go
+        if: always()
+        shell: bash
+        run: |
+          pip-audit --disable-pip --no-deps --progress-spinner off -r tarjim/constraints.txt \
+            -f json -o full.json || true
+          python scripts/advisories.py full.json advisories.md
       - if: always()
         uses: actions/upload-artifact@v4
         with:
           name: audit
-          path: audit.txt
+          path: |
+            audit.txt
+            advisories.md
 
   propose:
     needs: [compile, gates, audit]
@@ -101,23 +122,29 @@ jobs:
           GATES: ${{ needs.gates.result }}
           AUDIT: ${{ needs.audit.result }}
         run: |
-          if git diff --quiet -- tarjim/constraints.txt; then
+          day=$(date -u +%Y-%m-%d)
+          if git diff --quiet -- tarjim/constraints.txt tarjim/overrides.txt; then
             echo "No library moved this week."
+            if [ "$AUDIT" != "success" ] && [ -f report/advisories.md ]; then
+              gh issue create --title "Known vulnerabilities to review, week of $day" \
+                --body-file report/advisories.md
+            fi
             exit 0
           fi
-          day=$(date -u +%Y-%m-%d)
           branch="libraries/$day"
           title="Tested library versions, week of $day"
           {
-            echo "The weekly move of tarjim's tested library versions (tarjim/constraints.txt)."
+            echo "The weekly move of tarjim's tested library versions (tarjim/constraints.txt, tarjim/overrides.txt)."
             echo
             echo "- ruff, mypy and pytest on Windows and Linux: **$GATES**"
             echo "- known vulnerabilities (pip-audit): **$AUDIT**"
             echo
             echo "Details: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             echo
+            cat report/advisories.md 2>/dev/null || echo "no advisory report"
+            echo
             echo '```diff'
-            git diff -U0 -- tarjim/constraints.txt | grep '^[-+][^-+]' | head -n 400
+            git diff -U0 -- tarjim/constraints.txt tarjim/overrides.txt | grep '^[-+][^-+]' | head -n 400
             echo '```'
             echo
             echo '<details><summary>pip-audit</summary>'
@@ -130,7 +157,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git commit -m "Move the tested library versions to this week's releases" -- tarjim/constraints.txt
+          git commit -m "Move the tested library versions to this week's releases" -- tarjim/constraints.txt tarjim/overrides.txt
           if git push --force origin "$branch" &&
              gh pr create --base "$BASE" --head "$branch" --title "$title" --body-file body.md; then
             exit 0
