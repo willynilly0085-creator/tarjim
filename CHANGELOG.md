@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.25 (2026-10-15)
+
+- **One library vulnerability closed, the rest disclosed and blocked.** accelerate now installs at
+  1.15.0, past a known path-traversal issue (checked by listening to real Arabic and English
+  speech: the same words and timings as before). Six known issues in transformers cannot be
+  closed yet: the local listening library (qwen-asr) only works with the affected version. tarjim
+  now blocks the ways they could be reached: every model downloads and loads from one fixed,
+  checked version, as settings and safetensors files only, never code; the voice-separation and
+  vowel-mark models are checked before use. Settings shows the issues that still apply to your
+  copy, with the reason; the notice disappears by itself when an update brings the fix, which a
+  weekly check watches for. Details in SECURITY.md.
+- **Own-voice dubbing works on a new computer.** A fresh install lacked torchaudio, which the
+  voice model needs.
+- **tarjim installs on a Mac.** The vowel-mark model has no Mac build and stopped the whole
+  install; on a Mac the voice now gets the text without vowel marks.
+
 ## 1.0.24 (2026-10-15)
 
 - **yt-dlp, the downloader, keeps itself current.** Sites change every few weeks and an old
