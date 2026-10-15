@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, ClassVar
 
 from tarjim.languages import LANGUAGES
+from tarjim.server import desktop
 from tarjim.server.connections import ConnectionRoutes
 from tarjim.server.guard import (
     allowed_origin,
@@ -164,14 +165,10 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes):
             shutil.copyfileobj(source, self.wfile, BLOCK)
 
     def reveal(self, _query: Query, task_id: str) -> None:
-        from tarjim.server.desktop import reveal
-
-        self.on_output(task_id, reveal)
+        self.on_output(task_id, desktop.reveal)
 
     def play(self, _query: Query, task_id: str) -> None:
-        from tarjim.server.desktop import open_file
-
-        self.on_output(task_id, open_file)
+        self.on_output(task_id, desktop.open_file)
 
     def on_output(self, task_id: str, action: Callable[[Path], None]) -> None:
         task = self.board.get(task_id)
@@ -183,6 +180,10 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes):
     def steer_job(self, _query: Query, task_id: str, action: str) -> None:
         task = self.board.steer(task_id, action, self.headers.get("Origin") or "chat or script")
         self.reply(200, task.view()) if task else self.reply(409, {"error": "job"})
+
+    def remove_job(self, _query: Query, task_id: str) -> None:
+        removed = self.board.remove(task_id)  # the list only: its files stay in their folder
+        self.reply(200 if removed else 409, {"removed": removed})
 
     def retry(self, _query: Query, task_id: str) -> None:
         task = self.board.retry(task_id)

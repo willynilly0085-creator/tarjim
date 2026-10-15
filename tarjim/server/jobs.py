@@ -153,6 +153,16 @@ class Board:
         task.control = CONTROLS[action]
         return task
 
+    def remove(self, task_id: str) -> bool:
+        """An ended job leaves the list, and so the list a restart carries (renew.py). Its files
+        stay where they are; a job still queued or running is never removed."""
+        with self.lock:
+            task = self.tasks.get(task_id)
+            if task is None or not task.finished:
+                return False
+            del self.tasks[task_id]
+        return True
+
     def get(self, task_id: str) -> Task | None:
         with self.lock:
             return self.tasks.get(task_id)

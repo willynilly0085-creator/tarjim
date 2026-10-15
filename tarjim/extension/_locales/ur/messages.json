@@ -401,5 +401,47 @@
   },
   "voiceSpeech": {
     "message": "آپ کی جوڑی ہوئی آواز کی سروس (صرف متن بھیجتی ہے)"
+  },
+  "remove": {
+    "message": "فہرست سے ہٹائیں"
+  },
+  "removeLabel": {
+    "message": "فہرست سے ہٹائیں۔ ویڈیو اور سب ٹائٹل فائلیں آپ کے فولڈر میں رہیں گی۔"
+  },
+  "removeSure": {
+    "message": "ہٹائیں؟ فائلیں رہیں گی"
+  },
+  "removed": {
+    "message": "فہرست سے ہٹا دیا۔ فائلیں اب بھی آپ کے فولڈر میں ہیں۔"
+  },
+  "engineWith": {
+    "message": "ترجمہ کر رہا ہے"
+  },
+  "engineChange": {
+    "message": "بدلیں"
+  },
+  "engineProvider": {
+    "message": "مترجم"
+  },
+  "engineModel": {
+    "message": "ماڈل"
+  },
+  "engineNone": {
+    "message": "کوئی دوسرا مترجم تیار نہیں۔ ترتیبات میں شامل کریں۔"
+  },
+  "engineLoading": {
+    "message": "لوڈ ہو رہا ہے…"
+  },
+  "engineSaving": {
+    "message": "محفوظ ہو رہا ہے…"
+  },
+  "engineSaved": {
+    "message": "محفوظ ہو گیا۔ اگلا ترجمہ اسی سے ہوگا۔"
+  },
+  "engineFailed": {
+    "message": "محفوظ نہیں ہو سکا۔ دوبارہ کوشش کریں۔"
+  },
+  "modelSuggested": {
+    "message": "ترجمے کے لیے تجویز کردہ"
   }
 }

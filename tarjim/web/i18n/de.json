@@ -424,5 +424,18 @@
   "voiceEleven": "ElevenLabs-Stimmen (sendet nur den Text)",
   "voiceElevenClone": "ElevenLabs, die eigene Stimme der Person (sendet eine Stimmprobe)",
   "voiceSpeech": "Dein verbundener Sprachdienst (sendet nur den Text)",
-  "voiceMore": "Eine Stimme von einem anderen Dienst? Verbinde ihn in den Einstellungen."
+  "voiceMore": "Eine Stimme von einem anderen Dienst? Verbinde ihn in den Einstellungen.",
+  "remove": "Aus der Liste entfernen",
+  "removeLabel": "Aus der Liste entfernen. Die Video- und Untertiteldateien bleiben in deinem Ordner.",
+  "removeSure": "Entfernen? Dateien bleiben",
+  "removed": "Aus der Liste entfernt. Die Dateien sind weiter in deinem Ordner.",
+  "engineWith": "Übersetzt mit",
+  "engineChange": "Ändern",
+  "engineProvider": "Übersetzer",
+  "engineModel": "Modell",
+  "engineNone": "Kein anderer Übersetzer ist bereit. Füge einen in den Einstellungen hinzu.",
+  "engineLoading": "Wird geladen…",
+  "engineSaving": "Wird gespeichert…",
+  "engineSaved": "Gespeichert. Die nächste Übersetzung nutzt ihn.",
+  "engineFailed": "Speichern hat nicht geklappt. Versuch es noch einmal."
 }

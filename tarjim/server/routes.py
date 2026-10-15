@@ -32,6 +32,7 @@ POST_ROUTES = table([
     (r"^/setup$", "save_setup"), (r"^/tools/([a-z_]+)$", "get_tool"), (r"^/pair$", "ask_pair"),
     (rf"^/pairs/{PAIR}/(allow|deny)$", "decide_pair"),
     (rf"^/jobs/{JOB}/(pause|resume|cancel)$", "steer_job"), (r"^/jobs/local$", "create_local"),
+    (rf"^/jobs/{JOB}/remove$", "remove_job"),
     (r"^/connections/models$", "connection_models"), (r"^/connections/use$", "use_connection"),
     (r"^/connections/address$", "save_address"), (r"^/connections/sign-in$", "sign_in"),
     (r"^/connections/sign-in/code$", "sign_in_code"), (r"^/connections/signed-in$", "signed_in"),

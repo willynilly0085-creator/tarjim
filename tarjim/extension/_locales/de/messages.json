@@ -401,5 +401,47 @@
   },
   "voiceSpeech": {
     "message": "Dein verbundener Sprachdienst (sendet nur den Text)"
+  },
+  "remove": {
+    "message": "Aus der Liste entfernen"
+  },
+  "removeLabel": {
+    "message": "Aus der Liste entfernen. Die Video- und Untertiteldateien bleiben in deinem Ordner."
+  },
+  "removeSure": {
+    "message": "Entfernen? Dateien bleiben"
+  },
+  "removed": {
+    "message": "Aus der Liste entfernt. Die Dateien sind weiter in deinem Ordner."
+  },
+  "engineWith": {
+    "message": "Übersetzt mit"
+  },
+  "engineChange": {
+    "message": "Ändern"
+  },
+  "engineProvider": {
+    "message": "Übersetzer"
+  },
+  "engineModel": {
+    "message": "Modell"
+  },
+  "engineNone": {
+    "message": "Kein anderer Übersetzer ist bereit. Füge einen in den Einstellungen hinzu."
+  },
+  "engineLoading": {
+    "message": "Wird geladen…"
+  },
+  "engineSaving": {
+    "message": "Wird gespeichert…"
+  },
+  "engineSaved": {
+    "message": "Gespeichert. Die nächste Übersetzung nutzt ihn."
+  },
+  "engineFailed": {
+    "message": "Speichern hat nicht geklappt. Versuch es noch einmal."
+  },
+  "modelSuggested": {
+    "message": "empfohlen zum Übersetzen"
   }
 }

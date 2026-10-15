@@ -2,6 +2,7 @@ import { watchJobs } from "./jobs.js";
 import { api, loadWords, post, remember, settings, t, uiDirection, uiLanguage } from "./shared.js";
 import { downloadable } from "./posts.js";
 import { $, show } from "./dom.js";
+import { showEngine } from "./engine.js";
 import { claimPending } from "./pairing.js";
 import { showLinkedVoices } from "./keys.js";
 import { autoPair, openSettings, showPair, wirePanels } from "./panels.js";
@@ -87,7 +88,7 @@ async function openMain() {
   const [output, dubVoice] = saved.mode.startsWith("dub-") ? ["dub", saved.mode.slice(4)] : [saved.mode, saved.voice];
   document.querySelector(`input[name=mode][value=${output}]`).checked = true;
   $("voice").value = dubVoice || "gemini";
-  await showLinkedVoices($("voice"));
+  await Promise.all([showLinkedVoices($("voice")), showEngine()]);
   syncDialect();
   syncVoice();
   await describeSource();
@@ -102,17 +103,13 @@ function choices() {
   return { target: $("target").value, dialect: form.dialect.value, mode };
 }
 
-function syncVoice() {
-  $("voice-field").hidden = $("order").mode.value !== "dub";
-}
+const syncVoice = () => { $("voice-field").hidden = $("order").mode.value !== "dub"; };
 
 function sourceReady() {
   return pageMode ? Boolean(state.file) || downloadable($("link").value.trim()) : Boolean(state.url);
 }
 
-function refreshButton() {
-  $("go").disabled = !sourceReady();
-}
+const refreshButton = () => { $("go").disabled = !sourceReady(); };
 
 function progress(fraction) {
   $("upload").hidden = false;

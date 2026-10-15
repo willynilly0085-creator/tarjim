@@ -22,7 +22,7 @@ def test_the_extension_is_copied_to_a_short_folder_in_tarjims_home(home: Path) -
 
 def test_an_update_refreshes_the_copy_and_drops_files_it_no_longer_ships(home: Path) -> None:
     extension_home.extension_folder()
-    stale = home / "engine.js"
+    stale = home / "retired.js"  # a file the extension no longer ships
     stale.write_text("old", encoding="utf-8")
     changed = home / "background.js"
     changed.write_text("old", encoding="utf-8")

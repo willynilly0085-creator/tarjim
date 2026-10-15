@@ -424,5 +424,18 @@
   "voiceEleven": "Suara ElevenLabs (hanya mengirim teks)",
   "voiceElevenClone": "ElevenLabs, suara pembicara sendiri (mengirim contoh suara)",
   "voiceSpeech": "Layanan suara Anda yang terhubung (hanya mengirim teks)",
-  "voiceMore": "Ingin suara dari layanan lain? Hubungkan di Pengaturan."
+  "voiceMore": "Ingin suara dari layanan lain? Hubungkan di Pengaturan.",
+  "remove": "Hapus dari daftar",
+  "removeLabel": "Hapus dari daftar. File video dan subtitel tetap ada di folder kamu.",
+  "removeSure": "Hapus? File tetap ada",
+  "removed": "Dihapus dari daftar. File masih ada di folder kamu.",
+  "engineWith": "Diterjemahkan dengan",
+  "engineChange": "Ganti",
+  "engineProvider": "Penerjemah",
+  "engineModel": "Model",
+  "engineNone": "Belum ada penerjemah lain yang siap. Tambahkan di Pengaturan.",
+  "engineLoading": "Memuat…",
+  "engineSaving": "Menyimpan…",
+  "engineSaved": "Tersimpan. Terjemahan berikutnya memakainya.",
+  "engineFailed": "Gagal menyimpan. Coba lagi."
 }

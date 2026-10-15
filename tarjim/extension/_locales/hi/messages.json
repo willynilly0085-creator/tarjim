@@ -401,5 +401,47 @@
   },
   "voiceSpeech": {
     "message": "आपकी जोड़ी हुई आवाज़ सेवा (सिर्फ़ पाठ भेजती है)"
+  },
+  "remove": {
+    "message": "सूची से हटाएँ"
+  },
+  "removeLabel": {
+    "message": "सूची से हटाएँ। वीडियो और सबटाइटल फ़ाइलें आपके फ़ोल्डर में रहेंगी।"
+  },
+  "removeSure": {
+    "message": "हटाएँ? फ़ाइलें रहेंगी"
+  },
+  "removed": {
+    "message": "सूची से हटा दिया। फ़ाइलें अब भी आपके फ़ोल्डर में हैं।"
+  },
+  "engineWith": {
+    "message": "अनुवाद कर रहा है"
+  },
+  "engineChange": {
+    "message": "बदलें"
+  },
+  "engineProvider": {
+    "message": "अनुवादक"
+  },
+  "engineModel": {
+    "message": "मॉडल"
+  },
+  "engineNone": {
+    "message": "कोई दूसरा अनुवादक तैयार नहीं है। सेटिंग्स में जोड़ें।"
+  },
+  "engineLoading": {
+    "message": "लोड हो रहा है…"
+  },
+  "engineSaving": {
+    "message": "सहेजा जा रहा है…"
+  },
+  "engineSaved": {
+    "message": "सहेज लिया। अगला अनुवाद इसी से होगा।"
+  },
+  "engineFailed": {
+    "message": "सहेज नहीं पाए। फिर से कोशिश करें।"
+  },
+  "modelSuggested": {
+    "message": "अनुवाद के लिए सुझाया गया"
   }
 }

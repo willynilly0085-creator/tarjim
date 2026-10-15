@@ -424,5 +424,18 @@
   "voiceEleven": "ElevenLabs voices (sends the text only)",
   "voiceElevenClone": "ElevenLabs, the speaker's own voice (sends a voice sample)",
   "voiceSpeech": "Your linked voice service (sends the text only)",
-  "voiceMore": "Want a voice from another service? Link it in Settings."
+  "voiceMore": "Want a voice from another service? Link it in Settings.",
+  "remove": "Remove from list",
+  "removeLabel": "Remove from the list. The video and subtitle files stay in your folder.",
+  "removeSure": "Remove? Files stay",
+  "removed": "Removed from the list. The files are still in your folder.",
+  "engineWith": "Translating with",
+  "engineChange": "Change",
+  "engineProvider": "Translator",
+  "engineModel": "Model",
+  "engineNone": "No other translator is ready. Add one in Settings.",
+  "engineLoading": "Loading…",
+  "engineSaving": "Saving…",
+  "engineSaved": "Saved. The next translation uses it.",
+  "engineFailed": "Couldn't save that. Try again."
 }

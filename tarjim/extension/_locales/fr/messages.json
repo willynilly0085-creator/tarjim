@@ -401,5 +401,47 @@
   },
   "voiceSpeech": {
     "message": "Votre service de voix relié (envoie le texte seulement)"
+  },
+  "remove": {
+    "message": "Retirer de la liste"
+  },
+  "removeLabel": {
+    "message": "Retirer de la liste. Les fichiers vidéo et sous-titres restent dans votre dossier."
+  },
+  "removeSure": {
+    "message": "Retirer ? Les fichiers restent"
+  },
+  "removed": {
+    "message": "Retiré de la liste. Les fichiers sont toujours dans votre dossier."
+  },
+  "engineWith": {
+    "message": "Traduit avec"
+  },
+  "engineChange": {
+    "message": "Changer"
+  },
+  "engineProvider": {
+    "message": "Traducteur"
+  },
+  "engineModel": {
+    "message": "Modèle"
+  },
+  "engineNone": {
+    "message": "Aucun autre traducteur n'est prêt. Ajoutez-en un dans les réglages."
+  },
+  "engineLoading": {
+    "message": "Chargement…"
+  },
+  "engineSaving": {
+    "message": "Enregistrement…"
+  },
+  "engineSaved": {
+    "message": "Enregistré. La prochaine traduction l'utilisera."
+  },
+  "engineFailed": {
+    "message": "Impossible d'enregistrer. Réessayez."
+  },
+  "modelSuggested": {
+    "message": "conseillé pour la traduction"
   }
 }

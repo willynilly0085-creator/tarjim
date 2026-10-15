@@ -40,6 +40,37 @@ function steering(job, refresh) {
     button(t("cancel"), steer("cancel"))];
 }
 
+function named(el, label) {
+  el.setAttribute("aria-label", label);
+  el.title = label;
+}
+
+// A finished video is one press from gone from view, so it asks once; its files stay either way.
+function askFirst(el) {
+  el.dataset.sure = "yes";
+  el.textContent = t("removeSure");
+  named(el, t("removeSure"));
+  setTimeout(() => {
+    delete el.dataset.sure;
+    el.textContent = t("remove");
+    named(el, t("removeLabel"));
+  }, 5000);
+}
+
+function removeButton(job, refresh) {
+  const el = button(t("remove"), async () => {
+    if (job.stage === "done" && !el.dataset.sure) return askFirst(el);
+    await post(`/jobs/${job.id}/remove`).catch(() => null);
+    rows.delete(job.id);
+    $("announcer").textContent = t("removed");
+    if (document.activeElement === el) $("recent-title").focus();
+    refresh();
+  });
+  el.classList.add("job-remove");
+  named(el, t("removeLabel"));
+  return el;
+}
+
 function actions(job, box, refresh) {
   const ended = job.stage === "failed" || job.stage === "cancelled";
   const kind = job.stage === "done" ? "done" : ended ? "again" : job.paused ? "paused" : "running";
@@ -48,7 +79,8 @@ function actions(job, box, refresh) {
   box.hidden = false;
   box.replaceChildren(...(kind === "done"
     ? [button(t("play"), () => post(`/open/${job.id}`)), button(t("openFolder"), () => post(`/reveal/${job.id}`))]
-    : kind === "again" ? [button(t("retry"), () => post(`/retry/${job.id}`).then(refresh))] : steering(job, refresh)));
+    : kind === "again" ? [button(t("retry"), () => post(`/retry/${job.id}`).then(refresh))] : steering(job, refresh)),
+  ...(job.finished ? [removeButton(job, refresh)] : []));
 }
 function modeText(mode) {
   return t(mode.startsWith("dub") ? "outputDub" : mode === "srt" ? "outputSrt" : "outputBurn");

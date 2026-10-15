@@ -401,5 +401,47 @@
   },
   "voiceSpeech": {
     "message": "Ваш подключённый голосовой сервис (отправляет только текст)"
+  },
+  "remove": {
+    "message": "Убрать из списка"
+  },
+  "removeLabel": {
+    "message": "Убрать из списка. Файлы видео и субтитров останутся в вашей папке."
+  },
+  "removeSure": {
+    "message": "Убрать? Файлы останутся"
+  },
+  "removed": {
+    "message": "Убрано из списка. Файлы по-прежнему в вашей папке."
+  },
+  "engineWith": {
+    "message": "Переводит"
+  },
+  "engineChange": {
+    "message": "Изменить"
+  },
+  "engineProvider": {
+    "message": "Переводчик"
+  },
+  "engineModel": {
+    "message": "Модель"
+  },
+  "engineNone": {
+    "message": "Другой переводчик не готов. Добавьте его в настройках."
+  },
+  "engineLoading": {
+    "message": "Загрузка…"
+  },
+  "engineSaving": {
+    "message": "Сохранение…"
+  },
+  "engineSaved": {
+    "message": "Сохранено. Следующий перевод будет с ним."
+  },
+  "engineFailed": {
+    "message": "Не удалось сохранить. Попробуйте ещё раз."
+  },
+  "modelSuggested": {
+    "message": "рекомендуется для перевода"
   }
 }

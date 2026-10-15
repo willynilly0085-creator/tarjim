@@ -401,5 +401,47 @@
   },
   "voiceSpeech": {
     "message": "연결한 음성 서비스 (텍스트만 전송)"
+  },
+  "remove": {
+    "message": "목록에서 빼기"
+  },
+  "removeLabel": {
+    "message": "목록에서 빼요. 동영상과 자막 파일은 폴더에 그대로 있어요."
+  },
+  "removeSure": {
+    "message": "뺄까요? 파일은 남아요"
+  },
+  "removed": {
+    "message": "목록에서 뺐어요. 파일은 폴더에 그대로 있어요."
+  },
+  "engineWith": {
+    "message": "번역 담당"
+  },
+  "engineChange": {
+    "message": "변경"
+  },
+  "engineProvider": {
+    "message": "번역 AI"
+  },
+  "engineModel": {
+    "message": "모델"
+  },
+  "engineNone": {
+    "message": "준비된 다른 번역 AI가 없어요. 설정에서 추가하세요."
+  },
+  "engineLoading": {
+    "message": "불러오는 중…"
+  },
+  "engineSaving": {
+    "message": "저장 중…"
+  },
+  "engineSaved": {
+    "message": "저장했어요. 다음 번역부터 사용해요."
+  },
+  "engineFailed": {
+    "message": "저장하지 못했어요. 다시 시도해 주세요."
+  },
+  "modelSuggested": {
+    "message": "번역에 추천"
   }
 }

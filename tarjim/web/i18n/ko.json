@@ -424,5 +424,18 @@
   "voiceEleven": "ElevenLabs 목소리 (텍스트만 전송)",
   "voiceElevenClone": "ElevenLabs, 화자 본인의 목소리 (음성 샘플 전송)",
   "voiceSpeech": "연결한 음성 서비스 (텍스트만 전송)",
-  "voiceMore": "다른 서비스의 목소리를 쓰고 싶나요? 설정에서 연결하세요."
+  "voiceMore": "다른 서비스의 목소리를 쓰고 싶나요? 설정에서 연결하세요.",
+  "remove": "목록에서 빼기",
+  "removeLabel": "목록에서 빼요. 동영상과 자막 파일은 폴더에 그대로 있어요.",
+  "removeSure": "뺄까요? 파일은 남아요",
+  "removed": "목록에서 뺐어요. 파일은 폴더에 그대로 있어요.",
+  "engineWith": "번역 담당",
+  "engineChange": "변경",
+  "engineProvider": "번역 AI",
+  "engineModel": "모델",
+  "engineNone": "준비된 다른 번역 AI가 없어요. 설정에서 추가하세요.",
+  "engineLoading": "불러오는 중…",
+  "engineSaving": "저장 중…",
+  "engineSaved": "저장했어요. 다음 번역부터 사용해요.",
+  "engineFailed": "저장하지 못했어요. 다시 시도해 주세요."
 }

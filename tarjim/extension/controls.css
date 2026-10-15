@@ -1,0 +1,21 @@
+/* Quiet controls around the order: the translator line above Translate, and Remove on a job. */
+.engine { display: grid; gap: var(--space-sm); }
+.engine summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; width: fit-content; max-width: 100%;
+  padding-block: 2px; border-radius: 6px; color: var(--muted); font-size: var(--text-meta); list-style: none; cursor: pointer; }
+.engine summary::-webkit-details-marker { display: none; }
+.engine-now { min-width: 0; overflow-wrap: anywhere; color: var(--text); font-weight: 600; }
+.engine-change { margin-inline-start: 4px; color: var(--text); text-decoration: underline; text-underline-offset: 4px;
+  text-decoration-color: var(--line); transition: text-decoration-color 160ms var(--ease); }
+.engine summary:hover .engine-change, .engine[open] .engine-change { text-decoration-color: var(--accent-line); }
+.engine summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.engine-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm) var(--space-md); }
+@media (max-width: 479px) { .engine-body { grid-template-columns: minmax(0, 1fr); } }
+.engine-body .select:disabled { color: var(--muted); cursor: default; }
+.engine-note { grid-column: 1 / -1; }
+.engine-note:empty { display: none; }
+
+.job-actions .job-remove { margin-inline-start: auto; border-color: transparent; color: var(--muted); }
+.job-actions .job-remove:hover { border-color: var(--line); color: var(--text); }
+.job-actions .job-remove[data-sure] { border-color: var(--muted); color: var(--text); }
+.section-title:focus { outline: none; }
+.job-actions { flex-wrap: wrap; }

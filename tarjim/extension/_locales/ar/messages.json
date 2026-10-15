@@ -401,5 +401,47 @@
   },
   "voiceSpeech": {
     "message": "خدمة الصوت المربوطة (يرسل النص فقط)"
+  },
+  "remove": {
+    "message": "شيلها من القائمة"
+  },
+  "removeLabel": {
+    "message": "شيلها من القائمة، وملفات الفيديو والترجمة تبقى في مجلدك."
+  },
+  "removeSure": {
+    "message": "أشيلها؟ الملفات تبقى"
+  },
+  "removed": {
+    "message": "انشالت من القائمة، والملفات باقية في مجلدك."
+  },
+  "engineWith": {
+    "message": "يترجم بواسطة"
+  },
+  "engineChange": {
+    "message": "غيّر"
+  },
+  "engineProvider": {
+    "message": "المترجم"
+  },
+  "engineModel": {
+    "message": "النموذج"
+  },
+  "engineNone": {
+    "message": "ما فيه مترجم ثاني جاهز. تقدر تضيف واحد من الإعدادات."
+  },
+  "engineLoading": {
+    "message": "جاري التحميل…"
+  },
+  "engineSaving": {
+    "message": "جاري الحفظ…"
+  },
+  "engineSaved": {
+    "message": "انحفظ، والترجمة الجاية بتستخدمه."
+  },
+  "engineFailed": {
+    "message": "ما انحفظ، جرّب مرة ثانية."
+  },
+  "modelSuggested": {
+    "message": "مقترح للترجمة"
   }
 }

@@ -35,6 +35,37 @@ function actionButton(label, onClick) {
   return button;
 }
 
+function named(button, label) {
+  button.setAttribute("aria-label", label);
+  button.title = label;
+}
+
+// A finished video is one press from gone from view, so it asks once; its files stay either way.
+function askFirst(button) {
+  button.dataset.sure = "yes";
+  button.textContent = t("removeSure");
+  named(button, t("removeSure"));
+  setTimeout(() => {
+    delete button.dataset.sure;
+    button.textContent = t("remove");
+    named(button, t("removeLabel"));
+  }, 5000);
+}
+
+function removeButton(job, refresh) {
+  const button = actionButton(t("remove"), async () => {
+    if (job.stage === "done" && !button.dataset.sure) return askFirst(button);
+    await post(`/jobs/${job.id}/remove`).catch(() => null);
+    rows.delete(job.id);
+    document.getElementById("announcer").textContent = t("removed");
+    if (document.activeElement === button) document.getElementById("recent-title").focus();
+    refresh();
+  });
+  button.classList.add("job-remove");
+  named(button, t("removeLabel"));
+  return button;
+}
+
 function actionsFor(job, box, refresh) {
   const ended = job.stage === "failed" || job.stage === "cancelled";
   const wanted = job.stage === "done" ? "done" : ended ? "again" : job.paused ? "paused" : "running";
@@ -46,7 +77,7 @@ function actionsFor(job, box, refresh) {
        actionButton(t("openFolder"), () => post(`/reveal/${job.id}`))]
     : wanted === "again" ? [actionButton(t("retry"), () => post(`/retry/${job.id}`).then(refresh))]
       : steering(job, refresh);
-  box.replaceChildren(...buttons);
+  box.replaceChildren(...buttons, ...(job.finished ? [removeButton(job, refresh)] : []));
 }
 
 function metaText(job, languages) {

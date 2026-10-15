@@ -424,5 +424,18 @@
   "voiceEleven": "ElevenLabs sesleri (yalnızca metni gönderir)",
   "voiceElevenClone": "ElevenLabs, konuşmacının kendi sesi (ses örneği gönderir)",
   "voiceSpeech": "Bağladığın ses hizmeti (yalnızca metni gönderir)",
-  "voiceMore": "Başka bir hizmetten ses mi istiyorsun? Ayarlar'dan bağla."
+  "voiceMore": "Başka bir hizmetten ses mi istiyorsun? Ayarlar'dan bağla.",
+  "remove": "Listeden kaldır",
+  "removeLabel": "Listeden kaldır. Video ve altyazı dosyaları klasöründe kalır.",
+  "removeSure": "Kaldırılsın mı? Dosyalar kalır",
+  "removed": "Listeden kaldırıldı. Dosyalar hâlâ klasöründe.",
+  "engineWith": "Çeviren",
+  "engineChange": "Değiştir",
+  "engineProvider": "Çevirmen",
+  "engineModel": "Model",
+  "engineNone": "Hazır başka çevirmen yok. Ayarlar'dan ekleyebilirsin.",
+  "engineLoading": "Yükleniyor…",
+  "engineSaving": "Kaydediliyor…",
+  "engineSaved": "Kaydedildi. Sonraki çeviri bunu kullanır.",
+  "engineFailed": "Kaydedilemedi. Tekrar dene."
 }

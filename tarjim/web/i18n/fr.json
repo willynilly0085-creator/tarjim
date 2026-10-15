@@ -424,5 +424,18 @@
   "voiceEleven": "Voix ElevenLabs (envoie le texte seulement)",
   "voiceElevenClone": "ElevenLabs, la voix de la personne (envoie un échantillon de voix)",
   "voiceSpeech": "Votre service de voix relié (envoie le texte seulement)",
-  "voiceMore": "Envie d'une voix d'un autre service ? Reliez-le dans les réglages."
+  "voiceMore": "Envie d'une voix d'un autre service ? Reliez-le dans les réglages.",
+  "remove": "Retirer de la liste",
+  "removeLabel": "Retirer de la liste. Les fichiers vidéo et sous-titres restent dans votre dossier.",
+  "removeSure": "Retirer ? Les fichiers restent",
+  "removed": "Retiré de la liste. Les fichiers sont toujours dans votre dossier.",
+  "engineWith": "Traduit avec",
+  "engineChange": "Changer",
+  "engineProvider": "Traducteur",
+  "engineModel": "Modèle",
+  "engineNone": "Aucun autre traducteur n'est prêt. Ajoutez-en un dans les réglages.",
+  "engineLoading": "Chargement…",
+  "engineSaving": "Enregistrement…",
+  "engineSaved": "Enregistré. La prochaine traduction l'utilisera.",
+  "engineFailed": "Impossible d'enregistrer. Réessayez."
 }

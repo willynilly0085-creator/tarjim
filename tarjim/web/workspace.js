@@ -1,4 +1,5 @@
 import { $, api, post, upload } from "./api.js";
+import { showEngine } from "./engine.js";
 import { t } from "./i18n.js";
 import { watchJobs } from "./jobs.js";
 import { showUpdate } from "./update.js";
@@ -103,7 +104,7 @@ export async function openWorkspace() {
   state.languages = new Map(languages.map((l) => [l.code, l.native]));
   const current = $("target").value || (document.documentElement.lang === "ar" ? "ar" : "en");
   $("target").replaceChildren(...languages.map((l) => new Option(l.native, l.code, false, l.code === current)));
-  await showLinkedVoices();
+  await Promise.all([showLinkedVoices(), showEngine()]);
   sync();
   clearInterval(state.poll);
   state.poll = watchJobs(state.languages);

@@ -6,6 +6,7 @@
   <title>tarjim</title>
   <link rel="stylesheet" href="app.css">
   <link rel="stylesheet" href="brand.css">
+  <link rel="stylesheet" href="controls.css">
 </head>
 <body>
   <header class="bar">
@@ -90,12 +91,26 @@
           <div class="meter"><span id="upload-bar"></span></div>
           <p class="meta" id="upload-text"></p>
         </div>
+        <details class="engine" id="engine">
+          <summary><span class="engine-with" data-i18n="engineWith"></span> <bdi class="engine-now" id="engine-now"></bdi><span class="engine-change" data-i18n="engineChange"></span></summary>
+          <div class="engine-body">
+            <div class="field">
+              <label class="field-label" for="engine-provider" data-i18n="engineProvider"></label>
+              <select class="select" id="engine-provider"></select>
+            </div>
+            <div class="field">
+              <label class="field-label" for="engine-model" data-i18n="engineModel"></label>
+              <select class="select" id="engine-model"></select>
+            </div>
+            <p class="meta engine-note" id="engine-note" role="status" aria-live="polite"></p>
+          </div>
+        </details>
         <button class="primary" id="go" type="submit" data-i18n="translate"></button>
         <p class="notice" id="notice" role="status" aria-live="polite"></p>
       </form>
 
       <section class="recent" aria-labelledby="recent-title">
-        <h2 class="section-title" id="recent-title" data-i18n="recent"></h2>
+        <h2 class="section-title" id="recent-title" tabindex="-1" data-i18n="recent"></h2>
         <p class="empty" id="empty" data-i18n="empty" hidden></p>
         <ul class="jobs" id="jobs"></ul>
       </section>

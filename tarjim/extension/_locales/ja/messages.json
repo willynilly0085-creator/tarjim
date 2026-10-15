@@ -401,5 +401,47 @@
   },
   "voiceSpeech": {
     "message": "接続した音声サービス（テキストのみ送信）"
+  },
+  "remove": {
+    "message": "リストから外す"
+  },
+  "removeLabel": {
+    "message": "リストから外します。動画と字幕のファイルはフォルダーに残ります。"
+  },
+  "removeSure": {
+    "message": "外しますか？ファイルは残ります"
+  },
+  "removed": {
+    "message": "リストから外しました。ファイルはフォルダーに残っています。"
+  },
+  "engineWith": {
+    "message": "翻訳に使用中"
+  },
+  "engineChange": {
+    "message": "変更"
+  },
+  "engineProvider": {
+    "message": "翻訳AI"
+  },
+  "engineModel": {
+    "message": "モデル"
+  },
+  "engineNone": {
+    "message": "ほかに使える翻訳AIがありません。設定で追加してください。"
+  },
+  "engineLoading": {
+    "message": "読み込み中…"
+  },
+  "engineSaving": {
+    "message": "保存中…"
+  },
+  "engineSaved": {
+    "message": "保存しました。次の翻訳から使います。"
+  },
+  "engineFailed": {
+    "message": "保存できませんでした。もう一度お試しください。"
+  },
+  "modelSuggested": {
+    "message": "翻訳におすすめ"
   }
 }

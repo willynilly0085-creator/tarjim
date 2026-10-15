@@ -424,5 +424,18 @@
   "voiceEleven": "ElevenLabs 声音（只发送文字）",
   "voiceElevenClone": "ElevenLabs，说话人自己的声音（会发送声音样本）",
   "voiceSpeech": "你连接的语音服务（只发送文字）",
-  "voiceMore": "想用其他服务的声音？在设置里连接。"
+  "voiceMore": "想用其他服务的声音？在设置里连接。",
+  "remove": "从列表移除",
+  "removeLabel": "从列表移除。视频和字幕文件仍保留在你的文件夹中。",
+  "removeSure": "移除？文件会保留",
+  "removed": "已从列表移除。文件仍在你的文件夹中。",
+  "engineWith": "翻译使用",
+  "engineChange": "更改",
+  "engineProvider": "翻译服务",
+  "engineModel": "模型",
+  "engineNone": "没有其他可用的翻译服务。请在设置中添加。",
+  "engineLoading": "正在加载…",
+  "engineSaving": "正在保存…",
+  "engineSaved": "已保存。下次翻译将使用它。",
+  "engineFailed": "保存失败，请重试。"
 }

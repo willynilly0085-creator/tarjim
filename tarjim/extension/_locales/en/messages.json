@@ -401,5 +401,47 @@
   },
   "voiceSpeech": {
     "message": "Your linked voice service (sends the text only)"
+  },
+  "remove": {
+    "message": "Remove from list"
+  },
+  "removeLabel": {
+    "message": "Remove from the list. The video and subtitle files stay in your folder."
+  },
+  "removeSure": {
+    "message": "Remove? Files stay"
+  },
+  "removed": {
+    "message": "Removed from the list. The files are still in your folder."
+  },
+  "engineWith": {
+    "message": "Translating with"
+  },
+  "engineChange": {
+    "message": "Change"
+  },
+  "engineProvider": {
+    "message": "Translator"
+  },
+  "engineModel": {
+    "message": "Model"
+  },
+  "engineNone": {
+    "message": "No other translator is ready. Add one in Settings."
+  },
+  "engineLoading": {
+    "message": "Loading…"
+  },
+  "engineSaving": {
+    "message": "Saving…"
+  },
+  "engineSaved": {
+    "message": "Saved. The next translation uses it."
+  },
+  "engineFailed": {
+    "message": "Couldn't save that. Try again."
+  },
+  "modelSuggested": {
+    "message": "suggested for translation"
   }
 }

@@ -401,5 +401,47 @@
   },
   "voiceSpeech": {
     "message": "Layanan suara Anda yang terhubung (hanya mengirim teks)"
+  },
+  "remove": {
+    "message": "Hapus dari daftar"
+  },
+  "removeLabel": {
+    "message": "Hapus dari daftar. File video dan subtitel tetap ada di folder kamu."
+  },
+  "removeSure": {
+    "message": "Hapus? File tetap ada"
+  },
+  "removed": {
+    "message": "Dihapus dari daftar. File masih ada di folder kamu."
+  },
+  "engineWith": {
+    "message": "Diterjemahkan dengan"
+  },
+  "engineChange": {
+    "message": "Ganti"
+  },
+  "engineProvider": {
+    "message": "Penerjemah"
+  },
+  "engineModel": {
+    "message": "Model"
+  },
+  "engineNone": {
+    "message": "Belum ada penerjemah lain yang siap. Tambahkan di Pengaturan."
+  },
+  "engineLoading": {
+    "message": "Memuat…"
+  },
+  "engineSaving": {
+    "message": "Menyimpan…"
+  },
+  "engineSaved": {
+    "message": "Tersimpan. Terjemahan berikutnya memakainya."
+  },
+  "engineFailed": {
+    "message": "Gagal menyimpan. Coba lagi."
+  },
+  "modelSuggested": {
+    "message": "disarankan untuk terjemahan"
   }
 }

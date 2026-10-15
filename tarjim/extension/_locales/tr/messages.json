@@ -401,5 +401,47 @@
   },
   "voiceSpeech": {
     "message": "Bağladığın ses hizmeti (yalnızca metni gönderir)"
+  },
+  "remove": {
+    "message": "Listeden kaldır"
+  },
+  "removeLabel": {
+    "message": "Listeden kaldır. Video ve altyazı dosyaları klasöründe kalır."
+  },
+  "removeSure": {
+    "message": "Kaldırılsın mı? Dosyalar kalır"
+  },
+  "removed": {
+    "message": "Listeden kaldırıldı. Dosyalar hâlâ klasöründe."
+  },
+  "engineWith": {
+    "message": "Çeviren"
+  },
+  "engineChange": {
+    "message": "Değiştir"
+  },
+  "engineProvider": {
+    "message": "Çevirmen"
+  },
+  "engineModel": {
+    "message": "Model"
+  },
+  "engineNone": {
+    "message": "Hazır başka çevirmen yok. Ayarlar'dan ekleyebilirsin."
+  },
+  "engineLoading": {
+    "message": "Yükleniyor…"
+  },
+  "engineSaving": {
+    "message": "Kaydediliyor…"
+  },
+  "engineSaved": {
+    "message": "Kaydedildi. Sonraki çeviri bunu kullanır."
+  },
+  "engineFailed": {
+    "message": "Kaydedilemedi. Tekrar dene."
+  },
+  "modelSuggested": {
+    "message": "çeviri için önerilir"
   }
 }

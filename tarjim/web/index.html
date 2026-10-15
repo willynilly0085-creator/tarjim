@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/web/web.css">
   <link rel="stylesheet" href="/web/assistant.css">
   <link rel="stylesheet" href="/web/phone.css">
+  <link rel="stylesheet" href="/web/controls.css">
 </head>
 <body>
   <header class="bar">
@@ -176,11 +177,19 @@
           <option value="fishvoice" id="voice-narrator" data-t="voiceNarrator"></option>
         </select><span class="meta" id="voice-more" data-t="voiceMore"></span></label>
       <div class="upload" id="upload" hidden><div class="meter"><span id="upload-bar"></span></div><p class="meta" id="upload-text"></p></div>
+      <details class="engine" id="engine">
+        <summary><span class="engine-with" data-t="engineWith"></span> <bdi class="engine-now" id="engine-now"></bdi><span class="engine-change" data-t="engineChange"></span></summary>
+        <div class="engine-body">
+          <label class="field"><span class="field-label" data-t="engineProvider"></span><select class="select" id="engine-provider"></select></label>
+          <label class="field"><span class="field-label" data-t="engineModel"></span><select class="select" id="engine-model"></select></label>
+          <p class="meta engine-note" id="engine-note" role="status" aria-live="polite"></p>
+        </div>
+      </details>
       <button class="primary" id="go" type="submit" data-t="translate" disabled></button>
       <p class="notice" id="notice" role="status" aria-live="polite"></p>
     </form>
     <section class="recent" aria-labelledby="recent-title">
-      <h2 class="section-title" id="recent-title" data-t="recent"></h2>
+      <h2 class="section-title" id="recent-title" tabindex="-1" data-t="recent"></h2>
       <p class="meta" id="empty" data-t="empty" hidden></p>
       <ul class="jobs" id="jobs"></ul>
     </section>

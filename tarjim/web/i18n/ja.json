@@ -424,5 +424,18 @@
   "voiceEleven": "ElevenLabs の声（テキストのみ送信）",
   "voiceElevenClone": "ElevenLabs、話者本人の声（音声サンプルを送信）",
   "voiceSpeech": "接続した音声サービス（テキストのみ送信）",
-  "voiceMore": "ほかのサービスの声を使いたいときは、設定でつないでください。"
+  "voiceMore": "ほかのサービスの声を使いたいときは、設定でつないでください。",
+  "remove": "リストから外す",
+  "removeLabel": "リストから外します。動画と字幕のファイルはフォルダーに残ります。",
+  "removeSure": "外しますか？ファイルは残ります",
+  "removed": "リストから外しました。ファイルはフォルダーに残っています。",
+  "engineWith": "翻訳に使用中",
+  "engineChange": "変更",
+  "engineProvider": "翻訳AI",
+  "engineModel": "モデル",
+  "engineNone": "ほかに使える翻訳AIがありません。設定で追加してください。",
+  "engineLoading": "読み込み中…",
+  "engineSaving": "保存中…",
+  "engineSaved": "保存しました。次の翻訳から使います。",
+  "engineFailed": "保存できませんでした。もう一度お試しください。"
 }
