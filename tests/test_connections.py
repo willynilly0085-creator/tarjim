@@ -102,9 +102,10 @@ def test_the_windows_launch_line_carries_the_settings_and_the_log(
     from tarjim import installer
 
     plugin = str(tmp_path / "plugin")
+    for name in installer.KEEP_ENV:  # CI's uv setup sets UV_TOOL_DIR, for one
+        monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("PYTHONPATH", plugin)
-    monkeypatch.delenv("TARJIM_HOME", raising=False)
-    command = ["python", "-P", "-m", "tarjim.installer", "file:///x"]
+    command =["python", "-P", "-m", "tarjim.installer", "file:///x"]
     line = installer.windows_line(command, tmp_path / "i.log")
     assert line.startswith(f'cmd /d /s /c "set "PYTHONPATH={plugin}"&& python -P -m tarjim.')
     assert line.endswith(f'>> "{tmp_path / "i.log"}" 2>&1"')

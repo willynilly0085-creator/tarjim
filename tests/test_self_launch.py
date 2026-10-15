@@ -100,6 +100,8 @@ def test_programs_tarjim_starts_run_in_its_folder_without_relative_import_paths(
 
 def test_the_windows_launch_line_drops_relative_import_paths(
         tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    for name in installer.KEEP_ENV:  # CI's uv setup sets UV_TOOL_DIR, for one
+        monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("PYTHONPATH", os.pathsep + "lib")
     line = installer.windows_line(["python"], tmp_path / "i.log")
     assert line.startswith('cmd /d /s /c "set "PYTHONPATH="&& python ')
