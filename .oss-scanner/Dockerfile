@@ -20,8 +20,10 @@ COPY . /src
 WORKDIR /src
 
 # The same install as CI (.github/workflows/ci.yml): the processor build of PyTorch, then tarjim
-# with its development tools.
-RUN pip install --extra-index-url https://download.pytorch.org/whl/cpu -e ".[dev]"
+# with its development tools, at the tested versions people get (tarjim/constraints.txt, with the
+# pins tarjim/overrides.txt lifts; uv applies the overrides, pip cannot).
+RUN pip install uv && uv pip install --system --torch-backend cpu \
+      -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dev]"
 
 # The gates CI runs. A failure is reported but does not stop the image from being built.
 RUN ruff check tarjim tests || echo "WARNING: ruff reported problems"
