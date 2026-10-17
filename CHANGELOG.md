@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.29 (2026-10-17)
+
+- **Right-click "translate" works while tarjim restarts.** tarjim restarts by itself for a few
+  seconds after an update; a translation asked for in that moment, from the right-click menu,
+  the extension's window or a job kept while pairing, now waits for it instead of saying tarjim
+  is off.
+- **A translation cancelled while it was still waiting shows as cancelled at once**, and can be
+  removed from the list right away.
+
 ## 1.0.28 (2026-10-15)
 
 - **Antigravity translates in seconds and no longer stops with "no output produced".** Its
