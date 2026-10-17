@@ -82,6 +82,19 @@ export const post = (path, body) => api(path, {
   method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body ?? {}),
 });
 
+// tarjim restarts by itself after an update (a few seconds); a job asked for in that moment
+// waits for it instead of failing as "offline".
+export async function startJob(body, seconds = 20) {
+  for (let left = seconds; ; left -= 1) {
+    try {
+      return await post("/jobs", body);
+    } catch (error) {
+      if (error.kind !== "offline" || left <= 1) throw error;
+      await new Promise((done) => setTimeout(done, 1000));
+    }
+  }
+}
+
 export const stageLabel = (stage) => t(STAGE_KEYS[stage] || "stageQueued");
 
 export const errorLabel = (job) => t(ERROR_KEYS[job.error_code] || "errUnknown");

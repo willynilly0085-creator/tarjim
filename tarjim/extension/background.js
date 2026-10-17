@@ -1,7 +1,7 @@
 import { buildMenus, isMode, OTHER } from "./menus.js";
 import { claimPending, sendWaitingJob } from "./pairing.js";
 import { clickedPost, downloadable } from "./posts.js";
-import { ApiError, api, errorLabel, loadWords, post, remember, settings, t } from "./shared.js";
+import { ApiError, api, errorLabel, loadWords, remember, settings, startJob, t } from "./shared.js";
 
 const POLL = "poll";
 
@@ -43,7 +43,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   const { target, dialect } = await settings();
   const mode = info.menuItemId;
   try {
-    await post("/jobs", { url, target, dialect, mode });
+    await startJob({ url, target, dialect, mode });
     await remember(mode.startsWith("dub-") ? { mode, voice: mode.slice(4) } : { mode });
     refresh();
     await chrome.action.openPopup().catch(() => notify(`start-${Date.now()}`, t("appName"), t("notifyStarted")));

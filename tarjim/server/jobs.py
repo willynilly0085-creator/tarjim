@@ -151,6 +151,8 @@ class Board:
             return None
         print(f"job {task_id}: {action} at {task.stage} from {source or 'unknown'}", flush=True)
         task.control = CONTROLS[action]
+        if action == "cancel" and task.stage == "queued":
+            task.stage = "cancelled"  # nothing ran yet: shown at once; the worker skips it
         return task
 
     def remove(self, task_id: str) -> bool:

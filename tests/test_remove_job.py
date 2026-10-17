@@ -111,3 +111,12 @@ def test_the_remove_button_and_the_translator_switch_speak_every_language() -> N
         assert "/remove`" in (ROOT / path).read_text(encoding="utf-8"), path
     for path in ("web/engine.js", "extension/engine.js"):
         assert '"/connections/use"' in (ROOT / path).read_text(encoding="utf-8"), path
+
+
+def test_a_queued_job_shows_cancelled_at_once_and_can_then_be_removed(board: Board) -> None:
+    task = Task(Order("https://example.com/waiting"))
+    board.tasks[task.id] = task
+    assert board.steer(task.id, "cancel") is task
+    assert task.stage == "cancelled" and task.finished
+    task.stage = "downloading"  # a worker reaching it later changes nothing
+    assert task.stage == "cancelled" and board.remove(task.id)

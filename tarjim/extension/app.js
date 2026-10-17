@@ -1,5 +1,5 @@
 import { watchJobs } from "./jobs.js";
-import { api, loadWords, post, remember, settings, t, uiDirection, uiLanguage } from "./shared.js";
+import { api, loadWords, remember, settings, startJob, t, uiDirection, uiLanguage } from "./shared.js";
 import { downloadable } from "./posts.js";
 import { $, show } from "./dom.js";
 import { showEngine } from "./engine.js";
@@ -120,7 +120,7 @@ function progress(fraction) {
 async function send(options) {
   if (pageMode && state.file) return upload(state.file, options, progress);
   const url = pageMode ? $("link").value.trim() : state.url;
-  return post("/jobs", { url, ...options });
+  return startJob({ url, ...options });
 }
 
 async function submit(event) {

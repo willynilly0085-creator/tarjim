@@ -1,4 +1,4 @@
-import { post, remember, settings } from "./shared.js";
+import { remember, settings, startJob } from "./shared.js";
 
 export async function serverBase() {
   return (await settings()).server.replace(/\/+$/, "");
@@ -31,6 +31,6 @@ export async function sendWaitingJob() {
   const { waitingJob } = await chrome.storage.local.get("waitingJob");
   if (!waitingJob) return false;
   await remember({ waitingJob: null });
-  await post("/jobs", waitingJob).catch(() => null);
+  await startJob(waitingJob).catch(() => null);
   return true;
 }
