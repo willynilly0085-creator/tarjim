@@ -34,8 +34,12 @@ def own_arguments(argv: list[str]) -> list[str]:
 
 
 def command(argv: list[str] | None = None) -> list[str]:
+    """pythonw on Windows: a virtual environment's python.exe is a launcher whose real Python opens
+    a console window of its own, even when the launcher was started without one."""
+    from tarjim.autostart import quiet_python
+
     own = own_arguments(sys.argv[1:] if argv is None else argv)
-    return [*module_command("tarjim.server"), *own, "--after", str(os.getpid())]
+    return [*module_command("tarjim.server", quiet_python()), *own, "--after", str(os.getpid())]
 
 
 def compiles(root: Path) -> bool:

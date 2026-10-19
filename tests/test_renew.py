@@ -147,3 +147,11 @@ def test_the_reason_is_shown_in_every_language() -> None:
     assert '"updated"' in (ROOT / "web" / "jobs.js").read_text(encoding="utf-8")
     assert 'updated: "errUpdated"' in (ROOT / "extension" / "shared.js").read_text(
         encoding="utf-8")
+
+
+def test_the_restart_starts_a_windowless_python(monkeypatch: pytest.MonkeyPatch) -> None:
+    from tarjim import autostart
+
+    monkeypatch.setattr(autostart, "quiet_python", lambda: "C:/env/Scripts/pythonw.exe")
+    command = renew.command(["--port", "17701"])
+    assert command[:4] == ["C:/env/Scripts/pythonw.exe", "-P", "-m", "tarjim.server"]
