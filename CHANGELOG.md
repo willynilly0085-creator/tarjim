@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.30 (2026-10-19)
+
+- **Subtitles move clear of text already in the video.** When a clip already has words burned
+  in (the creator's own captions, a channel name, a news ticker), tarjim's subtitle used to land
+  right on top of them. tarjim now looks at a few frames first and raises its subtitle above that
+  text, or moves it to the top when there is no room; with nothing in the way it stays where it
+  was. It takes under a second on most computers and never holds a translation up.
+- **Videos carry tarjim's mark.** The logo with @Cut_Code, small and half-see-through: bottom
+  left on wide videos, top left on tall ones (where TikTok and Reels put their own text at the
+  bottom), always clear of the subtitles. Settings turns it off. Subtitle files carry no mark.
+- **No black window when tarjim updates itself** on Windows.
+
 ## 1.0.29 (2026-10-17)
 
 - **Right-click "translate" works while tarjim restarts.** tarjim restarts by itself for a few
