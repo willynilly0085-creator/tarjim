@@ -131,7 +131,7 @@ def test_every_ffmpeg_call_on_a_file_opens_only_that_file(
 def run_every_ffmpeg_call(clip: Path) -> None:
     from tarjim.dub import audio, mix
     from tarjim.phone import delivery
-    from tarjim.render import burn
+    from tarjim.render import burn, frames
 
     clip.write_bytes(b"video")
     for call in (lambda: media.check_readable(clip), lambda: media.extract_audio(clip, clip),
@@ -139,7 +139,7 @@ def run_every_ffmpeg_call(clip: Path) -> None:
                  lambda: mix.mux(clip, clip, clip), lambda: audio.decode(clip),
                  lambda: delivery.phone_copy(clip), lambda: media.probe(clip),
                  lambda: media.audio_bytes(clip), lambda: media.scene_cuts(clip),
-                 lambda: media.bright_bottom(clip)):
+                 lambda: media.bright_bottom(clip), lambda: frames.grab(clip, 1.0)):
         with contextlib.suppress(RuntimeError, ValueError):
             call()
 

@@ -8,6 +8,7 @@ from tarjim.models import Cue, Word
 from tarjim.qa import Issue, check
 from tarjim.render.ass import Canvas, render_ass
 from tarjim.render.burn import burn
+from tarjim.render.placement import placed
 from tarjim.render.srt import render_srt
 from tarjim.segment import build_cues
 
@@ -73,7 +74,8 @@ def write_outputs(job: Job, cues: list[Cue], words: list[Word], report: Report) 
     if not info.has_picture:
         return
     ass = job.output(".ass")
-    canvas = Canvas(info.width, info.height, job.font_name, media.bright_bottom(job.video))
+    canvas = placed(job, cues, Canvas(info.width, info.height, job.font_name,
+                                      media.bright_bottom(job.video)), info.duration)
     ass.write_text(render_ass(cues, canvas, job.rules), encoding="utf-8")
     if job.burn:
         report("burning")

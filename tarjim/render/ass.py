@@ -18,6 +18,7 @@ SHADOW_COLOUR = "&H8C000000"
 OUTLINE_COLOUR = "&H00141414"
 BOX_COLOUR = "&H3A141414"
 BOX_PADDING = 0.22
+BOTTOM_CENTRE, TOP_CENTRE = 2, 8
 
 HEADER = """[Script Info]
 ScriptType: v4.00+
@@ -31,7 +32,7 @@ Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour,
 BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, \
 BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Default,{font},{size},&H00FFFFFF,&H00FFFFFF,{edge},{back},-1,0,0,0,\
-100,100,0,0,{border},{outline},{shadow},2,{mh},{mh},{mv},{charset}
+100,100,0,0,{border},{outline},{shadow},{align},{mh},{mh},{mv},{charset}
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -44,6 +45,10 @@ class Canvas:
     height: int
     font: str = "Dubai"
     bright: bool = False
+    # Where the picture's own text leaves room (render/placement.py): a distance from the bottom
+    # edge, or from the top edge when top is set. None is the usual place.
+    margin: int | None = None
+    top: bool = False
 
     @property
     def portrait(self) -> bool:
@@ -56,6 +61,8 @@ class Canvas:
 
     @property
     def margin_v(self) -> int:
+        if self.margin is not None:
+            return self.margin
         return round(self.height * (0.14 if self.portrait else 0.07))
 
     @property
@@ -79,7 +86,8 @@ def render_ass(cues: list[Cue], canvas: Canvas, rules: Rules = DEFAULT_RULES) ->
         outline=canvas.outline, shadow=canvas.shadow, border=BOXED if canvas.bright else OUTLINED,
         edge=BOX_COLOUR if canvas.bright else OUTLINE_COLOUR,
         back=BOX_COLOUR if canvas.bright else SHADOW_COLOUR,
-        mh=canvas.margin_h, mv=canvas.margin_v, charset=ARABIC_CHARSET if rules.rtl else 1,
+        align=TOP_CENTRE if canvas.top else BOTTOM_CENTRE, mh=canvas.margin_h,
+        mv=canvas.margin_v, charset=ARABIC_CHARSET if rules.rtl else 1,
     )
     alphas = LETTERS_ONLY if canvas.bright else EVERYTHING
     events = [line for cue in cues if cue.text.strip() for line in event_lines(cue, rules, alphas)]
