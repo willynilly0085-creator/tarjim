@@ -379,6 +379,7 @@
   "updateFailed": "Güncelleme tamamlanmadı ve mevcut sürüm yeniden çalışıyor. Biraz sonra tekrar dene.",
   "updateManual": "Bu kopya kaynak koddan çalışıyor ve git ile güncellenir.",
   "autoUpdate": "Yeni sürüm çıkınca tarjim'i otomatik güncelle (günde bir kez yalnızca son sürüm numarasını sorar)",
+  "videoMark": "Videolarda tarjim işaretini göster",
   "versionLine": "Sürüm {version}",
   "knownIssuesTitle": "tarjim kitaplıklarındaki bilinen sorunlar",
   "knownIssuesLead": "tarjim ile kurulan bazı kitaplıklar için güvenlik açıkları yayımlandı. tarjim'in bunları kullanma biçimi hiçbirine ulaşmıyor.",

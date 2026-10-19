@@ -1,16 +1,17 @@
-"""Burn the subtitles into the picture. ffmpeg reads the subtitle file's name inside a filter
-description, where quotes, colons and backslashes have meanings of their own, so the file is
-copied under a plain name and ffmpeg runs in that folder.
+"""Burn the subtitles, and tarjim's mark (render/mark.py), into the picture in one pass. ffmpeg
+reads the subtitle file's name inside a filter description, where quotes, colons and backslashes
+have meanings of their own, so the file is written under a plain name and ffmpeg runs in that
+folder. The mark's logo is a second input, opened as a PNG and nothing else.
 
 The encoders aim at a quality, not a size, and on a clip that was already compressed hard (a
 phone video, a download) that alone made the result two to three times larger than the source:
 measured, 48 MB in and 127 MB out. Writing text onto a picture adds no detail worth those bits,
 so the result may spend a little more than the source did and no more."""
-import shutil
 import tempfile
 from pathlib import Path
 
-from tarjim.media import run, source, tool, video_kbps
+from tarjim.media import picture, run, source, tool, video_kbps
+from tarjim.render.mark import LOGO, Mark, overlay, with_mark
 
 ENCODERS = [
     ["-c:v", "h264_nvenc", "-preset", "p5", "-rc", "vbr", "-cq", "21", "-b:v", "0"],
@@ -20,10 +21,18 @@ PLAIN = "subtitles.ass"
 HEADROOM = 1.15
 
 
-def burn(video: Path, ass: Path, target: Path) -> Path:
+def burn(video: Path, subtitles: str, target: Path, mark: Mark | None = None) -> Path:
+    """The video with these subtitles (an .ass text) and, unless it is None, the mark."""
     with tempfile.TemporaryDirectory(prefix="tarjim-burn-") as folder:
-        shutil.copyfile(ass, Path(folder) / PLAIN)
-        return encode(video.resolve(), target.resolve(), Path(folder))
+        (Path(folder) / PLAIN).write_text(with_mark(subtitles, mark), encoding="utf-8")
+        return encode(video.resolve(), target.resolve(), Path(folder), mark)
+
+
+def drawing(mark: Mark | None) -> list[str]:
+    if mark is None:
+        return ["-vf", f"ass={PLAIN}"]
+    return [*picture(LOGO), "-filter_complex", f"[0:v]ass={PLAIN}[subtitled];"
+            + overlay(mark, "subtitled")]
 
 
 def ceiling(video: Path) -> list[str]:
@@ -31,9 +40,9 @@ def ceiling(video: Path) -> list[str]:
     return ["-maxrate", f"{rate}k", "-bufsize", f"{2 * rate}k"] if rate else []
 
 
-def encode(video: Path, target: Path, folder: Path) -> Path:
+def encode(video: Path, target: Path, folder: Path, mark: Mark | None) -> Path:
     base = [tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", *source(video),
-            "-vf", f"ass={PLAIN}", "-c:a", "copy", "-movflags", "+faststart"]
+            *drawing(mark), "-c:a", "copy", "-movflags", "+faststart"]
     errors, limit = [], ceiling(video)
     for encoder in ENCODERS:
         result = run([*base, *encoder, *limit, str(target)], cwd=folder)

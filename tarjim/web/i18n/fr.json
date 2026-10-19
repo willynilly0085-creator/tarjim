@@ -379,6 +379,7 @@
   "updateFailed": "La mise à jour n'a pas abouti et la version actuelle fonctionne de nouveau. Réessayez un peu plus tard.",
   "updateManual": "Cette copie s'exécute depuis le code source et se met à jour avec git.",
   "autoUpdate": "Mettre tarjim à jour automatiquement quand une nouvelle version sort (il demande seulement une fois par jour le numéro de la dernière version)",
+  "videoMark": "Afficher la marque tarjim sur les vidéos",
   "versionLine": "Version {version}",
   "knownIssuesTitle": "Problèmes connus dans les bibliothèques de tarjim",
   "knownIssuesLead": "Des failles de sécurité ont été publiées pour certaines bibliothèques installées avec tarjim. La façon dont tarjim les utilise n'en atteint aucune.",

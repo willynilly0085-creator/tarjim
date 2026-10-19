@@ -17,7 +17,8 @@ KEY_FIRST = "Then the person adds the key on tarjim's page: call open_tarjim_pag
 
 def get_settings() -> Any:
     """Current settings: interface language, engines, which keys are set (never the keys),
-    whether tarjim starts with the computer and updates by itself."""
+    whether tarjim starts with the computer and updates by itself, and video_mark ("no" when the
+    videos tarjim writes carry no mark)."""
     return call("/setup")
 
 
@@ -28,7 +29,8 @@ def change_settings(interface_language: str = "", listening_engine: str = "",
     interface_language: a code from get_settings' ui_languages. listening_engine: gemini or
     openai (keys), antigravity (a signed-in Gemini subscription) or local.
     start_with_computer and automatic_updates: "yes" or "no".
-    To change the translation engine or its model, use use_connection.
+    To change the translation engine or its model, use use_connection; the mark on videos,
+    show_mark_on_videos.
     """
     wanted: dict[str, Any] = {"ui_language": interface_language,
                               "listen_provider": listening_engine}
@@ -36,6 +38,12 @@ def change_settings(interface_language: str = "", listening_engine: str = "",
                 "auto_update": SWITCH.get(automatic_updates)}
     body = {k: v for k, v in {**wanted, **switches}.items() if v not in ("", None)}
     return call("/setup", body)
+
+
+def show_mark_on_videos(show: str) -> Any:
+    """Whether the videos tarjim writes (burned subtitles, dubbing) carry its mark: the tarjim
+    logo with @Cut_Code beside it, small, in a corner. "yes" (the default) or "no"."""
+    return call("/setup", {"video_mark": "no" if show == "no" else "yes"})
 
 
 def set_glossary(terms: str) -> Any:
@@ -146,7 +154,7 @@ def open_tarjim_page(section: str = "") -> str:
     return "Opened the tarjim page in the browser."
 
 
-TOOLS = (get_settings, change_settings, set_glossary, plan_setup, apply_setup,
+TOOLS = (get_settings, change_settings, show_mark_on_videos, set_glossary, plan_setup, apply_setup,
          install_subscription_app, set_custom_api_address, start_local_ai, find_local_ai,
          list_models, test_setup, list_voice_services,
          use_voice_service, prefer_elevenlabs_voice, phone_bot, update_tarjim, open_tarjim_page)

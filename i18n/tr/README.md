@@ -28,6 +28,8 @@ gömer, bir `.srt` dosyası yazar ya da videoyu her konuşmacı için ayrı bir 
 - **Üç kullanım yolu:** tarayıcıda sağ tık menüsü ("ترجم للعربية"), yerel bir web sayfası ya da bir
   sohbet: tarjim'i Claude uygulamasına, Claude Code'a veya Codex'e ekleyin ve bir bağlantıyı
   çevirmesini isteyin.
+- **tarjim işareti:** ürettiği videoların bir köşesinde, altyazılardan uzakta küçük logosu ve
+  @Cut_Code yer alır (`.srt` ve `.ass` dosyalarında yoktur); Ayarlar'dan kapatılabilir.
 
 ## Bir yapay zekâ bağlayın: üç yol
 

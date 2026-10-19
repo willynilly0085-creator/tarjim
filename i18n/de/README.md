@@ -30,6 +30,8 @@ Stimme für jeden Sprecher.
 - **Drei Nutzungswege:** ein Rechtsklick-Menü im Browser („ترجم للعربية“), eine lokale Webseite oder
   ein Chat: Fügen Sie tarjim zur Claude-App, zu Claude Code oder zu Codex hinzu und bitten Sie
   darum, einen Link zu übersetzen.
+- **Das tarjim-Zeichen:** Videos von tarjim tragen sein kleines Logo und @Cut_Code in einer Ecke,
+  abseits der Untertitel (`.srt`- und `.ass`-Dateien nicht); in den Einstellungen abschaltbar.
 
 ## Eine KI anbinden: drei Wege
 

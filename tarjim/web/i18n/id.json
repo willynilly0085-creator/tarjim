@@ -379,6 +379,7 @@
   "updateFailed": "Pembaruan tidak selesai dan versi saat ini berjalan lagi. Coba lagi sebentar lagi.",
   "updateManual": "Salinan ini berjalan dari kode sumber dan diperbarui dengan git.",
   "autoUpdate": "Perbarui tarjim otomatis saat versi baru keluar (hanya menanyakan nomor versi terbaru sekali sehari)",
+  "videoMark": "Tampilkan tanda tarjim di video",
   "versionLine": "Versi {version}",
   "knownIssuesTitle": "Masalah yang diketahui di pustaka tarjim",
   "knownIssuesLead": "Celah keamanan telah diumumkan untuk beberapa pustaka yang terpasang bersama tarjim. Cara tarjim memakainya tidak menyentuh satu pun di antaranya.",

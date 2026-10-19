@@ -81,7 +81,8 @@ def kept(record: Path, canvas: Canvas) -> Canvas | None:
     if not isinstance(margin, int) or not 0 <= margin < canvas.height:
         return None
     usual = margin == canvas.margin_v and not top
-    return canvas if usual else replace(canvas, margin=margin, top=bool(top))
+    chosen = canvas if usual else replace(canvas, margin=margin, top=bool(top))
+    return replace(chosen, bands=tuple((float(t), float(b)) for t, b in data["bands"]))
 
 
 def placed(job: Job, cues: list[Cue], canvas: Canvas, duration: float) -> Canvas:
@@ -93,7 +94,7 @@ def placed(job: Job, cues: list[Cue], canvas: Canvas, duration: float) -> Canvas
             return reused
         began = time.perf_counter()
         bands = look(job.video, cues, duration)
-        chosen = place(bands, canvas)
+        chosen = replace(place(bands, canvas), bands=tuple(bands))
         record.write_text(json.dumps({
             "bands": [[round(t, 4), round(b, 4)] for t, b in bands], "top": chosen.top,
             "margin": chosen.margin_v, "seconds": round(time.perf_counter() - began, 2)}),

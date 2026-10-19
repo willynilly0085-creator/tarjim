@@ -17,6 +17,8 @@ export async function renderDevice(state) {
   $("autostart").checked = Boolean(state.setup?.autostart);
   $("autostart").onchange = () => post("/setup", { autostart: $("autostart").checked });
   fillUpdateChoice(state.setup || {});
+  $("video-mark").checked = state.setup?.video_mark !== "no";
+  $("video-mark").onchange = () => post("/setup", { video_mark: $("video-mark").checked ? "yes" : "no" });
   const gpu = s.gpu ? `${s.gpu.name} (${s.gpu.memory_gb} GB)${s.gpu.usable ? "" : ` · ${t("gpuUnused")}`}` : t("gpuNone");
   $("facts").replaceChildren(...fact(t("gpu"), gpu, s.gpu && !s.gpu.usable), ...fact(t("memory"), `${s.memory_gb} GB`),
     ...fact(t("disk"), `${s.disk_free_gb} GB`),

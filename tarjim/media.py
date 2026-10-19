@@ -19,6 +19,8 @@ RUN_SECONDS = 6 * 3600
 # reads anything past the file's first bytes.
 CONTAINERS = "mov,matroska,avi,mp3,wav,flac,ogg,aac,mpegts,mpeg,flv,asf"
 OWN_FILE_ONLY = ["-protocol_whitelist", "file", "-format_whitelist", CONTAINERS]
+# tarjim's own pictures (the mark's logo) are PNG files and open as nothing else.
+OWN_PICTURE = ["-protocol_whitelist", "file", "-format_whitelist", "png_pipe"]
 NOT_MEDIA = "not a video or sound file tarjim can open"
 # The most sound tarjim works on. A file of a few hundred bytes can decode to days of sound, so
 # the length is measured on what ffmpeg decoded, never taken from what the file says about itself.
@@ -56,6 +58,11 @@ def run(args: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess
 def source(video: Path) -> list[str]:
     """How ffmpeg and ffprobe are handed a file that may come from a stranger."""
     return [*OWN_FILE_ONLY, "-i", str(video)]
+
+
+def picture(image: Path) -> list[str]:
+    """How ffmpeg is handed one of tarjim's own pictures."""
+    return [*OWN_PICTURE, "-i", str(image)]
 
 
 def check_readable(video: Path) -> None:

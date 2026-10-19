@@ -89,6 +89,14 @@ def test_setup_only_accepts_known_values(port: int) -> None:
     assert state["translate_provider"] == ""
 
 
+def test_settings_turn_the_mark_on_videos_off_and_on(port: int) -> None:
+    owner = {"X-Tarjim-Token": TOKEN, "Content-Type": "application/json"}
+    assert json.loads(call(port, "GET /setup", headers=owner).read())["video_mark"] == ""
+    for wanted, kept in (("no", "no"), ("maybe", "no"), ("yes", "yes")):
+        body = json.dumps({"video_mark": wanted}).encode()
+        assert json.loads(call(port, "POST /setup", body, owner).read())["video_mark"] == kept
+
+
 def test_someone_who_already_chose_a_translator_is_not_sent_through_setup_again(port: int) -> None:
     owner = {"X-Tarjim-Token": TOKEN, "Content-Type": "application/json"}
     fresh = json.loads(call(port, "GET /setup", headers=owner).read())

@@ -25,6 +25,8 @@ an `.srt`, or dubs it with a voice for every speaker.
   are pronounced and numbers as words, so the voice says them correctly.
 - **Three ways to use it:** a right-click menu in the browser ("ترجم للعربية"), a local web page,
   or a chat: add tarjim to the Claude app, Claude Code or Codex and ask it to translate a link.
+- **tarjim's mark:** the videos it writes carry its small logo and @Cut_Code in a corner, clear of
+  the subtitles (the `.srt` and `.ass` files carry none); Settings turns it off.
 
 ## Connect an AI: three ways
 

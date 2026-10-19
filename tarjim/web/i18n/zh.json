@@ -379,6 +379,7 @@
   "updateFailed": "更新没有完成，当前版本已恢复运行。请稍后再试。",
   "updateManual": "这个副本从源代码运行，请用 git 更新。",
   "autoUpdate": "有新版本时自动更新 tarjim（每天只询问一次最新版本号）",
+  "videoMark": "在视频上显示 tarjim 标志",
   "versionLine": "版本 {version}",
   "knownIssuesTitle": "tarjim 所用库的已知问题",
   "knownIssuesLead": "随 tarjim 安装的部分库已公布安全问题。tarjim 使用这些库的方式不会触及其中任何一个。",

@@ -56,8 +56,7 @@ def test_a_title_with_an_apostrophe_is_burned(tmp_path: Path,
                                               monkeypatch: pytest.MonkeyPatch) -> None:
     folder = tmp_path / "it's here"
     folder.mkdir()
-    ass, target = folder / "Don't stop.ar.ass", folder / "Don't stop.ar.mp4"
-    ass.write_text("[Script Info]", encoding="utf-8")
+    target = folder / "Don't stop.ar.mp4"
     seen: list[str] = []
 
     def fake_run(args: list[str], cwd: Path | None = None) -> Any:
@@ -71,7 +70,7 @@ def test_a_title_with_an_apostrophe_is_burned(tmp_path: Path,
     monkeypatch.setattr(burning, "run", fake_run)
     monkeypatch.setattr(burning, "tool", lambda name: name)
     monkeypatch.setattr(burning, "video_kbps", lambda _video: 0)
-    assert burning.burn(folder / "Don't stop.mp4", ass, target) == target
+    assert burning.burn(folder / "Don't stop.mp4", "[Script Info]", target) == target
     assert seen and all(mark not in seen[0] for mark in "'\\:")
 
 

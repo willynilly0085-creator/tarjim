@@ -26,6 +26,8 @@ untuk setiap pembicara.
   nama sebagaimana diucapkan dan angka sebagai kata, sehingga suara mengucapkannya dengan benar.
 - **Tiga cara memakainya:** menu klik kanan di peramban ("ترجم للعربية"), halaman web lokal,
   atau obrolan: tambahkan tarjim ke aplikasi Claude, Claude Code, atau Codex lalu minta ia menerjemahkan sebuah tautan.
+- **Tanda tarjim:** video yang dibuatnya memuat logo kecil dan @Cut_Code di satu sudut, jauh dari
+  subtitle (file `.srt` dan `.ass` tidak); bisa dimatikan di Pengaturan.
 
 ## Menghubungkan AI: tiga cara
 

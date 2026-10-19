@@ -28,6 +28,8 @@ sous-titres dans la vidéo, produit un fichier `.srt` ou la double avec une voix
 - **Trois façons de l'utiliser :** un menu clic droit dans le navigateur (« ترجم للعربية »), une
   page web locale ou une conversation : ajoutez tarjim à l'application Claude, à Claude Code ou à
   Codex et demandez-lui de traduire un lien.
+- **La marque tarjim :** les vidéos qu'il produit portent son petit logo et @Cut_Code dans un coin,
+  à l'écart des sous-titres (les fichiers `.srt` et `.ass` n'en ont pas) ; les Réglages la désactivent.
 
 ## Connecter une IA : trois façons
 

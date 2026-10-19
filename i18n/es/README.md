@@ -26,6 +26,8 @@ vídeo, genera un `.srt` o lo dobla con una voz distinta para cada hablante.
   nombres tal como se pronuncian y los números en letras, para que la voz los diga correctamente.
 - **Tres formas de usarlo:** un menú contextual en el navegador ("ترجم للعربية"), una página web
   local o un chat: añade tarjim a la app de Claude, a Claude Code o a Codex y pídele que traduzca un enlace.
+- **La marca de tarjim:** los videos que crea llevan su pequeño logo y @Cut_Code en una esquina,
+  lejos de los subtítulos (los archivos `.srt` y `.ass` no la llevan); se desactiva en Ajustes.
 
 ## Conecta una IA: tres formas
 

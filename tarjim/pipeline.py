@@ -1,5 +1,6 @@
 import json
 from collections.abc import Callable
+from pathlib import Path
 
 from tarjim import media
 from tarjim.hearing import transcript_for
@@ -8,6 +9,7 @@ from tarjim.models import Cue, Word
 from tarjim.qa import Issue, check
 from tarjim.render.ass import Canvas, render_ass
 from tarjim.render.burn import burn
+from tarjim.render.mark import Mark, mark_for
 from tarjim.render.placement import placed
 from tarjim.render.srt import render_srt
 from tarjim.segment import build_cues
@@ -73,19 +75,28 @@ def write_outputs(job: Job, cues: list[Cue], words: list[Word], report: Report) 
     info = media.probe(job.video)
     if not info.has_picture:
         return
-    ass = job.output(".ass")
     canvas = placed(job, cues, Canvas(info.width, info.height, job.font_name,
                                       media.bright_bottom(job.video)), info.duration)
-    ass.write_text(render_ass(cues, canvas, job.rules), encoding="utf-8")
+    subtitles = render_ass(cues, canvas, job.rules)
+    job.output(".ass").write_text(subtitles, encoding="utf-8")
+    mark = mark_for(canvas)
     if job.burn:
         report("burning")
-        burn(job.video, ass, job.output(".mp4"))
+        burn(job.video, subtitles, job.output(".mp4"), mark)
     if job.dub:
         from tarjim.dub.make import dub_video
 
         report("dubbing")
-        picture = job.output(".mp4") if job.burn else job.video
-        dub_video(job, cues, words, picture)
+        dub_video(job, cues, words, picture_for(job, canvas, mark))
+
+
+def picture_for(job: Job, canvas: Canvas, mark: Mark | None) -> Path:
+    """What a dub is laid on: the burned video, or the source with only the mark drawn on it."""
+    if job.burn:
+        return job.output(".mp4")
+    if mark is None:
+        return job.video
+    return burn(job.video, render_ass([], canvas, job.rules), job.cache / "marked.mp4", mark)
 
 
 def run(job: Job, report: Report = quiet) -> tuple[list[Cue], list[Issue]]:

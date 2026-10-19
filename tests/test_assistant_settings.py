@@ -66,3 +66,9 @@ def test_each_route_that_changes_a_setting_is_reached_by_some_tool() -> None:
             continue
         stem = pattern.pattern.lstrip("^").rstrip("$").split("(")[0].rstrip("/")
         assert f'"{stem}' in source or f"{stem}/" in source, f"no chat tool reaches {name}"
+
+
+def test_a_chat_can_turn_the_mark_on_videos_off_and_on(asked: list[tuple[str, Any]]) -> None:
+    assistant_settings.show_mark_on_videos("no")
+    assistant_settings.show_mark_on_videos("yes")
+    assert asked == [("/setup", {"video_mark": "no"}), ("/setup", {"video_mark": "yes"})]

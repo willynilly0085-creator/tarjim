@@ -379,6 +379,7 @@
   "updateFailed": "업데이트가 끝나지 않아 현재 버전이 다시 실행 중이에요. 잠시 후 다시 시도하세요.",
   "updateManual": "이 사본은 소스 코드에서 실행되며 git으로 업데이트해요.",
   "autoUpdate": "새 버전이 나오면 tarjim을 자동으로 업데이트 (하루에 한 번 최신 버전 번호만 확인해요)",
+  "videoMark": "동영상에 tarjim 마크 표시",
   "versionLine": "버전 {version}",
   "knownIssuesTitle": "tarjim 라이브러리의 알려진 문제",
   "knownIssuesLead": "tarjim과 함께 설치되는 일부 라이브러리에 보안 문제가 공개됐어요. tarjim이 이 라이브러리를 쓰는 방식은 그중 어느 것에도 닿지 않아요.",

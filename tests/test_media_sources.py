@@ -12,6 +12,8 @@ import pytest
 
 from tarjim import media, pipeline
 from tarjim.job import Job
+from tarjim.render import mark
+from tarjim.render.ass import Canvas, render_ass
 from tarjim.server.guard import safe_name
 from tarjim.server.jobs import classify
 
@@ -124,8 +126,11 @@ def test_every_ffmpeg_call_on_a_file_opens_only_that_file(
     monkeypatch.setattr(delivery, "DIRECT", 0)
     run_every_ffmpeg_call(tmp_path / "clip.mp4")
     opened = [entry for argv in calls for entry in inputs_of(argv) if entry[0] != "-"]
-    assert len(opened) >= 11
-    assert all(before == media.OWN_FILE_ONLY for _name, before in opened), opened
+    assert len(opened) >= 12
+    logo = str(mark.LOGO)
+    logos = [before for name, before in opened if name == logo]
+    assert logos and all(before == media.OWN_PICTURE for before in logos)
+    assert all(before == media.OWN_FILE_ONLY for name, before in opened if name != logo), opened
 
 
 def run_every_ffmpeg_call(clip: Path) -> None:
@@ -134,8 +139,9 @@ def run_every_ffmpeg_call(clip: Path) -> None:
     from tarjim.render import burn, frames
 
     clip.write_bytes(b"video")
+    ass, on_top = render_ass([], Canvas(96, 54)), mark.place_mark(Canvas(96, 54))
     for call in (lambda: media.check_readable(clip), lambda: media.extract_audio(clip, clip),
-                 lambda: burn.burn(clip, clip, clip.with_suffix(".ar.mp4")),
+                 lambda: burn.burn(clip, ass, clip.with_suffix(".ar.mp4"), on_top),
                  lambda: mix.mux(clip, clip, clip), lambda: audio.decode(clip),
                  lambda: delivery.phone_copy(clip), lambda: media.probe(clip),
                  lambda: media.audio_bytes(clip), lambda: media.scene_cuts(clip),

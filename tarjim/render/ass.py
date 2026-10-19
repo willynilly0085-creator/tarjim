@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from tarjim.lines import display_lines
 from tarjim.models import Cue
@@ -49,6 +49,9 @@ class Canvas:
     # edge, or from the top edge when top is set. None is the usual place.
     margin: int | None = None
     top: bool = False
+    # The picture's own text bands (render/text_bands.py), for tarjim's mark (render/mark.py).
+    # They say what the picture holds, not where the subtitle goes, so equality leaves them out.
+    bands: tuple[tuple[float, float], ...] = field(default=(), compare=False)
 
     @property
     def portrait(self) -> bool:

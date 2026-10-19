@@ -28,6 +28,8 @@ gera um `.srt` ou faz a dublagem com uma voz para cada locutor.
 - **Três formas de usar:** um menu de clique com o botão direito no navegador ("ترجم للعربية"), uma
   página web local ou um chat: adicione o tarjim ao app do Claude, ao Claude Code ou ao Codex e peça
   que ele traduza um link.
+- **A marca do tarjim:** os vídeos que ele gera levam o pequeno logo e @Cut_Code num canto, longe
+  das legendas (os arquivos `.srt` e `.ass` não a levam); dá para desligar em Configurações.
 
 ## Conecte uma IA: três formas
 
