@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.31 (2026-10-22)
+
+- **The phone bot asks Saudi or standard Arabic.** After you choose what to make of a link or a
+  video, an Arabic translation asks one more question on the same message: Saudi or standard. The
+  style you chose last is first and marked, one tap away. Other languages start right away.
+- **25 known library vulnerabilities closed.** pillow 13.0.0 and certifi 2026.10.19, tested with
+  this release (local listening gave the same words on a real clip).
+
 ## 1.0.30 (2026-10-19)
 
 - **Subtitles move clear of text already in the video.** When a clip already has words burned
