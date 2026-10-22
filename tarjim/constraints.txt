@@ -16,7 +16,7 @@ backports-tarfile==1.2.0 ; python_full_version < '3.12'
 blinker==1.9.0
 brotli==1.2.0
 catt-tashkeel==1.0.2 ; sys_platform != 'darwin'
-certifi==2026.7.22
+certifi==2026.10.19
 cffi==2.1.1
 charset-normalizer==3.5.2
 click==8.5.0
@@ -97,7 +97,7 @@ ormsgpack==1.12.2
 packaging==26.3
 pandas==2.3.3 ; python_full_version >= '3.14' and platform_machine == 'x86_64' and sys_platform == 'darwin'
 pandas==3.0.6 ; python_full_version < '3.14' or platform_machine != 'x86_64' or sys_platform != 'darwin'
-pillow==12.3.0
+pillow==13.0.0
 platformdirs==4.13.0
 pooch==1.9.0
 propcache==0.5.4
