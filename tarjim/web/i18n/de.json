@@ -364,6 +364,7 @@
   "phoneReadyHint": "Möchten Sie Links vom Handy senden? Verbinden Sie es mit Ihrem eigenen Telegram-Bot und erhalten Sie Übersetzungen überall.",
   "phoneReadyButton": "Handy verbinden",
   "phone_choose": "Was soll ich aus diesem Video machen?",
+  "phone_choose_dialect": "Welcher Stil des Arabischen?",
   "phone_choice_expired": "Diese Auswahl ist abgelaufen. Senden Sie den Link erneut.",
   "phone_sent": "An Ihr Handy gesendet",
   "phone_send_failed": "Das Video konnte nicht gesendet werden, hier ist die Untertiteldatei. Das vollständige Video liegt im Download-Ordner Ihres Computers.",

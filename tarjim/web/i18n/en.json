@@ -364,6 +364,7 @@
   "phoneReadyHint": "Want to send links from your phone? Pair it with your own Telegram bot and get translations back anywhere.",
   "phoneReadyButton": "Pair your phone",
   "phone_choose": "What should I make of this video?",
+  "phone_choose_dialect": "Which style of Arabic?",
   "phone_choice_expired": "This choice has expired. Send the link again.",
   "phone_sent": "Sent to your phone",
   "phone_send_failed": "I could not send the video, so here is the subtitle file. The full video is in your computer's Downloads folder.",

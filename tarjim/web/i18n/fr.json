@@ -364,6 +364,7 @@
   "phoneReadyHint": "Envie d'envoyer des liens depuis votre téléphone ? Associez-le à votre propre bot Telegram et recevez les traductions où que vous soyez.",
   "phoneReadyButton": "Associer votre téléphone",
   "phone_choose": "Que dois-je faire de cette vidéo ?",
+  "phone_choose_dialect": "Quel style d'arabe ?",
   "phone_choice_expired": "Ce choix a expiré. Renvoyez le lien.",
   "phone_sent": "Envoyé sur votre téléphone",
   "phone_send_failed": "Impossible d'envoyer la vidéo, voici le fichier de sous-titres. La vidéo complète est dans le dossier Téléchargements de votre ordinateur.",

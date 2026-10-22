@@ -364,6 +364,7 @@
   "phoneReadyHint": "Quer enviar links do celular? Conecte-o ao seu próprio bot do Telegram e receba as traduções onde estiver.",
   "phoneReadyButton": "Conectar o celular",
   "phone_choose": "O que faço com este vídeo?",
+  "phone_choose_dialect": "Qual estilo de árabe?",
   "phone_choice_expired": "Esta escolha expirou. Envie o link de novo.",
   "phone_sent": "Enviado para o celular",
   "phone_send_failed": "Não consegui enviar o vídeo, então aqui está o arquivo de legendas. O vídeo completo está na pasta Downloads do computador.",

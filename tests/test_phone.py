@@ -28,8 +28,10 @@ class FakeBot:
             self.keyboards.append(json.loads(extra["reply_markup"]))
         return len(self.said)
 
-    def edit(self, chat: int, _message: int, text: str, **_extra: Any) -> None:
+    def edit(self, chat: int, _message: int, text: str, **extra: Any) -> None:
         self.said.append((chat, text))
+        if "reply_markup" in extra:
+            self.keyboards.append(json.loads(extra["reply_markup"]))
 
     def call(self, method: str, **_params: Any) -> None:
         self.calls.append(method)
@@ -92,11 +94,23 @@ def test_an_expired_code_does_not_pair(home: Path, monkeypatch: pytest.MonkeyPat
     assert not config.setting("phone_chat")
 
 
+def pick(inbox: Inbox, bot: FakeBot, prefix: str, chat: int = OWNER) -> bool:
+    """Press the newest button whose data starts with prefix; False when none is shown."""
+    rows = [row for keys in reversed(bot.keyboards) for row in keys["inline_keyboard"]]
+    buttons = [b for row in rows for b in row]
+    found = [b["callback_data"] for b in buttons if b["callback_data"].startswith(prefix)]
+    if found:
+        inbox.handle(bot, {"callback_query": {"id": "q", "data": found[0],
+                                              "message": {"chat": {"id": chat}, "message_id": 9}}})
+    return bool(found)
+
+
 def tap(inbox: Inbox, bot: FakeBot, mode: str, chat: int = OWNER) -> None:
-    buttons = [b for row in bot.keyboards[-1]["inline_keyboard"] for b in row]
-    data = next(b["callback_data"] for b in buttons if b["callback_data"].startswith(f"go:{mode}:"))
-    inbox.handle(bot, {"callback_query": {"id": "q", "data": data,
-                                          "message": {"chat": {"id": chat}, "message_id": 9}}})
+    """Choose a result; for Arabic, keep the style offered first, as a person in a hurry would."""
+    shown = len(bot.keyboards)
+    pick(inbox, bot, f"go:{mode}:", chat)
+    if len(bot.keyboards) > shown and "dl:" in json.dumps(bot.keyboards[-1]):
+        pick(inbox, bot, "dl:", chat)
 
 
 def test_a_link_asks_what_to_make_and_starts_on_the_tap(
@@ -250,3 +264,23 @@ def test_the_message_lists_every_step_with_what_is_done_now_and_left() -> None:
     stopped = checklist(job("failed", "burn"), "translating").splitlines()
     assert f"✕ {say('stage_translating')}" in stopped and stopped[-1] == say("stage_failed")
     assert marks(checklist(job("done", "burn"), "sent")) == ["✓"] * 8
+
+
+def test_arabic_asks_saudi_or_standard_and_remembers_it(
+        home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(links, "addresses", lambda _host: ["142.250.1.1"])
+    inbox, bot, jobs, _pairing = setup_inbox(home)
+    config.save("phone_chat", str(OWNER))
+    inbox.handle(bot, message(OWNER, "https://youtu.be/abc"))
+    pick(inbox, bot, "go:srt:")
+    assert jobs.orders == [] and bot.said[-1][1] == say("phone_choose_dialect")
+    first = bot.keyboards[-1]["inline_keyboard"][0][0]
+    assert first["text"] == "✓ " + say("dialectSaudi")
+    pick(inbox, bot, "dl:msa:", chat=STRANGER)
+    assert jobs.orders == []
+    pick(inbox, bot, "dl:msa:")
+    assert [(o.mode, o.target, o.dialect) for o in jobs.orders] == [("srt", "ar", "msa")]
+    assert config.setting("phone_dialect") == "msa"
+    inbox.handle(bot, message(OWNER, "https://youtu.be/def"))
+    pick(inbox, bot, "go:burn:")
+    assert bot.keyboards[-1]["inline_keyboard"][0][0]["text"] == "✓ " + say("dialectMsa")

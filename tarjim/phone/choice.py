@@ -1,17 +1,19 @@
 """Ask what the person wants for each link or video before starting it: subtitles in the video, a
-subtitle file, or dubbing. The last choice is offered first, marked, one tap away."""
+subtitle file, or dubbing, then for Arabic whether Saudi or standard. The last choice is offered
+first, marked, one tap away."""
 import json
 import secrets
 import threading
 from typing import Any
 
 from tarjim.config import setting
-from tarjim.phone.words import result_name
+from tarjim.phone.words import result_name, say
 
 ALWAYS = ("burn", "srt", "dub-gemini", "dub-clone", "dub-studio")
 LINKED = {"dub-eleven": "eleven_api_key", "dub-elevenclone": "eleven_api_key",
           "dub-speech": "speech_api_key"}
 MODES = (*ALWAYS, *LINKED)
+DIALECTS = {"saudi": "dialectSaudi", "msa": "dialectMsa"}
 KEEP = 50
 
 
@@ -29,6 +31,10 @@ class Waiting:
             while len(self.items) > KEEP:
                 self.items.pop(next(iter(self.items)))
         return key
+
+    def has(self, key: str) -> bool:
+        with self.lock:
+            return key in self.items
 
     def take(self, key: str) -> dict[str, Any] | None:
         with self.lock:
@@ -60,4 +66,13 @@ def modes_keyboard() -> str:
     current = setting("phone_mode") or "burn"
     rows = [[{"text": label(mode, current), "callback_data": f"mode:{mode}"}]
             for mode in offered()]
+    return json.dumps({"inline_keyboard": rows})
+
+
+def dialect_keyboard(mode: str, key: str) -> str:
+    """Arabic only: Saudi or standard, the last one first and marked."""
+    current = setting("phone_dialect") or "saudi"
+    order = [current, *[d for d in DIALECTS if d != current]]
+    rows = [[{"text": ("✓ " if d == current else "") + say(DIALECTS[d]),
+              "callback_data": f"dl:{d}:{mode}:{key}"}] for d in order]
     return json.dumps({"inline_keyboard": rows})

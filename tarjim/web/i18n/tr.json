@@ -364,6 +364,7 @@
   "phoneReadyHint": "Telefondan bağlantı mı göndermek istiyorsun? Kendi Telegram botunla eşleştir, çevirileri her yerde al.",
   "phoneReadyButton": "Telefonu eşleştir",
   "phone_choose": "Bu videoyla ne yapayım?",
+  "phone_choose_dialect": "Arapçanın hangi üslubu?",
   "phone_choice_expired": "Bu seçimin süresi doldu. Bağlantıyı yeniden gönder.",
   "phone_sent": "Telefonuna gönderildi",
   "phone_send_failed": "Video gönderilemedi, altyazı dosyasını gönderdim. Videonun tamamı bilgisayarındaki İndirilenler klasöründe.",
