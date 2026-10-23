@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.32 (2026-10-23)
+
+- **tarjim keeps the programs it brings up to date by itself.** On Windows, for people who did
+  not have them, tarjim installs its own Node.js (for Codex and Copilot) and its own ffmpeg; it
+  installed them once and never again, so security releases never reached those people. Now,
+  once a day while nothing is running, each is checked against its maker's latest release,
+  verified against the published checksum (a mismatch is refused), put in place beside the old
+  one, and the old one kept until the new one works. The Codex and Copilot installed with that
+  Node.js move with it. A Node.js or ffmpeg you installed yourself is never touched.
+- **Python 3.11 under tarjim stays current too.** When a newer 3.11 security release is out,
+  tarjim's environment is rebuilt on it once, while nothing is running.
+- **20 libraries moved to their newest tested versions**, among them google-genai 2.33,
+  websockets 17 and python-dateutil 3, checked with real listening, burning, own-voice dubbing
+  and a Gemini translation.
+- **Saving settings no longer fails when the settings file is on another drive.**
+
 ## 1.0.31 (2026-10-22)
 
 - **The phone bot asks Saudi or standard Arabic.** After you choose what to make of a link or a
