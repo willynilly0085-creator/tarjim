@@ -1,12 +1,13 @@
 """Updates from the page and by themselves: what version this is, whether a newer one is out, and
 the background watch that, with automatic updates on and nothing running, installs it, brings
-the libraries onto the versions tested with this release, and keeps yt-dlp current; and, once a
-minute, restarts the engine into its own code when that changed on disk (renew.py)."""
+the libraries onto the versions tested with this release, and keeps yt-dlp and tarjim's own
+Node.js current; and, once a minute, restarts the engine into its own code when that changed on
+disk (renew.py)."""
 import os
 import threading
 from typing import Any, ClassVar
 
-from tarjim import downloader, same_code, update
+from tarjim import downloader, node_update, same_code, update
 from tarjim.server.jobs import Board
 from tarjim.server.renew import Renewal
 
@@ -42,6 +43,7 @@ def look(board: Board, port: int) -> None:
         close_soon(update.repair(port))
     else:
         downloader.refresh(idle=True)
+        node_update.refresh(idle=idle(board))
 
 
 def settle_after_update() -> None:

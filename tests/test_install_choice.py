@@ -1,4 +1,5 @@
 """Every subscription is offered in setup, installed or not, and a failed install says why."""
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -61,8 +62,8 @@ def test_without_node_tarjim_brings_its_own_for_npm_programs(
     monkeypatch.setattr(own_node, "AVAILABLE", True)
     monkeypatch.setattr(own_node, "FOLDER", tmp_path / "node")
     command = app_install.command("codex")
-    assert command[0] == "powershell" and "nodejs.org/dist" in command[-1]
-    assert "@openai/codex" in command[-1] and app_install.state("codex", False)["can_install"]
+    assert command == [sys.executable, "-P", "-m", "tarjim.engines.node_setup", "@openai/codex"]
+    assert app_install.state("codex", False)["can_install"]
     assert app_install.command("claude") == app_install.NATIVE["claude"]
     (tmp_path / "node" / "node_modules" / "codex").mkdir(parents=True)
     for name in ("npm.cmd", "node.exe", "node_modules/codex/run.js"):
@@ -73,3 +74,24 @@ def test_without_node_tarjim_brings_its_own_for_npm_programs(
     monkeypatch.setattr(subscription.programs, "find", lambda _name: None)
     found = subscription.launcher("codex")
     assert found[0] == own_node.node() and found[1].endswith("run.js")
+
+
+def test_the_first_node_install_takes_the_newest_lts_and_only_a_known_program(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    from tarjim.engines import node_release, node_setup
+
+    made: list[Any] = []
+    index = [{"version": "v24.22.1", "lts": "Krypton", "files": ["win-x64-zip"]}]
+    monkeypatch.setattr(node_release, "ask_index", lambda: index)
+    monkeypatch.setattr(node_release, "build", lambda *given: made.append(given))
+    assert node_setup.main(["@openai/codex & calc"]) == 2 and made == []
+    assert node_setup.main(["@openai/codex"]) == 0
+    assert made == [("v24.22.1", ["@openai/codex"])]
+
+    def refused(*_given: Any) -> None:
+        raise node_release.Refused("node-v24.22.1-win-x64.zip does not match SHASUMS256.txt")
+
+    monkeypatch.setattr(node_release, "build", refused)
+    assert node_setup.main(["@github/copilot"]) == 1
+    monkeypatch.setattr(node_release, "ask_index", lambda: [])
+    assert node_setup.main(["@github/copilot"]) == 1
