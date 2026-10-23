@@ -74,7 +74,7 @@ def test_a_stream_handed_to_ffmpeg_stops_at_the_limit(
         site: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     clip = tmp_path / "clip.ts"
     subprocess.run([str(FFMPEG), "-loglevel", "error", "-f", "lavfi", "-i", "testsrc=s=160x120",
-                    "-f", "lavfi", "-i", "sine", "-t", "1", "-c:v", "libx264", "-c:a", "aac",
+                    "-f", "lavfi", "-i", "sine", "-t", "1", "-c:v", "mpeg4", "-c:a", "aac",
                     "-f", "mpegts", str(clip)], check=True)
     FILES["/seg.ts"] = clip.read_bytes()
     clip.unlink()

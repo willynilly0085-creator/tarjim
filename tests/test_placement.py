@@ -40,7 +40,7 @@ def clip(folder: Path, shape: tuple[int, int], rows: list[float]) -> Path:
     target = folder / f"clip-{width}x{height}-{len(rows)}-{rows[0] if rows else 0}.mp4"
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i",
                     f"testsrc2=size={width}x{height}:rate=10:duration=8",
-                    "-vf", ",".join(drawn) or "null", "-c:v", "libx264", "-g", "10",
+                    "-vf", ",".join(drawn) or "null", "-c:v", "mpeg4", "-g", "10",
                     "-pix_fmt", "yuv420p", target.name], check=True, cwd=folder)
     return target
 

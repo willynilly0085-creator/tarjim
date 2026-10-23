@@ -11,12 +11,9 @@ import tempfile
 from pathlib import Path
 
 from tarjim.media import picture, run, source, tool, video_kbps
+from tarjim.render.encoders import for_quality
 from tarjim.render.mark import LOGO, Mark, overlay, with_mark
 
-ENCODERS = [
-    ["-c:v", "h264_nvenc", "-preset", "p5", "-rc", "vbr", "-cq", "21", "-b:v", "0"],
-    ["-c:v", "libx264", "-crf", "19", "-preset", "medium"],
-]
 PLAIN = "subtitles.ass"
 HEADROOM = 1.15
 
@@ -35,16 +32,16 @@ def drawing(mark: Mark | None) -> list[str]:
             + overlay(mark, "subtitled")]
 
 
-def ceiling(video: Path) -> list[str]:
-    rate = int(video_kbps(video) * HEADROOM)
+def ceiling(rate: int) -> list[str]:
     return ["-maxrate", f"{rate}k", "-bufsize", f"{2 * rate}k"] if rate else []
 
 
 def encode(video: Path, target: Path, folder: Path, mark: Mark | None) -> Path:
     base = [tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", *source(video),
             *drawing(mark), "-c:a", "copy", "-movflags", "+faststart"]
-    errors, limit = [], ceiling(video)
-    for encoder in ENCODERS:
+    rate = int(video_kbps(video) * HEADROOM)
+    errors, limit = [], ceiling(rate)
+    for encoder in for_quality(rate):
         result = run([*base, *encoder, *limit, str(target)], cwd=folder)
         if result.returncode == 0 and target.exists() and target.stat().st_size > 0:
             return target

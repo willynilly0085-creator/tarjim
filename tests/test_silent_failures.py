@@ -74,12 +74,10 @@ def test_a_title_with_an_apostrophe_is_burned(tmp_path: Path,
     assert seen and all(mark not in seen[0] for mark in "'\\:")
 
 
-def test_a_burned_video_spends_little_more_than_its_source(
-        monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(burning, "video_kbps", lambda _video: 2520)
-    assert burning.ceiling(Path("clip.mp4")) == ["-maxrate", "2898k", "-bufsize", "5796k"]
-    monkeypatch.setattr(burning, "video_kbps", lambda _video: 0)
-    assert burning.ceiling(Path("clip.mp4")) == []
+def test_a_burned_video_spends_little_more_than_its_source() -> None:
+    assert burning.ceiling(int(2520 * burning.HEADROOM)) == [
+        "-maxrate", "2898k", "-bufsize", "5796k"]
+    assert burning.ceiling(0) == []
 
 
 @pytest.mark.parametrize("answer", [None, [], [{"id": 9, "text": "x"}]])
