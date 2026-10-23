@@ -31,15 +31,8 @@ yang dapat dilakukan seseorang dengannya. Laporan dibaca dan ditanggapi secepat 
 
 ## Masalah yang diketahui di pustaka
 
-Celah keamanan yang sudah diumumkan di pustaka yang dipasang tarjim dan belum bisa dihindari versi uji mana pun, karena qwen-asr (mesin pendengar lokal) meminta tepat transformers 4.57.6 dan berhenti bekerja dengan versi 5 mana pun. Cara tarjim memakai pustaka itu tidak menyentuh satu pun di antaranya: setiap model dari Hugging Face diunduh dari versi tetap yang sudah diperiksa tarjim, hanya berkas pengaturan dan bobotnya (tanpa kode), lalu dimuat dari foldernya di komputer tanpa internet. Pengaturan menampilkan yang berlaku di komputer Anda, dan masing-masing hilang dengan sendirinya saat pembaruan memasang versi yang sudah diperbaiki.
+Kerentanan yang dipublikasikan di pustaka yang dipasang tarjim dan belum bisa dihindari versi teruji mana pun: saat ini tidak ada. Jika muncul, datanya ikut bersama tarjim di `tarjim/known_issues.json`: **Pengaturan**, jawaban `/update` dari mesin, dan `setup_status` di alat chat menampilkannya di komputer yang versi terpasangnya terdampak, dan ia hilang sendiri begitu pembaruan memasang versi yang sudah diperbaiki. CI gagal untuk kerentanan apa pun yang tidak tercantum di sini, dan pemeriksaan mingguan memberi tahu saat yang tercantum bisa diperbaiki.
 
-| Peringatan | Pustaka | Versi terdampak | Diperbaiki di |
-|---|---|---|---|
-| PYSEC-2025-217 | transformers | `<=5.0.0rc0` | 5.0.0 |
-| PYSEC-2026-2288 | transformers | `<5.0.0` | 5.0.0 |
-| PYSEC-2026-2289 | transformers | `<5.3.0` | 5.3.0 |
-| PYSEC-2026-2290 | transformers | `<5.5.0` | 5.5.0 |
-| PYSEC-2026-3929 | transformers | `<5.10.0` | 5.10.0 |
-| PYSEC-2026-4174 | transformers | `>=4.49.0,<=5.8.1` | 5.9.0 |
+**Ditutup pada 2026-10-23.** Enam peringatan transformers (PYSEC-2025-217, PYSEC-2026-2288, PYSEC-2026-2289, PYSEC-2026-2290, PYSEC-2026-3929, PYSEC-2026-4174) tetap terbuka selama qwen-asr, mesin pendengar lokal waktu itu, menahan transformers di 4.57.6. Pendengaran lokal kini memakai model Qwen3-ASR milik Transformers sendiri, jadi tarjim memasang transformers 5.20.2 dan tidak lagi memasang qwen-asr; accelerate tetap di 1.15.0 (PYSEC-2026-3804 ditutup) tanpa pengecualian apa pun.
 
-Rincian (bahasa Inggris): [SECURITY.md](../../SECURITY.md#known-library-issues).
+**Yang selalu dilakukan tarjim.** Setiap model Hugging Face diunduh dari satu commit tetap (`tarjim/model_pins.py`), hanya pengaturan, tokenizer, templat chat, dan berkas safetensors-nya, tidak pernah kode; berkas besarnya harus cocok dengan SHA-256 yang dipublikasikan, dan dimuat dari folder itu di komputer dengan hub luring. `trust_remote_code` tidak pernah diaktifkan, dan paket `kernels` tidak terpasang. Bobot pemisah suara hanya dimuat jika menyebut kelas model milik demucs, dan model harakat hanya jika kedua berkasnya cocok dengan SHA-256 rilisnya.

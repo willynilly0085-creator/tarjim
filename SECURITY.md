@@ -35,49 +35,8 @@ someone do. Reports are read and answered as soon as possible.
 
 ## Known library issues
 
-Published vulnerabilities in libraries tarjim installs that no tested version can avoid yet. The
-same facts ship with tarjim in `tarjim/known_issues.json`: **Settings**, the engine's `/update`
-answer and the chat tools' `setup_status` show the ones that apply to the versions installed on
-that computer, and each one disappears by itself once an update installs a fixed version. CI fails
-on any vulnerability not listed here, and a weekly check reports when one of these can be fixed.
+Published vulnerabilities in libraries tarjim installs that no tested version can avoid yet: none at the moment. If one appears, its facts ship with tarjim in `tarjim/known_issues.json`: **Settings**, the engine's `/update` answer and the chat tools' `setup_status` show it on the computers whose installed version it applies to, and it disappears by itself once an update installs a fixed version. CI fails on any vulnerability not listed here, and a weekly check reports when a listed one can be fixed.
 
-**Why they remain.** qwen-asr 0.0.6, the local listening engine, requires transformers 4.57.6
-exactly, and every transformers 5 release stops it from loading (checked on 2026-10-15: with 5.0
-and 5.1 the model cannot be built, `KeyError: 'default'` in its rotary embedding; 5.2 and 5.3 no
-longer have `check_model_inputs`; from 5.5 on that decorator takes different arguments). The fix
-arrives when qwen-asr allows transformers 5, or when tarjim moves to the Transformers-native
-Qwen3-ASR models published in June 2026. accelerate, which qwen-asr also pins exactly, is
-installed at 1.15.0 (`tarjim/overrides.txt`), which closes PYSEC-2026-3804; the words heard and
-their timings were the same with it.
+**Closed on 2026-10-23.** Six transformers advisories (PYSEC-2025-217, PYSEC-2026-2288, PYSEC-2026-2289, PYSEC-2026-2290, PYSEC-2026-3929, PYSEC-2026-4174) stayed open while qwen-asr, the local listening engine of that time, held transformers at 4.57.6. Local listening now runs Transformers' own Qwen3-ASR models, so tarjim installs transformers 5.20.2 and no longer installs qwen-asr; accelerate stays at 1.15.0 (PYSEC-2026-3804 closed) without any override.
 
-**What tarjim does against all of them.** Every Hugging Face model is downloaded at one fixed
-commit (`tarjim/model_pins.py`), only its settings, tokenizer and safetensors files, never code,
-and is loaded from that folder on the computer with the hub offline; `trust_remote_code` is never
-set, and the `kernels` package is not installed. The voice separation weights load only if they
-name demucs' own model class, and the diacritics model only if both files match the SHA-256 of
-their release.
-
-- **PYSEC-2025-217** (CVE-2025-14929): transformers `<=5.0.0rc0`, fixed in 5.0.0.
-  What it is: A tool that converts X-CLIP model checkpoints could run code hidden in a checkpoint file.
-  Reached by tarjim: no. tarjim never converts checkpoints and never loads X-CLIP models.
-  Where the fix comes from: transformers 5.0.0. tarjim installs it once qwen-asr, its listening engine, allows transformers 5 (qwen-asr 0.0.6 requires 4.57.6 exactly, and stops loading with any 5.x release).
-- **PYSEC-2026-2288** (CVE-2026-1839, GHSA-69w3-r845-3855): transformers `<5.0.0`, fixed in 5.0.0.
-  What it is: Resuming a training run from a crafted checkpoint could run code, when PyTorch is older than 2.6.
-  Reached by tarjim: no. tarjim never trains models, so it never resumes from a checkpoint.
-  Where the fix comes from: transformers 5.0.0. tarjim installs it once qwen-asr, its listening engine, allows transformers 5 (qwen-asr 0.0.6 requires 4.57.6 exactly, and stops loading with any 5.x release).
-- **PYSEC-2026-2289** (CVE-2026-4372, GHSA-29pf-2h5f-8g72): transformers `<5.3.0`, fixed in 5.3.0.
-  What it is: A model whose config.json was written by an attacker could make transformers fetch and run code from another repository.
-  Reached by tarjim: no. tarjim loads only its own models, each from one fixed commit it checked, from a folder on this computer and offline, so a changed config.json never reaches it; the kernels package this needs is not installed either.
-  Where the fix comes from: transformers 5.3.0. tarjim installs it once qwen-asr, its listening engine, allows transformers 5 (qwen-asr 0.0.6 requires 4.57.6 exactly, and stops loading with any 5.x release).
-- **PYSEC-2026-2290** (CVE-2026-5241, GHSA-fgcw-684q-jj6r): transformers `<5.5.0`, fixed in 5.5.0.
-  What it is: Loading a LightGlue model from an attacker's repository could run its code even with remote code switched off.
-  Reached by tarjim: no. tarjim never loads LightGlue models; its own models come from fixed commits it checked.
-  Where the fix comes from: transformers 5.5.0. tarjim installs it once qwen-asr, its listening engine, allows transformers 5 (qwen-asr 0.0.6 requires 4.57.6 exactly, and stops loading with any 5.x release).
-- **PYSEC-2026-3929** (CVE-2026-9856, GHSA-xrqw-3rrv-vx5w): transformers `<5.10.0`, fixed in 5.10.0.
-  What it is: Saving a tokenizer that came from a crafted repository could write files outside the chosen folder.
-  Reached by tarjim: no. tarjim never saves a tokenizer or processor that way (save_pretrained), and its models come from fixed commits it checked.
-  Where the fix comes from: transformers 5.10.0. tarjim installs it once qwen-asr, its listening engine, allows transformers 5 (qwen-asr 0.0.6 requires 4.57.6 exactly, and stops loading with any 5.x release).
-- **PYSEC-2026-4174** (CVE-2026-80047, GHSA-x9r9-c232-4q39): transformers `>=4.49.0,<=5.8.1`, fixed in 5.9.0.
-  What it is: Loading a model from a repository that carries custom generation code saves that code to disk before asking for permission; it is not run.
-  Reached by tarjim: no. tarjim downloads only the model files it needs, never code, from fixed commits it checked, and loads them from a folder on this computer, so no such code is fetched.
-  Where the fix comes from: transformers 5.9.0. tarjim installs it once qwen-asr, its listening engine, allows transformers 5 (qwen-asr 0.0.6 requires 4.57.6 exactly, and stops loading with any 5.x release).
+**What tarjim does in any case.** Every Hugging Face model is downloaded at one fixed commit (`tarjim/model_pins.py`), only its settings, tokenizer, chat template and safetensors files, never code; its large files must match their published SHA-256, and it is loaded from that folder on the computer with the hub offline. `trust_remote_code` is never set, and the `kernels` package is not installed. The voice separation weights load only if they name demucs' own model class, and the diacritics model only if both files match the SHA-256 of their release.

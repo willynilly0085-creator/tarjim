@@ -2,7 +2,8 @@
 the background watch that, with automatic updates on and nothing running, installs it, brings
 the libraries onto the versions tested with this release, and keeps yt-dlp, tarjim's own Node.js
 and ffmpeg, and the Python under its environment current; and, once a minute, restarts the engine
-into its own code when that changed on disk (renew.py)."""
+into its own code when that changed on disk (renew.py) and moves local listening onto its newer
+models (listen_upgrade.py)."""
 import os
 import threading
 from typing import Any, ClassVar
@@ -62,11 +63,22 @@ def settle_after_update() -> None:
     repair()
 
 
+def upgrade_listening(board: Board) -> None:
+    from tarjim.listen_upgrade import step
+    from tarjim.tools import shelf
+
+    done = step(shelf(), idle(board))
+    if done in ("started", "removed earlier"):
+        print(f"listening models: {done}", flush=True)
+
+
 def tick(board: Board, port: int, renewal: Renewal, count: int) -> None:
     if idle(board) and renewal.due() and idle(board):
         close_soon(renewal.restart(board))
-    elif count % LOOK_EVERY == 0:
+        return
+    if count % LOOK_EVERY == 0:
         look(board, port)
+    upgrade_listening(board)
 
 
 def watch(board: Board, port: int, stop: threading.Event) -> None:

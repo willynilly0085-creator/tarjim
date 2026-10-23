@@ -439,5 +439,8 @@
   "engineLoading": "불러오는 중…",
   "engineSaving": "저장 중…",
   "engineSaved": "저장했어요. 다음 번역부터 사용해요.",
-  "engineFailed": "저장하지 못했어요. 다시 시도해 주세요."
+  "engineFailed": "저장하지 못했어요. 다시 시도해 주세요.",
+  "tool_accuracy_upgrading": "지금도 작동합니다. 이 모델의 새 버전을 백그라운드에서 내려받는 중이며, 끝나면 알아서 바뀝니다.",
+  "tool_accuracy_upgrade_manual": "지금도 작동합니다. 이 모델의 새 버전을 내려받을 수 있으며, 끝나면 알아서 바뀝니다.",
+  "tool_accuracy_upgrade_failed": "지금도 작동합니다. 새 버전을 다 내려받지 못했습니다. 다시 시도하면 멈춘 곳부터 이어서 받습니다."
 }

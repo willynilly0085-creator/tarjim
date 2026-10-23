@@ -21,10 +21,30 @@ def ids() -> set[str]:
     return {entry["id"] for entry in known_issues.entries()}
 
 
+CLOSED = {"PYSEC-2025-217": ">=5.0.0", "PYSEC-2026-2288": ">=5.0.0", "PYSEC-2026-2289": ">=5.3.0",
+          "PYSEC-2026-2290": ">=5.5.0", "PYSEC-2026-3929": ">=5.10.0", "PYSEC-2026-4174": ">=5.9.0"}
+SAMPLE = [{"id": "X-1", "package": "transformers", "affected": "<5.0.0", "fixed_by": ">=5.0.0"},
+          {"id": "X-2", "package": "transformers", "affected": "<5.10.0", "fixed_by": ">=5.10.0"}]
+
+
 def test_the_shipped_list_is_the_list_ci_accepts() -> None:
     lines = (ROOT / ".github" / "audit-known.txt").read_text(encoding="utf-8").splitlines()
     accepted = {line.split()[0] for line in lines if line.strip() and not line.startswith("#")}
-    assert ids() and ids() == accepted
+    assert ids() == accepted
+
+
+def test_the_six_transformers_advisories_are_closed_by_the_tested_version() -> None:
+    """qwen-asr held transformers at 4.57.6; the native Qwen3-ASR classes let it move."""
+    (version,) = pins.parse(pins.FILE.read_text(encoding="utf-8"))["transformers"]
+    assert all(version in SpecifierSet(fixed) for fixed in CLOSED.values())
+    assert not set(CLOSED) & ids()
+
+
+@pytest.fixture
+def sample(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    file = tmp_path / "known_issues.json"
+    file.write_text(json.dumps(SAMPLE), encoding="utf-8")
+    monkeypatch.setattr(known_issues, "FILE", file)
 
 
 @pytest.mark.parametrize("entry", known_issues.entries(), ids=lambda entry: entry["id"])
@@ -38,7 +58,8 @@ def test_each_entry_says_what_it_is_what_tarjim_does_and_where_the_fix_comes_fro
 
 
 @pytest.mark.parametrize(("version", "shown"), [
-    ("4.57.6", 6), ("5.0.0", 4), ("5.3.0", 3), ("5.9.0", 1), ("5.10.0", 0), ("5.19.0", 0)])
+    ("4.57.6", 2), ("5.0.0", 1), ("5.9.0", 1), ("5.10.0", 0), ("5.20.2", 0)])
+@pytest.mark.usefixtures("sample")
 def test_only_the_entries_for_the_installed_version_are_shown(version: str, shown: int) -> None:
     found = known_issues.current(lambda name: version if name == "transformers" else "")
     assert len(found) == shown and all(issue["installed"] == version for issue in found)
@@ -62,12 +83,13 @@ def test_the_closed_accelerate_advisory_no_longer_applies_to_the_tested_version(
     assert "PYSEC-2026-3804" not in ids()
 
 
+@pytest.mark.usefixtures("sample")
 def test_the_update_state_carries_the_entries_that_apply(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(update, "latest", lambda: "")
     monkeypatch.setattr(known_issues.pins, "installed",
                         lambda name: "4.57.6" if name == "transformers" else "")
     state = update.view()
-    assert len(state["known_issues"]) == 6
+    assert len(state["known_issues"]) == 2
     assert state["known_issues_details"].endswith("SECURITY.md#known-library-issues")
 
 

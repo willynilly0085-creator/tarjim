@@ -439,5 +439,8 @@
   "engineLoading": "正在加载…",
   "engineSaving": "正在保存…",
   "engineSaved": "已保存。下次翻译将使用它。",
-  "engineFailed": "保存失败，请重试。"
+  "engineFailed": "保存失败，请重试。",
+  "tool_accuracy_upgrading": "现在就能用。这个模型的新版本正在后台下载，下载完会自动替换。",
+  "tool_accuracy_upgrade_manual": "现在就能用。这个模型的新版本可以下载，下载完会自动替换。",
+  "tool_accuracy_upgrade_failed": "现在就能用。新版本没有下载完。请再试一次，会从中断的地方继续。"
 }

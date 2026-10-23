@@ -97,10 +97,10 @@ class Emitter:
         self.device = device or best_device()
         self.dtype = precision(self.device, torch.float16)
         where = folder(self.MODEL)
-        self.model = AutoModelForCTC.from_pretrained(where, torch_dtype=self.dtype,
+        self.model = AutoModelForCTC.from_pretrained(where, dtype=self.dtype,
                                                      use_safetensors=True)
         self.model = self.model.to(self.device).eval()
-        tokenizer = AutoTokenizer.from_pretrained(where)  # type: ignore[no-untyped-call]
+        tokenizer = AutoTokenizer.from_pretrained(where)
         self.vocab: dict[str, int] = tokenizer.get_vocab()
 
     def emissions(self, wav: Any) -> np.ndarray:

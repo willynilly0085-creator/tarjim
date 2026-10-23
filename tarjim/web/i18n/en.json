@@ -439,5 +439,8 @@
   "engineLoading": "Loading…",
   "engineSaving": "Saving…",
   "engineSaved": "Saved. The next translation uses it.",
-  "engineFailed": "Couldn't save that. Try again."
+  "engineFailed": "Couldn't save that. Try again.",
+  "tool_accuracy_upgrading": "Works now. A newer version of this model is downloading in the background and takes over by itself.",
+  "tool_accuracy_upgrade_manual": "Works now. A newer version of this model is ready to download, and takes over by itself.",
+  "tool_accuracy_upgrade_failed": "Works now. The newer version did not finish downloading. Try again: it continues where it stopped."
 }

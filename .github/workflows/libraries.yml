@@ -9,8 +9,7 @@ name: libraries
 # The audit runs twice: with the accepted list (.github/audit-known.txt), as CI does, and without
 # it, through scripts/advisories.py, which fails this workflow when an accepted advisory is no
 # longer found or a fixed version of it can now be installed, so its line is removed and the fix
-# ships. When qwen-asr releases a version that allows a fixed transformers, --upgrade below takes
-# it and the pull request carries it.
+# ships.
 on:
   workflow_dispatch:
   schedule:

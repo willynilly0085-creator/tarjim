@@ -439,5 +439,8 @@
   "engineLoading": "Yükleniyor…",
   "engineSaving": "Kaydediliyor…",
   "engineSaved": "Kaydedildi. Sonraki çeviri bunu kullanır.",
-  "engineFailed": "Kaydedilemedi. Tekrar dene."
+  "engineFailed": "Kaydedilemedi. Tekrar dene.",
+  "tool_accuracy_upgrading": "Şu an çalışıyor. Bu modelin yeni sürümü arka planda iniyor ve kendiliğinden yerini alacak.",
+  "tool_accuracy_upgrade_manual": "Şu an çalışıyor. Bu modelin yeni sürümü indirilmeye hazır ve kendiliğinden yerini alacak.",
+  "tool_accuracy_upgrade_failed": "Şu an çalışıyor. Yeni sürümün indirilmesi bitmedi. Yeniden deneyin: kaldığı yerden devam eder."
 }

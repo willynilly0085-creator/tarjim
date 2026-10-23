@@ -62,10 +62,27 @@ def library_issues() -> dict[str, Any]:
             "known_library_issues_details": found.get("known_issues_details", "")}
 
 
+LISTENING_NOTE = ("Local listening works with its earlier models while their newer version "
+                  "downloads; the newer one takes over by itself. 'manual' means automatic updates "
+                  "are off: install_tool('accuracy') fetches it.")
+
+
+def listening_update() -> dict[str, Any]:
+    """The newer listening models' download, while the earlier ones still listen."""
+    from tarjim.assistant_http import call
+
+    tools = call("/tools")
+    found = [t for t in tools if t.get("upgrade")] if isinstance(tools, list) else []
+    if not found:
+        return {}
+    return {"listening_models_update": found[0]["upgrade"], "listening_models_note": LISTENING_NOTE,
+            "listening_models_gb": found[0].get("size_gb")}
+
+
 def status() -> dict[str, Any]:
     page = f"{setting('server') or SERVER}/"
     if running():
-        return {"engine": "running", "page": page, **library_issues()}
+        return {"engine": "running", "page": page, **library_issues(), **listening_update()}
     progress = installing()
     if progress.get("state") == "installing":
         if alive(int(progress.get("pid", 0))) or launching(progress):

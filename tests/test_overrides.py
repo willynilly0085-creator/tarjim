@@ -20,15 +20,22 @@ GOOD = "# tested\nrequests==2.34.2\naccelerate==1.15.0\n"
 def test_every_override_is_an_exact_tested_version() -> None:
     lifted = pins.parse(pins.OVERRIDES.read_text(encoding="utf-8"))
     tested = pins.parse(pins.FILE.read_text(encoding="utf-8"))
-    assert lifted and release_pins.plain_pins(pins.OVERRIDES.read_text(encoding="utf-8"))
+    text = pins.OVERRIDES.read_text(encoding="utf-8")
+    assert not lifted or release_pins.plain_pins(text)
     assert all(tested[name] == versions for name, versions in lifted.items())
 
 
-def test_accelerate_is_lifted_past_the_vulnerable_releases() -> None:
+def test_nothing_is_lifted_now_that_no_package_pins_accelerate_or_pillow() -> None:
+    """qwen-asr pinned accelerate and transformers exactly and gradio held pillow back; with
+    qwen-asr gone the tested versions need no override (2026-10-23)."""
     from packaging.version import Version
 
-    (version,) = pins.parse(pins.OVERRIDES.read_text(encoding="utf-8"))["accelerate"]
-    assert Version(version) >= Version("1.15.0")
+    assert pins.parse(pins.OVERRIDES.read_text(encoding="utf-8")) == {}
+    tested = pins.parse(pins.FILE.read_text(encoding="utf-8"))
+    assert "qwen-asr" not in tested and "gradio" not in tested
+    (accelerate,) = tested["accelerate"]
+    (transformers,) = tested["transformers"]
+    assert Version(accelerate) >= Version("1.15.0") and Version(transformers) >= Version("5.13")
 
 
 def test_the_pins_script_writes_what_it_lifts() -> None:

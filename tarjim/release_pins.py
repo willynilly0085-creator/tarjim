@@ -52,7 +52,9 @@ def tested_versions(source: str, home: Path, name: str = CONSTRAINTS) -> Path | 
         note(home, f"{name} unavailable ({error}); installing without it")
         return None
     if not plain_pins(text):
-        note(home, f"{name} holds more than exact versions; installing without it")
+        listed = [line for line in text.splitlines() if line.strip() and not line.startswith("#")]
+        why = "holds more than exact versions" if listed else "lists nothing"
+        note(home, f"{name} {why}; installing without it")
         return None
     saved = home / name
     saved.write_text(text, encoding="utf-8")

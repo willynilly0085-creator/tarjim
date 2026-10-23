@@ -439,5 +439,8 @@
   "engineLoading": "Memuat…",
   "engineSaving": "Menyimpan…",
   "engineSaved": "Tersimpan. Terjemahan berikutnya memakainya.",
-  "engineFailed": "Gagal menyimpan. Coba lagi."
+  "engineFailed": "Gagal menyimpan. Coba lagi.",
+  "tool_accuracy_upgrading": "Sudah berfungsi. Versi baru model ini sedang diunduh di latar belakang dan akan menggantikannya sendiri.",
+  "tool_accuracy_upgrade_manual": "Sudah berfungsi. Versi baru model ini siap diunduh, dan akan menggantikannya sendiri.",
+  "tool_accuracy_upgrade_failed": "Sudah berfungsi. Versi baru belum selesai diunduh. Coba lagi: unduhan berlanjut dari titik berhentinya."
 }

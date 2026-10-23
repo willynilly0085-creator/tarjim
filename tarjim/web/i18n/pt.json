@@ -439,5 +439,8 @@
   "engineLoading": "Carregando…",
   "engineSaving": "Salvando…",
   "engineSaved": "Salvo. A próxima tradução vai usar.",
-  "engineFailed": "Não foi possível salvar. Tente de novo."
+  "engineFailed": "Não foi possível salvar. Tente de novo.",
+  "tool_accuracy_upgrading": "Já funciona. Uma versão mais nova deste modelo está sendo baixada em segundo plano e assume sozinha.",
+  "tool_accuracy_upgrade_manual": "Já funciona. Uma versão mais nova deste modelo está pronta para baixar, e assume sozinha.",
+  "tool_accuracy_upgrade_failed": "Já funciona. A versão mais nova não terminou de baixar. Tente de novo: continua de onde parou."
 }

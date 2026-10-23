@@ -47,7 +47,7 @@ The heavy parts are optional. What you need depends on which parts run on your o
 |---|---|---|---|
 | Subtitles with an AI you connect (a Gemini key, a Claude or ChatGPT subscription, any API key) | Not needed | 8 GB | about 6 GB |
 | Dubbing with natural or studio voices | Not needed | 8 GB | nothing extra |
-| Listening on this computer (the audio never leaves it) | NVIDIA, 8 GB | 16 GB | 6.3 GB more |
+| Listening on this computer (the audio never leaves it) | NVIDIA, 8 GB | 16 GB | 5.9 GB more |
 | Translating on this computer (Ollama with aya-expanse 8B) | 8 GB | 16 GB | 5.1 GB more |
 | Dubbing in each speaker's own voice | NVIDIA, 8 GB | 16 GB | 4.7 GB more |
 
@@ -61,7 +61,7 @@ The heavy parts are optional. What you need depends on which parts run on your o
 - **Everything on this computer:** about 22 GB of disk.
 
 Measured on Windows 11 with an RTX 5080 (16 GB) and 32 GB of RAM: listening on the card peaked at
-5.9 GB of graphics memory, translating with aya-expanse 8B at 5.7 GB and the speaker's own voice at
+6.8 GB of graphics memory, translating with aya-expanse 8B at 5.7 GB and the speaker's own voice at
 6.1 GB, about 3 seconds per sentence. Loading the speaker-voice model briefly takes about 11 GB of
 RAM before settling at 2.5 GB, which is why it asks for 16 GB. The engine itself (Python with the
 graphics-card build of PyTorch) takes about 4 GB of the disk figures above.
@@ -99,7 +99,7 @@ The setup page downloads the rest, and only what your choices need:
 |---|---|---|
 | The timing model | 1.2 GB | Always |
 | ffmpeg | 80 MB | Always (it reads the video and burns the subtitles) |
-| The listening model | 6.3 GB | Only if you choose listening on this computer |
+| The listening model | 5.9 GB | Only if you choose listening on this computer |
 | The speaker-voice model | 4.7 GB | Only if you dub in each speaker's own voice |
 
 With a cloud AI (a Gemini key, or a Gemini, Claude, ChatGPT or Grok subscription) only the first
@@ -224,7 +224,7 @@ versions with `uv pip install -c tarjim/constraints.txt --overrides tarjim/overr
 
 ### Known library issues
 
-A few libraries tarjim installs have published security issues that no tested version can avoid yet: transformers stays at 4.57.6 because qwen-asr, the local listening engine, requires exactly that version. None of them is reached by the way tarjim uses the library, and every model loads from a fixed version tarjim has checked. **Settings** shows the ones that still apply on your computer; when an update installs a fixed version, that notice goes away by itself. [SECURITY.md](SECURITY.md#known-library-issues) lists each one, what it is and what tarjim does about it.
+None right now: no library tarjim installs has a published security issue that its tested versions cannot avoid. The six transformers issues listed until 2026-10-23 are fixed, since local listening now uses Transformers' own Qwen3-ASR models. If one appears, **Settings** shows it on the computers it applies to, and the notice goes away by itself when an update installs a fixed version. [SECURITY.md](SECURITY.md#known-library-issues) has the details.
 
 ## Privacy and security
 

@@ -19,7 +19,8 @@ def loaded_repos() -> set[str]:
     from tarjim.dub import clone, separate
 
     hub = {repo for tool in tools.TOOLS if tool.kind in ("hub", "voice") for repo in tool.sources}
-    return {qwen.ASR_MODEL, qwen.ALIGNER_MODEL, ctc.Emitter.MODEL, clone.REPO, separate.REPO, *hub}
+    listening = {qwen.ASR_MODEL, qwen.ALIGNER_MODEL, qwen.EARLIER_ASR, qwen.EARLIER_ALIGNER}
+    return {*listening, ctc.Emitter.MODEL, clone.REPO, separate.REPO, *hub}
 
 
 def test_every_model_tarjim_loads_is_pinned_to_a_commit() -> None:
@@ -48,14 +49,22 @@ def test_the_pinned_folder_is_looked_up_on_this_computer_only(
         tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     asked = hub(monkeypatch, tmp_path)
     assert model_pins.folder("openbmb/VoxCPM2") == tmp_path and tools.hub_ready("openbmb/VoxCPM2")
+    pin = model_pins.PINS["openbmb/VoxCPM2"]
     assert asked == [{"repo": "openbmb/VoxCPM2", "local_files_only": True,
-                      "revision": model_pins.PINS["openbmb/VoxCPM2"].revision}] * 2
+                      "revision": pin.revision, "allow_patterns": list(pin.files)}] * 2
 
 
 def test_a_download_takes_the_pinned_commit_and_only_its_named_files(
         tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import tarjim.hub_fetch
+
     asked = hub(monkeypatch, tmp_path)
+    fetched: list[tuple[str, ...]] = []
+    monkeypatch.setattr(tarjim.hub_fetch, "fetch", lambda *pinned: fetched.append(pinned))
     tools.download(tools.BY_ID["accuracy"])
+    assert fetched == [(repo, model_pins.PINS[repo].revision, name, sha)
+                       for repo in tools.BY_ID["accuracy"].sources
+                       for name, sha in model_pins.PINS[repo].sha256]
     for repo, options in zip(tools.BY_ID["accuracy"].sources, asked, strict=True):
         pin = model_pins.PINS[repo]
         assert options == {"repo": repo, "revision": pin.revision,
@@ -68,23 +77,25 @@ def folders(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     return tmp_path
 
 
-def test_listening_loads_both_models_from_their_pinned_folders(
+def test_listening_loads_both_native_models_from_their_pinned_folders(
         folders: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    import qwen_asr
+    import transformers
 
-    from tarjim.asr import qwen
+    from tarjim.asr import qwen_load
 
-    seen: dict[str, Any] = {}
-
-    def from_pretrained(path: str, **options: Any) -> Any:
-        seen.update(path=path, **options)
-        return types.SimpleNamespace(processor=None, forced_aligner=None)
-
-    monkeypatch.setattr(qwen_asr.Qwen3ASRModel, "from_pretrained", from_pretrained)
-    qwen.QwenEngine("cpu")
-    assert seen["path"] == str(folders / "Qwen--Qwen3-ASR-1.7B")
-    assert seen["forced_aligner"] == str(folders / "Qwen--Qwen3-ForcedAligner-0.6B")
-    assert seen["use_safetensors"] and seen["forced_aligner_kwargs"]["use_safetensors"]
+    seen: list[tuple[Any, dict[str, Any]]] = []
+    model = types.SimpleNamespace(eval=lambda: "model")
+    for name in ("Qwen3ASRForConditionalGeneration", "Qwen3ASRForTokenClassification"):
+        monkeypatch.setattr(getattr(transformers, name), "from_pretrained",
+                            lambda where, **options: seen.append((where, options)) or model)
+    monkeypatch.setattr(transformers.AutoProcessor, "from_pretrained", lambda where: where)
+    monkeypatch.setattr(model_pins, "ready", lambda repo: repo.endswith("-hf"))
+    asr, aligner = qwen_load.load_pair("cpu")
+    assert [where for where, _ in seen] == [folders / "Qwen--Qwen3-ASR-1.7B-hf",
+                                            folders / "Qwen--Qwen3-ForcedAligner-0.6B-hf"]
+    assert all(options["use_safetensors"] and options["device_map"] == "cpu"
+               for _, options in seen)
+    assert (asr.processor, aligner.processor) == (seen[0][0], seen[1][0])
 
 
 def test_word_timing_loads_safetensors_from_its_pinned_folder(

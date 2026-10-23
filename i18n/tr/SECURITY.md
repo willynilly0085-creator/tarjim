@@ -34,15 +34,8 @@ Bildirimler en kısa sürede okunur ve yanıtlanır.
 
 ## Kitaplıklardaki bilinen sorunlar
 
-tarjim'in kurduğu kitaplıklarda yayımlanmış ve test edilmiş hiçbir sürümün henüz önleyemediği güvenlik açıkları: qwen-asr (yerel dinleme motoru) tam olarak transformers 4.57.6 istiyor ve herhangi bir 5 sürümüyle çalışmıyor. tarjim'in kitaplığı kullanma biçimi bunların hiçbirine ulaşmıyor: Hugging Face'teki her model, tarjim'in kontrol ettiği sabit bir sürümden yalnızca ayar ve ağırlık dosyalarıyla (asla kod değil) indirilir ve bilgisayardaki klasöründen çevrimdışı yüklenir. Ayarlar bilgisayarınızda geçerli olanları gösterir; bir güncelleme düzeltilmiş sürümü kurduğunda her biri kendiliğinden kaybolur.
+tarjim'in kurduğu kitaplıklarda yayımlanmış ve hiçbir test edilmiş sürümün henüz önleyemediği açıklar: şu an yok. Biri çıkarsa bilgileri tarjim ile birlikte `tarjim/known_issues.json` içinde gelir: **Ayarlar**, motorun `/update` yanıtı ve sohbet araçlarının `setup_status` çıktısı onu kurulu sürümü etkilenen bilgisayarlarda gösterir; bir güncelleme düzeltilmiş sürümü kurduğunda kendiliğinden kaybolur. CI burada listelenmeyen her açıkta başarısız olur ve haftalık bir kontrol listedeki biri düzeltilebildiğinde haber verir.
 
-| Uyarı | Kitaplık | Etkilenen sürümler | Düzeltildiği sürüm |
-|---|---|---|---|
-| PYSEC-2025-217 | transformers | `<=5.0.0rc0` | 5.0.0 |
-| PYSEC-2026-2288 | transformers | `<5.0.0` | 5.0.0 |
-| PYSEC-2026-2289 | transformers | `<5.3.0` | 5.3.0 |
-| PYSEC-2026-2290 | transformers | `<5.5.0` | 5.5.0 |
-| PYSEC-2026-3929 | transformers | `<5.10.0` | 5.10.0 |
-| PYSEC-2026-4174 | transformers | `>=4.49.0,<=5.8.1` | 5.9.0 |
+**2026-10-23'te kapandı.** O zamanki yerel dinleme motoru qwen-asr, transformers'ı 4.57.6'da tuttuğu sürece altı transformers uyarısı (PYSEC-2025-217, PYSEC-2026-2288, PYSEC-2026-2289, PYSEC-2026-2290, PYSEC-2026-3929, PYSEC-2026-4174) açık kaldı. Yerel dinleme artık Transformers'ın kendi Qwen3-ASR modelleriyle çalışıyor; bu yüzden tarjim transformers 5.20.2'yi kuruyor ve qwen-asr'ı artık kurmuyor. accelerate hiçbir istisna olmadan 1.15.0'da kalıyor (PYSEC-2026-3804 kapandı).
 
-Ayrıntılar (İngilizce): [SECURITY.md](../../SECURITY.md#known-library-issues).
+**tarjim'in her durumda yaptığı.** Her Hugging Face modeli sabit bir commit'ten (`tarjim/model_pins.py`) indirilir; yalnızca ayarları, tokenizer'ı, sohbet şablonu ve safetensors dosyaları, asla kod değil. Büyük dosyaları yayımlanan SHA-256 ile eşleşmek zorundadır ve model, hub çevrimdışıyken bilgisayardaki o klasörden yüklenir. `trust_remote_code` hiç açılmaz ve `kernels` paketi kurulu değildir. Ses ayırma ağırlıkları yalnızca demucs'un kendi model sınıfını adlandırırsa, hareke modeli de yalnızca iki dosyası sürümünün SHA-256'sı ile eşleşirse yüklenir.

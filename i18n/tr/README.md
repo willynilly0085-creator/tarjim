@@ -51,7 +51,7 @@ Ağır işler isteğe bağlıdır. Neye ihtiyacınız olduğu, hangi parçaları
 |---|---|---|---|
 | Bağladığınız bir yapay zekâyla altyazı (bir Gemini anahtarı, bir Claude veya ChatGPT aboneliği, herhangi bir API anahtarı) | Gerekmez | 8 GB | yaklaşık 6 GB |
 | Doğal veya stüdyo seslerle seslendirme | Gerekmez | 8 GB | ek alan gerekmez |
-| Bu bilgisayarda dinleme (ses bilgisayardan asla çıkmaz) | NVIDIA, 8 GB | 16 GB | 6.3 GB daha |
+| Bu bilgisayarda dinleme (ses bilgisayardan asla çıkmaz) | NVIDIA, 8 GB | 16 GB | 5.9 GB daha |
 | Bu bilgisayarda çeviri (Ollama ile aya-expanse 8B) | 8 GB | 16 GB | 5.1 GB daha |
 | Her konuşmacının kendi sesiyle seslendirme | NVIDIA, 8 GB | 16 GB | 4.7 GB daha |
 
@@ -66,7 +66,7 @@ Ağır işler isteğe bağlıdır. Neye ihtiyacınız olduğu, hangi parçaları
   olması gerekir.
 - **Her şey bu bilgisayarda:** yaklaşık 22 GB disk.
 
-Windows 11 üzerinde, RTX 5080 (16 GB) ve 32 GB RAM ile ölçüldü: kartta dinleme en fazla 5.9 GB ekran
+Windows 11 üzerinde, RTX 5080 (16 GB) ve 32 GB RAM ile ölçüldü: kartta dinleme en fazla 6.8 GB ekran
 belleği kullandı, aya-expanse 8B ile çeviri 5.7 GB, konuşmacının kendi sesi ise 6.1 GB; cümle başına
 yaklaşık 3 saniye sürdü. Konuşmacı sesi modelini yüklemek, 2.5 GB düzeyine inmeden önce kısa
 süreliğine yaklaşık 11 GB RAM kullanır; 16 GB istenmesinin nedeni budur. Motorun kendisi (Python ile
@@ -107,7 +107,7 @@ Kurulum sayfası gerisini indirir, yalnızca seçimlerinizin gerektirdiklerini:
 |---|---|---|
 | Zamanlama modeli | 1.2 GB | Her zaman |
 | ffmpeg | 80 MB | Her zaman (videoyu okur ve altyazıları gömer) |
-| Dinleme modeli | 6.3 GB | Yalnızca bu bilgisayarda dinlemeyi seçerseniz |
+| Dinleme modeli | 5.9 GB | Yalnızca bu bilgisayarda dinlemeyi seçerseniz |
 | Konuşmacı sesi modeli | 4.7 GB | Yalnızca her konuşmacıyı kendi sesiyle seslendirirseniz |
 
 Bulut yapay zekâsıyla (bir Gemini anahtarı ya da Gemini, Claude, ChatGPT veya Grok aboneliği)
@@ -237,7 +237,7 @@ güncellenir.
 
 ### Kitaplıklardaki bilinen sorunlar
 
-tarjim'in kurduğu birkaç kitaplık için, test edilmiş hiçbir sürümün henüz önleyemediği güvenlik açıkları yayımlandı: transformers 4.57.6'da kalıyor, çünkü yerel dinleme motoru qwen-asr tam olarak bu sürümü istiyor. tarjim'in kitaplığı kullanma biçimi bunların hiçbirine ulaşmıyor ve her model, tarjim'in kontrol ettiği sabit bir sürümden yükleniyor. **Ayarlar**, bilgisayarınızda hâlâ geçerli olanları gösterir; bir güncelleme düzeltilmiş sürümü kurduğunda bu uyarı kendiliğinden kaybolur. [SECURITY.md](SECURITY.md) her birini, ne olduğunu ve tarjim'in ne yaptığını listeler.
+Şu an yok: tarjim'in kurduğu hiçbir kitaplıkta test edilmiş sürümlerinin önleyemediği yayımlanmış bir güvenlik sorunu yok. 2026-10-23'e kadar listelenen altı transformers sorunu giderildi, çünkü yerel dinleme artık Transformers'ın kendi Qwen3-ASR modellerini kullanıyor. Biri çıkarsa **Ayarlar** onu etkilenen bilgisayarlarda gösterir ve bir güncelleme düzeltilmiş sürümü kurduğunda uyarı kendiliğinden kaybolur. Ayrıntılar [SECURITY.md](SECURITY.md) içinde.
 
 ## Gizlilik ve güvenlik
 

@@ -49,7 +49,7 @@ komputer Anda sendiri:
 |---|---|---|---|
 | Subtitle dengan AI yang Anda hubungkan (kunci Gemini, langganan Claude atau ChatGPT, kunci API apa pun) | Tidak perlu | 8 GB | sekitar 6 GB |
 | Sulih suara dengan suara alami atau suara studio | Tidak perlu | 8 GB | tidak ada tambahan |
-| Mendengarkan di komputer ini (audio tidak pernah keluar dari komputer) | NVIDIA, 8 GB | 16 GB | 6.3 GB tambahan |
+| Mendengarkan di komputer ini (audio tidak pernah keluar dari komputer) | NVIDIA, 8 GB | 16 GB | 5.9 GB tambahan |
 | Menerjemahkan di komputer ini (Ollama dengan aya-expanse 8B) | 8 GB | 16 GB | 5.1 GB tambahan |
 | Sulih suara dengan suara asli tiap pembicara | NVIDIA, 8 GB | 16 GB | 4.7 GB tambahan |
 
@@ -65,7 +65,7 @@ komputer Anda sendiri:
 - **Semuanya di komputer ini:** sekitar 22 GB disk.
 
 Diukur di Windows 11 dengan RTX 5080 (16 GB) dan RAM 32 GB: mendengarkan di kartu mencapai puncak
-5.9 GB memori grafis, menerjemahkan dengan aya-expanse 8B 5.7 GB, dan suara asli pembicara 6.1 GB,
+6.8 GB memori grafis, menerjemahkan dengan aya-expanse 8B 5.7 GB, dan suara asli pembicara 6.1 GB,
 sekitar 3 detik per kalimat. Memuat model suara pembicara sesaat memakai sekitar 11 GB RAM sebelum
 turun ke 2.5 GB, itulah sebabnya diminta 16 GB. Mesinnya sendiri (Python dengan PyTorch versi kartu
 grafis) memakai sekitar 4 GB dari angka disk di atas.
@@ -106,7 +106,7 @@ Halaman penyiapan mengunduh sisanya, dan hanya yang dibutuhkan pilihan Anda:
 |---|---|---|
 | Model waktu | 1.2 GB | Selalu |
 | ffmpeg | 80 MB | Selalu (membaca video dan menanamkan subtitle) |
-| Model mendengarkan | 6.3 GB | Hanya jika Anda memilih mendengarkan di komputer ini |
+| Model mendengarkan | 5.9 GB | Hanya jika Anda memilih mendengarkan di komputer ini |
 | Model suara pembicara | 4.7 GB | Hanya jika Anda melakukan sulih suara dengan suara asli tiap pembicara |
 
 Dengan AI cloud (kunci Gemini, atau langganan Gemini, Claude, ChatGPT atau Grok) hanya dua yang
@@ -233,7 +233,7 @@ sumber mendapat versi yang diuji dengan `uv pip install -c tarjim/constraints.tx
 
 ### Masalah yang diketahui di pustaka
 
-Beberapa pustaka yang dipasang tarjim punya celah keamanan yang sudah diumumkan dan belum bisa dihindari versi uji mana pun: transformers tetap di 4.57.6 karena qwen-asr, mesin pendengar lokal, meminta tepat versi itu. Cara tarjim memakai pustaka itu tidak menyentuh satu pun di antaranya, dan setiap model dimuat dari versi tetap yang sudah diperiksa tarjim. **Pengaturan** menampilkan yang masih berlaku di komputer Anda; begitu pembaruan memasang versi yang sudah diperbaiki, pemberitahuan itu hilang dengan sendirinya. [SECURITY.md](SECURITY.md) mencantumkan masing-masing, apa itu, dan apa yang dilakukan tarjim.
+Saat ini tidak ada: tidak ada pustaka yang dipasang tarjim yang punya masalah keamanan terpublikasi yang tidak bisa dihindari versi terujinya. Enam masalah transformers yang tercantum sampai 2026-10-23 sudah diperbaiki, karena pendengaran lokal kini memakai model Qwen3-ASR milik Transformers sendiri. Jika muncul, **Pengaturan** menampilkannya di komputer yang terdampak, dan pemberitahuannya hilang sendiri saat pembaruan memasang versi yang sudah diperbaiki. Detailnya ada di [SECURITY.md](SECURITY.md).
 
 ## Privasi dan keamanan
 

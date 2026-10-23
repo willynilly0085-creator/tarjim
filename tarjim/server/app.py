@@ -24,7 +24,7 @@ from tarjim.server.pages import PageRoutes
 from tarjim.server.pairing import Pairing
 from tarjim.server.routes import GET_ROUTES, POST_ROUTES, KeyRoutes, Query, Routes, is_open
 from tarjim.server.setup_routes import SetupRoutes
-from tarjim.tools import Shelf
+from tarjim.tools import shelf
 
 PORT = 17653
 MAX_UPLOAD = 8 * 1024**3
@@ -195,5 +195,5 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes):
 
 def serve(board: Board, token: str, uploads: Path, port: int = PORT) -> None:
     Handler.board, Handler.token, Handler.uploads = board, token, uploads
-    Handler.shelf, Handler.pairing = Shelf(), Pairing()
+    Handler.shelf, Handler.pairing = shelf(), Pairing()
     ThreadingHTTPServer(("127.0.0.1", port), Handler).serve_forever()

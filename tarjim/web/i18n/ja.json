@@ -439,5 +439,8 @@
   "engineLoading": "読み込み中…",
   "engineSaving": "保存中…",
   "engineSaved": "保存しました。次の翻訳から使います。",
-  "engineFailed": "保存できませんでした。もう一度お試しください。"
+  "engineFailed": "保存できませんでした。もう一度お試しください。",
+  "tool_accuracy_upgrading": "今も使えます。このモデルの新しい版をバックグラウンドでダウンロード中で、終わると自動で切り替わります。",
+  "tool_accuracy_upgrade_manual": "今も使えます。このモデルの新しい版をダウンロードできます。終わると自動で切り替わります。",
+  "tool_accuracy_upgrade_failed": "今も使えます。新しい版のダウンロードが完了しませんでした。もう一度お試しください。止まったところから続きます。"
 }

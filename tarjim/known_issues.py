@@ -36,8 +36,9 @@ def affected(entry: dict[str, Any], version: str) -> bool:
         return True
 
 
-def current(installed: Callable[[str], str] = pins.installed) -> list[dict[str, Any]]:
+def current(installed: Callable[[str], str] | None = None) -> list[dict[str, Any]]:
     """The entries that apply here, each with the version installed."""
+    installed = installed or pins.installed  # looked up now, so a test can stand in for it
     shown = []
     for entry in entries():
         version = installed(str(entry.get("package", "")))

@@ -38,12 +38,22 @@ function consentBox(tool, button) {
   return label;
 }
 
+// While the earlier listening models still work, their newer version downloads (or is offered).
+const UPGRADE_HINT = { downloading: "upgrading", waiting: "upgrading", manual: "upgrade_manual", failed: "upgrade_failed" };
+
+function toolHint(tool) {
+  if (tool.upgrade) return t(`tool_${tool.id}_${UPGRADE_HINT[tool.upgrade]}`);
+  if (tool.state === "failed") return t("failed");
+  return t(`tool_${tool.id}_${tool.manual && !tool.installed ? "manual" : "hint"}`);
+}
+
 function toolAction(tool, refresh) {
   if (tool.manual && !tool.installed) return "";
-  if (tool.installed) return Object.assign(document.createElement("span"), { className: "ready", textContent: t("installed") });
+  const offered = tool.upgrade === "manual" || tool.upgrade === "failed";
+  if (tool.installed && !offered) return Object.assign(document.createElement("span"), { className: "ready", textContent: t("installed") });
   if (tool.state === "downloading") return Object.assign(document.createElement("span"), { className: "meta", textContent: t("downloading") });
   const button = Object.assign(document.createElement("button"), {
-    type: "button", className: tool.required ? "primary small" : "button-quiet",
+    type: "button", className: tool.required && !tool.installed ? "primary small" : "button-quiet",
     textContent: t(tool.state === "failed" ? "retry" : "download"),
   });
   button.addEventListener("click", () => post(`/tools/${tool.id}`, { accept_license: tool.consent }).finally(refresh));
@@ -67,8 +77,7 @@ export async function renderTools(state, refresh = () => renderTools(state)) {
   $("tool-list").replaceChildren(...state.tools.map((tool) => {
     const row = $("tool-row").content.firstElementChild.cloneNode(true);
     row.querySelector(".tool-name").textContent = `${t(`tool_${tool.id}`)} · ${t(tool.required ? "required" : "optional")}`;
-    row.querySelector(".tool-hint").textContent = tool.state === "failed" ? t("failed")
-      : t(`tool_${tool.id}_${tool.manual && !tool.installed ? "manual" : "hint"}`);
+    row.querySelector(".tool-hint").textContent = toolHint(tool);
     row.querySelector(".tool-hint").after(licenseLine(tool));
     row.querySelector(".tool-size").textContent = t("sizeGb", { n: tool.size_gb });
     row.querySelector(".tool-action").replaceChildren(toolAction(tool, refresh));

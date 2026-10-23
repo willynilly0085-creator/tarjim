@@ -439,5 +439,8 @@
   "engineLoading": "Wird geladen…",
   "engineSaving": "Wird gespeichert…",
   "engineSaved": "Gespeichert. Die nächste Übersetzung nutzt ihn.",
-  "engineFailed": "Speichern hat nicht geklappt. Versuch es noch einmal."
+  "engineFailed": "Speichern hat nicht geklappt. Versuch es noch einmal.",
+  "tool_accuracy_upgrading": "Funktioniert jetzt. Eine neuere Version dieses Modells lädt im Hintergrund und übernimmt von selbst.",
+  "tool_accuracy_upgrade_manual": "Funktioniert jetzt. Eine neuere Version dieses Modells ist zum Herunterladen bereit und übernimmt von selbst.",
+  "tool_accuracy_upgrade_failed": "Funktioniert jetzt. Die neuere Version wurde nicht fertig geladen. Versuch es noch einmal: Es geht dort weiter, wo es aufgehört hat."
 }

@@ -34,15 +34,8 @@ o mais rápido possível.
 
 ## Problemas conhecidos nas bibliotecas
 
-Vulnerabilidades publicadas em bibliotecas que o tarjim instala e que nenhuma versão testada consegue evitar ainda, porque o qwen-asr (o motor de escuta local) exige exatamente o transformers 4.57.6 e deixa de funcionar com qualquer versão 5. A forma como o tarjim usa a biblioteca não chega a nenhuma delas: cada modelo do Hugging Face é baixado de uma versão fixa que o tarjim verificou, só com os arquivos de configuração e pesos (nunca código), e carregado da sua pasta no computador, sem conexão. As configurações mostram as que se aplicam ao seu computador, e cada uma desaparece sozinha quando uma atualização instala uma versão corrigida.
+Vulnerabilidades publicadas em bibliotecas que o tarjim instala e que nenhuma versão testada consegue evitar ainda: nenhuma no momento. Se surgir alguma, seus dados vêm com o tarjim em `tarjim/known_issues.json`: **Configurações**, a resposta `/update` do motor e o `setup_status` das ferramentas de chat a mostram nos computadores cuja versão instalada é afetada, e ela some sozinha quando uma atualização instala uma versão corrigida. O CI falha com qualquer vulnerabilidade que não esteja aqui, e uma verificação semanal avisa quando uma da lista pode ser corrigida.
 
-| Aviso | Biblioteca | Versões afetadas | Corrigido em |
-|---|---|---|---|
-| PYSEC-2025-217 | transformers | `<=5.0.0rc0` | 5.0.0 |
-| PYSEC-2026-2288 | transformers | `<5.0.0` | 5.0.0 |
-| PYSEC-2026-2289 | transformers | `<5.3.0` | 5.3.0 |
-| PYSEC-2026-2290 | transformers | `<5.5.0` | 5.5.0 |
-| PYSEC-2026-3929 | transformers | `<5.10.0` | 5.10.0 |
-| PYSEC-2026-4174 | transformers | `>=4.49.0,<=5.8.1` | 5.9.0 |
+**Fechadas em 2026-10-23.** Seis avisos do transformers (PYSEC-2025-217, PYSEC-2026-2288, PYSEC-2026-2289, PYSEC-2026-2290, PYSEC-2026-3929, PYSEC-2026-4174) ficaram abertos enquanto o qwen-asr, o mecanismo de escuta local da época, prendia o transformers na 4.57.6. A escuta local agora usa os modelos Qwen3-ASR do próprio Transformers, então o tarjim instala o transformers 5.20.2 e não instala mais o qwen-asr; o accelerate continua na 1.15.0 (PYSEC-2026-3804 fechada) sem nenhuma exceção.
 
-Detalhes (em inglês): [SECURITY.md](../../SECURITY.md#known-library-issues).
+**O que o tarjim faz em qualquer caso.** Cada modelo do Hugging Face é baixado de um commit fixo (`tarjim/model_pins.py`), só suas configurações, tokenizador, modelo de chat e arquivos safetensors, nunca código; seus arquivos grandes precisam bater com o SHA-256 publicado, e ele é carregado dessa pasta no computador com o hub offline. `trust_remote_code` nunca é ativado, e o pacote `kernels` não é instalado. Os pesos de separação de voz só carregam se nomearem a classe de modelo do próprio demucs, e o modelo de diacríticos só se os dois arquivos baterem com o SHA-256 da sua versão.

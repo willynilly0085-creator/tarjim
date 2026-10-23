@@ -20,10 +20,9 @@ HEADER = ("# Tested versions of tarjim's libraries, written by scripts/pins.py; 
 LIFTED_HEADER = (
     "# Libraries whose exact pin in another package is replaced, written by scripts/pins.py; do\n"
     "# not edit. Each closes a known vulnerability and was tested with this release.\n")
-# qwen-asr 0.0.6 requires accelerate==1.12.0 exactly; 1.15.0 closes PYSEC-2026-3804 and hears
-# the same words at the same times (docs/decisions.md, 2026-10-15). transformers cannot be lifted
-# the same way: every 5.x release stops qwen-asr 0.0.6 from loading.
-LIFTED = {"accelerate": ">=1.15.0", "pillow": ">=13.0.0"}
+# Nothing is lifted now: qwen-asr, which pinned transformers and accelerate exactly and brought
+# gradio (which held pillow back), was replaced by Transformers' own Qwen3-ASR (2026-10-23).
+LIFTED: dict[str, str] = {}
 # Only for working out the pins: people get the newest PyTorch for their card, so the libraries
 # around it are pinned as they resolve beside a current one (Intel Macs stop at PyTorch 2.2).
 TORCH_AS_INSTALLED = "torch>=2.6 ; platform_machine != 'x86_64' or sys_platform != 'darwin'\n"

@@ -3,8 +3,7 @@
 Run by the owner's scheduled task (see scripts/windows/library-report.cmd); nothing here runs for
 people who use tarjim. It reads only public release data and the versions installed here:
 known vulnerabilities in the tested Python libraries, how many of them have newer releases,
-yt-dlp, Node.js, ffmpeg, Python 3.11, the subscription programs, the listening library that
-holds transformers back, and the last GitHub check.
+yt-dlp, Node.js, ffmpeg, Python 3.11, the subscription programs, and the last GitHub check.
     python -P scripts/library_report.py            send it
     python -P scripts/library_report.py --print    show it here instead
 """
@@ -109,13 +108,6 @@ def programs() -> list[str]:
     return lines
 
 
-def listening() -> str:
-    """qwen-asr pins transformers; a release that lets it move closes the six open advisories."""
-    latest = pypi("qwen-asr")
-    return f"مكتبة السمع qwen-asr: {latest}" + (" (نسخة جديدة، شيّك هل تسمح بتحديث transformers)"
-                                              if latest and latest != "0.0.6" else " (بدون جديد)")
-
-
 def checks() -> str:
     out = run("gh", "run", "list", "--repo", "willynilly0085-creator/tarjim", "--branch", "master",
               "--workflow", "ci", "--limit", "1", "--json", "conclusion")
@@ -137,8 +129,7 @@ def compose() -> str:
     body = [*section("ثغرات جديدة تحتاج تحديث", new_risks),
             *section("مكتبات لها نسخة أحدث (تنحدث مع الإصدار الجاي بعد الاختبار)", behind),
             *section("برامج الاشتراكات", apps)]
-    status = [node(), ffmpeg(), python(), listening(), checks(),
-              "ثغرات transformers الست المعلنة: للحين مفتوحة"]
+    status = [node(), ffmpeg(), python(), checks()]
     return "\n".join([*head, *verdict, *body, *status])
 
 

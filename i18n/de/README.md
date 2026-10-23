@@ -54,7 +54,7 @@ eigenen Computer laufen:
 |---|---|---|---|
 | Untertitel mit einer KI, die Sie anbinden (ein Gemini-Schlüssel, ein Claude- oder ChatGPT-Abonnement, jeder API-Schlüssel) | Nicht nötig | 8 GB | etwa 6 GB |
 | Synchronisation mit natürlichen oder Studiostimmen | Nicht nötig | 8 GB | nichts zusätzlich |
-| Zuhören auf diesem Computer (der Ton verlässt ihn nie) | NVIDIA, 8 GB | 16 GB | 6.3 GB mehr |
+| Zuhören auf diesem Computer (der Ton verlässt ihn nie) | NVIDIA, 8 GB | 16 GB | 5.9 GB mehr |
 | Übersetzen auf diesem Computer (Ollama mit aya-expanse 8B) | 8 GB | 16 GB | 5.1 GB mehr |
 | Synchronisation mit der eigenen Stimme jedes Sprechers | NVIDIA, 8 GB | 16 GB | 4.7 GB mehr |
 
@@ -69,7 +69,7 @@ eigenen Computer laufen:
 - **Alles auf diesem Computer:** etwa 22 GB Speicherplatz.
 
 Gemessen unter Windows 11 mit einer RTX 5080 (16 GB) und 32 GB RAM: Das Zuhören auf der Karte
-erreichte höchstens 5.9 GB Grafikspeicher, das Übersetzen mit aya-expanse 8B 5.7 GB und die eigene
+erreichte höchstens 6.8 GB Grafikspeicher, das Übersetzen mit aya-expanse 8B 5.7 GB und die eigene
 Stimme des Sprechers 6.1 GB, bei etwa 3 Sekunden pro Satz. Beim Laden des Modells für die
 Sprecherstimme werden kurzzeitig etwa 11 GB RAM belegt, bevor es sich bei 2.5 GB einpendelt; deshalb
 werden 16 GB verlangt. Die Engine selbst (Python mit der Grafikkarten-Variante von PyTorch) belegt
@@ -112,7 +112,7 @@ Die Einrichtungsseite lädt den Rest herunter, und zwar nur, was Ihre Auswahl br
 |---|---|---|
 | Das Timing-Modell | 1.2 GB | Immer |
 | ffmpeg | 80 MB | Immer (es liest das Video und brennt die Untertitel ein) |
-| Das Modell fürs Zuhören | 6.3 GB | Nur, wenn Sie das Zuhören auf diesem Computer wählen |
+| Das Modell fürs Zuhören | 5.9 GB | Nur, wenn Sie das Zuhören auf diesem Computer wählen |
 | Das Modell für die Sprecherstimme | 4.7 GB | Nur, wenn Sie mit der eigenen Stimme jedes Sprechers synchronisieren |
 
 Mit einer Cloud-KI (ein Gemini-Schlüssel oder ein Gemini-, Claude-, ChatGPT- oder Grok-Abonnement)
@@ -250,7 +250,7 @@ Quellcode erhält die getesteten Versionen mit `uv pip install -c tarjim/constra
 
 ### Bekannte Probleme in Bibliotheken
 
-Für einige Bibliotheken, die tarjim installiert, wurden Sicherheitslücken veröffentlicht, die noch keine getestete Version vermeiden kann: transformers bleibt auf 4.57.6, weil qwen-asr, die lokale Hör-Engine, genau diese Version verlangt. Die Art, wie tarjim die Bibliothek nutzt, erreicht keine davon, und jedes Modell wird aus einer festen, von tarjim geprüften Version geladen. **Einstellungen** zeigt die, die auf deinem Computer noch zutreffen; installiert ein Update eine behobene Version, verschwindet der Hinweis von selbst. [SECURITY.md](SECURITY.md) listet jede einzeln auf, was sie ist und was tarjim dagegen tut.
+Derzeit keine: Keine Bibliothek, die tarjim installiert, hat eine veröffentlichte Sicherheitslücke, die ihre getesteten Versionen nicht vermeiden. Die sechs transformers-Probleme, die bis 2026-10-23 aufgeführt waren, sind behoben, denn das lokale Hören nutzt jetzt die eigenen Qwen3-ASR-Modelle von Transformers. Taucht eines auf, zeigt **Einstellungen** es auf den betroffenen Computern, und der Hinweis verschwindet von selbst, sobald ein Update eine behobene Version installiert. Details stehen in [SECURITY.md](SECURITY.md).
 
 ## Datenschutz und Sicherheit
 

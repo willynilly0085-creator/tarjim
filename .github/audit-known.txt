@@ -3,15 +3,6 @@
 # what each one is and what tarjim does about it (people see the ones that apply in Settings);
 # a test keeps the two lists equal. The weekly libraries workflow flags a line that can go.
 #
-# qwen-asr 0.0.6 (the listening engine) requires transformers==4.57.6 exactly, and every
-# transformers 5.x release stops it from loading (checked 2026-10-15). accelerate, also pinned
-# exactly by qwen-asr, is lifted to 1.15.0 by tarjim/overrides.txt, which closed PYSEC-2026-3804.
-# These concern loading untrusted checkpoints or model repositories, training state, or saving to
-# paths a stranger names; tarjim loads only its own models, each at a fixed commit, from a folder
-# on the computer. Reviewed 2026-10-15.
-PYSEC-2025-217 transformers 4.57.6, X-CLIP checkpoint conversion; fixed in 5.0.0
-PYSEC-2026-2288 transformers 4.57.6, Trainer state loading; fixed in 5.0.0
-PYSEC-2026-2289 transformers 4.57.6, crafted config.json in a model repository; fixed in 5.3.0
-PYSEC-2026-2290 transformers 4.57.6, LightGlue remote code; fixed in 5.5.0
-PYSEC-2026-3929 transformers 4.57.6, save_pretrained path traversal; fixed in 5.10.0
-PYSEC-2026-4174 transformers 4.57.6, load_custom_generate writes remote files; fixed in 5.9.0
+# None at the moment. The six transformers advisories accepted from 2026-10-15 (qwen-asr held
+# transformers at 4.57.6) closed on 2026-10-23, when local listening moved to Transformers' own
+# Qwen3-ASR classes and transformers to 5.20.2; pip-audit of the tested versions finds nothing.

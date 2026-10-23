@@ -51,7 +51,7 @@ próprio computador:
 |---|---|---|---|
 | Legendas com uma IA que você conecta (uma chave do Gemini, uma assinatura do Claude ou do ChatGPT, qualquer chave de API) | Não é necessária | 8 GB | cerca de 6 GB |
 | Dublagem com vozes naturais ou de estúdio | Não é necessária | 8 GB | nada extra |
-| Escuta neste computador (o áudio nunca sai dele) | NVIDIA, 8 GB | 16 GB | 6.3 GB a mais |
+| Escuta neste computador (o áudio nunca sai dele) | NVIDIA, 8 GB | 16 GB | 5.9 GB a mais |
 | Tradução neste computador (Ollama com aya-expanse 8B) | 8 GB | 16 GB | 5.1 GB a mais |
 | Dublagem com a voz própria de cada locutor | NVIDIA, 8 GB | 16 GB | 4.7 GB a mais |
 
@@ -66,7 +66,7 @@ próprio computador:
 - **Tudo neste computador:** cerca de 22 GB de disco.
 
 Medido no Windows 11 com uma RTX 5080 (16 GB) e 32 GB de RAM: a escuta na placa chegou ao pico de
-5.9 GB de memória de vídeo, a tradução com aya-expanse 8B a 5.7 GB e a voz própria do locutor a 6.1
+6.8 GB de memória de vídeo, a tradução com aya-expanse 8B a 5.7 GB e a voz própria do locutor a 6.1
 GB, com cerca de 3 segundos por frase. Carregar o modelo da voz do locutor ocupa por pouco tempo
 cerca de 11 GB de RAM antes de se estabilizar em 2.5 GB, e é por isso que ele pede 16 GB. O motor em
 si (Python com a versão do PyTorch para placa de vídeo) ocupa cerca de 4 GB dos valores de disco
@@ -107,7 +107,7 @@ A página de configuração baixa o resto, e só o que as suas escolhas exigem:
 |---|---|---|
 | O modelo de sincronização | 1.2 GB | Sempre |
 | ffmpeg | 80 MB | Sempre (ele lê o vídeo e grava as legendas) |
-| O modelo de escuta | 6.3 GB | Só se você escolher a escuta neste computador |
+| O modelo de escuta | 5.9 GB | Só se você escolher a escuta neste computador |
 | O modelo da voz do locutor | 4.7 GB | Só se você dublar com a voz própria de cada locutor |
 
 Com uma IA na nuvem (uma chave do Gemini, ou uma assinatura do Gemini, Claude, ChatGPT ou Grok), só
@@ -239,7 +239,7 @@ partir do código-fonte recebe as versões testadas com `uv pip install -c tarji
 
 ### Problemas conhecidos nas bibliotecas
 
-Algumas bibliotecas que o tarjim instala têm falhas de segurança publicadas que nenhuma versão testada consegue evitar ainda: o transformers fica na 4.57.6 porque o qwen-asr, o motor de escuta local, exige exatamente essa versão. A forma como o tarjim usa a biblioteca não chega a nenhuma delas, e cada modelo é carregado de uma versão fixa que o tarjim verificou. **Configurações** mostra as que ainda se aplicam ao seu computador; quando uma atualização instala uma versão corrigida, esse aviso desaparece sozinho. O [SECURITY.md](SECURITY.md) lista cada uma, o que é e o que o tarjim faz a respeito.
+Nenhum no momento: nenhuma biblioteca que o tarjim instala tem um problema de segurança publicado que suas versões testadas não evitem. Os seis problemas do transformers listados até 2026-10-23 foram corrigidos, porque a escuta local agora usa os modelos Qwen3-ASR do próprio Transformers. Se surgir algum, **Configurações** o mostra nos computadores afetados, e o aviso some sozinho quando uma atualização instala uma versão corrigida. Os detalhes estão em [SECURITY.md](SECURITY.md).
 
 ## Privacidade e segurança
 

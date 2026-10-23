@@ -3,50 +3,20 @@ import threading
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 
 from tarjim.config import setting
 from tarjim.retry import patiently
 from tarjim.server.evidence import evidence
+from tarjim.tool_catalog import BY_ID, TOOLS, VOICE_REPO, License, Tool
 
-VOICE_REPO = "openbmb/VoxCPM2"
+__all__ = ["BY_ID", "TOOLS", "VOICE_REPO", "License", "Shelf", "Tool", "shelf"]
+
 ONLINE = threading.Lock()
 DOWNLOADING: list[bool] = []
 
 
-@dataclass(frozen=True)
-class License:
-    name: str
-    url: str
-    commercial: bool
-    consent: bool = False
-
-
-@dataclass(frozen=True)
-class Tool:
-    id: str
-    sources: tuple[str, ...]
-    size_gb: float
-    required: bool
-    kind: str
-    license: License
-
-
-MMS = License("CC-BY-NC-4.0", "https://huggingface.co/MahmoudAshraf/mms-300m-1130-forced-aligner",
-              commercial=False)
-QWEN = License("Apache-2.0", "https://huggingface.co/Qwen/Qwen3-ASR-1.7B", commercial=True)
-APACHE = License("Apache-2.0", "https://huggingface.co/openbmb/VoxCPM2", commercial=True)
-AYA = License("CC-BY-NC-4.0", "https://ollama.com/library/aya-expanse", commercial=False)
-LGPL = License("LGPL-2.1", "https://ffmpeg.org/legal.html", commercial=True)
-TOOLS = [
-    Tool("ffmpeg", ("BtbN/FFmpeg-Builds",), 0.08, True, "ffmpeg", LGPL),
-    Tool("timing", ("MahmoudAshraf/mms-300m-1130-forced-aligner",), 1.2, True, "hub", MMS),
-    Tool("accuracy", ("Qwen/Qwen3-ASR-1.7B", "Qwen/Qwen3-ForcedAligner-0.6B"), 6.3, False, "hub",
-         QWEN),
-    Tool("dubbing", (VOICE_REPO,), 4.7, False, "voice", APACHE),
-    Tool("local_translation", ("aya-expanse:8b",), 5.1, False, "ollama", AYA),
-]
-BY_ID = {tool.id: tool for tool in TOOLS}
 
 
 @dataclass
@@ -105,6 +75,10 @@ def installed(tool: Tool) -> bool:
         return ready() and hub_ready(VOICE_REPO)
     if tool.kind == "ollama":
         return all(ollama_ready(model) for model in tool.sources)
+    if tool.id == "accuracy":  # the earlier pair listens too until the native one is here
+        from tarjim.listen_upgrade import listening_ready
+
+        return listening_ready()
     return all(hub_ready(repo) for repo in tool.sources)
 
 
@@ -161,13 +135,16 @@ class Shelf:
         self.lock = threading.Lock()
 
     def view(self) -> list[dict[str, object]]:
+        from tarjim.listen_upgrade import upgrade_view
+
         local = listening_locally()
         return [{"id": t.id, "size_gb": t.size_gb,
                  "required": t.required or (t.id == "accuracy" and local),
                  "installed": installed(t), "state": self.progress[t.id].state,
                  "detail": self.progress[t.id].detail, "license": t.license.name,
                  "license_url": t.license.url, "commercial": t.license.commercial,
-                 "consent": t.license.consent, "manual": not self_installs(t)} for t in TOOLS]
+                 "consent": t.license.consent, "manual": not self_installs(t),
+                 **(upgrade_view(self) if t.id == "accuracy" else {})} for t in TOOLS]
 
     def start(self, tool_id: str, accepted: bool = False) -> str:
         tool = BY_ID.get(tool_id)
@@ -191,3 +168,9 @@ class Shelf:
         except Exception as error:
             said = str(error) or type(error).__name__
             self.progress[tool.id] = Progress("failed", evidence(f"{type(error).__name__}: {said}"))
+
+
+@lru_cache(maxsize=1)
+def shelf() -> Shelf:
+    """The one shelf of this engine: the page, the chat tools and the update watch share it."""
+    return Shelf()
