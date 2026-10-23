@@ -85,13 +85,14 @@ def extension_version() -> str:
 
 def view() -> dict[str, Any]:
     found = latest()
-    from tarjim import downloader, known_issues, node_update
+    from tarjim import downloader, ffmpeg_update, known_issues, node_update, python_update
 
     return {"current": __version__, "latest": found.lstrip("v"), "available": newer(found),
             "automatic": automatic(), "can_install": installed_by_uv(),
             "failed": newer(found) and progress().get("state") == "failed",
             "extension": extension_version(), "downloader": downloader.view(),
-            "node": node_update.view(), **known_issues.view()}
+            "node": node_update.view(), "ffmpeg": ffmpeg_update.view(),
+            "python": python_update.view(), **known_issues.view()}
 
 
 def archive(tag: str) -> str:

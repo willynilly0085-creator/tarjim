@@ -148,6 +148,10 @@ def engine(home: Path, monkeypatch: pytest.MonkeyPatch) -> list[str]:
     monkeypatch.setattr(update_routes.threading, "Timer", lambda *_args: type(
         "Timer", (), {"start": lambda self: None})())
     monkeypatch.setattr(update_routes.downloader, "refresh", lambda idle: "")
+    # nothing outside this test's home: not the real ~/.tarjim/node, ffmpeg or uv
+    monkeypatch.setattr(update_routes.node_update, "refresh", lambda idle: "")
+    monkeypatch.setattr(update_routes.ffmpeg_update, "refresh", lambda idle: "")
+    monkeypatch.setattr(update_routes.python_update, "refresh", lambda idle, port: False)
     return started
 
 

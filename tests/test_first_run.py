@@ -3,14 +3,14 @@ from typing import Any
 
 import pytest
 
-from tarjim import ffmpeg_setup, system, tools
+from tarjim import ffmpeg_release, ffmpeg_setup, system, tools
 
 
 def test_the_ffmpeg_checksum_is_read_from_the_release_listing() -> None:
-    listing = f"abc123  other.zip\nfeedbeef  {ffmpeg_setup.ARCHIVE}\n"
-    assert ffmpeg_setup.published_digest(listing) == "feedbeef"
-    with pytest.raises(RuntimeError):
-        ffmpeg_setup.published_digest("abc123  other.zip")
+    digest = "f" * 64
+    listing = "\n".join([f"{'a' * 64}  other.zip", f"{digest}  {ffmpeg_setup.ARCHIVE}", ""])
+    assert ffmpeg_release.builds(listing) == {ffmpeg_setup.ARCHIVE: digest}
+    assert ffmpeg_release.builds(f"{'a' * 64}  other.zip") == {}
 
 
 def test_a_tampered_ffmpeg_download_is_refused(tmp_path: Path,
@@ -18,8 +18,6 @@ def test_a_tampered_ffmpeg_download_is_refused(tmp_path: Path,
     import requests
 
     class Reply:
-        text = f"{'0' * 64}  {ffmpeg_setup.ARCHIVE}"
-
         def __enter__(self) -> "Reply":
             return self
 
@@ -34,7 +32,8 @@ def test_a_tampered_ffmpeg_download_is_refused(tmp_path: Path,
 
     monkeypatch.setattr(requests, "get", lambda *_a, **_k: Reply())
     with pytest.raises(RuntimeError, match="checksum"):
-        ffmpeg_setup.fetch_archive(tmp_path / "ffmpeg.zip")
+        ffmpeg_release.download(ffmpeg_setup.ARCHIVE, "0" * 64, tmp_path / "ffmpeg.zip")
+    assert not (tmp_path / "ffmpeg.zip").exists()
 
 
 def test_a_card_torch_cannot_use_is_reported_with_the_fix(monkeypatch: pytest.MonkeyPatch) -> None:

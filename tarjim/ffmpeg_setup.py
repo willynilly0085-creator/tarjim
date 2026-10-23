@@ -1,56 +1,43 @@
 """Install ffmpeg for people who do not have it: a checksum-verified LGPL build on Windows,
-plain instructions elsewhere."""
-import hashlib
-import shutil
+plain instructions elsewhere. ffmpeg_update keeps it current; ffmpeg_release does the checking.
+
+ARCHIVE is the release branch tested with this release of tarjim. A fresh install takes it while
+BtbN still builds it, and the newest branch once it is gone; a release of tarjim moves it on.
+"""
 import sys
-import tempfile
-import zipfile
+import threading
 from pathlib import Path
 
-from tarjim.config import HOME, prepare_environment, save
+from tarjim import config, ffmpeg_release
 
-RELEASE = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/"
 ARCHIVE = "ffmpeg-n8.1-latest-win64-lgpl-shared-8.1.zip"
-CHUNK = 1 << 20
 ELSEWHERE = ("Install ffmpeg with your package manager: brew install ffmpeg (macOS) or "
              "sudo apt install ffmpeg (Linux)")
+PLACING = threading.Lock()  # one install or update of tarjim's ffmpeg at a time
 
 
-def published_digest(listing: str) -> str:
-    for line in listing.splitlines():
-        digest, _, name = line.strip().partition("  ")
-        if name == ARCHIVE:
-            return digest
-    raise RuntimeError("ffmpeg checksum is not published")
+def use(binary: Path) -> None:
+    """New programs start from this build; one already running keeps the files it has."""
+    config.save("ffmpeg", str(binary))
+    config.save("ffprobe", str(binary.with_name("ffprobe.exe")))
+    config.prepare_environment()
 
 
-def fetch_archive(target: Path) -> None:
-    import requests
-
-    wanted = published_digest(requests.get(RELEASE + "checksums.sha256", timeout=30).text)
-    digest = hashlib.sha256()
-    with (requests.get(RELEASE + ARCHIVE, stream=True, timeout=60) as reply,
-          target.open("wb") as out):
-        reply.raise_for_status()
-        for chunk in reply.iter_content(CHUNK):
-            digest.update(chunk)
-            out.write(chunk)
-    if digest.hexdigest() != wanted:
-        raise RuntimeError("ffmpeg download does not match its published checksum")
+def in_use() -> set[Path]:
+    saved = config.settings()
+    found = (ffmpeg_release.folder_of(saved.get(name, "")) for name in ("ffmpeg", "ffprobe"))
+    return {folder for folder in found if folder}
 
 
 def install_ffmpeg() -> Path:
     if sys.platform != "win32":
         raise RuntimeError(ELSEWHERE)
-    folder = HOME / "tools" / "ffmpeg"
-    with tempfile.TemporaryDirectory() as scratch:
-        archive = Path(scratch) / ARCHIVE
-        fetch_archive(archive)
-        shutil.rmtree(folder, ignore_errors=True)
-        with zipfile.ZipFile(archive) as bundle:
-            bundle.extractall(folder)
-    binary = next(folder.rglob("ffmpeg.exe"))
-    save("ffmpeg", str(binary))
-    save("ffprobe", str(binary.with_name("ffprobe.exe")))
-    prepare_environment()
+    with PLACING:
+        listed = ffmpeg_release.ask()
+        name = ffmpeg_release.choose(listed, ARCHIVE)
+        if not name:
+            raise RuntimeError("ffmpeg checksum is not published")
+        binary = ffmpeg_release.build(name, listed[name])
+        use(binary)
+        ffmpeg_release.tidy(in_use())
     return binary
