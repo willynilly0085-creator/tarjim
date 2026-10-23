@@ -12,7 +12,7 @@ audioop-lts==0.2.2 ; python_full_version >= '3.13' and platform_machine == 'x86_
 audioread==3.1.0 ; (python_full_version < '3.12' and platform_machine != 'x86_64') or (python_full_version < '3.12' and sys_platform != 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin')
 backports-tarfile==1.2.0 ; python_full_version < '3.12'
 catt-tashkeel==1.0.2 ; sys_platform != 'darwin'
-certifi==2026.10.19
+certifi==2026.10.23
 cffi==2.1.1
 charset-normalizer==3.5.2
 click==8.5.0
