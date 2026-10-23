@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.33 (2026-10-23)
+
+- **Local listening is more accurate, faster, and free of known vulnerabilities.** It now runs on
+  Qwen's own Transformers models (Qwen3-ASR-1.7B-hf and its aligner) instead of the qwen-asr
+  package, which held transformers on an old version with six known advisories. Measured on the
+  same speech: Arabic word errors fell from 14.9% to 6.0%, English from 4.0% to 2.9%, 10–20%
+  faster on a graphics card, and 2–3 GB of memory instead of 5 while it works. Your current
+  models keep working; the new ones download in the background while tarjim is idle, and the old
+  ones are removed once the new ones are verified. A full vulnerability check of every library
+  now finds nothing.
+- **Burned subtitles and the phone copy work on every computer.** tarjim's own ffmpeg has no x264,
+  so without an NVIDIA card both failed. tarjim now tries Intel and AMD encoders, x264, then
+  OpenH264 and Windows' own encoder.
+- **Libraries at their newest tested versions:** transformers 5.20, huggingface-hub 2.3,
+  certifi 2026.10.23 and the rest; qwen-asr, gradio and their dependencies are gone.
+
 ## 1.0.32 (2026-10-23)
 
 - **tarjim keeps the programs it brings up to date by itself.** On Windows, for people who did
