@@ -71,7 +71,9 @@ def save(name: str, value: str) -> None:
 
 def write_settings(data: dict[str, str]) -> None:
     private_home()
-    handle, temporary = tempfile.mkstemp(dir=HOME, prefix=".config-")
+    # Beside the settings file itself: a swap across two drives is refused (EXDEV).
+    CONFIG.parent.mkdir(parents=True, exist_ok=True)
+    handle, temporary = tempfile.mkstemp(dir=CONFIG.parent, prefix=".config-")
     try:
         os.chmod(temporary, OWNER_FILE)
         with os.fdopen(handle, "w", encoding="utf-8") as out:
