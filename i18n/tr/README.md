@@ -84,7 +84,8 @@ PyTorch'un ekran kartı sürümü) yukarıdaki disk rakamlarının içinde yakla
    eklentisi.
 
 Bundan sonra tarjim arka planda pencere olmadan çalışır ve bilgisayarla birlikte başlar.
-Masaüstündeki **tarjim** kısayolu sayfasını açar.
+Masaüstündeki ve Başlat menüsündeki **tarjim** kısayolu sayfasını açar; tarjim durmuşsa önce onu
+başlatır.
 
 ### Dosya ne yapar ve ne indirir
 

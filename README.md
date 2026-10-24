@@ -77,7 +77,8 @@ You need nothing installed first: no Python, no AI tool, no terminal.
    setup continues there: your language, the AI you want to use, and the browser extension.
 
 After that tarjim runs in the background with no window and starts with the computer. A **tarjim**
-shortcut on the desktop opens its page.
+shortcut on the desktop and in the Start menu opens its page, and starts tarjim first if it has
+stopped.
 
 ### What the file does, and what it downloads
 
@@ -91,7 +92,7 @@ It downloads about 4 GB, once. tarjim itself is under 2 MB; the rest is what it 
 | About 160 other libraries | about 1 GB | Downloading a video from a link, talking to the AI you connect, listening, dubbing, the phone bot |
 
 Then the file starts tarjim, adds it to the programs that start with Windows, puts the shortcut on
-the desktop and opens the page. It changes nothing else, and needs no administrator rights.
+the desktop and in the Start menu, and opens the page. It changes nothing else, and needs no administrator rights.
 
 The setup page downloads the rest, and only what your choices need:
 
@@ -106,7 +107,7 @@ With a cloud AI (a Gemini key, or a Gemini, Claude, ChatGPT or Grok subscription
 two are needed: no AI runs on your computer.
 
 To remove tarjim: run `uv tool uninstall tarjim`, then delete the `.tarjim` folder in your user
-folder and the shortcut.
+folder and the shortcuts.
 
 Tested by running the file where uv was not installed: it installed uv and tarjim and started the
 engine. Windows 10 was not tested by us.

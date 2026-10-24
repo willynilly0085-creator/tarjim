@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.35 (2026-10-24)
+
+- **The tarjim shortcut starts tarjim when it has stopped.** The shortcut on the desktop only
+  opened tarjim's page, which could not load once the engine had stopped, and the extension then
+  asked for a terminal command. Now the shortcut, on the desktop and in the Start menu, starts
+  tarjim without a window when it is not running and then opens its page (about four seconds);
+  when it is running, the page opens at once. The extension says to double-click it. The plain
+  link an earlier version put on the desktop is replaced by itself the next time tarjim starts.
+
 ## 1.0.34 (2026-10-24)
 
 - **tarjim starts with your computer more reliably, and says why when it cannot.** If the engine

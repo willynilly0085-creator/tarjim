@@ -83,7 +83,8 @@ Você não precisa ter nada instalado antes: nem Python, nem ferramenta de IA, n
    e a configuração continua lá: seu idioma, a IA que você quer usar e a extensão do navegador.
 
 Depois disso o tarjim roda em segundo plano, sem janela, e inicia junto com o computador. Um atalho
-**tarjim** na área de trabalho abre a página dele.
+**tarjim** na área de trabalho e no menu Iniciar abre a página dele e, se o tarjim tiver parado,
+inicia-o antes.
 
 ### O que o arquivo faz e o que ele baixa
 

@@ -82,7 +82,8 @@ Anda tidak perlu memasang apa pun lebih dulu: tanpa Python, tanpa alat AI, tanpa
    ekstensi peramban.
 
 Setelah itu tarjim berjalan di latar belakang tanpa jendela dan mulai bersama komputer. Pintasan
-**tarjim** di desktop membuka halamannya.
+**tarjim** di desktop dan menu Start membuka halamannya, dan menjalankan tarjim dulu jika sedang
+berhenti.
 
 ### Apa yang dilakukan berkas ini, dan apa yang diunduhnya
 

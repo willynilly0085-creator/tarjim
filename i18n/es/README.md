@@ -82,7 +82,8 @@ No necesitas tener nada instalado antes: ni Python, ni una herramienta de IA, ni
    navegador.
 
 Después tarjim se ejecuta en segundo plano, sin ventana, y arranca con el ordenador. Un acceso
-directo **tarjim** en el escritorio abre su página.
+directo **tarjim** en el escritorio y en el menú Inicio abre su página, y antes inicia tarjim si se
+ha detenido.
 
 ### Qué hace el archivo y qué descarga
 

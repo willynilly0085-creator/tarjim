@@ -88,7 +88,8 @@ Sie müssen vorher nichts installiert haben: kein Python, kein KI-Werkzeug, kein
    möchten, und die Browser-Erweiterung.
 
 Danach läuft tarjim im Hintergrund ohne Fenster und startet mit dem Computer. Eine Verknüpfung
-**tarjim** auf dem Desktop öffnet die Seite.
+**tarjim** auf dem Desktop und im Startmenü öffnet die Seite und startet tarjim vorher, falls es
+nicht läuft.
 
 ### Was die Datei macht und was sie herunterlädt
 

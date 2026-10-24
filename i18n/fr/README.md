@@ -84,7 +84,8 @@ Vous n'avez rien à installer au préalable : ni Python, ni outil d'IA, ni termi
    utiliser et l'extension de navigateur.
 
 Ensuite, tarjim tourne en arrière-plan, sans fenêtre, et démarre avec l'ordinateur. Un raccourci
-**tarjim** sur le bureau ouvre sa page.
+**tarjim** sur le bureau et dans le menu Démarrer ouvre sa page, et lance d'abord tarjim s'il s'est
+arrêté.
 
 ### Ce que fait le fichier, et ce qu'il télécharge
 
