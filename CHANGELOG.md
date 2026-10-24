@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.36 (2026-10-24)
+
+- **You pick the quality a link downloads in.** tarjim used to download 1080p or less by itself.
+  Now a link shows the qualities it really offers (2160p, 1440p, 1080p, 720p and so on), each with
+  its approximate size, before anything downloads, and downloads exactly the one you pick with its
+  sound. 1080p, or the nearest below it, is picked each time unless you pick another; "sound only"
+  is offered when you want a subtitle file; a quality past the 8 GB limit cannot be picked. It
+  works on tarjim's page, in the extension (the right-click menu now opens its window on the
+  link, so you pick there), from chat (your AI shows the qualities and asks before it starts) and
+  in the phone bot (buttons after the kind of result). A playlist link says so before you start.
+- **Burned subtitles keep the video's quality.** Most videos from YouTube and other sites are AV1
+  or VP9, which need about half as many bits as the H.264 tarjim writes, and the burned video was
+  held to the source's own rate, so it came out softer. The limit now allows for the source's
+  codec: on a 1080p AV1 clip the burned video went from 0.9936 to 0.9970 similarity to the
+  source, at 5.0 MB instead of 3.1 for 20 seconds.
+
 ## 1.0.35 (2026-10-24)
 
 - **The tarjim shortcut starts tarjim when it has stopped.** The shortcut on the desktop only
