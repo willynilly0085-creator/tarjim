@@ -37,9 +37,17 @@ def names(folder: Path) -> list[str]:
     return sorted(p.name for p in folder.iterdir()) if folder.exists() else []
 
 
+def named_ffmpeg(process: Any) -> bool:
+    """A child that ended between being listed and being asked its name (yt-dlp runs a quick
+    `ffmpeg -version` of its own) is not one."""
+    try:
+        return "ffmpeg" in process.name().lower()
+    except psutil.NoSuchProcess:
+        return False
+
+
 def ffmpegs() -> list[Any]:
-    return [p for p in psutil.Process().children(recursive=True)
-            if "ffmpeg" in p.name().lower()]
+    return [p for p in psutil.Process().children(recursive=True) if named_ffmpeg(p)]
 
 
 def gone(process: Any) -> bool:
