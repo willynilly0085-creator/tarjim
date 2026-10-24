@@ -122,6 +122,9 @@
   "offlineBody": {
     "message": "이 명령으로 실행한 뒤 다시 오세요:"
   },
+  "offlineWindows": {
+    "message": "바탕 화면의 tarjim 바로 가기를 두 번 클릭해(또는 시작 메뉴에서 tarjim 검색) 실행한 다음 여기로 돌아오세요."
+  },
   "tryAgain": {
     "message": "다시 시도"
   },

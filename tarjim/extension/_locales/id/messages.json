@@ -122,6 +122,9 @@
   "offlineBody": {
     "message": "Jalankan dengan perintah ini, lalu kembali ke sini:"
   },
+  "offlineWindows": {
+    "message": "Klik dua kali pintasan tarjim di desktop (atau cari tarjim di menu Start) untuk menjalankannya, lalu kembali ke sini."
+  },
   "tryAgain": {
     "message": "Coba lagi"
   },

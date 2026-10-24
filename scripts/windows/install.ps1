@@ -4,7 +4,8 @@
 #   irm https://raw.githubusercontent.com/willynilly0085-creator/tarjim/master/scripts/windows/install.ps1 | iex
 # It installs uv when it is missing, installs tarjim (from the folder this file came with, or the
 # latest release when run on its own), starts the engine without a window, makes it start with the
-# computer, puts a shortcut to its page on the desktop and opens that page, where setup continues.
+# computer, puts a tarjim shortcut on the desktop and in the Start menu (it starts the engine when
+# it has stopped, then opens its page) and opens that page, where setup continues.
 # -Quiet leaves the computer as it is (no browser, no startup entry, no shortcut): for tests.
 param([int]$Port = 17653, [switch]$Quiet)
 
@@ -68,11 +69,6 @@ function Stop-Engine {
     if ($listening) { Stop-Process -Id $listening.OwningProcess -Force -ErrorAction SilentlyContinue }
 }
 
-function Add-Shortcut($folder) {
-    $lines = "[InternetShortcut]", "URL=$Page", "IconIndex=0"
-    Set-Content -Path (Join-Path $folder "tarjim.url") -Value $lines -Encoding ASCII
-}
-
 Say "This installs tarjim on this computer. Nothing else is needed first."
 Say "It downloads about 4 GB: tarjim itself is under 1 MB, the rest is what it runs on"
 Say "(PyTorch for timing subtitles to speech, and the libraries for listening and dubbing)."
@@ -107,10 +103,11 @@ foreach ($try in 1..45) {
 if (-not (Test-Engine)) { Stop-With "tarjim was installed but did not start. Run install again." }
 
 if (-not $Quiet) {
-    & (Join-Path (Split-Path $python) "python.exe") -c "from tarjim import autostart; autostart.enable()"
-    Add-Shortcut ([Environment]::GetFolderPath("Desktop"))
+    # The shortcut starts tarjim when it has stopped, then opens its page (tarjim/shortcut.py).
+    & (Join-Path (Split-Path $python) "python.exe") -c "from tarjim import autostart, shortcut; autostart.enable(); shortcut.make()"
     Start-Process $Page
 }
 Say ""
-Say "Ready. tarjim's page is $Page (also the 'tarjim' shortcut on your desktop)."
+Say "Ready. tarjim's page is $Page."
+if (-not $Quiet) { Say "If it ever stops, double-click the 'tarjim' shortcut on your desktop: it starts it again." }
 Say "Setup continues there. You can close this window."

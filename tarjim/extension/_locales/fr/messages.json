@@ -122,6 +122,9 @@
   "offlineBody": {
     "message": "Lancez-le avec cette commande, puis revenez :"
   },
+  "offlineWindows": {
+    "message": "Double-cliquez sur le raccourci tarjim de votre bureau (ou cherchez tarjim dans le menu Démarrer) pour le lancer, puis revenez ici."
+  },
   "tryAgain": {
     "message": "Réessayer"
   },

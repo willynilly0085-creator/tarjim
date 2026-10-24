@@ -122,6 +122,9 @@
   "offlineBody": {
     "message": "Starte es mit diesem Befehl und komm dann zurück:"
   },
+  "offlineWindows": {
+    "message": "Doppelklicke auf die tarjim-Verknüpfung auf deinem Desktop (oder suche tarjim im Startmenü), um es zu starten, und komm dann zurück."
+  },
   "tryAgain": {
     "message": "Erneut versuchen"
   },

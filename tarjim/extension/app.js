@@ -21,6 +21,7 @@ function applyText() {
     el.title = t(el.dataset.i18nLabel);
   });
   document.body.classList.toggle("page", pageMode);
+  document.body.classList.toggle("windows", navigator.userAgent.includes("Windows"));
 }
 
 function linkState(online) {

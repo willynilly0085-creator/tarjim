@@ -122,6 +122,9 @@
   "offlineBody": {
     "message": "このコマンドで起動してから、戻ってきてください："
   },
+  "offlineWindows": {
+    "message": "デスクトップの tarjim ショートカットをダブルクリック（またはスタートメニューで tarjim を検索）して起動し、ここに戻ってください。"
+  },
   "tryAgain": {
     "message": "再試行"
   },

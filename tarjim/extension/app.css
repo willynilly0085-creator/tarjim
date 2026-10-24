@@ -432,3 +432,9 @@ form { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-md
 .advanced { border-top: 1px solid var(--line); padding-top: var(--space-xs, 8px); }
 .advanced summary { cursor: pointer; color: var(--muted); padding-block: var(--space-xs, 8px); }
 .advanced summary:focus-visible { outline: 2px solid var(--focus, currentColor); outline-offset: 2px; }
+
+/* Windows has the tarjim shortcut, which starts the engine; elsewhere, the command. */
+body:not(.windows) .windows-only,
+body.windows .not-windows {
+  display: none;
+}

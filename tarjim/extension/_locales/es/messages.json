@@ -122,6 +122,9 @@
   "offlineBody": {
     "message": "Inícialo con este comando y luego vuelve:"
   },
+  "offlineWindows": {
+    "message": "Haz doble clic en el acceso directo de tarjim en tu escritorio (o busca tarjim en el menú Inicio) para iniciarlo y luego vuelve aquí."
+  },
   "tryAgain": {
     "message": "Reintentar"
   },

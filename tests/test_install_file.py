@@ -28,5 +28,5 @@ def test_the_script_starts_the_engine_hidden_and_leaves_tests_alone() -> None:
     script = (ROOT / "scripts" / "windows" / "install.ps1").read_text(encoding="utf-8")
     assert "pythonw.exe" in script and "-WindowStyle Hidden" in script
     quiet = script[script.index("if (-not $Quiet)"):]
-    for step in ("autostart.enable()", "Add-Shortcut", "Start-Process $Page"):
+    for step in ("autostart.enable()", "shortcut.make()", "Start-Process $Page"):
         assert step in quiet, step

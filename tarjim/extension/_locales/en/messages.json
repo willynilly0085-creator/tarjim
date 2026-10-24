@@ -122,6 +122,9 @@
   "offlineBody": {
     "message": "Start it with this command, then come back:"
   },
+  "offlineWindows": {
+    "message": "Double-click the tarjim shortcut on your desktop (or find tarjim in the Start menu) to start it, then come back here."
+  },
   "tryAgain": {
     "message": "Try again"
   },

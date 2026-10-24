@@ -122,6 +122,9 @@
   "offlineBody": {
     "message": "用这条命令启动它，然后回到这里："
   },
+  "offlineWindows": {
+    "message": "双击桌面上的 tarjim 快捷方式（或在开始菜单中搜索 tarjim）来启动它，然后回到这里。"
+  },
   "tryAgain": {
     "message": "重试"
   },

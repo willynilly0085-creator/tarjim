@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from tarjim import vault
+from tarjim import shortcut, vault
 
 
 class MemoryVault:
@@ -21,3 +21,12 @@ def memory_vault(monkeypatch: pytest.MonkeyPatch) -> Any:
     store = MemoryVault()
     monkeypatch.setattr(vault, "backend", lambda: store)
     return store
+
+
+@pytest.fixture(autouse=True)
+def own_desktop(monkeypatch: pytest.MonkeyPatch, tmp_path_factory: pytest.TempPathFactory) -> Any:
+    """No test writes a shortcut on the real desktop or Start menu."""
+    folder = tmp_path_factory.mktemp("desktop")
+    monkeypatch.setattr(shortcut, "desktop", lambda: folder / "Desktop")
+    monkeypatch.setattr(shortcut, "start_menu", lambda: folder / "Programs")
+    return folder

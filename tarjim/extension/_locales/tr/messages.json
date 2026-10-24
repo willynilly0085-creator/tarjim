@@ -122,6 +122,9 @@
   "offlineBody": {
     "message": "Bu komutla başlat, sonra geri gel:"
   },
+  "offlineWindows": {
+    "message": "Başlatmak için masaüstündeki tarjim kısayoluna çift tıklayın (veya Başlat menüsünde tarjim'i arayın), sonra buraya dönün."
+  },
   "tryAgain": {
     "message": "Tekrar dene"
   },

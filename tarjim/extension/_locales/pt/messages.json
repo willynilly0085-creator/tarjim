@@ -122,6 +122,9 @@
   "offlineBody": {
     "message": "Inicie com este comando e depois volte:"
   },
+  "offlineWindows": {
+    "message": "Clique duas vezes no atalho do tarjim na área de trabalho (ou procure tarjim no menu Iniciar) para iniciá-lo e depois volte aqui."
+  },
   "tryAgain": {
     "message": "Tentar de novo"
   },
