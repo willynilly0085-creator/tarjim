@@ -8,8 +8,7 @@ from typing import Any
 import pytest
 
 from tarjim import same_code
-from tarjim.server import __main__ as engine
-from tarjim.server import renew, update_routes
+from tarjim.server import engine, renew, update_routes
 from tarjim.server.jobs import Board, Order, Task, classify
 from tarjim.ui_languages import FOLDER, codes
 

@@ -31,3 +31,35 @@ def test_windows_starts_the_engine_without_a_window(home: Path,
     autostart.enable()
     script = autostart.entry().read_text(encoding="utf-8")
     assert "pythonw" in script.lower() and ", 0, False" in script
+
+
+def test_windows_tries_once_more_when_the_engine_is_gone(home: Path,
+                                                         monkeypatch: pytest.MonkeyPatch) -> None:
+    script = autostart.windows_script(r"C:\py\pythonw.exe")
+    assert script.count('shell.Run engine, 0, False') == 2
+    assert r'engine = """C:\py\pythonw.exe"" -P -m tarjim.server"' in script
+    assert "WScript.Sleep 60000" in script and "Win32_Process" in script
+    assert str(autostart.HOME / "server.log") in script and "{" not in script
+
+
+def test_an_older_startup_script_for_this_python_is_brought_up_to_date(
+        home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(autostart.sys, "platform", "win32")
+    monkeypatch.setattr(autostart, "quiet_python", lambda: r"C:\py\pythonw.exe")
+    entry = autostart.entry()
+    entry.parent.mkdir(parents=True)
+    entry.write_text(r'CreateObject("WScript.Shell").Run """C:\py\pythonw.exe"" -P -m '
+                     'tarjim.server", 0, False\n', encoding="utf-8")
+    autostart.refresh()
+    assert entry.read_text(encoding="utf-8") == autostart.windows_script(r"C:\py\pythonw.exe")
+
+
+def test_a_startup_script_for_another_python_is_left_alone(
+        home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(autostart.sys, "platform", "win32")
+    monkeypatch.setattr(autostart, "quiet_python", lambda: r"C:\copy\pythonw.exe")
+    entry = autostart.entry()
+    entry.parent.mkdir(parents=True)
+    entry.write_text(autostart.windows_script(r"C:\py\pythonw.exe"), encoding="utf-8")
+    autostart.refresh()
+    assert entry.read_text(encoding="utf-8") == autostart.windows_script(r"C:\py\pythonw.exe")

@@ -8,8 +8,7 @@ import pytest
 
 import tarjim.pipeline
 from tarjim.job import Job
-from tarjim.server import __main__ as engine
-from tarjim.server import housekeeping
+from tarjim.server import engine, housekeeping
 from tarjim.server.jobs import Order, Task
 
 

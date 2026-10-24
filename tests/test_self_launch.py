@@ -68,11 +68,12 @@ def test_a_start_command_saved_by_an_older_version_is_made_safe(
 
 
 def test_the_engine_saves_a_safe_start_command(monkeypatch: pytest.MonkeyPatch) -> None:
-    from tarjim.server import __main__ as engine
+    from tarjim.server import engine
 
     saved: dict[str, str] = {}
     monkeypatch.setattr("tarjim.quiet.hide_child_windows", lambda: None)
     monkeypatch.setattr(engine, "attach_output", lambda: None)
+    monkeypatch.setattr(autostart, "refresh", lambda: None)
     monkeypatch.setattr(engine, "prepare_environment", lambda: None)
     monkeypatch.setattr(engine, "save", lambda key, value: saved.update({key: value}))
     engine.start_up()

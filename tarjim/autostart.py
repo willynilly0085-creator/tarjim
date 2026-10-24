@@ -3,12 +3,38 @@ browser extension and chat tools find it after a restart. The person turns it on
 
 Windows: a small script in the Startup folder. macOS: a LaunchAgent. Linux: an autostart entry.
 """
+import contextlib
 import os
 import sys
 from pathlib import Path
 from xml.sax.saxutils import escape
 
+from tarjim.config import HOME
+
 STARTUP = Path("Microsoft") / "Windows" / "Start Menu" / "Programs" / "Startup"
+WINDOWS = """Set shell = CreateObject("WScript.Shell")
+engine = {launch}
+Note "starting the engine"
+shell.Run engine, 0, False
+WScript.Sleep 60000
+On Error Resume Next
+Set found = GetObject("winmgmts:").ExecQuery("select ProcessId from Win32_Process where " & _
+  "CommandLine like '%-m tarjim.server%' or CommandLine like '%tarjim-serve%'")
+running = found.Count
+If Err.Number <> 0 Then running = 1
+On Error GoTo 0
+If running = 0 Then
+  Note "the engine was gone a minute later; starting it once more"
+  shell.Run engine, 0, False
+End If
+
+Sub Note(text)
+  On Error Resume Next
+  Set trace = CreateObject("Scripting.FileSystemObject").OpenTextFile("{log}", 8, True)
+  trace.WriteLine Now & " sign-in launch: " & text
+  trace.Close
+End Sub
+"""
 
 
 def entry() -> Path:
@@ -26,10 +52,29 @@ def quiet_python() -> str:
     return str(windowless) if sys.platform == "win32" and windowless.exists() else sys.executable
 
 
+def windowless(python: str) -> str:
+    return python if python.lower().endswith("pythonw.exe") else str(
+        Path(python).with_name("pythonw.exe"))
+
+
+def launch(python: str) -> str:
+    return f'"""{windowless(python)}"" -P -m tarjim.server"'
+
+
 def windows_script(python: str) -> str:
-    if not python.lower().endswith("pythonw.exe"):
-        python = str(Path(python).with_name("pythonw.exe"))
-    return f'CreateObject("WScript.Shell").Run """{python}"" -P -m tarjim.server", 0, False\n'
+    """Writes a dated line to server.log, starts the engine, and a minute later starts it once
+    more if no engine process is left: on 2026-10-24 the one started at sign-in was gone."""
+    return WINDOWS.replace("{launch}", launch(python)).replace("{log}", str(HOME / "server.log"))
+
+
+def refresh() -> None:
+    """A Startup script written by an older version for this same Python becomes today's."""
+    if sys.platform != "win32" or not enabled():
+        return
+    with contextlib.suppress(OSError):
+        text, wanted = entry().read_text(encoding="utf-8"), windows_script(quiet_python())
+        if text != wanted and launch(quiet_python()) in text:
+            entry().write_text(wanted, encoding="utf-8")
 
 
 def mac_agent(python: str) -> str:

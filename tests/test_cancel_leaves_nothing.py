@@ -16,7 +16,7 @@ import pytest
 import tarjim.pipeline
 from tarjim import fetch
 from tarjim.job import Job
-from tarjim.server import __main__ as engine
+from tarjim.server import engine
 from tarjim.server.jobs import Board, Order
 
 SOON = 2.0
