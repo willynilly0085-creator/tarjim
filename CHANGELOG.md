@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.37 (2026-10-24)
+
+- **The automatic checks on Linux pass again.** Since 1.0.35 the type check stopped at the Windows
+  registry lookup for the desktop's folder, so the tests never ran on Linux. The lookup now runs
+  on Windows only, and one test that read the names of programs tarjim had started no longer
+  fails when one of them ends while it reads. Nothing changes in how tarjim works.
+
 ## 1.0.36 (2026-10-24)
 
 - **You pick the quality a link downloads in.** tarjim used to download 1080p or less by itself.
