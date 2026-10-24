@@ -24,7 +24,10 @@ NO_WINDOW = 0x08000000
 
 
 def desktop() -> Path:
-    """The desktop the person sees, also when OneDrive or a policy moved it."""
+    """The desktop the person sees, also when OneDrive or a policy moved it. Only Windows has the
+    registry; the check also lets the type checker on other systems skip it."""
+    if sys.platform != "win32":
+        return Path.home() / "Desktop"
     import winreg
 
     with winreg.OpenKey(winreg.HKEY_CURRENT_USER, FOLDERS) as key:
