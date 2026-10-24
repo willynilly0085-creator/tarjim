@@ -442,5 +442,13 @@
   "engineFailed": "Impossible d'enregistrer. Réessayez.",
   "tool_accuracy_upgrading": "Fonctionne déjà. Une version plus récente de ce modèle se télécharge en arrière-plan et prend le relais toute seule.",
   "tool_accuracy_upgrade_manual": "Fonctionne déjà. Une version plus récente de ce modèle est prête à être téléchargée, et prend le relais toute seule.",
-  "tool_accuracy_upgrade_failed": "Fonctionne déjà. La version plus récente n'a pas fini de se télécharger. Réessayez : elle reprend là où elle s'est arrêtée."
+  "tool_accuracy_upgrade_failed": "Fonctionne déjà. La version plus récente n'a pas fini de se télécharger. Réessayez : elle reprend là où elle s'est arrêtée.",
+  "quality": "Qualité",
+  "qualityReading": "Lecture des qualités disponibles…",
+  "qualityRow": "{label} · environ {size}",
+  "qualityAudio": "Son uniquement",
+  "qualityTooBig": "{label} · plus de 8 Go",
+  "qualityFailed": "Impossible de lire les qualités : la vidéo sera téléchargée en 1080p ou dans la plus proche en dessous.",
+  "sizeMb": "{n} Mo",
+  "phone_choose_quality": "Quelle qualité télécharger ?"
 }

@@ -446,5 +446,52 @@
   },
   "modelSuggested": {
     "message": "рекомендуется для перевода"
+  },
+  "quality": {
+    "message": "Качество"
+  },
+  "qualityReading": {
+    "message": "Читаем доступные варианты качества…"
+  },
+  "qualityRow": {
+    "message": "$LABEL$ · около $SIZE$",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      },
+      "size": {
+        "content": "$2"
+      }
+    }
+  },
+  "qualityAudio": {
+    "message": "Только звук"
+  },
+  "qualityTooBig": {
+    "message": "$LABEL$ · больше 8 GB",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      }
+    }
+  },
+  "qualityFailed": {
+    "message": "Не удалось прочитать варианты качества, поэтому будет скачано 1080p или ближайшее ниже."
+  },
+  "sizeMb": {
+    "message": "$N$ MB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeGb": {
+    "message": "$N$ GB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

@@ -442,5 +442,13 @@
   "engineFailed": "Gagal menyimpan. Coba lagi.",
   "tool_accuracy_upgrading": "Sudah berfungsi. Versi baru model ini sedang diunduh di latar belakang dan akan menggantikannya sendiri.",
   "tool_accuracy_upgrade_manual": "Sudah berfungsi. Versi baru model ini siap diunduh, dan akan menggantikannya sendiri.",
-  "tool_accuracy_upgrade_failed": "Sudah berfungsi. Versi baru belum selesai diunduh. Coba lagi: unduhan berlanjut dari titik berhentinya."
+  "tool_accuracy_upgrade_failed": "Sudah berfungsi. Versi baru belum selesai diunduh. Coba lagi: unduhan berlanjut dari titik berhentinya.",
+  "quality": "Kualitas",
+  "qualityReading": "Membaca kualitas yang tersedia…",
+  "qualityRow": "{label} · sekitar {size}",
+  "qualityAudio": "Suara saja",
+  "qualityTooBig": "{label} · lebih dari 8 GB",
+  "qualityFailed": "Kualitas tidak bisa dibaca, jadi 1080p atau yang terdekat di bawahnya akan diunduh.",
+  "sizeMb": "{n} MB",
+  "phone_choose_quality": "Kualitas mana yang saya unduh?"
 }

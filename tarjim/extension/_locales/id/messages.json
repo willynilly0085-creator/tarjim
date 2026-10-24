@@ -446,5 +446,52 @@
   },
   "modelSuggested": {
     "message": "disarankan untuk terjemahan"
+  },
+  "quality": {
+    "message": "Kualitas"
+  },
+  "qualityReading": {
+    "message": "Membaca kualitas yang tersedia…"
+  },
+  "qualityRow": {
+    "message": "$LABEL$ · sekitar $SIZE$",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      },
+      "size": {
+        "content": "$2"
+      }
+    }
+  },
+  "qualityAudio": {
+    "message": "Suara saja"
+  },
+  "qualityTooBig": {
+    "message": "$LABEL$ · lebih dari 8 GB",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      }
+    }
+  },
+  "qualityFailed": {
+    "message": "Kualitas tidak bisa dibaca, jadi 1080p atau yang terdekat di bawahnya akan diunduh."
+  },
+  "sizeMb": {
+    "message": "$N$ MB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeGb": {
+    "message": "$N$ GB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

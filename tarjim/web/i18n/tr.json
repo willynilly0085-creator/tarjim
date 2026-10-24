@@ -442,5 +442,13 @@
   "engineFailed": "Kaydedilemedi. Tekrar dene.",
   "tool_accuracy_upgrading": "Şu an çalışıyor. Bu modelin yeni sürümü arka planda iniyor ve kendiliğinden yerini alacak.",
   "tool_accuracy_upgrade_manual": "Şu an çalışıyor. Bu modelin yeni sürümü indirilmeye hazır ve kendiliğinden yerini alacak.",
-  "tool_accuracy_upgrade_failed": "Şu an çalışıyor. Yeni sürümün indirilmesi bitmedi. Yeniden deneyin: kaldığı yerden devam eder."
+  "tool_accuracy_upgrade_failed": "Şu an çalışıyor. Yeni sürümün indirilmesi bitmedi. Yeniden deneyin: kaldığı yerden devam eder.",
+  "quality": "Kalite",
+  "qualityReading": "Mevcut kaliteler okunuyor…",
+  "qualityRow": "{label} · yaklaşık {size}",
+  "qualityAudio": "Yalnızca ses",
+  "qualityTooBig": "{label} · 8 GB'tan büyük",
+  "qualityFailed": "Kaliteler okunamadı; 1080p ya da altındaki en yakın kalite indirilecek.",
+  "sizeMb": "{n} MB",
+  "phone_choose_quality": "Hangi kaliteyi indireyim?"
 }

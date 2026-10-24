@@ -442,5 +442,13 @@
   "engineFailed": "Não foi possível salvar. Tente de novo.",
   "tool_accuracy_upgrading": "Já funciona. Uma versão mais nova deste modelo está sendo baixada em segundo plano e assume sozinha.",
   "tool_accuracy_upgrade_manual": "Já funciona. Uma versão mais nova deste modelo está pronta para baixar, e assume sozinha.",
-  "tool_accuracy_upgrade_failed": "Já funciona. A versão mais nova não terminou de baixar. Tente de novo: continua de onde parou."
+  "tool_accuracy_upgrade_failed": "Já funciona. A versão mais nova não terminou de baixar. Tente de novo: continua de onde parou.",
+  "quality": "Qualidade",
+  "qualityReading": "Lendo as qualidades disponíveis…",
+  "qualityRow": "{label} · cerca de {size}",
+  "qualityAudio": "Só o som",
+  "qualityTooBig": "{label} · mais de 8 GB",
+  "qualityFailed": "Não foi possível ler as qualidades; será baixado 1080p ou a mais próxima abaixo.",
+  "sizeMb": "{n} MB",
+  "phone_choose_quality": "Que qualidade devo baixar?"
 }

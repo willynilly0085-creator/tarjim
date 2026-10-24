@@ -46,6 +46,11 @@
           <label class="field-label" for="link" data-i18n="linkLabel"></label>
           <input class="text-input" id="link" type="url" inputmode="url" dir="ltr" placeholder="https://">
         </div>
+        <div class="field quality" id="quality-field" hidden>
+          <label class="field-label" for="quality" data-i18n="quality"></label>
+          <select id="quality" class="select" hidden></select>
+          <p class="meta quality-note" id="quality-note" role="status" aria-live="polite"></p>
+        </div>
         <button class="button-quiet wide" id="open-file-page" type="button">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>
           <span data-i18n="pickFile"></span>

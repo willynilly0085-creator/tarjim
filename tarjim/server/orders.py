@@ -1,6 +1,7 @@
 import json
 from typing import Any
 
+from tarjim.qualities import AUDIO, clean
 from tarjim.server.jobs import Order
 
 BLOCK = 1024 * 1024
@@ -12,8 +13,11 @@ def first(query: Query, key: str) -> str:
 
 
 def order_from(source: str, data: dict[str, Any], name: str = "") -> Order:
-    return Order(source, str(data.get("target") or "ar"), str(data.get("mode") or "burn"),
-                 str(data.get("dialect") or "saudi"), name)
+    mode = str(data.get("mode") or "burn")
+    quality = clean(data.get("quality"))
+    sound_only = quality == AUDIO and mode != "srt"  # burning and dubbing need the picture
+    return Order(source, str(data.get("target") or "ar"), mode,
+                 str(data.get("dialect") or "saudi"), name, "" if sound_only else quality)
 
 
 def body_size(headers: Any) -> int:

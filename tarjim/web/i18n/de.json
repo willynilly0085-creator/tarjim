@@ -442,5 +442,13 @@
   "engineFailed": "Speichern hat nicht geklappt. Versuch es noch einmal.",
   "tool_accuracy_upgrading": "Funktioniert jetzt. Eine neuere Version dieses Modells lädt im Hintergrund und übernimmt von selbst.",
   "tool_accuracy_upgrade_manual": "Funktioniert jetzt. Eine neuere Version dieses Modells ist zum Herunterladen bereit und übernimmt von selbst.",
-  "tool_accuracy_upgrade_failed": "Funktioniert jetzt. Die neuere Version wurde nicht fertig geladen. Versuch es noch einmal: Es geht dort weiter, wo es aufgehört hat."
+  "tool_accuracy_upgrade_failed": "Funktioniert jetzt. Die neuere Version wurde nicht fertig geladen. Versuch es noch einmal: Es geht dort weiter, wo es aufgehört hat.",
+  "quality": "Qualität",
+  "qualityReading": "Verfügbare Qualitäten werden gelesen…",
+  "qualityRow": "{label} · etwa {size}",
+  "qualityAudio": "Nur Ton",
+  "qualityTooBig": "{label} · über 8 GB",
+  "qualityFailed": "Die Qualitäten ließen sich nicht lesen; geladen wird 1080p oder die nächstniedrigere.",
+  "sizeMb": "{n} MB",
+  "phone_choose_quality": "Welche Qualität soll ich laden?"
 }

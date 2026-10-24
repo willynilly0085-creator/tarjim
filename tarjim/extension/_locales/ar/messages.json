@@ -446,5 +446,52 @@
   },
   "modelSuggested": {
     "message": "مقترح للترجمة"
+  },
+  "quality": {
+    "message": "الجودة"
+  },
+  "qualityReading": {
+    "message": "نقرأ الجودات المتاحة…"
+  },
+  "qualityRow": {
+    "message": "$LABEL$ · تقريباً $SIZE$",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      },
+      "size": {
+        "content": "$2"
+      }
+    }
+  },
+  "qualityAudio": {
+    "message": "صوت فقط"
+  },
+  "qualityTooBig": {
+    "message": "$LABEL$ · أكبر من 8 GB",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      }
+    }
+  },
+  "qualityFailed": {
+    "message": "ما قدرنا نقرأ الجودات، بينزل 1080p أو أقرب وحدة تحتها."
+  },
+  "sizeMb": {
+    "message": "$N$ MB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeGb": {
+    "message": "$N$ GB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

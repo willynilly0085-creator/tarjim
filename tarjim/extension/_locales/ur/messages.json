@@ -446,5 +446,52 @@
   },
   "modelSuggested": {
     "message": "ترجمے کے لیے تجویز کردہ"
+  },
+  "quality": {
+    "message": "کوالٹی"
+  },
+  "qualityReading": {
+    "message": "دستیاب کوالٹیز پڑھی جا رہی ہیں…"
+  },
+  "qualityRow": {
+    "message": "$LABEL$ · تقریباً $SIZE$",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      },
+      "size": {
+        "content": "$2"
+      }
+    }
+  },
+  "qualityAudio": {
+    "message": "صرف آواز"
+  },
+  "qualityTooBig": {
+    "message": "$LABEL$ · 8 GB سے زیادہ",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      }
+    }
+  },
+  "qualityFailed": {
+    "message": "کوالٹیز نہیں پڑھی جا سکیں، اس لیے 1080p یا اس سے نیچے کی قریب ترین ڈاؤن لوڈ ہوگی۔"
+  },
+  "sizeMb": {
+    "message": "$N$ MB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeGb": {
+    "message": "$N$ GB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

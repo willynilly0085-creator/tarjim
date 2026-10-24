@@ -2,6 +2,7 @@ import { $, api, post, upload } from "./api.js";
 import { showEngine } from "./engine.js";
 import { t } from "./i18n.js";
 import { watchJobs } from "./jobs.js";
+import { chosenQuality, forgetQuality, qualityBlocked, soundOnly, watchQuality } from "./quality.js";
 import { showUpdate } from "./update.js";
 import { linkedVoices, loadVoices, speechName } from "./voices.js";
 
@@ -9,7 +10,7 @@ const MEDIA = /\.(mp4|mkv|webm|mov|avi|m4v|mp3|m4a|wav|flac|ogg|opus|aac)$/i;
 const state = { file: null, poll: 0, wired: false, languages: new Map() };
 const LINKED = { eleven: "voiceEleven", elevenclone: "voiceElevenClone", speech: "voiceSpeech" };
 
-const linkReady = () => /^https?:\/\//i.test($("link").value.trim());
+const linkReady = () => /^https?:\/\//i.test($("link").value.trim()) && !qualityBlocked();
 const ready = () => Boolean(state.file) || linkReady();
 
 function sync() {
@@ -19,6 +20,7 @@ function sync() {
   $("voice-narrator").hidden = !arabic;
   if (!arabic && $("voice").value === "fishvoice") $("voice").value = "clone";
   $("voice-field").hidden = form.mode.value !== "dub";
+  soundOnly(form.mode.value === "srt");
   $("go").disabled = !ready();
 }
 
@@ -66,11 +68,12 @@ async function submit(event) {
   $("go").textContent = t("sending");
   try {
     if (state.file) await upload(state.file, choices(), progress);
-    else await post("/jobs", { url: $("link").value.trim(), ...choices() });
+    else await post("/jobs", { url: $("link").value.trim(), ...choices(), quality: chosenQuality() });
     $("notice").textContent = t("started");
     state.file = null;
     $("file").value = "";
     $("link").value = "";
+    forgetQuality();
     $("drop-file").hidden = true;
   } catch {
     $("notice").textContent = t("err_unknown");
@@ -89,6 +92,7 @@ function wire() {
   zone.addEventListener("drop", (event) => { event.preventDefault(); zone.classList.remove("over"); take(event.dataTransfer.files[0]); });
   $("order").addEventListener("change", sync);
   $("link").addEventListener("input", sync);
+  watchQuality($("link"), sync);
   $("order").addEventListener("submit", submit);
   state.wired = true;
 }

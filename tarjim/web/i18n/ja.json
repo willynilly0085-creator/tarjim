@@ -442,5 +442,13 @@
   "engineFailed": "保存できませんでした。もう一度お試しください。",
   "tool_accuracy_upgrading": "今も使えます。このモデルの新しい版をバックグラウンドでダウンロード中で、終わると自動で切り替わります。",
   "tool_accuracy_upgrade_manual": "今も使えます。このモデルの新しい版をダウンロードできます。終わると自動で切り替わります。",
-  "tool_accuracy_upgrade_failed": "今も使えます。新しい版のダウンロードが完了しませんでした。もう一度お試しください。止まったところから続きます。"
+  "tool_accuracy_upgrade_failed": "今も使えます。新しい版のダウンロードが完了しませんでした。もう一度お試しください。止まったところから続きます。",
+  "quality": "画質",
+  "qualityReading": "利用できる画質を確認しています…",
+  "qualityRow": "{label} · 約 {size}",
+  "qualityAudio": "音声のみ",
+  "qualityTooBig": "{label} · 8 GB 超",
+  "qualityFailed": "画質を確認できなかったため、1080p かそれ以下で最も近い画質をダウンロードします。",
+  "sizeMb": "{n} MB",
+  "phone_choose_quality": "どの画質でダウンロードしますか？"
 }

@@ -5,6 +5,7 @@ from typing import Any
 from mcp.server.mcpserver import MCPServer
 
 from tarjim.assistant_http import call, fetch_text, wait_for
+from tarjim.assistant_quality import answer
 from tarjim.assistant_settings import attach
 from tarjim.assistant_setup import install, start, status
 
@@ -21,30 +22,38 @@ tarjim = MCPServer("tarjim", instructions=(
     "open_tarjim_page opens."))
 
 
-def mode_for(output: str, voice: str) -> str:
-    mode = OUTPUTS.get(output, "burn")
+def mode_for(output: str) -> str:
+    kind, _, voice = output.partition("-")
+    mode = OUTPUTS.get(kind, "burn")
     chosen = {"natural": "gemini"}.get(voice, voice if voice in VOICES else "gemini")
     return f"dub-{chosen}" if mode == "dub" else mode
 
 
 @tarjim.tool()
 def translate_video(source: str, language: str = "ar", output: str = "burned",
-                    voice: str = "natural") -> Any:
+                    quality: str = "") -> Any:
     """Translate a video from a link (YouTube, X, ...) or a local file path.
 
     language: target language code such as ar, en, fr, ja. Arabic is Saudi by default;
     use "ar-msa" for Modern Standard Arabic.
     output: "burned" (subtitles inside the video), "subtitles" (an .srt file) or "dubbed".
-    voice (dubbing only): "natural" Gemini voices per speaker (default), "clone" the speaker's own
-    voice on this computer, "studio", "fish" cloud cloning, "fishvoice" Arabic narrator, "eleven"
-    ElevenLabs voices, "elevenclone" the speaker's voice there, "speech" a linked voice service.
+    Dubbing takes a voice after a dash: "dubbed" is natural Gemini voices per speaker,
+    "dubbed-clone" the speaker's own voice on this computer, "dubbed-studio", "dubbed-fish" cloud
+    cloning, "dubbed-fishvoice" Arabic narrator, "dubbed-eleven" ElevenLabs voices,
+    "dubbed-elevenclone" the speaker's voice there, "dubbed-speech" a linked voice service.
+    quality (links only): leave it empty the first time. The link is not started; the answer
+    lists the qualities it offers, to ask the person. Then call again with their pick: a number
+    such as "1080" or "720", "audio" (subtitles only), or "default".
     """
     target, _, dialect = language.partition("-")
-    order = {"target": target, "mode": mode_for(output, voice),
+    order = {"target": target, "mode": mode_for(output),
              "dialect": "msa" if dialect == "msa" else "saudi"}
-    if source.lower().startswith(("http://", "https://")):
-        return call("/jobs", {"url": source, **order})
-    return call("/jobs/local", {"path": source, **order})
+    if not source.lower().startswith(("http://", "https://")):
+        return call("/jobs/local", {"path": source, **order})
+    if quality:
+        return call("/jobs", {"url": source, **order, "quality": quality})
+    found = call("/links/qualities", {"url": source})
+    return answer(found, lambda: call("/jobs", {"url": source, **order}), order["mode"] == "srt")
 
 
 @tarjim.tool()

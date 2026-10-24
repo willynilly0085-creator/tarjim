@@ -446,5 +446,52 @@
   },
   "modelSuggested": {
     "message": "çeviri için önerilir"
+  },
+  "quality": {
+    "message": "Kalite"
+  },
+  "qualityReading": {
+    "message": "Mevcut kaliteler okunuyor…"
+  },
+  "qualityRow": {
+    "message": "$LABEL$ · yaklaşık $SIZE$",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      },
+      "size": {
+        "content": "$2"
+      }
+    }
+  },
+  "qualityAudio": {
+    "message": "Yalnızca ses"
+  },
+  "qualityTooBig": {
+    "message": "$LABEL$ · 8 GB'tan büyük",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      }
+    }
+  },
+  "qualityFailed": {
+    "message": "Kaliteler okunamadı; 1080p ya da altındaki en yakın kalite indirilecek."
+  },
+  "sizeMb": {
+    "message": "$N$ MB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeGb": {
+    "message": "$N$ GB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

@@ -442,5 +442,13 @@
   "engineFailed": "No se pudo guardar. Inténtalo de nuevo.",
   "tool_accuracy_upgrading": "Funciona ya. Una versión más nueva de este modelo se descarga en segundo plano y lo sustituye sola.",
   "tool_accuracy_upgrade_manual": "Funciona ya. Hay una versión más nueva de este modelo lista para descargar, y lo sustituye sola.",
-  "tool_accuracy_upgrade_failed": "Funciona ya. La versión más nueva no terminó de descargarse. Vuelve a intentarlo: sigue donde se quedó."
+  "tool_accuracy_upgrade_failed": "Funciona ya. La versión más nueva no terminó de descargarse. Vuelve a intentarlo: sigue donde se quedó.",
+  "quality": "Calidad",
+  "qualityReading": "Leyendo las calidades disponibles…",
+  "qualityRow": "{label} · unos {size}",
+  "qualityAudio": "Solo sonido",
+  "qualityTooBig": "{label} · más de 8 GB",
+  "qualityFailed": "No se pudieron leer las calidades; se descargará 1080p o la más cercana por debajo.",
+  "sizeMb": "{n} MB",
+  "phone_choose_quality": "¿Qué calidad descargo?"
 }

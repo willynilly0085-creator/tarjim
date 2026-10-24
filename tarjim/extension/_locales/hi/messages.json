@@ -446,5 +446,52 @@
   },
   "modelSuggested": {
     "message": "अनुवाद के लिए सुझाया गया"
+  },
+  "quality": {
+    "message": "गुणवत्ता"
+  },
+  "qualityReading": {
+    "message": "उपलब्ध गुणवत्ताएँ पढ़ी जा रही हैं…"
+  },
+  "qualityRow": {
+    "message": "$LABEL$ · लगभग $SIZE$",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      },
+      "size": {
+        "content": "$2"
+      }
+    }
+  },
+  "qualityAudio": {
+    "message": "सिर्फ़ आवाज़"
+  },
+  "qualityTooBig": {
+    "message": "$LABEL$ · 8 GB से ज़्यादा",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      }
+    }
+  },
+  "qualityFailed": {
+    "message": "गुणवत्ताएँ पढ़ी नहीं जा सकीं, इसलिए 1080p या उससे नीचे की सबसे क़रीबी डाउनलोड होगी।"
+  },
+  "sizeMb": {
+    "message": "$N$ MB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeGb": {
+    "message": "$N$ GB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

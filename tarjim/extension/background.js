@@ -1,7 +1,7 @@
 import { buildMenus, isMode, OTHER } from "./menus.js";
 import { claimPending, sendWaitingJob } from "./pairing.js";
 import { clickedPost, downloadable } from "./posts.js";
-import { ApiError, api, errorLabel, loadWords, remember, settings, startJob, t } from "./shared.js";
+import { ApiError, api, errorLabel, loadWords, remember, t } from "./shared.js";
 
 const POLL = "poll";
 
@@ -40,18 +40,12 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     notify(`nourl-${Date.now()}`, t("appName"), t("menuNoVideo"));
     return;
   }
-  const { target, dialect } = await settings();
+  // The window opens on this link with the kind picked here, and the person picks the quality
+  // there; when the browser cannot open it from a menu, the full page does the same.
   const mode = info.menuItemId;
-  try {
-    await startJob({ url, target, dialect, mode });
-    await remember(mode.startsWith("dub-") ? { mode, voice: mode.slice(4) } : { mode });
-    refresh();
-    await chrome.action.openPopup().catch(() => notify(`start-${Date.now()}`, t("appName"), t("notifyStarted")));
-  } catch (error) {
-    const unpaired = error.kind !== "offline";
-    if (unpaired) await remember({ waitingJob: { url, target, dialect, mode } });
-    chrome.tabs.create({ url: chrome.runtime.getURL(unpaired ? "app.html?pair=auto" : "app.html") });
-  }
+  await remember({ ...(mode.startsWith("dub-") ? { mode, voice: mode.slice(4) } : { mode }),
+    pendingLink: { url, at: Date.now() } });
+  await chrome.action.openPopup().catch(() => chrome.tabs.create({ url: chrome.runtime.getURL("app.html?page=1") }));
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {

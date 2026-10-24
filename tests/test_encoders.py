@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -31,10 +32,29 @@ def test_a_burn_without_nvidia_or_x264_uses_openh264(
     tried: list[str] = []
     monkeypatch.setattr(burn, "run", fake_ffmpeg("libopenh264", tried))
     monkeypatch.setattr(burn, "video_kbps", lambda _video: 2000)
+    monkeypatch.setattr(burn, "codec", lambda _video: "h264")
     monkeypatch.setattr(burn, "tool", lambda _name: "ffmpeg")
     target = burn.encode(tmp_path / "in.mp4", tmp_path / "out.mp4", tmp_path, None)
     assert target.read_bytes() == b"video" and tried[-1] == "libopenh264"
     assert "libx264" in tried
+
+
+FFMPEG = shutil.which("ffmpeg")
+
+
+@pytest.mark.skipif(not FFMPEG, reason="needs ffmpeg with VP9 and H.264 encoders")
+@pytest.mark.parametrize("case", [
+    ("libvpx-vp9", "vp9", 1840), ("libx264", "h264", 1150), ("mpeg4", "mpeg4", 1150)])
+def test_the_burns_ceiling_gives_h264_the_bits_the_sources_codec_saved(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: tuple[str, str, int]) -> None:
+    encoder, found, ceiling = case
+    clip = tmp_path / "clip.mkv"
+    subprocess.run([str(FFMPEG), "-y", "-loglevel", "error", "-f", "lavfi", "-i",
+                    "testsrc=size=64x36:rate=10", "-t", "1", "-c:v", encoder, str(clip)],
+                   check=True)
+    monkeypatch.setattr(burn, "tool", lambda name: shutil.which(name) or name)
+    monkeypatch.setattr(burn, "video_kbps", lambda _video: 1000)
+    assert burn.codec(clip) == found and burn.ceiling_kbps(clip) == ceiling
 
 
 def test_the_phone_copy_without_x264_uses_the_next_encoder(

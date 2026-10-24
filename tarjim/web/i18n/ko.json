@@ -442,5 +442,13 @@
   "engineFailed": "저장하지 못했어요. 다시 시도해 주세요.",
   "tool_accuracy_upgrading": "지금도 작동합니다. 이 모델의 새 버전을 백그라운드에서 내려받는 중이며, 끝나면 알아서 바뀝니다.",
   "tool_accuracy_upgrade_manual": "지금도 작동합니다. 이 모델의 새 버전을 내려받을 수 있으며, 끝나면 알아서 바뀝니다.",
-  "tool_accuracy_upgrade_failed": "지금도 작동합니다. 새 버전을 다 내려받지 못했습니다. 다시 시도하면 멈춘 곳부터 이어서 받습니다."
+  "tool_accuracy_upgrade_failed": "지금도 작동합니다. 새 버전을 다 내려받지 못했습니다. 다시 시도하면 멈춘 곳부터 이어서 받습니다.",
+  "quality": "화질",
+  "qualityReading": "받을 수 있는 화질을 확인하는 중…",
+  "qualityRow": "{label} · 약 {size}",
+  "qualityAudio": "소리만",
+  "qualityTooBig": "{label} · 8 GB 초과",
+  "qualityFailed": "화질을 확인하지 못해 1080p 또는 그보다 낮은 가장 가까운 화질로 받습니다.",
+  "sizeMb": "{n} MB",
+  "phone_choose_quality": "어떤 화질로 받을까요?"
 }

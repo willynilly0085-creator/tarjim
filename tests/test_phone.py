@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from tarjim import config
+from tarjim import config, fetch
 from tarjim.phone import bot as inbox_module
 from tarjim.phone import delivery, links, telegram
 from tarjim.phone.bot import Inbox, Pairing
@@ -62,6 +62,9 @@ class FakeJobs:
 def home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setattr(config, "HOME", tmp_path)
     monkeypatch.setattr(config, "CONFIG", tmp_path / "config.json")
+    # A link offers one quality, so these tests go straight on (test_phone_quality.py asks).
+    monkeypatch.setattr(fetch, "look", lambda _url: {"choices": [], "default": "", "audio": None,
+                                                     "limit": 8 * 1024 ** 3, "title": ""})
     return tmp_path
 
 

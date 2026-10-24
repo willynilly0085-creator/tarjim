@@ -6,6 +6,7 @@ import { showPhone } from "./phone.js";
 import { repaint, startSettings, startWizard, wireWizard } from "./wizard.js";
 import { repaintAssistant, startAssistant } from "./assistant.js";
 import { openWorkspace } from "./workspace.js";
+import { repaintQuality } from "./quality.js";
 
 async function boot() {
   const setup = await api("/setup");
@@ -18,6 +19,7 @@ async function boot() {
     await load($("ui-language").value);
     repaint();
     repaintAssistant();
+    repaintQuality();
   });
   const manual = (from) => startWizard(setup, openWorkspace, from);
   const settings = async () => {

@@ -446,5 +446,52 @@
   },
   "modelSuggested": {
     "message": "empfohlen zum Übersetzen"
+  },
+  "quality": {
+    "message": "Qualität"
+  },
+  "qualityReading": {
+    "message": "Verfügbare Qualitäten werden gelesen…"
+  },
+  "qualityRow": {
+    "message": "$LABEL$ · etwa $SIZE$",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      },
+      "size": {
+        "content": "$2"
+      }
+    }
+  },
+  "qualityAudio": {
+    "message": "Nur Ton"
+  },
+  "qualityTooBig": {
+    "message": "$LABEL$ · über 8 GB",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      }
+    }
+  },
+  "qualityFailed": {
+    "message": "Die Qualitäten ließen sich nicht lesen; geladen wird 1080p oder die nächstniedrigere."
+  },
+  "sizeMb": {
+    "message": "$N$ MB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeGb": {
+    "message": "$N$ GB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

@@ -446,5 +446,52 @@
   },
   "modelSuggested": {
     "message": "번역에 추천"
+  },
+  "quality": {
+    "message": "화질"
+  },
+  "qualityReading": {
+    "message": "받을 수 있는 화질을 확인하는 중…"
+  },
+  "qualityRow": {
+    "message": "$LABEL$ · 약 $SIZE$",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      },
+      "size": {
+        "content": "$2"
+      }
+    }
+  },
+  "qualityAudio": {
+    "message": "소리만"
+  },
+  "qualityTooBig": {
+    "message": "$LABEL$ · 8 GB 초과",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      }
+    }
+  },
+  "qualityFailed": {
+    "message": "화질을 확인하지 못해 1080p 또는 그보다 낮은 가장 가까운 화질로 받습니다."
+  },
+  "sizeMb": {
+    "message": "$N$ MB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeGb": {
+    "message": "$N$ GB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

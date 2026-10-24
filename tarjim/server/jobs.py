@@ -48,6 +48,7 @@ class Order:
     mode: str = "burn"
     dialect: str = "saudi"
     name: str = ""
+    quality: str = ""  # a link's picked quality (tarjim/qualities.py); empty: 1080p or below
 
 
 @dataclass

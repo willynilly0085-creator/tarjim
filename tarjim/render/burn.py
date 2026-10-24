@@ -6,7 +6,13 @@ folder. The mark's logo is a second input, opened as a PNG and nothing else.
 The encoders aim at a quality, not a size, and on a clip that was already compressed hard (a
 phone video, a download) that alone made the result two to three times larger than the source:
 measured, 48 MB in and 127 MB out. Writing text onto a picture adds no detail worth those bits,
-so the result may spend a little more than the source did and no more."""
+so the result may spend a little more than the source did and no more.
+
+A little more than the source counted in H.264's bits, though: most videos from YouTube and
+other sites come as AV1 or VP9, which draw the same picture with about half and two thirds of
+H.264's bits. Capped at the source's own rate, a 1080p AV1 download came out visibly softer
+(the owner: "do not compress the video and spoil its quality"), so the cap is weighed by the
+source's codec. The result stays H.264, which every phone and editor plays."""
 import tempfile
 from pathlib import Path
 
@@ -16,6 +22,7 @@ from tarjim.render.mark import LOGO, Mark, overlay, with_mark
 
 PLAIN = "subtitles.ass"
 HEADROOM = 1.15
+WEIGHTS = {"av1": 2.0, "vp9": 1.6, "hevc": 1.6}
 
 
 def burn(video: Path, subtitles: str, target: Path, mark: Mark | None = None) -> Path:
@@ -36,10 +43,23 @@ def ceiling(rate: int) -> list[str]:
     return ["-maxrate", f"{rate}k", "-bufsize", f"{2 * rate}k"] if rate else []
 
 
+def codec(video: Path) -> str:
+    out = run([tool("ffprobe"), "-v", "error", "-select_streams", "v:0", "-show_entries",
+               "stream=codec_name", "-of", "csv=p=0", *source(video)])
+    return out.stdout.strip().lower()
+
+
+def ceiling_kbps(video: Path) -> int:
+    """The most the burned picture may spend: the source's rate, as H.264 would need it; 0 (no
+    ceiling) when the file does not say its rate."""
+    kbps = video_kbps(video)
+    return int(kbps * HEADROOM * WEIGHTS.get(codec(video), 1.0)) if kbps else 0
+
+
 def encode(video: Path, target: Path, folder: Path, mark: Mark | None) -> Path:
     base = [tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", *source(video),
             *drawing(mark), "-c:a", "copy", "-movflags", "+faststart"]
-    rate = int(video_kbps(video) * HEADROOM)
+    rate = ceiling_kbps(video)
     errors, limit = [], ceiling(rate)
     for encoder in for_quality(rate):
         result = run([*base, *encoder, *limit, str(target)], cwd=folder)

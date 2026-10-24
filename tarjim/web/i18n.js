@@ -1,6 +1,6 @@
 let words = {};
 
-const LTR_RUN = /\d[\d.,]*\s?GB/g;
+const LTR_RUN = /(?<![\u2066\d.,])\d[\d.,]*\s?[GM]B/g;
 const keepLeftToRight = (text) => text.replace(LTR_RUN, (run) => `\u2066${run}\u2069`);
 
 export const t = (key, values = {}) =>

@@ -36,6 +36,18 @@ class Waiting:
         with self.lock:
             return key in self.items
 
+    def peek(self, key: str) -> dict[str, Any] | None:
+        with self.lock:
+            return self.items.get(key)
+
+    def mark(self, key: str, **values: Any) -> bool:
+        """Keep a choice with a waiting item; False when the item is gone."""
+        with self.lock:
+            found = key in self.items
+            if found:
+                self.items[key].update(values)
+            return found
+
     def take(self, key: str) -> dict[str, Any] | None:
         with self.lock:
             return self.items.pop(key, None)

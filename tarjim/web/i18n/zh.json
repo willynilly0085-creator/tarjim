@@ -442,5 +442,13 @@
   "engineFailed": "保存失败，请重试。",
   "tool_accuracy_upgrading": "现在就能用。这个模型的新版本正在后台下载，下载完会自动替换。",
   "tool_accuracy_upgrade_manual": "现在就能用。这个模型的新版本可以下载，下载完会自动替换。",
-  "tool_accuracy_upgrade_failed": "现在就能用。新版本没有下载完。请再试一次，会从中断的地方继续。"
+  "tool_accuracy_upgrade_failed": "现在就能用。新版本没有下载完。请再试一次，会从中断的地方继续。",
+  "quality": "画质",
+  "qualityReading": "正在读取可用画质…",
+  "qualityRow": "{label} · 约 {size}",
+  "qualityAudio": "仅声音",
+  "qualityTooBig": "{label} · 超过 8 GB",
+  "qualityFailed": "无法读取画质，将下载 1080p 或低于它的最接近画质。",
+  "sizeMb": "{n} MB",
+  "phone_choose_quality": "下载哪种画质？"
 }

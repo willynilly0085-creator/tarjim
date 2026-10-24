@@ -29,7 +29,7 @@ def perform(task: Task, downloads: Path) -> None:
     PROGRESS.set(lambda done, total: setattr(task, "moved", (done, total)))
     task.stage = "downloading" if is_url(order.source) else "hearing"
     task.undo.append(Undo(HOME / "sources", keep=lambda: task.video))
-    task.video = resolve(order.source, HOME / "sources")
+    task.video = resolve(order.source, HOME / "sources", order.quality)
     task.checkpoint()
     task.moved = (0, 0)
     downloads.mkdir(parents=True, exist_ok=True)

@@ -446,5 +446,52 @@
   },
   "modelSuggested": {
     "message": "推荐用于翻译"
+  },
+  "quality": {
+    "message": "画质"
+  },
+  "qualityReading": {
+    "message": "正在读取可用画质…"
+  },
+  "qualityRow": {
+    "message": "$LABEL$ · 约 $SIZE$",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      },
+      "size": {
+        "content": "$2"
+      }
+    }
+  },
+  "qualityAudio": {
+    "message": "仅声音"
+  },
+  "qualityTooBig": {
+    "message": "$LABEL$ · 超过 8 GB",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      }
+    }
+  },
+  "qualityFailed": {
+    "message": "无法读取画质，将下载 1080p 或低于它的最接近画质。"
+  },
+  "sizeMb": {
+    "message": "$N$ MB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeGb": {
+    "message": "$N$ GB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

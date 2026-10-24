@@ -446,5 +446,52 @@
   },
   "modelSuggested": {
     "message": "conseillé pour la traduction"
+  },
+  "quality": {
+    "message": "Qualité"
+  },
+  "qualityReading": {
+    "message": "Lecture des qualités disponibles…"
+  },
+  "qualityRow": {
+    "message": "$LABEL$ · environ $SIZE$",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      },
+      "size": {
+        "content": "$2"
+      }
+    }
+  },
+  "qualityAudio": {
+    "message": "Son uniquement"
+  },
+  "qualityTooBig": {
+    "message": "$LABEL$ · plus de 8 Go",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      }
+    }
+  },
+  "qualityFailed": {
+    "message": "Impossible de lire les qualités : la vidéo sera téléchargée en 1080p ou dans la plus proche en dessous."
+  },
+  "sizeMb": {
+    "message": "$N$ Mo",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeGb": {
+    "message": "$N$ Go",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

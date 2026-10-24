@@ -22,6 +22,7 @@ from tarjim.server.jobs import MODES, Board, Order, Task
 from tarjim.server.orders import body_size, copy_limited, first, json_body, order_from
 from tarjim.server.pages import PageRoutes
 from tarjim.server.pairing import Pairing
+from tarjim.server.quality_routes import QualityRoutes
 from tarjim.server.routes import GET_ROUTES, POST_ROUTES, KeyRoutes, Query, Routes, is_open
 from tarjim.server.setup_routes import SetupRoutes
 from tarjim.tools import shelf
@@ -33,7 +34,7 @@ TOKEN_HEADERS = ("X-Tarjim-Token", "X-Trans-Token")
 LEGACY = {"dub": "dub-gemini"}
 
 
-class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes):
+class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoutes):
     board: ClassVar[Board]
     token: ClassVar[str]
     uploads: ClassVar[Path]

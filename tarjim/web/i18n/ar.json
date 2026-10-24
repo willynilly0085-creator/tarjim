@@ -442,5 +442,13 @@
   "engineFailed": "ما انحفظ، جرّب مرة ثانية.",
   "tool_accuracy_upgrading": "شغّال الحين. فيه نسخة أحدث من النموذج تنزل بالخلفية، وتاخذ مكانه بنفسها.",
   "tool_accuracy_upgrade_manual": "شغّال الحين. فيه نسخة أحدث من النموذج جاهزة للتنزيل، وتاخذ مكانه بنفسها.",
-  "tool_accuracy_upgrade_failed": "شغّال الحين. تنزيل النسخة الأحدث ما اكتمل. جرّب مرة ثانية ويكمل من وين ما وقف."
+  "tool_accuracy_upgrade_failed": "شغّال الحين. تنزيل النسخة الأحدث ما اكتمل. جرّب مرة ثانية ويكمل من وين ما وقف.",
+  "quality": "الجودة",
+  "qualityReading": "نقرأ الجودات المتاحة…",
+  "qualityRow": "{label} · تقريباً {size}",
+  "qualityAudio": "صوت فقط",
+  "qualityTooBig": "{label} · أكبر من 8 GB",
+  "qualityFailed": "ما قدرنا نقرأ الجودات، بينزل 1080p أو أقرب وحدة تحتها.",
+  "sizeMb": "{n} MB",
+  "phone_choose_quality": "أي جودة أنزّل؟"
 }

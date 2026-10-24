@@ -2,11 +2,13 @@ import threading
 from pathlib import Path
 from typing import Any
 
+from tarjim import qualities
 from tarjim.job import checkpoint, progress
 from tarjim.media import tool
 
-FORMAT = "bv*[ext=mp4][height<=1080]+ba[ext=m4a]/b[ext=mp4]/b"
-NAME = "%(title).70s [%(id)s].%(ext)s"
+# The quality's name (tarjim_quality, set by tarjim) follows a space when there is one, so the
+# same video in another quality is a file of its own.
+NAME = "%(title).70s [%(id)s]%(tarjim_quality& {})s.%(ext)s"
 MEDIA_SUFFIXES = (".mp4", ".mkv", ".webm", ".m4a", ".mp3")
 LARGEST = 8 * 1024 ** 3
 # What yt-dlp calls a link that stands for several videos. "noplaylist" only picks the video
@@ -47,15 +49,20 @@ class Budget:
         self.ffmpeg[1] = str(left)
 
 
-def options(folder: Path) -> dict[str, Any]:
+def asking() -> dict[str, Any]:
+    """Reading what a link is: one video or a list, live or not, and its qualities."""
     from yt_dlp.utils import match_filter_func
 
-    budget = Budget()
-    return {"format": FORMAT, "outtmpl": str(folder / NAME), "merge_output_format": "mp4",
-            "ffmpeg_location": tool("ffmpeg"), "noplaylist": True, "quiet": True,
-            "no_warnings": True, "progress_hooks": [budget, told], "max_filesize": LARGEST,
-            "external_downloader_args": {"ffmpeg_o": budget.ffmpeg},
+    return {"noplaylist": True, "quiet": True, "no_warnings": True,
             "match_filter": match_filter_func("!is_live"), "extract_flat": "in_playlist"}
+
+
+def options(folder: Path, choice: Any = qualities.FALLBACK) -> dict[str, Any]:
+    budget = Budget()
+    return {**asking(), "format": choice, "outtmpl": str(folder / NAME),
+            "merge_output_format": "mp4", "ffmpeg_location": tool("ffmpeg"),
+            "progress_hooks": [budget, told], "max_filesize": LARGEST,
+            "external_downloader_args": {"ffmpeg_o": budget.ffmpeg}}
 
 
 def one_video(ydl: Any, url: str) -> dict[str, Any]:
@@ -73,18 +80,31 @@ def clear(folder: Path, name: str, before: set[Path]) -> None:
             path.unlink(missing_ok=True)
 
 
-def download(url: str, folder: Path) -> Path:
+def look(url: str) -> dict[str, Any]:
+    """The qualities this link offers, read without downloading anything. Not under IN_USE: a
+    download holds it for as long as it runs, and reading must not wait behind one."""
+    from yt_dlp import YoutubeDL
+
+    with YoutubeDL({**asking(), "socket_timeout": qualities.ASK_SECONDS}) as ydl:
+        return {**qualities.offer(ydl, one_video(ydl, url)), "limit": LARGEST}
+
+
+def download(url: str, folder: Path, quality: str = "") -> Path:
     with IN_USE:
-        return download_now(url, folder)
+        return download_now(url, folder, quality)
 
 
-def download_now(url: str, folder: Path) -> Path:
+def download_now(url: str, folder: Path, quality: str = "") -> Path:
+    """quality: a number of lines such as "720", "audio", or nothing for 1080p or the nearest
+    below it. The link is read once, and exactly the picked quality is downloaded."""
     from yt_dlp import YoutubeDL
 
     folder.mkdir(parents=True, exist_ok=True)
     before = set(folder.iterdir())
-    with YoutubeDL(options(folder)) as ydl:
-        info = one_video(ydl, url)
+    choice = qualities.Choice(quality)
+    with YoutubeDL(options(folder, choice)) as ydl:
+        choice.ydl = ydl
+        info = {**one_video(ydl, url), "tarjim_quality": choice.named}
         path = Path(ydl.prepare_filename(info))
         try:
             ydl.process_ie_result(info, download=True)
@@ -106,5 +126,5 @@ def media(path: Path, url: str) -> Path:
     return video
 
 
-def resolve(source: str, folder: Path) -> Path:
-    return download(source, folder) if is_url(source) else Path(source)
+def resolve(source: str, folder: Path, quality: str = "") -> Path:
+    return download(source, folder, quality) if is_url(source) else Path(source)

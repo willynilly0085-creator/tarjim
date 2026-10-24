@@ -23,6 +23,7 @@ from tarjim.phone.choice import (
 from tarjim.phone.links import first_link
 from tarjim.phone.meter import shown
 from tarjim.phone.progress import Follower
+from tarjim.phone.quality_step import QualityStep
 from tarjim.phone.telegram import FETCH_LIMIT, Bot, TelegramError
 from tarjim.phone.words import result_name, say
 from tarjim.server.guard import safe_name
@@ -51,17 +52,17 @@ def owner() -> int:
     return int(setting("phone_chat") or 0)
 
 
-def order_for(source: str, name: str, mode: str, dialect: str) -> Any:
+def order_for(source: str, item: dict[str, Any], mode: str, dialect: str) -> Any:
     from tarjim.server.jobs import Order
 
-    return Order(source, target(), mode, dialect, name)
+    return Order(source, target(), mode, dialect, item["name"], item.get("quality", ""))
 
 
 def target() -> str:
     return setting("phone_target") or "ar"
 
 
-class Inbox:
+class Inbox(QualityStep):
     def __init__(self, follower: Follower, uploads: Path, pairing: Pairing) -> None:
         self.follower, self.uploads, self.pairing = follower, uploads, pairing
         self.waiting = Waiting()
@@ -131,13 +132,18 @@ class Inbox:
         return str(folder / item["name"])
 
     def start_choice(self, bot: Bot, chat: int, message: int, choice: str) -> None:
-        """For Arabic the style is asked next, on the same message; otherwise it starts."""
+        """A link asks its quality next (quality_step.py), all on the same message."""
         mode, _, key = choice.partition(":")
+        if mode in MODES and "source" in (self.waiting.peek(key) or {}):
+            return self.ask_quality(bot, (chat, message), mode, key)
+        self.next_step(bot, (chat, message), mode, key)
+
+    def next_step(self, bot: Bot, where: tuple[int, int], mode: str, key: str) -> None:
+        """For Arabic the style is asked next; otherwise it starts."""
         if mode in MODES and target() == "ar" and self.waiting.has(key):
-            bot.edit(chat, message, say("phone_choose_dialect"),
-                     reply_markup=dialect_keyboard(mode, key))
+            bot.edit(*where, say("phone_choose_dialect"), reply_markup=dialect_keyboard(mode, key))
             return
-        self.begin(bot, (chat, message), (mode, key, setting("phone_dialect") or "saudi"))
+        self.begin(bot, where, (mode, key, setting("phone_dialect") or "saudi"))
 
     def chosen_dialect(self, bot: Bot, chat: int, message: int, choice: str) -> None:
         dialect, _, rest = choice.partition(":")
@@ -161,7 +167,7 @@ class Inbox:
         except (TelegramError, OSError):
             bot.edit(chat, message, say("phone_fetch_failed"))
             return
-        task = self.follower.jobs.submit(order_for(source, item["name"], mode, dialect))
+        task = self.follower.jobs.submit(order_for(source, item, mode, dialect))
         self.follower.adopt(bot, chat, message, task)
 
     def pressed(self, bot: Bot, press: dict[str, Any]) -> None:
@@ -172,7 +178,7 @@ class Inbox:
         with contextlib.suppress(TelegramError):
             bot.call("answerCallbackQuery", callback_query_id=press["id"])
         message = int(press["message"]["message_id"])
-        steps = {"go": self.start_choice, "dl": self.chosen_dialect}
+        steps = {"go": self.start_choice, "dl": self.chosen_dialect, "q": self.chosen_quality}
         if kind in steps:
             steps[kind](bot, chat, message, value)
         elif kind == "mode" and value in MODES:

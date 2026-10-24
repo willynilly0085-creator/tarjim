@@ -13,6 +13,9 @@ an `.srt`, or dubs it with a voice for every speaker.
 ## What it does
 
 - **Any source:** YouTube, X and other links (yt-dlp), or any video or audio file on your device.
+  A link shows the qualities it really offers, with their sizes, before anything downloads; 1080p
+  (or the nearest below it) is picked unless you pick another, or the sound alone for a subtitle
+  file.
 - **34 target languages**, right-to-left and left-to-right. Arabic defaults to a Saudi dialect;
   Modern Standard Arabic is one click away.
 - **Careful listening:** the audio is heard three times and every word is voted on, so a single

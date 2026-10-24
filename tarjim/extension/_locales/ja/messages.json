@@ -446,5 +446,52 @@
   },
   "modelSuggested": {
     "message": "翻訳におすすめ"
+  },
+  "quality": {
+    "message": "画質"
+  },
+  "qualityReading": {
+    "message": "利用できる画質を確認しています…"
+  },
+  "qualityRow": {
+    "message": "$LABEL$ · 約 $SIZE$",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      },
+      "size": {
+        "content": "$2"
+      }
+    }
+  },
+  "qualityAudio": {
+    "message": "音声のみ"
+  },
+  "qualityTooBig": {
+    "message": "$LABEL$ · 8 GB 超",
+    "placeholders": {
+      "label": {
+        "content": "$1"
+      }
+    }
+  },
+  "qualityFailed": {
+    "message": "画質を確認できなかったため、1080p かそれ以下で最も近い画質をダウンロードします。"
+  },
+  "sizeMb": {
+    "message": "$N$ MB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeGb": {
+    "message": "$N$ GB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

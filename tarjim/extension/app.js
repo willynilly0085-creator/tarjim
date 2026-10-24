@@ -1,6 +1,8 @@
 import { watchJobs } from "./jobs.js";
 import { api, loadWords, remember, settings, startJob, t, uiDirection, uiLanguage } from "./shared.js";
 import { downloadable } from "./posts.js";
+import { chosenQuality, forgetQuality, heardLink, onQuality, qualityBlocked, soundOnly } from "./quality.js";
+import { clearPending, describeSource } from "./source.js";
 import { $, show } from "./dom.js";
 import { showEngine } from "./engine.js";
 import { claimPending } from "./pairing.js";
@@ -65,22 +67,6 @@ function syncDialect() {
 
 const persist = () => remember({ ...choices(), voice: $("voice").value });
 
-async function describeSource() {
-  if (pageMode) {
-    $("source-tab").hidden = true;
-    $("drop").hidden = false;
-    $("open-file-page").hidden = true;
-    return;
-  }
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  const usable = downloadable(tab?.url);
-  state.url = usable ? tab.url : "";
-  $("source-tab").hidden = !usable;
-  $("source-none").hidden = usable;
-  $("tab-title").textContent = tab?.title || "";
-  $("tab-host").textContent = usable ? new URL(tab.url).hostname.replace(/^www\./, "") : "";
-}
-
 async function openMain() {
   show("main");
   const saved = await settings();
@@ -92,7 +78,7 @@ async function openMain() {
   await Promise.all([showLinkedVoices($("voice")), showEngine()]);
   syncDialect();
   syncVoice();
-  await describeSource();
+  state.url = await describeSource(pageMode);
   refreshButton();
   state.poll = watchJobs(state.languages);
 }
@@ -104,10 +90,14 @@ function choices() {
   return { target: $("target").value, dialect: form.dialect.value, mode };
 }
 
-const syncVoice = () => { $("voice-field").hidden = $("order").mode.value !== "dub"; };
+function syncVoice() {
+  $("voice-field").hidden = $("order").mode.value !== "dub";
+  soundOnly($("order").mode.value === "srt");
+}
 
 function sourceReady() {
-  return pageMode ? Boolean(state.file) || downloadable($("link").value.trim()) : Boolean(state.url);
+  if (pageMode && state.file) return true;
+  return !qualityBlocked() && (pageMode ? downloadable($("link").value.trim()) : Boolean(state.url));
 }
 
 const refreshButton = () => { $("go").disabled = !sourceReady(); };
@@ -121,7 +111,7 @@ function progress(fraction) {
 async function send(options) {
   if (pageMode && state.file) return upload(state.file, options, progress);
   const url = pageMode ? $("link").value.trim() : state.url;
-  return startJob({ url, ...options });
+  return startJob({ url, ...options, quality: chosenQuality() });
 }
 
 async function submit(event) {
@@ -134,6 +124,7 @@ async function submit(event) {
   try {
     await send(options);
     $("notice").textContent = t("started");
+    await clearPending();
     clearSource();
   } catch (error) {
     return error.kind === "token" ? showPair() : connect();
@@ -149,6 +140,7 @@ function clearSource() {
   state.file = null;
   $("file").value = "";
   $("link").value = "";
+  forgetQuality();
   $("drop-file").hidden = true;
 }
 
@@ -174,10 +166,14 @@ function wireDrop() {
     zone.classList.remove("over");
     takeFile(event.dataTransfer.files[0]);
   });
-  $("link").addEventListener("input", refreshButton);
+  $("link").addEventListener("input", () => {
+    heardLink($("link").value.trim());
+    refreshButton();
+  });
 }
 
 function wire() {
+  onQuality(refreshButton);
   $("order").addEventListener("submit", submit);
   $("target").addEventListener("change", syncDialect);
   $("order").addEventListener("change", persist);
