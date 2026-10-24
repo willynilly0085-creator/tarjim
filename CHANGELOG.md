@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.34 (2026-10-24)
+
+- **tarjim starts with your computer more reliably, and says why when it cannot.** If the engine
+  started at sign-in is gone a minute later, tarjim starts it once more. Every start and stop is
+  now written with its time to `~/.tarjim/server.log`, including an error that used to vanish
+  before the engine had opened its log, so a failed start explains itself.
+
 ## 1.0.33 (2026-10-23)
 
 - **Local listening is more accurate, faster, and free of known vulnerabilities.** It now runs on
