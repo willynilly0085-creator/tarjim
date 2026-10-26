@@ -165,14 +165,3 @@ def repair_due() -> bool:
 def repair(port: int) -> bool:
     config.save("repaired_for", __version__)
     return start(f"v{__version__}", port)
-
-
-def forget_old_environment() -> None:
-    """A clone moved onto another Python kept its old environment beside the new one
-    (".venv-3.11"); once the engine runs on the new one, the old one goes."""
-    here = Path(sys.prefix)
-    if not from_source() or not (here / "pyvenv.cfg").is_file():
-        return
-    for kept in here.parent.glob(f"{here.name}-3.*"):
-        if kept.name != f"{here.name}-{running_minor()}" and (kept / "pyvenv.cfg").is_file():
-            shutil.rmtree(kept, ignore_errors=True)

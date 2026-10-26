@@ -11,7 +11,7 @@ from typing import Any
 
 import pytest
 
-from tarjim import config, installer, source_updater, update
+from tarjim import config, installer, old_environment, source_updater, update
 
 pytestmark = pytest.mark.skipif(not shutil.which("git"), reason="needs git")
 
@@ -190,8 +190,38 @@ def test_the_old_environment_goes_once_the_engine_runs_on_the_new_one(
     old = environment(tmp_path / ".venv-3.11", "3.11.15")
     other = tmp_path / ".venv-3.11-notes"
     other.mkdir()
-    monkeypatch.setattr(update.sys, "prefix", str(here))
+    monkeypatch.setattr(old_environment.sys, "prefix", str(here))
     monkeypatch.setattr(update, "running_minor", lambda: "3.12")
     monkeypatch.setattr(update, "from_source", lambda: True)
-    update.forget_old_environment()
+    old_environment.forget_old_environment()
     assert here.is_dir() and not old.exists() and other.is_dir()
+
+
+def test_an_old_environment_a_program_still_runs_from_is_kept_for_later(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """A chat connection started before the move still loads libraries from the old one."""
+    here = environment(tmp_path / ".venv", "3.12.13")
+    old = environment(tmp_path / ".venv-3.11", "3.11.15")
+    monkeypatch.setattr(old_environment.sys, "prefix", str(here))
+    monkeypatch.setattr(update, "running_minor", lambda: "3.12")
+    monkeypatch.setattr(update, "from_source", lambda: True)
+    monkeypatch.setattr(old_environment, "in_use", lambda kept: kept == old)
+    old_environment.forget_old_environment()
+    assert (old / "marker").is_file()
+    monkeypatch.setattr(old_environment, "in_use", lambda _kept: False)
+    old_environment.forget_old_environment()
+    assert not old.exists()
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows locks a running program's file")
+def test_a_running_program_shows_its_environment_is_in_use(tmp_path: Path) -> None:
+    scripts = tmp_path / "Scripts"
+    scripts.mkdir()
+    shutil.copyfile(sys.executable, scripts / "python.exe")
+    assert not old_environment.in_use(tmp_path)
+    running = subprocess.Popen([str(scripts / "python.exe"), "-c", "import time; time.sleep(30)"])
+    try:
+        assert old_environment.in_use(tmp_path)
+    finally:
+        running.kill()
+        running.wait()
