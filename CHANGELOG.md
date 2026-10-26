@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.38 (2026-10-26)
+
+- **A copy run from source updates itself.** It used to say "updated with git" and wait. Now it
+  updates like an installed copy: with automatic updates on, while nothing runs (or with Update
+  now), tarjim closes, moves the clone forward to the new release, installs the libraries tested
+  with it, and starts again. A clone with commits of its own is never merged: it is left as it is
+  and the page says the update failed. If the libraries cannot be installed, the code goes back
+  to where it was.
+- **Four libraries move to their newest versions:** importlib-metadata 10.1.0, multidict 7.2.1,
+  starlette 1.10.0 and sse-starlette 3.6.0. The others with newer releases wait for a reason:
+  numpy 2.5, scipy 1.18, librosa 1.0 and networkx 3.7 need Python 3.12 or later, and tarjim runs
+  on 3.11; mpmath 1.4 and tenacity 9.2 are held by other libraries. None of the versions tarjim
+  uses has a known vulnerability.
+
 ## 1.0.37 (2026-10-24)
 
 - **The automatic checks on Linux pass again.** Since 1.0.35 the type check stopped at the Windows
