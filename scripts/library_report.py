@@ -108,11 +108,22 @@ def programs() -> list[str]:
     return lines
 
 
+RUNS = ("https://api.github.com/repos/willynilly0085-creator/tarjim/actions/workflows/ci.yml/runs"
+        "?branch=master&per_page=1")
+STATES = {"success": "ناجح", "failure": "فاشل", "cancelled": "انلغى", "in_progress": "شغّال الحين",
+          "queued": "ينتظر دوره"}
+
+
 def checks() -> str:
-    out = run("gh", "run", "list", "--repo", "willynilly0085-creator/tarjim", "--branch", "master",
-              "--workflow", "ci", "--limit", "1", "--json", "conclusion")
-    state = (json.loads(out or "[{}]") or [{}])[0].get("conclusion", "")
-    return "فحص GitHub: " + {"success": "ناجح", "failure": "فاشل"}.get(state, state or "غير معروف")
+    """Asked of GitHub's public API, not of gh: the scheduled task runs outside the Claude app,
+    where gh was never signed in (its sign-in sits in the app's own copy of AppData), so gh
+    answered nothing and the line said "unknown" every morning."""
+    try:
+        runs = requests.get(RUNS, timeout=TIMEOUT).json().get("workflow_runs") or [{}]
+    except (requests.RequestException, ValueError):
+        runs = [{}]
+    state = runs[0].get("conclusion") or runs[0].get("status") or ""
+    return "فحص GitHub: " + STATES.get(state, state or "غير معروف")
 
 
 def section(title: str, lines: list[str], limit: int = 8) -> list[str]:
@@ -154,7 +165,7 @@ def main(argv: list[str]) -> int:
         with log.open("a", encoding="utf-8") as out:
             out.write(f"{type(error).__name__}: {error}\n")
         raise
-    sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+    sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
     print(text)
     return 0
 
