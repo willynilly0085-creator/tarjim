@@ -12,6 +12,8 @@ from pathlib import Path
 
 FILE = Path(__file__).with_name("constraints.txt")
 OVERRIDES = Path(__file__).with_name("overrides.txt")
+PYTHON = Path(__file__).with_name("python.txt")
+MINOR = re.compile(r"3\.\d{1,2}")
 # sympy is here because some PyTorch builds ask for one exact sympy.
 FLOATING = {"yt-dlp", "torch", "torchaudio", "torchvision", "torchcodec", "triton", "sympy"}
 FLOATING_FAMILIES = ("nvidia-", "cuda-", "pytorch-triton")
@@ -57,3 +59,12 @@ def drift(pinned: dict[str, set[str]] | None = None) -> list[str]:
     pinned = shipped() if pinned is None else pinned
     return sorted(name for name, versions in pinned.items()
                   if installed(name) and installed(name) not in versions)
+
+
+def python() -> str:
+    """The Python this release runs on (python.txt), such as "3.12"."""
+    try:
+        text = PYTHON.read_text(encoding="utf-8").strip()
+    except OSError:
+        return "3.11"
+    return text if MINOR.fullmatch(text) else "3.11"

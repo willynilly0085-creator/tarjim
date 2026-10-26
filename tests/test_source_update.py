@@ -110,7 +110,89 @@ def test_a_clone_offers_the_update_and_hands_over_to_its_updater(
     assert update.from_source() and update.can_install()  # this test runs in a clone
     assert update.start("v1.0.99", 17999)
     command = started[0]
-    assert command[1:4] == ["-E", "-S", str(tmp_path / "source_updater.py")]
-    assert command[4:6] == [str(update.SOURCE), "v1.0.99"]
-    assert json.loads(command[7])[-2:] == ["--port", "17999"]
+    minor = f"{sys.version_info[0]}.{sys.version_info[1]}"
+    assert command[1:8] == ["run", "--quiet", "--no-project", "--python", minor, "python",
+                            str(tmp_path / "source_updater.py")]
+    assert command[8:10] == [str(update.SOURCE), "v1.0.99"]
+    assert json.loads(command[11])[-2:] == ["--port", "17999"]
     assert (tmp_path / "installer.py").is_file() and (tmp_path / "release_pins.py").is_file()
+
+
+def environment(folder: Path, version: str) -> Path:
+    folder.mkdir(parents=True)
+    (folder / "pyvenv.cfg").write_text(f"home = x\nversion_info = {version}\n", encoding="utf-8")
+    (folder / "marker").write_text(version, encoding="utf-8")
+    return folder
+
+
+def release_on(root: Path, python: str) -> Path:
+    (root / "tarjim").mkdir(parents=True)
+    (root / "tarjim" / "python.txt").write_text(f"{python}\n", encoding="utf-8")
+    (root / "tarjim" / "constraints.txt").write_text("numpy==2.5.4\nmultidict==7.2.1\n",
+                                                      encoding="utf-8")
+    return root
+
+
+def fake_uv(monkeypatch: pytest.MonkeyPatch, works: bool) -> list[list[str]]:
+    """`uv venv` makes the environment; an install works or not."""
+    ran: list[list[str]] = []
+
+    def run_install(command: list[str]) -> int:
+        ran.append(command)
+        if command[1] == "venv":
+            environment(Path(command[-1]), f"{command[3]}.13")
+            return 0
+        return 0 if works else 1
+
+    monkeypatch.setattr(installer, "run_install", run_install)
+    monkeypatch.setattr(source_updater, "listing", lambda _uv, prefix: (
+        {"pytest": "9", "multidict": "7.1.0"} if "3.11" in (Path(prefix) / "marker").read_text(
+            encoding="utf-8") else {"numpy": "2.5.4"}))
+    return ran
+
+
+def test_a_release_on_another_python_gets_a_new_environment_and_keeps_the_old_one(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    root, prefix = release_on(tmp_path / "clone", "3.12"), tmp_path / ".venv"
+    environment(prefix, "3.11.15")
+    ran = fake_uv(monkeypatch, works=True)
+    assert source_updater.settle("uv", root, str(prefix)) == 0
+    assert source_updater.env_python(str(prefix)) == "3.12"
+    assert (tmp_path / ".venv-3.11" / "marker").read_text(encoding="utf-8") == "3.11.15"
+    assert ran[0] == ["uv", "venv", "--python", "3.12", str(prefix)]
+    assert ran[1][-1] == f"{root}[dub,dev]" and "--torch-backend" in ran[1]
+    assert ran[2][-1:] == ["multidict"]  # a tested library the engine itself does not bring
+
+
+def test_a_new_environment_that_fails_puts_the_old_one_back(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    root, prefix = release_on(tmp_path / "clone", "3.12"), tmp_path / ".venv"
+    environment(prefix, "3.11.15")
+    fake_uv(monkeypatch, works=False)
+    assert source_updater.settle("uv", root, str(prefix)) == 1
+    assert (prefix / "marker").read_text(encoding="utf-8") == "3.11.15"
+    assert not (tmp_path / ".venv-3.11").exists()
+
+
+def test_the_same_python_only_moves_the_libraries(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    root, prefix = release_on(tmp_path / "clone", "3.11"), tmp_path / ".venv"
+    environment(prefix, "3.11.15")
+    moved: list[str] = []
+    monkeypatch.setattr(source_updater, "libraries", lambda _uv, _root, where: moved.append(where)
+                        or 0)
+    assert source_updater.settle("uv", root, str(prefix)) == 0 and moved == [str(prefix)]
+    assert source_updater.wanted_python(tmp_path / "older") == "3.11"
+
+
+def test_the_old_environment_goes_once_the_engine_runs_on_the_new_one(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    here = environment(tmp_path / ".venv", "3.12.13")
+    old = environment(tmp_path / ".venv-3.11", "3.11.15")
+    other = tmp_path / ".venv-3.11-notes"
+    other.mkdir()
+    monkeypatch.setattr(update.sys, "prefix", str(here))
+    monkeypatch.setattr(update, "running_minor", lambda: "3.12")
+    monkeypatch.setattr(update, "from_source", lambda: True)
+    update.forget_old_environment()
+    assert here.is_dir() and not old.exists() and other.is_dir()

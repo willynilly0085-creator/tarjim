@@ -142,3 +142,22 @@ def test_the_watch_closes_the_engine_only_for_a_rebuild_that_started(
     monkeypatch.setattr(update_routes.python_update, "refresh", lambda idle, port: idle)
     update_routes.keep_current(Idle(), 17653)  # type: ignore[arg-type]
     assert closed == [True]
+
+
+def test_an_engine_on_an_older_python_moves_to_the_releases_own(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """A release on 3.12 installed by an older installer (which knew only 3.11) moves itself;
+    a clone moves too, but takes no patch releases of the Python it is on."""
+    from tarjim import pins, python_update
+
+    monkeypatch.setattr(pins, "python", lambda: "3.12")
+    assert python_update.newer("3.12.13", "3.11.15") and python_update.newer("3.12.0", "3.11.15")
+    assert not python_update.newer("3.11.16", "3.11.15") and not python_update.newer("3.12.13", "")
+    monkeypatch.setattr(python_update, "running", lambda: "3.11.15")
+    monkeypatch.setattr(python_update, "busy", lambda: False)
+    monkeypatch.setattr(python_update.update, "automatic", lambda: True)
+    monkeypatch.setattr(python_update.update, "installed_by_uv", lambda: False)
+    monkeypatch.setattr(python_update.update, "from_source", lambda: True)
+    assert python_update.allowed(True)
+    monkeypatch.setattr(pins, "python", lambda: "3.11")
+    assert not python_update.allowed(True)

@@ -127,15 +127,21 @@ def start(tag: str, port: int) -> bool:
     shutil.copyfile(release_pins.__file__, config.HOME / "release_pins.py")
     shutil.copyfile(installer.__file__, copy)
     installer.record("starting", tag, installer.UPDATE_STATE)
-    command = [uv, "run", "--quiet", "--no-project", "--python", "3.11", "python", str(copy),
-               archive(tag), "--after", str(os.getpid()), "--port", str(port)]
+    command = [uv, "run", "--quiet", "--no-project", "--python", running_minor(), "python",
+               str(copy), archive(tag), "--after", str(os.getpid()), "--port", str(port)]
     installer.start_detached(command, config.HOME / "update.log")
     return True
 
 
+def running_minor() -> str:
+    """The Python the engine runs on, such as "3.11": uv has it, so the updater downloads none."""
+    return f"{sys.version_info[0]}.{sys.version_info[1]}"
+
+
 def start_from_source(tag: str, port: int) -> bool:
-    """The same hand-over for a clone: its updater runs on this environment's Python without the
-    environment's own libraries (-S), which it replaces, beside its copies of what it imports."""
+    """The same hand-over for a clone, beside copies of what its updater imports. It runs on the
+    Python uv manages, not the environment's: a release on another Python replaces the
+    environment, which cannot be renamed while a program runs from it."""
     from tarjim import installer, release_pins, source_updater
     from tarjim.autostart import quiet_python
 
@@ -143,7 +149,8 @@ def start_from_source(tag: str, port: int) -> bool:
         shutil.copyfile(str(module.__file__), config.HOME / Path(str(module.__file__)).name)
     engine = [*installer.module_command("tarjim.server", quiet_python()), "--port", str(port)]
     installer.record("starting", tag, installer.UPDATE_STATE)
-    command = [sys.executable, "-E", "-S", str(config.HOME / "source_updater.py"), str(SOURCE),
+    command = [str(shutil.which("uv")), "run", "--quiet", "--no-project", "--python",
+               running_minor(), "python", str(config.HOME / "source_updater.py"), str(SOURCE),
                tag, sys.prefix, json.dumps(engine), "--after", str(os.getpid())]
     return installer.start_detached(command, config.HOME / "update.log")
 
@@ -158,3 +165,14 @@ def repair_due() -> bool:
 def repair(port: int) -> bool:
     config.save("repaired_for", __version__)
     return start(f"v{__version__}", port)
+
+
+def forget_old_environment() -> None:
+    """A clone moved onto another Python kept its old environment beside the new one
+    (".venv-3.11"); once the engine runs on the new one, the old one goes."""
+    here = Path(sys.prefix)
+    if not from_source() or not (here / "pyvenv.cfg").is_file():
+        return
+    for kept in here.parent.glob(f"{here.name}-3.*"):
+        if kept.name != f"{here.name}-{running_minor()}" and (kept / "pyvenv.cfg").is_file():
+            shutil.rmtree(kept, ignore_errors=True)

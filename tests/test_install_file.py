@@ -15,9 +15,11 @@ def test_the_install_file_runs_the_script_that_ships_beside_it() -> None:
 
 def test_the_script_installs_what_the_engines_installer_installs() -> None:
     script = (ROOT / "scripts" / "windows" / "install.ps1").read_text(encoding="utf-8")
-    command = installer.install_command("uv", "SOURCE", Path("PINS"), Path("LIFTED"))
+    command = installer.install_command("uv", "SOURCE", installer.Tested(
+        Path("PINS"), Path("LIFTED"), "PYTHON"))
     for part in command[1:-1]:
-        assert part.replace("PINS", "$pins").replace("LIFTED", "$lifted") in script, part
+        script_part = part.replace("PINS", "$pins").replace("LIFTED", "$lifted")
+        assert script_part.replace("PYTHON", "$python") in script, part
     assert command[-1].replace("SOURCE", "$source") in script
     assert "raw.githubusercontent.com/$Repo/$($Matches[1])/tarjim/$name" in script
     for name in ("constraints.txt", "overrides.txt"):

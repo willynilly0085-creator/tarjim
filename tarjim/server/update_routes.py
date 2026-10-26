@@ -61,6 +61,7 @@ def settle_after_update() -> None:
 
     extension_folder()
     repair()
+    update.forget_old_environment()
 
 
 def upgrade_listening(board: Board) -> None:

@@ -19,6 +19,8 @@ if __package__:
 else:  # the copy in ~/.tarjim, beside its own copy of release_pins
     import release_pins  # type: ignore[no-redef]
 
+Tested, install_command = release_pins.Tested, release_pins.install_command
+
 HOME = Path(os.environ.get("TARJIM_HOME", Path.home() / ".tarjim"))
 STATE = HOME / "install.json"
 UPDATE_STATE = HOME / "update.json"
@@ -51,18 +53,6 @@ def alive(pid: int) -> bool:
     ctypes.windll.kernel32.GetExitCodeProcess(handle, ctypes.byref(code))
     ctypes.windll.kernel32.CloseHandle(handle)
     return code.value == STILL_ACTIVE
-
-
-def install_command(uv: str, source: str, pins: Path | None = None,
-                    lifted: Path | None = None) -> list[str]:
-    """uv picks the PyTorch build for the graphics card it finds (CPU when there is none). With
-    the release's tested versions every other library moves to them, and yt-dlp and the PyTorch
-    family to their newest; without them, uv takes the newest of each, as it did before.
-    Overrides (only with them) lift another package's exact pin to a tested, safer release."""
-    tested = ["--upgrade", "-c", str(pins)] if pins else []
-    tested += ["--overrides", str(lifted)] if pins and lifted else []
-    return [uv, "tool", "install", "--force", "--python", "3.11", "--torch-backend", "auto",
-            *tested, f"tarjim[dub] @ {source}"]
 
 
 def tool_bin(uv: str) -> Path:
@@ -166,10 +156,11 @@ def install(uv: str, source: str) -> int:
     install is tried again the way it was before them."""
     pins = release_pins.tested_versions(source, HOME)
     lifted = release_pins.tested_versions(source, HOME, release_pins.OVERRIDES) if pins else None
-    code = run_install(install_command(uv, source, pins, lifted))
+    python = release_pins.python_for(source, HOME)
+    code = run_install(install_command(uv, source, Tested(pins, lifted, python)))
     if code and pins:
         release_pins.note(HOME, "the install with tested versions failed; trying without them")
-        code = run_install(install_command(uv, source, None))
+        code = run_install(install_command(uv, source, Tested(python=python)))
     return code
 
 

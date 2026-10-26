@@ -41,7 +41,7 @@ function Get-Source {
 # The versions of tarjim's libraries tested with this release (tarjim/release_pins.py does the
 # same for the engine's own installer): constraints.txt, and overrides.txt for the few that lift
 # another package's exact pin. Without them the install still happens, as before.
-function Get-Pins($source, $name) {
+function Get-Pins($source, $name, [switch]$Plain) {
     $file = Join-Path $env:TEMP "tarjim-$name"
     try {
         if ($source -match "^https://github\.com/$Repo/archive/refs/tags/(v?\d+\.\d+\.\d+)\.zip$") {
@@ -54,6 +54,7 @@ function Get-Pins($source, $name) {
     } catch {
         return $null
     }
+    if ($Plain) { return $file }
     $other = $pinned | Where-Object { $_ -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*==[A-Za-z0-9.+!_-]+( *;[ -~]*)?$' }
     if ($pinned.Count -eq 0 -or $other) { return $null }
     return $file
@@ -79,6 +80,14 @@ if (-not (Find-Uv)) {
     if (-not (Find-Uv)) { Stop-With "uv was installed but cannot be found. Close this window and run install again." }
 }
 
+# The Python the release runs on (tarjim/python.txt); a release older than that file runs on 3.11.
+function Get-Python($source) {
+    $file = Get-Pins $source "python.txt" -Plain
+    $wanted = if ($file) { (Get-Content $file -TotalCount 1).Trim() } else { "" }
+    if ($wanted -match '^3\.\d{1,2}$') { return $wanted }
+    return "3.11"
+}
+
 $source = Get-Source
 Say "step 2 of 3: downloading and installing. This takes several minutes; keep this window open."
 if (Test-Engine) { Stop-Engine }
@@ -86,16 +95,17 @@ $pins = Get-Pins $source "constraints.txt"
 $tested = if ($pins) { @("--upgrade", "-c", $pins) } else { @() }
 $lifted = if ($pins) { Get-Pins $source "overrides.txt" } else { $null }
 if ($lifted) { $tested += @("--overrides", $lifted) }
-& uv tool install --force --python 3.11 --torch-backend auto @tested "tarjim[dub] @ $source"
+$python = Get-Python $source
+& uv tool install --force --python $python --torch-backend auto @tested "tarjim[dub] @ $source"
 if ($LASTEXITCODE -ne 0 -and $pins) {
     Say "trying again without the tested library versions"
-    & uv tool install --force --python 3.11 --torch-backend auto "tarjim[dub] @ $source"
+    & uv tool install --force --python $python --torch-backend auto "tarjim[dub] @ $source"
 }
 if ($LASTEXITCODE -ne 0) { Stop-With "the download or install stopped. Run install again; it continues where it stopped." }
 
 Say "step 3 of 3: starting tarjim (it runs in the background, with no window)"
-$python = Join-Path (& uv tool dir) "tarjim\Scripts\pythonw.exe"
-Start-Process -FilePath $python -ArgumentList "-P", "-m", "tarjim.server", "--port", $Port -WindowStyle Hidden
+$engine = Join-Path (& uv tool dir) "tarjim\Scripts\pythonw.exe"
+Start-Process -FilePath $engine -ArgumentList "-P", "-m", "tarjim.server", "--port", $Port -WindowStyle Hidden
 foreach ($try in 1..45) {
     if (Test-Engine) { break }
     Start-Sleep -Seconds 2

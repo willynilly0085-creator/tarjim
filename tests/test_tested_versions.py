@@ -46,11 +46,11 @@ def test_drift_lists_installed_libraries_at_another_version(
 
 def test_the_install_carries_upgrade_and_the_tested_versions(tmp_path: Path) -> None:
     file = tmp_path / "constraints.txt"
-    command = installer.install_command("uv", RELEASE, file)
+    command = installer.install_command("uv", RELEASE, installer.Tested(file))
     assert command[-1] == f"tarjim[dub] @ {RELEASE}" and "--upgrade" in command
     assert command[command.index("-c") + 1] == str(file)
     assert "--torch-backend" in command and "--upgrade" not in installer.install_command(
-        "uv", RELEASE, None) and "-c" not in installer.install_command("uv", RELEASE, None)
+        "uv", RELEASE) and "-c" not in installer.install_command("uv", RELEASE)
 
 
 @pytest.mark.parametrize(("source", "address"), [
@@ -126,7 +126,7 @@ def test_a_failed_download_of_the_tested_versions_falls_back(
     serve(monkeypatch, urllib.error.URLError("offline"))
     commands = installs(home, monkeypatch, [0])
     assert installer.main(RELEASE) == 0
-    assert commands == [installer.install_command("uv", RELEASE, None)]
+    assert commands == [installer.install_command("uv", RELEASE)]
 
 
 def test_an_install_the_tested_versions_cannot_satisfy_is_tried_again_as_before(
@@ -134,7 +134,7 @@ def test_an_install_the_tested_versions_cannot_satisfy_is_tried_again_as_before(
     serve(monkeypatch, GOOD)
     commands = installs(home, monkeypatch, [1, 0])
     assert installer.main(RELEASE) == 0
-    assert "-c" in commands[0] and commands[1] == installer.install_command("uv", RELEASE, None)
+    assert "-c" in commands[0] and commands[1] == installer.install_command("uv", RELEASE)
 
 
 @pytest.fixture

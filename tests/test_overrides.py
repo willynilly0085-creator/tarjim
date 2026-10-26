@@ -59,8 +59,10 @@ def test_the_overrides_come_only_from_the_same_release(source: str, address: str
 
 def test_overrides_are_never_used_without_the_tested_versions() -> None:
     lifted = Path("overrides.txt")
-    assert "--overrides" not in installer.install_command("uv", RELEASE, None, lifted)
-    command = installer.install_command("uv", RELEASE, Path("constraints.txt"), lifted)
+    assert "--overrides" not in installer.install_command("uv", RELEASE, installer.Tested(
+        None, lifted))
+    command = installer.install_command("uv", RELEASE, installer.Tested(
+        Path("constraints.txt"), lifted))
     assert command[command.index("--overrides") + 1] == str(lifted)
     assert command[-1] == f"tarjim[dub] @ {RELEASE}"
 
@@ -97,8 +99,20 @@ def test_the_install_uses_the_release_overrides(
         home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     asked = serve(monkeypatch, {"constraints.txt": GOOD, "overrides.txt": "accelerate==1.15.0\n"})
     (command,) = installed_with(home, monkeypatch)
-    assert asked == [RAW + "constraints.txt", RAW + "overrides.txt"]
+    assert asked == [RAW + "constraints.txt", RAW + "overrides.txt", RAW + "python.txt"]
     assert command[command.index("--overrides") + 1] == str(home / "overrides.txt")
+
+
+@pytest.mark.parametrize(("said", "python"), [
+    ("3.12\n", "3.12"), (None, "3.11"), ("3.12; calc\n", "3.11"), ("--python 2.7", "3.11"),
+    ("3.13", "3.13")])
+def test_the_install_runs_on_the_python_the_release_names(
+        home: Path, monkeypatch: pytest.MonkeyPatch, said: str | None, python: str) -> None:
+    """A release names its Python in python.txt, so an update can move to a newer one; a release
+    older than that file, or a file with anything but a version in it, runs on 3.11."""
+    serve(monkeypatch, {"constraints.txt": GOOD, **({"python.txt": said} if said else {})})
+    (command,) = installed_with(home, monkeypatch)
+    assert command[command.index("--python") + 1] == python
 
 
 @pytest.mark.parametrize("overrides", [None, "accelerate>=1\n", "--index-url https://x.example\n"])
