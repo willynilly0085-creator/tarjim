@@ -35,7 +35,7 @@ class Utterance:
 
 
 def listen(audio: bytes, client: Hearer | None = None) -> tuple[str, list[Utterance]]:
-    answer = (client or GeminiClient()).ask(PROMPT, audio, SCHEMA)
+    answer = (client or GeminiClient(listening=True)).ask(PROMPT, audio, SCHEMA)
     if not isinstance(answer, dict):
         raise RuntimeError("listening returned nothing readable")
     utterances = [u for row in answer.get("utterances", []) if (u := parse(row)) is not None]

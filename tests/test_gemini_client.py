@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -121,6 +122,7 @@ def test_a_picked_model_that_cannot_answer_gives_way_to_the_usual_ones(
 
 def test_an_overloaded_or_slow_model_is_left_for_the_next_one_at_once(
         monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(gemini_client, "STALLED", {})
     monkeypatch.setattr(gemini_client.time, "sleep", lambda _s: pytest.fail("should not wait"))
     asked: list[str] = []
     outcomes = {MODELS[0]: ReadTimeout(), MODELS[1]: Busy(), MODELS[2]: ["ok"]}
@@ -139,6 +141,37 @@ def test_text_is_translated_with_short_thinking_and_no_silent_retries(
     monkeypatch.setattr(genai, "Client", lambda **options: made.update(options))
     GeminiClient(api_key="AIzaSyA1234567890abcdefghij")
     assert made["http_options"].retry_options.attempts == 1
-    assert gemini_client.thinking("gemini-3.8-flash", None) is not None
-    assert gemini_client.thinking("gemini-3.8-flash", b"sound") is None
-    assert gemini_client.thinking("gemini-2.5-flash", None) is None
+    assert gemini_client.thinking("gemini-3.8-flash", listening=False) is not None
+    assert gemini_client.thinking("gemini-3.8-flash", listening=True) is None
+    assert gemini_client.thinking("gemini-2.5-flash", listening=False) is None
+
+
+def sent_config(monkeypatch: pytest.MonkeyPatch, listening: bool) -> Any:
+    from google import genai
+
+    sent: dict[str, Any] = {}
+    answer = SimpleNamespace(text="[]")
+    models = SimpleNamespace(generate_content=lambda **kw: sent.update(kw) or answer)
+    monkeypatch.setattr(genai, "Client", lambda **_options: SimpleNamespace(models=models))
+    client = GeminiClient(api_key="AIzaSyA1234567890abcdefghij", listening=listening)
+    client.call("gemini-3.8-flash", "p", b"sound", {})
+    return sent["config"]
+
+
+def test_translating_with_the_clip_sound_thinks_briefly_and_gives_way_in_90_seconds(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    config = sent_config(monkeypatch, listening=False)
+    assert config.thinking_config is not None
+    assert config.http_options.timeout == gemini_client.ANSWER_MS
+    client = bare_client({})
+    client.listening = False
+    minute = bytes(gemini_client.SOUND_BYTES_PER_SECOND * 60)
+    assert client.limit_ms(minute) == 120_000
+    assert client.limit_ms(minute * 10) == gemini_client.REQUEST_MS
+
+
+def test_listening_keeps_full_thinking_and_the_long_limit(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    config = sent_config(monkeypatch, listening=True)
+    assert config.thinking_config is None
+    assert config.http_options.timeout == gemini_client.REQUEST_MS
