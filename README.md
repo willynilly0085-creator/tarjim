@@ -90,7 +90,7 @@ It downloads about 4 GB, once. tarjim itself is under 2 MB; the rest is what it 
 | What is installed | Size | Why |
 |---|---|---|
 | uv, a small installer tool | 33 MB | Gets Python and the libraries into tarjim's own folder, so nothing else on the computer is touched |
-| Python 3.11, when the computer has none | small | tarjim is written in Python; it gets its own copy |
+| Python 3.12, when the computer has none | small | tarjim is written in Python; it gets its own copy |
 | PyTorch | 2.8 GB with an NVIDIA card, smaller without | Runs the model that places every word at the moment it is spoken, which every job needs, and the listening and voice models if you choose to run them on this computer |
 | About 160 other libraries | about 1 GB | Downloading a video from a link, talking to the AI you connect, listening, dubbing, the phone bot |
 
@@ -143,7 +143,7 @@ only accept remote MCP servers), so use Codex for ChatGPT.
 
 ## Install by hand (Windows)
 
-Needs Python 3.11. Disk, memory and graphics card: see
+Needs Python 3.12. Disk, memory and graphics card: see
 [What your computer needs](#what-your-computer-needs).
 
 ```powershell
@@ -225,9 +225,9 @@ commits of its own is left for you to update with git.
   vulnerabilities before a release takes them. PyTorch follows the build uv picks for your
   graphics card.
 
-Turning **Update tarjim automatically** off stops both. Some libraries' newest versions need
-Python 3.12 or later (numpy 2.5, scipy 1.18, librosa 1.0), and tarjim runs on 3.11, so they wait;
-the weekly check for known vulnerabilities covers the versions tarjim uses. To bring a clone's
+Turning **Update tarjim automatically** off stops both. tarjim runs on Python 3.12; a release
+says which Python it needs, and an update moves tarjim onto it by itself. The weekly check for
+known vulnerabilities covers the versions tarjim uses. To bring a clone's
 libraries onto the tested versions by hand:
 `uv pip install -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dub]"`.
 

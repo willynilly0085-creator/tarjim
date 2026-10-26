@@ -1,6 +1,7 @@
 """Write tarjim/constraints.txt and tarjim/overrides.txt: the version of every library tarjim
-installs, for Python 3.11 on Windows, macOS and Linux, except yt-dlp and the PyTorch family (see
-tarjim/pins.py), and the libraries whose exact pin in another package is lifted (LIFTED below).
+installs, for the release's Python (tarjim/python.txt) on Windows, macOS and Linux, except yt-dlp
+and the PyTorch family (see tarjim/pins.py), and the libraries whose exact pin in another package
+is lifted (LIFTED below).
 
     python scripts/pins.py             keep what is pinned, add what is new
     python scripts/pins.py --upgrade   move everything to its newest version (the weekly check)
@@ -13,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from tarjim.pins import FILE, OVERRIDES, PIN, canonical, floating  # noqa: E402
+from tarjim.pins import FILE, OVERRIDES, PIN, canonical, floating, python  # noqa: E402
 
 HEADER = ("# Tested versions of tarjim's libraries, written by scripts/pins.py; do not edit.\n"
           "# yt-dlp and the PyTorch family are left out on purpose (see tarjim/pins.py).\n")
@@ -33,7 +34,7 @@ def compile_pins(extra: list[str], folder: Path) -> None:
     lifted.write_text("".join(f"{name}{spec}\n" for name, spec in LIFTED.items()))
     torch.write_text(TORCH_AS_INSTALLED)
     subprocess.run(["uv", "pip", "compile", str(ROOT / "pyproject.toml"), "--extra", "dub",
-                    "--universal", "--python-version", "3.11", "--no-annotate", "--no-header",
+                    "--universal", "--python-version", python(), "--no-annotate", "--no-header",
                     "--quiet", "--overrides", str(lifted), "-c", str(torch), "-o", str(FILE),
                     *extra], check=True)
 

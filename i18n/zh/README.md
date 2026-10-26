@@ -66,7 +66,7 @@
 | 安装的内容 | 大小 | 用途 |
 |---|---|---|
 | uv，一个小型安装工具 | 33 MB | 把 Python 和各种库放进 tarjim 自己的文件夹，因此不会动电脑上的其他任何东西 |
-| Python 3.11（电脑上没有时） | 很小 | tarjim 是用 Python 写的，它会获得自己的一份副本 |
+| Python 3.12（电脑上没有时） | 很小 | tarjim 是用 Python 写的，它会获得自己的一份副本 |
 | PyTorch | 有 NVIDIA 显卡时 2.8 GB，没有则更小 | 运行那个在每个词被说出的瞬间为它定位的模型（每项任务都需要），以及你选择在这台电脑上运行的聆听和声音模型 |
 | 约 160 个其他库 | 约 1 GB | 通过链接下载视频、与你连接的 AI 通信、聆听、配音、手机机器人 |
 
@@ -104,7 +104,7 @@ claude plugin install tarjim@tarjim
 
 ## 手动安装（Windows）
 
-需要 Python 3.11。磁盘、内存和显卡的要求见 [你的电脑需要什么](#你的电脑需要什么)。
+需要 Python 3.12。磁盘、内存和显卡的要求见 [你的电脑需要什么](#你的电脑需要什么)。
 
 ```powershell
 git clone https://github.com/willynilly0085-creator/tarjim

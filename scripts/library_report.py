@@ -3,7 +3,7 @@
 Run by the owner's scheduled task (see scripts/windows/library-report.cmd); nothing here runs for
 people who use tarjim. It reads only public release data and the versions installed here:
 known vulnerabilities in the tested Python libraries, how many of them have newer releases,
-yt-dlp, Node.js, ffmpeg, Python 3.11, the subscription programs, and the last GitHub check.
+yt-dlp, Node.js, ffmpeg, tarjim's Python, the subscription programs, and the last GitHub check.
     python -P scripts/library_report.py            send it
     python -P scripts/library_report.py --print    show it here instead
 """
@@ -20,6 +20,7 @@ import requests
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tarjim.config import setting  # noqa: E402
+from tarjim.pins import python as target_python  # noqa: E402
 
 PINS = ROOT / "tarjim" / "constraints.txt"
 KNOWN = ROOT / ".github" / "audit-known.txt"
@@ -27,7 +28,7 @@ PIN = re.compile(r"^([A-Za-z0-9_.-]+)==([^\s;]+)")
 NPM = {"Claude Code": "@anthropic-ai/claude-code", "Codex": "@openai/codex",
        "Copilot": "@github/copilot"}
 TIMEOUT = 20
-OUR_MINOR = 11  # tarjim runs on Python 3.11
+OUR_MINOR = int(target_python().split(".")[1])  # the minor of the Python tarjim runs on
 
 
 def run(*command: str) -> str:
@@ -53,8 +54,7 @@ def pypi(name: str) -> tuple[str, str]:
 
 
 def needs(supported: str) -> str:
-    """Why a newer version cannot be taken yet: tarjim runs on Python 3.11, and many libraries'
-    newest versions start at 3.12 (numpy 2.5, scipy 1.18, librosa 1.0, networkx 3.7)."""
+    """Why a newer version cannot be taken yet: it needs a newer Python than tarjim runs on."""
     found = re.search(r">=\s*3\.(\d+)", supported)
     return f" (تحتاج بايثون 3.{found[1]})" if found and int(found[1]) > OUR_MINOR else ""
 
@@ -98,12 +98,13 @@ def ffmpeg() -> str:
 
 
 def python() -> str:
-    listing = run("uv", "python", "list", "3.11", "--only-downloads", "--output-format", "json")
+    listing = run("uv", "python", "list", target_python(), "--only-downloads", "--output-format",
+                  "json")
     offered = [v["version"] for v in json.loads(listing or "[]")]
     newest = max(offered, key=numbers, default="")
     here = ".".join(map(str, sys.version_info[:3]))
     newer = f"، وفيه {newest}" if newest and newest != here else " (محدّث)"
-    return f"بايثون 3.11: عندك {here}{newer}"
+    return f"بايثون {target_python()}: عندك {here}{newer}"
 
 
 def programs() -> list[str]:

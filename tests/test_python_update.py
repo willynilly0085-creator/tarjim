@@ -1,12 +1,14 @@
-"""The Python 3.11 under tarjim's environment keeps itself current: uv names the newest patch, and
-a newer one starts one rebuild through the updater, only for the uv copy and while nothing runs."""
+"""The Python under tarjim's environment keeps itself current: uv names the newest patch, and a
+newer one starts one rebuild through the updater, only for the uv copy and while nothing runs.
+These hold the release's Python at 3.11 (python.txt says which one a release runs on), so they
+read the same whichever Python the release is on; moving to another one is tested at the end."""
 import json
 from pathlib import Path
 from typing import Any
 
 import pytest
 
-from tarjim import config, python_update, update
+from tarjim import config, pins, python_update, update
 from tarjim.engines import app_install
 
 LISTING = [
@@ -18,6 +20,11 @@ LISTING = [
     {"version": "3.12.20", "implementation": "cpython", "variant": "default"},
 ]
 REAL_BUSY = python_update.busy
+
+
+@pytest.fixture(autouse=True)
+def release_on_three_eleven(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(pins, "python", lambda: "3.11")
 
 
 @pytest.fixture
@@ -148,8 +155,6 @@ def test_an_engine_on_an_older_python_moves_to_the_releases_own(
         monkeypatch: pytest.MonkeyPatch) -> None:
     """A release on 3.12 installed by an older installer (which knew only 3.11) moves itself;
     a clone moves too, but takes no patch releases of the Python it is on."""
-    from tarjim import pins, python_update
-
     monkeypatch.setattr(pins, "python", lambda: "3.12")
     assert python_update.newer("3.12.13", "3.11.15") and python_update.newer("3.12.0", "3.11.15")
     assert not python_update.newer("3.11.16", "3.11.15") and not python_update.newer("3.12.13", "")

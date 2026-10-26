@@ -95,7 +95,7 @@ Bir kez, yaklaşık 4 GB indirir. tarjim'in kendisi 2 MB'tan küçüktür; geri 
 | Ne kurulur | Boyut | Neden |
 |---|---|---|
 | uv, küçük bir kurulum aracı | 33 MB | Python'u ve kütüphaneleri tarjim'in kendi klasörüne getirir, böylece bilgisayardaki başka hiçbir şeye dokunulmaz |
-| Python 3.11, bilgisayarda yoksa | küçük | tarjim Python ile yazılmıştır; kendi kopyasını alır |
+| Python 3.12, bilgisayarda yoksa | küçük | tarjim Python ile yazılmıştır; kendi kopyasını alır |
 | PyTorch | NVIDIA kartla 2.8 GB, kartsız daha az | Her kelimeyi söylendiği ana yerleştiren modeli çalıştırır, ki her iş buna ihtiyaç duyar; ayrıca dinleme ve ses modellerini de, bunları bu bilgisayarda çalıştırmayı seçerseniz |
 | Yaklaşık 160 başka kütüphane | yaklaşık 1 GB | Bağlantıdan video indirme, bağladığınız yapay zekâyla konuşma, dinleme, seslendirme, telefon botu |
 
@@ -149,7 +149,7 @@ kullanın.
 
 ## Elle kurulum (Windows)
 
-Python 3.11 gerekir. Disk, bellek ve ekran kartı için bkz. [Bilgisayarınızın neye ihtiyacı var](#bilgisayarınızın-neye-ihtiyacı-var).
+Python 3.12 gerekir. Disk, bellek ve ekran kartı için bkz. [Bilgisayarınızın neye ihtiyacı var](#bilgisayarınızın-neye-ihtiyacı-var).
 
 ```powershell
 git clone https://github.com/willynilly0085-creator/tarjim

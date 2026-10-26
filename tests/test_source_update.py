@@ -160,8 +160,7 @@ def test_a_release_on_another_python_gets_a_new_environment_and_keeps_the_old_on
     assert source_updater.env_python(str(prefix)) == "3.12"
     assert (tmp_path / ".venv-3.11" / "marker").read_text(encoding="utf-8") == "3.11.15"
     assert ran[0] == ["uv", "venv", "--python", "3.12", str(prefix)]
-    assert ran[1][-1] == f"{root}[dub,dev]" and "--torch-backend" in ran[1]
-    assert ran[2][-1:] == ["multidict"]  # a tested library the engine itself does not bring
+    assert ran[1][-1] == f"{root}[dub,dev]" and "--torch-backend" in ran[1] and len(ran) == 2
 
 
 def test_a_new_environment_that_fails_puts_the_old_one_back(

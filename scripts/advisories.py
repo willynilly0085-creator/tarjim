@@ -20,6 +20,12 @@ ROOT = Path(__file__).resolve().parents[1]
 ACCEPTED = ROOT / ".github" / "audit-known.txt"
 KNOWN = ROOT / "tarjim" / "known_issues.json"
 OVERRIDES = ROOT / "tarjim" / "overrides.txt"
+PYTHON = ROOT / "tarjim" / "python.txt"
+
+
+def python() -> str:
+    """The Python the release runs on (read here: this runs without tarjim installed)."""
+    return PYTHON.read_text(encoding="utf-8").strip()
 
 
 def accepted() -> set[str]:
@@ -37,13 +43,13 @@ def found(audit: dict) -> dict[str, str]:
 
 
 def installable(package: str, fixed_by: str) -> bool:
-    """Does tarjim (dub extra, Python 3.11, Linux) resolve with the fixed version required?"""
+    """Does tarjim (dub extra, the release's Python, Linux) resolve with the fixed version?"""
     with tempfile.TemporaryDirectory() as folder:
         wanted = Path(folder) / "fixed.in"
         wanted.write_text(f"{package}{fixed_by}\n", encoding="utf-8")
         done = subprocess.run(
             ["uv", "pip", "compile", str(ROOT / "pyproject.toml"), str(wanted), "--extra", "dub",
-             "--python-version", "3.11", "--python-platform", "x86_64-unknown-linux-gnu",
+             "--python-version", python(), "--python-platform", "x86_64-unknown-linux-gnu",
              "--overrides", str(OVERRIDES), "--quiet", "-o", str(Path(folder) / "out.txt")],
             capture_output=True, text=True, check=False)
     return done.returncode == 0

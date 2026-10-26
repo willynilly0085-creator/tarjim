@@ -100,18 +100,16 @@ def libraries(uv: str, root: Path, prefix: str) -> int:
 
 
 def fresh(uv: str, root: Path, prefix: str, before: dict[str, str]) -> int:
-    """A new environment: the engine with its extras, then the tested libraries it had before
-    that the engine does not bring (a tool installed later). The voice engine, installed
+    """A new environment: the engine with its extras (the developer's tools too when they were
+    there). Nothing else is carried over: a library the old one had that the release no longer
+    needs (librosa 1.0 dropped audioread) would come back unpinned. The voice engine, installed
     without its dependencies, is put back by the engine itself (dub/voice_setup.repair)."""
     constraints, overrides = root / "tarjim" / "constraints.txt", root / "tarjim" / "overrides.txt"
     tested = ["-c", str(constraints)] + (["--overrides", str(overrides)]
                                          if overrides.is_file() else [])
-    base = [uv, "pip", "install", "--python", prefix, "--torch-backend", "auto", *tested]
     extras = "dub,dev" if "pytest" in before else "dub"
-    code = installer.run_install([*base, "-e", f"{root}[{extras}]"])
-    now = listing(uv, prefix) if code == 0 else {}
-    carried = sorted(set(before) & set(pinned(constraints)) - set(now))
-    return code or (installer.run_install([*base, *carried]) if carried else 0)
+    return installer.run_install([uv, "pip", "install", "--python", prefix, "--torch-backend",
+                                  "auto", *tested, "-e", f"{root}[{extras}]"])
 
 
 def rebuild(uv: str, root: Path, prefix: str, python: str) -> int:

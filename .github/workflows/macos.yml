@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - uses: astral-sh/setup-uv@v7
       # uv applies tarjim/overrides.txt; pip cannot.
       - run: uv pip install --system -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dev]"

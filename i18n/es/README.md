@@ -93,7 +93,7 @@ funcionar.
 | Qué se instala | Tamaño | Para qué |
 |---|---|---|
 | uv, una pequeña herramienta de instalación | 33 MB | Lleva Python y las bibliotecas a la propia carpeta de tarjim, así que no se toca nada más del ordenador |
-| Python 3.11, si el ordenador no lo tiene | pequeño | tarjim está escrito en Python; recibe su propia copia |
+| Python 3.12, si el ordenador no lo tiene | pequeño | tarjim está escrito en Python; recibe su propia copia |
 | PyTorch | 2.8 GB con una tarjeta NVIDIA, menos sin ella | Ejecuta el modelo que coloca cada palabra en el momento en que se dice, que todo trabajo necesita, y los modelos de escucha y de voz si decides ejecutarlos en este ordenador |
 | Unas 160 bibliotecas más | alrededor de 1 GB | Descargar un vídeo desde un enlace, hablar con la IA que conectas, la escucha, el doblaje, el bot del teléfono |
 
@@ -149,7 +149,7 @@ Codex para ChatGPT.
 
 ## Instalación manual (Windows)
 
-Requiere Python 3.11. Disco, memoria y tarjeta gráfica: consulta [Qué necesita tu ordenador](#qué-necesita-tu-ordenador).
+Requiere Python 3.12. Disco, memoria y tarjeta gráfica: consulta [Qué necesita tu ordenador](#qué-necesita-tu-ordenador).
 
 ```powershell
 git clone https://github.com/willynilly0085-creator/tarjim

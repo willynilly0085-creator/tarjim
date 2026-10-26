@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       # ffmpeg, so the download tests that merge or record streams run here too.
       - if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - run: pip install pip-audit
       # Known vulnerabilities in the tested versions; the ones listed, with reasons, in
       # .github/audit-known.txt are reported but do not fail the check.

@@ -95,7 +95,7 @@ sur quoi il tourne.
 | Ce qui est installé | Taille | Pourquoi |
 |---|---|---|
 | uv, un petit outil d'installation | 33 Mo | Place Python et les bibliothèques dans le dossier propre à tarjim, si bien que rien d'autre sur l'ordinateur n'est touché |
-| Python 3.11, si l'ordinateur n'en a pas | petit | tarjim est écrit en Python ; il reçoit sa propre copie |
+| Python 3.12, si l'ordinateur n'en a pas | petit | tarjim est écrit en Python ; il reçoit sa propre copie |
 | PyTorch | 2.8 Go avec une carte NVIDIA, moins sans | Fait tourner le modèle qui place chaque mot au moment où il est prononcé, dont toute tâche a besoin, ainsi que les modèles d'écoute et de voix si vous choisissez de les faire tourner sur cet ordinateur |
 | Environ 160 autres bibliothèques | environ 1 Go | Télécharger une vidéo depuis un lien, parler à l'IA que vous connectez, l'écoute, le doublage, le bot du téléphone |
 
@@ -149,7 +149,7 @@ Codex pour ChatGPT.
 
 ## Installation manuelle (Windows)
 
-Nécessite Python 3.11. Disque, mémoire et carte graphique : voir [Ce dont votre ordinateur a besoin](#ce-dont-votre-ordinateur-a-besoin).
+Nécessite Python 3.12. Disque, mémoire et carte graphique : voir [Ce dont votre ordinateur a besoin](#ce-dont-votre-ordinateur-a-besoin).
 
 ```powershell
 git clone https://github.com/willynilly0085-creator/tarjim

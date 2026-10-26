@@ -93,7 +93,7 @@ yang dipakainya untuk berjalan.
 | Yang dipasang | Ukuran | Mengapa |
 |---|---|---|
 | uv, alat pemasang kecil | 33 MB | Membawa Python dan pustaka ke folder tarjim sendiri, sehingga tidak ada hal lain di komputer yang disentuh |
-| Python 3.11, bila komputer belum punya | kecil | tarjim ditulis dengan Python; ia mendapat salinannya sendiri |
+| Python 3.12, bila komputer belum punya | kecil | tarjim ditulis dengan Python; ia mendapat salinannya sendiri |
 | PyTorch | 2.8 GB dengan kartu NVIDIA, lebih kecil tanpanya | Menjalankan model yang menempatkan setiap kata tepat saat diucapkan, yang dibutuhkan setiap pekerjaan, serta model mendengarkan dan model suara bila Anda memilih menjalankannya di komputer ini |
 | Sekitar 160 pustaka lain | sekitar 1 GB | Mengunduh video dari tautan, berbicara dengan AI yang Anda hubungkan, mendengarkan, sulih suara, bot ponsel |
 
@@ -147,7 +147,7 @@ dan menetapkan glosarium. Situs web dan aplikasi desktop ChatGPT belum bisa menj
 
 ## Pasang secara manual (Windows)
 
-Memerlukan Python 3.11. Disk, memori, dan kartu grafis: lihat [Kebutuhan komputer Anda](#kebutuhan-komputer-anda).
+Memerlukan Python 3.12. Disk, memori, dan kartu grafis: lihat [Kebutuhan komputer Anda](#kebutuhan-komputer-anda).
 
 ```powershell
 git clone https://github.com/willynilly0085-creator/tarjim
