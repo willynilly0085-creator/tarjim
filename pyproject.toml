@@ -1,6 +1,6 @@
 [project]
 name = "tarjim"
-version = "1.0.38"
+version = "1.0.39"
 description = "Subtitles and dubbing for any video, from any language to any language, on your own computer"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0 with Commons Clause 1.0" }
@@ -54,6 +54,7 @@ include = ["tarjim*"]
 
 [tool.setuptools.package-data]
 tarjim = ["web/*", "web/**/*", "extension/*", "extension/**/*", "constraints.txt", "overrides.txt",
+          "python.txt",
           "known_issues.json", "render/mark.png"]
 
 [tool.ruff]

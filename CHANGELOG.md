@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.39 (2026-10-26)
+
+- **Updates can move tarjim onto a newer Python.** A release now says which Python it runs on, and
+  the update installs it there: the installed copy is set up on that Python, and a copy run from
+  source gets a new environment on it, with the old one kept beside it until tarjim runs on the
+  new one (and put back if the new one cannot be made). Nothing moves yet: this release still runs
+  on Python 3.11. It prepares the next one, which moves to 3.12 so numpy, scipy, librosa and
+  networkx can take their newest versions.
+
 ## 1.0.38 (2026-10-26)
 
 - **A copy run from source updates itself.** It used to say "updated with git" and wait. Now it
