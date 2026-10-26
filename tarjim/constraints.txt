@@ -9,7 +9,7 @@ annotated-types==0.8.0
 anyio==4.15.1
 attrs==26.1.0
 audioop-lts==0.2.2 ; python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform == 'darwin'
-audioread==3.1.0 ; (python_full_version < '3.12' and platform_machine != 'x86_64') or (python_full_version < '3.12' and sys_platform != 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin')
+audioread==3.1.0 ; python_full_version < '3.12' or (platform_machine == 'x86_64' and sys_platform == 'darwin')
 backports-tarfile==1.2.0 ; python_full_version < '3.12'
 catt-tashkeel==1.0.2 ; sys_platform != 'darwin'
 certifi==2026.10.23
@@ -45,7 +45,7 @@ httpx2==2.16.0
 httpx2-jsfetch==1.0 ; python_full_version >= '3.12' and sys_platform == 'emscripten'
 huggingface-hub==2.3.0
 idna==3.20
-importlib-metadata==9.1.0 ; python_full_version < '3.12'
+importlib-metadata==10.1.0 ; python_full_version < '3.12'
 jaraco-classes==3.4.0
 jaraco-context==6.1.2
 jaraco-functools==4.6.0
@@ -58,7 +58,7 @@ julius==0.2.8
 keyring==25.7.0
 lameenc==1.9.0
 lazy-loader==0.6
-librosa==0.11.0 ; (python_full_version < '3.12' and platform_machine != 'x86_64') or (python_full_version < '3.12' and sys_platform != 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin')
+librosa==0.11.0 ; python_full_version < '3.12' or (platform_machine == 'x86_64' and sys_platform == 'darwin')
 librosa==1.0.0 ; (python_full_version >= '3.12' and platform_machine != 'x86_64') or (python_full_version >= '3.12' and sys_platform != 'darwin')
 llvmlite==0.50.0
 markdown-it-py==4.2.0
@@ -69,7 +69,7 @@ mdurl==0.1.2
 more-itertools==11.2.1
 mpmath==1.3.0
 msgpack==1.2.3
-multidict==7.1.0
+multidict==7.2.1
 nagisa==0.3.0
 narwhals==2.27.1
 networkx==3.6.1 ; python_full_version < '3.12'
@@ -108,7 +108,7 @@ rpds-py==2026.9.1
 rsa==4.9.1
 safetensors==0.8.0
 scikit-learn==1.9.1
-scipy==1.17.1 ; (python_full_version < '3.12' and platform_machine != 'x86_64') or (python_full_version < '3.12' and sys_platform != 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin')
+scipy==1.17.1 ; python_full_version < '3.12' or (platform_machine == 'x86_64' and sys_platform == 'darwin')
 scipy==1.18.1 ; (python_full_version >= '3.12' and platform_machine != 'x86_64') or (python_full_version >= '3.12' and sys_platform != 'darwin')
 secretstorage==3.5.0 ; sys_platform == 'linux'
 segno==1.6.6
@@ -121,11 +121,11 @@ soundfile==0.14.0
 soxr==1.1.0
 soynlp==0.0.493
 sphn==0.2.1
-sse-starlette==3.5.0
+sse-starlette==3.6.0
 standard-aifc==3.13.0 ; python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform == 'darwin'
 standard-chunk==3.13.0 ; python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform == 'darwin'
 standard-sunau==3.13.0 ; python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform == 'darwin'
-starlette==1.9.0
+starlette==1.10.0
 tabulate==0.10.0
 telethon==1.45.0
 tenacity==9.1.4
