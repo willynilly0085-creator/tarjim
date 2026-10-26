@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.42 (2026-10-26)
+
+- **Translating with Gemini takes seconds again, in every language.** A one-minute clip into Saudi
+  Arabic could take 8 to 13 minutes. Gemini translates with the clip's sound beside the text, and
+  with sound it kept its long default thinking, which sometimes ran to its ceiling (200 seconds
+  for 17 lines, in Arabic or English alike), while tarjim waited up to 4 minutes for each model
+  and asked the same stuck model again. Translation now thinks briefly (the same lines take about
+  3 seconds), gives up on a model sooner for short clips, and a model that kept a job waiting is
+  asked last for the next 20 minutes. Listening is unchanged.
+
 ## 1.0.41 (2026-10-26)
 
 - **The chat connection keeps working when tarjim moves to a newer Python.** A copy run from
