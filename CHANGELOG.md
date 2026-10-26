@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.46 (2026-10-27)
+
+- **Updates take effect again.** tarjim downloaded new versions but could keep running the old
+  one: when it restarted to use the update, it found its own log file held shut by the program
+  that had started it, gave up, and stayed on the old code, so the browser extension stayed old
+  too. The restart now writes to a second log beside the first (`server-restart.log`) and goes
+  ahead. If your tarjim is stuck on an older version, close it and open it once; after that,
+  updates restart it by themselves. Then press Reload on tarjim in Chrome's extensions page.
+
 ## 1.0.45 (2026-10-27)
 
 - **The translator next to Translate only offers what works.** A local AI program without a model,

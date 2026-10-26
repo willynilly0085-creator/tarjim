@@ -126,7 +126,11 @@ def start_detached(command: list[str], log: Path, here: Path | None = None) -> b
     """Start a program that outlives the chat session; `here`: in this folder and environment."""
     if sys.platform == "win32" and not here and spawn_outside_job(command, log):
         return True
-    with log.open("ab") as out:
+    try:
+        out = log.open("ab")
+    except PermissionError:  # held shut by the cmd `>>` the running engine was started with
+        out = log.with_name(f"{log.stem}-restart{log.suffix}").open("ab")
+    with out:
         for flags in (NO_WINDOW | DETACHED | BREAKAWAY, NO_WINDOW | DETACHED):
             try:
                 subprocess.Popen(command, stdout=out, stderr=out, stdin=subprocess.DEVNULL,
