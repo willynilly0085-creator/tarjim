@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.0.45 (2026-10-27)
+
+- **The translator next to Translate only offers what works.** A local AI program without a model,
+  or a provider without its key, is no longer offered or saved, so a job no longer fails later at
+  the translation step. When the saved translator stops working, the line above Translate says
+  "not working now" and the list asks you to pick another. If the list cannot load, it says so and
+  offers Try again, instead of "Couldn't save that".
+- **Dubbing voices that need a key you have not added are marked** and cannot be picked, instead
+  of being swapped quietly for the voice on your computer. A dub into a language the voices on your
+  computer do not speak is refused when you press Translate, not at the end of the work.
+- **Sending says what went wrong:** a file over 8 GB, tarjim not running, a bad link, or a voice
+  that needs its key. A chosen file has a Remove button, typing a link sets the file aside, and a
+  file dropped anywhere on the page is taken instead of being opened by the browser.
+- **Recent translations stay after a restart of the computer.** Cancel asks once before deleting
+  the work done so far. Play, Show in folder, Pause, Cancel and Try again say why when they could
+  not act (a file that was moved, for example), and the list no longer waits for the voice
+  services to answer.
+- **Smaller fixes:** failure reasons keep their line breaks; a subtitle file's button reads "Open
+  subtitles"; the page remembers your last language, output and voice; the page language menu is
+  named in your language; and stage names no longer get cut on a phone.
+
 ## 1.0.44 (2026-10-27)
 
 - **The extension says where AI keys go.** Under the translator in the popup, a line now says that
