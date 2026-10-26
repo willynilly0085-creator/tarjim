@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.40 (2026-10-26)
+
+- **tarjim runs on Python 3.12, and its libraries take their newest versions:** numpy 2.5.4,
+  scipy 1.18.1, librosa 1.0.0 and networkx 3.7, which needed Python 3.12. The update moves your
+  copy by itself: an installed copy is set up again on Python 3.12, and a copy run from source
+  gets a new environment on it, with the old one kept until tarjim runs on the new one. It
+  downloads the libraries again (about 3 GB with PyTorch for a graphics card) the first time.
+  Intel Macs stay on numpy 1.26 and PyTorch 2.2, the last versions made for them.
+
 ## 1.0.39 (2026-10-26)
 
 - **Updates can move tarjim onto a newer Python.** A release now says which Python it runs on, and

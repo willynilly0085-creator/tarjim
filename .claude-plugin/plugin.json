@@ -1,7 +1,7 @@
 {
   "name": "tarjim",
   "displayName": "tarjim",
-  "version": "1.0.39",
+  "version": "1.0.40",
   "description": "Translate, subtitle and dub any video from any language to any language with tarjim running on your computer. Your AI calls tarjim's tools: translate a link or a file, follow and control jobs, and change tarjim's settings (engines, subscriptions, local models, glossary).",
   "author": { "name": "Indicators", "email": "willy.nilly0085@gmail.com", "url": "https://indicators.sa/" },
   "homepage": "https://github.com/willynilly0085-creator/tarjim",
@@ -11,7 +11,7 @@
   "mcpServers": {
     "tarjim": {
       "command": "uv",
-      "args": ["run", "--quiet", "--no-project", "--python", "3.11",
+      "args": ["run", "--quiet", "--no-project", "--python", "3.12",
                "--with", "mcp>=2.2", "--with", "keyring", "--with", "requests",
                "python", "-P", "-m", "tarjim.assistant"],
       "env": { "PYTHONPATH": "${CLAUDE_PLUGIN_ROOT}" }
