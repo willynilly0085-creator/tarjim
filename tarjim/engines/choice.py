@@ -1,6 +1,6 @@
 from typing import Any, Protocol
 
-from tarjim.config import setting
+from tarjim.config import api_key, setting
 from tarjim.engines.catalog import API, BY_ID, PROVIDERS, SUBSCRIPTION, compatible
 
 LOCAL = "local"
@@ -17,7 +17,7 @@ class Asker(Protocol):
 
 def has_key(provider: str) -> bool:
     found = BY_ID.get(provider)
-    if found is None or found.method != API or not setting(found.key_name):
+    if found is None or found.method != API or not api_key(found.key_name):
         return False
     return provider != "custom" or bool(setting("custom_base_url"))
 

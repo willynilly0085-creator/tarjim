@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-from tarjim.config import setting
+from tarjim.config import api_key, setting
 from tarjim.engines.catalog import BY_ID, SUBSCRIPTION, compatible
 from tarjim.engines.model_catalog import Model, Row, describe
 
@@ -50,7 +50,7 @@ def web_rows(url: str, headers: dict[str, str]) -> list[Row]:
 
 def api_rows(provider: str) -> list[Row]:
     found = BY_ID[provider]
-    key = setting(found.key_name)
+    key = api_key(found.key_name)
     if not key:
         return []
     if provider == "gemini":

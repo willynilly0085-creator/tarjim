@@ -3,7 +3,7 @@ import re
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
-from tarjim.config import save, setting
+from tarjim.config import api_key, save, setting
 from tarjim.engines.catalog import API, BY_ID, LOCAL, SUBSCRIPTION, Provider, of_method
 from tarjim.engines.choice import LISTENERS, chosen, has_key, usable
 
@@ -14,7 +14,7 @@ Query = dict[str, list[str]]
 
 def api_view(provider: Provider) -> dict[str, Any]:
     view = {"id": provider.id, "name": provider.name, "hears": provider.hears,
-            "key_url": provider.key_url, "has_key": bool(setting(provider.key_name)),
+            "key_url": provider.key_url, "has_key": bool(api_key(provider.key_name)),
             "ready": has_key(provider.id), "model": setting(provider.model_name),
             "plan": provider.plan}
     return {**view, "base_url": setting("custom_base_url")} if provider.id == "custom" else view

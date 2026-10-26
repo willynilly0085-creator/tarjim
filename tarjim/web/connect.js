@@ -1,10 +1,14 @@
 import { $, api, post } from "./api.js";
 import { t } from "./i18n.js";
 import { localPanel, modelNeeded } from "./local.js";
+import { forgetKeyForm, keyForm, submitKey, typedKey } from "./keyform.js";
 import { fillModels, modelOptions } from "./models.js";
 import { signInPanel } from "./signin.js";
 
 let view = null;
+let preferred = "";  // a way to open on once, e.g. "api" for someone who said they have a key
+
+export const preferKeys = () => { preferred = "api"; };
 
 const method = () => document.querySelector("input[name=method]:checked")?.value || "api";
 function el(tag, props = {}, ...children) {
@@ -47,30 +51,6 @@ function pickModel() {
   if (other) $("connect-model").focus();
 }
 
-async function keyForm(provider) {
-  const input = el("input", { className: "text-input", type: "password", dir: "ltr", autocomplete: "off",
-    spellcheck: false, placeholder: provider.has_key ? t("keySet") : "" });
-  const note = el("span", { className: "meta key-state", role: "status" });
-  const save = el("button", { type: "submit", className: "button-quiet", textContent: t("keySave") });
-  const form = el("form", { className: "key-row", noValidate: true },
-    el("label", { className: "field" }, el("span", { className: "field-label", textContent: t("keyLabel") }), input),
-    el("div", { className: "row" }, provider.key_url ? el("a", { className: "text-link", href: provider.key_url,
-      target: "_blank", rel: "noopener noreferrer", textContent: t("getKey") }) : "", save, note));
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    note.textContent = t("keyChecking");
-    try {
-      await post("/keys", { provider: provider.id, key: input.value.trim() });
-      input.value = "";
-      note.textContent = t("keySaved");
-      await refresh(provider.id);
-    } catch (error) {
-      note.textContent = t(error.body?.result === "rejected" ? "keyRejected" : "keyShape");
-    }
-  });
-  return form;
-}
-
 function addressForm(provider) {
   const input = el("input", { className: "text-input", type: "url", dir: "ltr", value: provider.base_url || "",
     placeholder: "https://example.com/v1" });
@@ -95,6 +75,7 @@ function subscriptionDetail(provider) {
 }
 
 async function detail() {
+  forgetKeyForm();
   fillListeners();
   const provider = current();
   const box = $("connect-detail");
@@ -112,9 +93,10 @@ async function detail() {
     suggest(provider.models, provider.model, provider);
   } else {
     const terms = provider.plan ? [el("p", { className: "meta", textContent: t(`planTerms_${provider.id}`) })] : [];
-    box.replaceChildren(...(provider.id === "custom" ? [addressForm(provider)] : []), await keyForm(provider), ...terms);
+    box.replaceChildren(...(provider.id === "custom" ? [addressForm(provider)] : []), keyForm(provider, () => refresh(provider.id)), ...terms);
     const listed = provider.has_key ? await post("/connections/models", { provider: provider.id }).catch(() => ({})) : {};
     suggest(listed.models || [], provider.model, listed);
+    if (!provider.has_key) box.append(el("p", { className: "meta", textContent: t("modelsAfterKey") }));
   }
 }
 
@@ -127,8 +109,14 @@ function fillListeners() {
   const picked = $("connect-listen").value || view.chosen.listen;
   $("connect-listen").replaceChildren(...view.listening.map((way) => Object.assign(
     new Option(listenLabel(way), way.id, false, way.id === picked), { disabled: way.id !== "local" && !way.ready })));
+  listenHint();
+}
+
+// The words under the listening choice describe the one picked, not always the local model.
+function listenHint() {
   const local = view.listening.find((way) => way.id === "local");
-  $("listen-hint").textContent = t(local.gpu ? "reason_gpu" : "reason_cpu_slow");
+  const onComputer = $("connect-listen").value === "local";
+  $("listen-hint").textContent = onComputer ? t(local.gpu ? "reason_gpu" : "reason_cpu_slow") : "";
 }
 
 function fillProviders(picked) {
@@ -154,13 +142,21 @@ function methodOf(provider) {
 export async function renderConnect() {
   view = await api("/connections");
   const translate = view.chosen.translate;
-  document.querySelector(`input[name=method][value=${methodOf(translate)}]`).checked = true;
+  const way = preferred || methodOf(translate);
+  preferred = "";
+  document.querySelector(`input[name=method][value=${way}]`).checked = true;
   await fillProviders(translate === "local" ? view.local.server : translate);
 }
 
 export async function saveConnect() {
   const provider = current();
-  if (!provider || provider.ready === false) return "connectNotReady";
+  const typed = typedKey();
+  if (provider && typed) {  // a key pasted then saved with the big button, not the small one
+    const problem = await submitKey(provider, typed);
+    if (problem) return problem;
+    await refresh(provider.id);
+  }
+  if (!current() || current().ready === false) return "connectNotReady";
   const local = method() === "local";
   const body = { provider: local ? "local" : provider.id, model: $("connect-model").value.trim(),
     listen: $("connect-listen").value, ...(local ? { server: provider.id } : {}) };
@@ -176,4 +172,5 @@ export function wireConnect() {
   document.querySelectorAll("input[name=method]").forEach((input) => input.addEventListener("change", () => fillProviders("")));
   $("connect-provider").addEventListener("change", detail);
   $("connect-model-pick").addEventListener("change", pickModel);
+  $("connect-listen").addEventListener("change", listenHint);
 }

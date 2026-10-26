@@ -4,7 +4,7 @@ import json
 import uuid
 from typing import Any
 
-from tarjim.config import setting
+from tarjim.config import api_key, setting
 from tarjim.engines.catalog import BY_ID
 from tarjim.engines.web import (
     BAD_REQUEST,
@@ -91,5 +91,5 @@ class CompatibleAsker:
 def api_asker(provider: str) -> CompatibleAsker:
     from tarjim.engines.provider_models import model_in_use
 
-    key = setting(BY_ID[provider].key_name)
+    key = api_key(BY_ID[provider].key_name)
     return CompatibleAsker(provider, address(provider), key, model_in_use(provider))

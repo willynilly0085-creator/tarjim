@@ -1,7 +1,7 @@
 import re
 from collections.abc import Callable
 
-from tarjim.config import save, setting
+from tarjim.config import api_key, save
 from tarjim.engines.catalog import BY_ID, compatible
 from tarjim.engines.catalog import PROVIDERS as CATALOG
 
@@ -16,16 +16,26 @@ def well_formed(key: str) -> bool:
     return bool(KEY_SHAPE.match(key))
 
 
-def gemini_works(key: str) -> bool:
-    from google import genai
-    from google.genai import types
+REFUSED_BY_GOOGLE = (400, 401, 403)
 
-    quick = types.HttpOptions(timeout=CHECK_MS)
+
+def gemini_verdict(key: str) -> str:
+    """"" when Google accepts the key, "rejected" when Google refuses it, "unreachable" when Google
+    could not be asked (no internet, a timeout, a limit reached): that is not the key's fault, and
+    calling it a bad key sent people hunting for a typo in a good one."""
+    from google import genai
+    from google.genai import errors, types
+
+    # The client is kept in a name while the list is read: google-genai 2.33 closes a client the
+    # moment nothing holds it, so the inline form failed every key ("client has been closed").
+    client = genai.Client(api_key=key, http_options=types.HttpOptions(timeout=CHECK_MS))
     try:
-        next(iter(genai.Client(api_key=key, http_options=quick).models.list()), None)
+        next(iter(client.models.list()), None)
+    except errors.APIError as error:
+        return "rejected" if error.code in REFUSED_BY_GOOGLE else "unreachable"
     except Exception:
-        return False
-    return True
+        return "unreachable"
+    return ""
 
 
 def openai_works(key: str) -> bool:
@@ -50,7 +60,7 @@ def eleven_works(key: str) -> bool:
 
 
 CHECKS: dict[str, Callable[[str], bool]] = {
-    "gemini": gemini_works, "openai": openai_works, "anthropic": anthropic_works,
+    "openai": openai_works, "anthropic": anthropic_works,
     "eleven": eleven_works}
 
 
@@ -61,16 +71,25 @@ def compatible_works(provider: str, key: str) -> bool:
 
 
 def status() -> dict[str, bool]:
-    return {provider: bool(setting(name)) for provider, name in PROVIDERS.items()}
+    return {provider: bool(api_key(name)) for provider, name in PROVIDERS.items()}
+
+
+def verdict(provider: str, key: str) -> str:
+    if provider == "gemini":
+        return gemini_verdict(key)
+    check = CHECKS.get(provider)
+    fits = compatible(BY_ID[provider]) if provider in BY_ID else False
+    if (check and not check(key)) or (not check and fits and not compatible_works(provider, key)):
+        return "rejected"
+    return ""
 
 
 def store(provider: str, key: str) -> str:
     key = key.strip()
     if provider not in PROVIDERS or not well_formed(key):
         return "shape"
-    check = CHECKS.get(provider)
-    fits = compatible(BY_ID[provider]) if provider in BY_ID else False
-    if (check and not check(key)) or (not check and fits and not compatible_works(provider, key)):
-        return "rejected"
+    refused = verdict(provider, key)
+    if refused:
+        return refused
     save(PROVIDERS[provider], key)
     return "saved"

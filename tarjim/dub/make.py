@@ -6,7 +6,7 @@ from typing import Protocol
 import numpy as np
 
 from tarjim import media
-from tarjim.config import setting
+from tarjim.config import api_key, setting
 from tarjim.dub.audio import cut, write_wav
 from tarjim.dub.clone import LANGUAGES as CLONE_LANGUAGES
 from tarjim.dub.lines import Line, lines_from
@@ -42,7 +42,7 @@ def choose(engine: str, language: str) -> str:
     wanted = engine.split(":", maxsplit=1)[0]
     if wanted in LINKED:
         return linked(wanted)
-    keyless = wanted in KEYS and not setting(KEYS[wanted])
+    keyless = wanted in KEYS and not api_key(KEYS[wanted])
     if keyless or (wanted == "studio" and language not in VOICES):
         wanted = "clone"
     if wanted == "clone" and language not in CLONE_LANGUAGES:

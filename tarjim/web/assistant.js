@@ -4,6 +4,7 @@ import { aiScreen } from "./assistant_ai.js";
 import { planScreen } from "./assistant_plan.js";
 import { progressScreen, readyScreen } from "./assistant_finish.js";
 import { scanScreen } from "./assistant_scan.js";
+import { preferKeys } from "./connect.js";
 import { el } from "./ui.js";
 
 const flow = { finish: null, manual: null };
@@ -41,7 +42,7 @@ async function scan() {
 }
 
 function ai() {
-  aiScreen(screen, { back: welcome, done: scan });
+  aiScreen(screen, { back: welcome, done: scan, useKey: () => { preferKeys(); flow.manual("connect"); } });
 }
 
 function progress(started) {

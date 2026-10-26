@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.43 (2026-10-27)
+
+- **A Gemini key can be saved again.** Since an update of Google's library, checking a Gemini key
+  failed every time, and the page said the provider refused it, even for a good paid key. The
+  check works again, and it now says "refused" only when Google refuses the key; when Google could
+  not be reached or a limit was hit, it says so instead.
+- **The big Save button saves the key you typed.** A key pasted without pressing "Check and save"
+  was dropped while the page said "saved". Now it is checked and saved first.
+- **The key you save on tarjim's page is the one tarjim uses**, also when an older key sits in the
+  `GEMINI_API_KEY` environment variable (left by Gemini CLI, for example). A key only in that
+  variable now shows as set. If you had been relying on that variable, save the key on the page.
+- **Clearer key screens.** The key field says how to replace a saved key, the model list says it
+  appears after the key is saved, and the words under the listening choice match the one picked.
+  "Use the AI you pay for" now offers "Use my key" right away, since a Gemini key is not a
+  subscription, and the Gemini key option reads "API key, free or paid".
+
 ## 1.0.42 (2026-10-26)
 
 - **Translating with Gemini takes seconds again, in every language.** A one-minute clip into Saudi

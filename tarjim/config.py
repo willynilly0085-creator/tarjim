@@ -131,5 +131,16 @@ def prepare_environment() -> None:
         os.environ["PATH"] = f"{tools}{os.pathsep}{os.environ.get('PATH', '')}"
 
 
+# Gemini CLI and Google's own samples keep a key in GEMINI_API_KEY. It is used only when none is
+# saved on tarjim's page: a key the person saves there is the one every part of tarjim uses (an
+# older key left in the environment once kept translation on an exhausted free key).
+ENVIRONMENT_KEYS = {"gemini_api_key": "GEMINI_API_KEY"}
+
+
+def api_key(name: str) -> str:
+    outside = ENVIRONMENT_KEYS.get(name)
+    return setting(name) or (os.environ.get(outside, "") if outside else "")
+
+
 def gemini_key() -> str:
-    return os.environ.get("GEMINI_API_KEY") or setting("gemini_api_key")
+    return api_key("gemini_api_key")

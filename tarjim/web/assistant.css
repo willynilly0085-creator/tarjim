@@ -35,6 +35,9 @@
 .ai-app { display: grid; grid-template-columns: 1fr auto; gap: var(--space-md); align-items: center;
   padding-block: var(--space-md); border-bottom: 1px solid var(--line); }
 .ai-body { display: grid; gap: var(--space-xs); justify-items: end; }
+.ai-key { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-md); align-items: center;
+  justify-content: space-between; padding: var(--space-md); border: 1px solid var(--line); border-radius: var(--radius); }
+.ai-key .meta { margin: 0; }
 
 @keyframes pulse { from { opacity: 0.35; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .check.busy .check-mark { animation: none; } }

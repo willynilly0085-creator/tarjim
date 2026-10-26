@@ -85,8 +85,12 @@ function planRow(plan, done) {
     plan.ready ? el("div", { className: "ai-body" }, button(t("aiUse"), done, "primary compact")) : form);
 }
 
-export async function aiScreen(screen, { back, done }) {
-  const title = () => [el("h1", { tabIndex: -1, textContent: t("aiTitle") }), el("p", { className: "lede", textContent: t("aiHint") })];
+export async function aiScreen(screen, { back, done, useKey }) {
+  // Gemini by key is not a subscription: without this line a key holder only met Antigravity here.
+  // It is shown at once, not after the subscription check that can take a quarter of a minute.
+  const title = () => [el("h1", { tabIndex: -1, textContent: t("aiTitle") }), el("p", { className: "lede", textContent: t("aiHint") }),
+    el("div", { className: "ai-key" }, el("p", { className: "meta", textContent: t("aiHaveKey") }),
+      button(t("aiUseKey"), useKey, "button-quiet compact"))];
   screen(...title(), status(t("scanLooking")));
   const [apps, view] = await Promise.all([api("/setup/scan/subscriptions?fresh=1"), api("/connections")]);
   const rows = apps.apps.map((app) => appRow(app, view.subscription.find((s) => s.id === app.id), done));
