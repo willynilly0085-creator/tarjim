@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.41 (2026-10-26)
+
+- **The chat connection keeps working when tarjim moves to a newer Python.** A copy run from
+  source removed its old environment as soon as tarjim ran on the new one, while the chat
+  connections Claude had started still ran from the old one, so their tools could no longer reach
+  tarjim. The old environment now stays until nothing runs from it. If tarjim's tools in Claude
+  answer with an error after the move to 1.0.40, restart the Claude app once.
+
 ## 1.0.40 (2026-10-26)
 
 - **tarjim runs on Python 3.12, and its libraries take their newest versions:** numpy 2.5.4,
