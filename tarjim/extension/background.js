@@ -1,4 +1,4 @@
-import { buildMenus, isMode, OTHER } from "./menus.js";
+import { buildMenus, isMode, OTHER, refreshMenus } from "./menus.js";
 import { claimPending, sendWaitingJob } from "./pairing.js";
 import { clickedPost, downloadable } from "./posts.js";
 import { ApiError, api, errorLabel, loadWords, remember, t } from "./shared.js";
@@ -52,7 +52,9 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name !== POLL) return;
   if (await loadWords()) buildMenus();
   await matchEngine();
+  await refreshMenus();
   if ((await claimPending()) === "paired") {
+    chrome.notifications.clear("pair-code");  // the code the popup left on screen
     notify(`paired-${Date.now()}`, t("appName"), t("pairedNotice"));
     await sendWaitingJob();
   }

@@ -102,10 +102,10 @@
     "message": "Try again"
   },
   "errQuota": {
-    "message": "The free Gemini quota is used up for today. It comes back tomorrow morning."
+    "message": "The free quota is used up for today. It comes back tomorrow, or use local mode."
   },
   "errKey": {
-    "message": "Gemini key is not set. Add it in Settings."
+    "message": "The key is missing or was refused. Check it in Settings."
   },
   "errDownload": {
     "message": "Could not download the video from that link. Check that the link works."
@@ -201,7 +201,7 @@
     "message": "Fish cloning (sends a voice sample)"
   },
   "keyChecking": {
-    "message": "Checking the key with Google"
+    "message": "Checking with the provider"
   },
   "keyShape": {
     "message": "That does not look like a key. Check that you copied all of it."
@@ -210,7 +210,7 @@
     "message": "Fish key (optional, for cloud dubbing)"
   },
   "keyRejected": {
-    "message": "Google refused this key. Check that you copied all of it."
+    "message": "The provider refused this key. Check that you copied all of it."
   },
   "keySet": {
     "message": "Set. Type a new key to replace it."
@@ -493,5 +493,71 @@
         "content": "$1"
       }
     }
+  },
+  "needsKey": {
+    "message": "needs a key"
+  },
+  "keyUnreachable": {
+    "message": "We couldn't check the key right now: the provider didn't answer or a usage limit was reached. The key itself may be fine; try again in a moment."
+  },
+  "keyFailed": {
+    "message": "The key wasn't saved. Make sure tarjim is running and try again."
+  },
+  "engineKeys": {
+    "message": "Gemini and other AI keys are added on tarjim's page."
+  },
+  "addKey": {
+    "message": "Add a key"
+  },
+  "keysButton": {
+    "message": "Translator and AI keys"
+  },
+  "voiceKeys": {
+    "message": "Voices that need a key work once you add their key on tarjim's page."
+  },
+  "actionOffline": {
+    "message": "tarjim didn't answer. Make sure it's running and try again."
+  },
+  "actionMissing": {
+    "message": "The file wasn't found. It may have been deleted or moved from its folder."
+  },
+  "actionChanged": {
+    "message": "This translation changed in the meantime; the list updates in a moment."
+  },
+  "actionFailed": {
+    "message": "That didn't work. Try again."
+  },
+  "opened": {
+    "message": "Opened on your computer."
+  },
+  "sendTooBig": {
+    "message": "This file is over 8 GB, the largest tarjim takes."
+  },
+  "sendBadLink": {
+    "message": "That isn't a video link. Copy the whole link, starting with https://"
+  },
+  "sendFile": {
+    "message": "The file didn't arrive in full. Try again."
+  },
+  "sendFailed": {
+    "message": "The translation didn't start. Try again, and update tarjim if it keeps happening."
+  },
+  "pairExpired": {
+    "message": "The connection request expired. Press “Connect automatically” again."
+  },
+  "pairUnreachable": {
+    "message": "tarjim isn't answering right now, waiting for it…"
+  },
+  "pairManualTitle": {
+    "message": "Connect by hand with the security token"
+  },
+  "summaryFailed": {
+    "message": "Couldn't read the settings from tarjim. Make sure it's running."
+  },
+  "stillOffline": {
+    "message": "Still no answer. Make sure it's running and try again in a moment."
+  },
+  "setupNotDone": {
+    "message": "Setup isn't finished yet. Go through the steps on tarjim's page to the end."
   }
 }

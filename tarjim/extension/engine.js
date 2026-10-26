@@ -1,8 +1,10 @@
 // The translator and its model, changed in place next to Translate. Only translators that work
-// right now are offered: a saved key, a subscription app that is signed in, a local AI running.
+// right now are offered: a saved key, a subscription app that is signed in, a local AI running;
+// a line under them always says that keys are added on tarjim's page, with a button to it.
 // The line shows the saved choice at once; the lists load only when the person opens it.
 // The same control as the page's (tarjim/web/engine.js), with the extension's words.
 import { $ } from "./dom.js";
+import { openPage } from "./pairing.js";
 import { api, post, t } from "./shared.js";
 
 function modelLabel(source, m) {
@@ -118,6 +120,9 @@ function wire() {
     if (choice) await save(await fillModelList(choice));
   });
   $("engine-model").addEventListener("change", () => save($("engine-model").value));
+  // Keys (Gemini's and every other) are typed on tarjim's page, never in this popup.
+  $("open-keys").addEventListener("click", () => openPage("#connect"));
+  $("open-voice-keys").addEventListener("click", () => openPage("#voice"));
   state.wired = true;
 }
 

@@ -2,11 +2,15 @@ import { $, api, post } from "./api.js";
 import { load } from "./i18n.js";
 import { fillLanguageMenu, guessLanguage } from "./languages.js";
 import { watchPairing } from "./pairing.js";
-import { showPhone } from "./phone.js";
 import { repaint, startSettings, startWizard, wireWizard } from "./wizard.js";
 import { repaintAssistant, startAssistant } from "./assistant.js";
 import { openWorkspace } from "./workspace.js";
 import { repaintQuality } from "./quality.js";
+import { preferKeys } from "./connect.js";
+import { showSection } from "./ui.js";
+
+// Addresses that open settings on one section: the extension links here to add a key.
+const SECTIONS = { "#phone": "phone", "#connect": "connect", "#voice": "voice" };
 
 async function boot() {
   const setup = await api("/setup");
@@ -28,9 +32,11 @@ async function boot() {
   };
   $("open-settings").addEventListener("click", settings);
   if (setup.setup_done !== "yes" || location.hash === "#setup") return startAssistant(openWorkspace, manual);
-  if (location.hash !== "#phone") return openWorkspace();
+  const section = SECTIONS[location.hash];
+  if (!section) return openWorkspace();
+  if (section === "connect") preferKeys();
   await settings();
-  showPhone();
+  showSection(section);
 }
 
 boot();

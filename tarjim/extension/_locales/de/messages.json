@@ -102,10 +102,10 @@
     "message": "Erneut versuchen"
   },
   "errQuota": {
-    "message": "Das kostenlose Gemini-Kontingent ist für heute aufgebraucht. Es steht morgen früh wieder bereit."
+    "message": "Das kostenlose Kontingent ist für heute aufgebraucht. Es steht morgen wieder bereit, oder nutze den lokalen Modus."
   },
   "errKey": {
-    "message": "Kein Gemini-Schlüssel eingerichtet. Füge ihn in den Einstellungen hinzu."
+    "message": "Der Schlüssel fehlt oder wurde abgelehnt. Prüfe ihn in den Einstellungen."
   },
   "errDownload": {
     "message": "Das Video konnte über diesen Link nicht heruntergeladen werden. Prüfe, ob der Link funktioniert."
@@ -201,7 +201,7 @@
     "message": "Fish-Klonen (sendet eine Stimmprobe)"
   },
   "keyChecking": {
-    "message": "Schlüssel wird bei Google geprüft"
+    "message": "Wird beim Anbieter geprüft"
   },
   "keyShape": {
     "message": "Das sieht nicht wie ein Schlüssel aus. Prüfe, ob du ihn vollständig kopiert hast."
@@ -210,7 +210,7 @@
     "message": "Fish-Schlüssel (optional, für Synchronisation in der Cloud)"
   },
   "keyRejected": {
-    "message": "Google hat diesen Schlüssel abgelehnt. Prüfe, ob du ihn vollständig kopiert hast."
+    "message": "Der Anbieter hat diesen Schlüssel abgelehnt. Prüfe, ob du ihn vollständig kopiert hast."
   },
   "keySet": {
     "message": "Eingerichtet. Gib einen neuen Schlüssel ein, um ihn zu ersetzen."
@@ -493,5 +493,71 @@
         "content": "$1"
       }
     }
+  },
+  "needsKey": {
+    "message": "braucht einen Schlüssel"
+  },
+  "keyUnreachable": {
+    "message": "Der Schlüssel konnte gerade nicht geprüft werden: Der Anbieter hat nicht geantwortet oder ein Nutzungslimit ist erreicht. Der Schlüssel selbst kann in Ordnung sein; versuche es gleich noch einmal."
+  },
+  "keyFailed": {
+    "message": "Der Schlüssel wurde nicht gespeichert. Prüfe, ob tarjim läuft, und versuche es erneut."
+  },
+  "engineKeys": {
+    "message": "Den Gemini-Schlüssel und andere KI-Schlüssel fügst du auf der tarjim-Seite hinzu."
+  },
+  "addKey": {
+    "message": "Schlüssel hinzufügen"
+  },
+  "keysButton": {
+    "message": "Übersetzer und KI-Schlüssel"
+  },
+  "voiceKeys": {
+    "message": "Stimmen, die einen Schlüssel brauchen, funktionieren, sobald du ihn auf der tarjim-Seite hinzufügst."
+  },
+  "actionOffline": {
+    "message": "tarjim hat nicht geantwortet. Prüfe, ob es läuft, und versuch es noch einmal."
+  },
+  "actionMissing": {
+    "message": "Die Datei wurde nicht gefunden. Vielleicht wurde sie gelöscht oder aus ihrem Ordner verschoben."
+  },
+  "actionChanged": {
+    "message": "Diese Übersetzung hat sich inzwischen geändert; die Liste aktualisiert sich gleich."
+  },
+  "actionFailed": {
+    "message": "Das hat nicht geklappt. Versuch es noch einmal."
+  },
+  "opened": {
+    "message": "Auf deinem Computer geöffnet."
+  },
+  "sendTooBig": {
+    "message": "Diese Datei ist größer als 8 GB, das Maximum für tarjim."
+  },
+  "sendBadLink": {
+    "message": "Das ist kein Videolink. Kopiere den ganzen Link, er beginnt mit https://"
+  },
+  "sendFile": {
+    "message": "Die Datei kam nicht vollständig an. Versuch es noch einmal."
+  },
+  "sendFailed": {
+    "message": "Die Übersetzung hat nicht begonnen. Versuch es noch einmal und aktualisiere tarjim, wenn es wieder passiert."
+  },
+  "pairExpired": {
+    "message": "Die Verbindungsanfrage ist abgelaufen. Drück noch einmal auf „Automatisch verbinden“."
+  },
+  "pairUnreachable": {
+    "message": "tarjim antwortet gerade nicht, wir warten…"
+  },
+  "pairManualTitle": {
+    "message": "Von Hand mit dem Sicherheitstoken verbinden"
+  },
+  "summaryFailed": {
+    "message": "Die Einstellungen konnten nicht von tarjim gelesen werden. Prüfe, ob es läuft."
+  },
+  "stillOffline": {
+    "message": "Immer noch keine Antwort. Prüfe, ob es läuft, und versuch es gleich noch einmal."
+  },
+  "setupNotDone": {
+    "message": "Die Einrichtung ist noch nicht fertig. Geh die Schritte auf der tarjim-Seite bis zum Ende durch."
   }
 }

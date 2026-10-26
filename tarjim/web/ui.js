@@ -35,3 +35,11 @@ export function selectText(node) {
   window.getSelection().removeAllRanges();
   window.getSelection().addRange(range);
 }
+
+// Settings opened on one section, e.g. tarjim/#connect from the extension's "Add a key".
+export function showSection(step) {
+  const section = document.querySelector(`[data-step="${step}"]`);
+  section.scrollIntoView({ block: "start" });
+  section.querySelector("h1").tabIndex = -1;
+  section.querySelector("h1").focus({ preventScroll: true });
+}

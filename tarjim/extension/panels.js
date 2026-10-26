@@ -1,6 +1,6 @@
 import { $, show } from "./dom.js";
 import { keyStatus, saveKey } from "./keys.js";
-import { askToPair, claimPending, sendWaitingJob, serverBase } from "./pairing.js";
+import { askToPair, claimPending, openPage, sendWaitingJob } from "./pairing.js";
 import { ApiError, api, remember, settings, t } from "./shared.js";
 
 window.addEventListener("unhandledrejection", (event) => {
@@ -17,7 +17,8 @@ async function pair(event, ready) {
     await api("/jobs");
     $("pair-error").hidden = true;
     await ready();
-  } catch {
+  } catch (error) {
+    $("pair-error").textContent = t(error.kind === "offline" ? "actionOffline" : "pairWrong");
     $("pair-error").hidden = false;
   }
 }
@@ -36,31 +37,54 @@ export async function showPair() {
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const ATTEMPTS = 400;
+const ENDED = { denied: "pairDenied", none: "pairExpired" };
+const CODE_NOTICE = "pair-code";
+let pageTab = null;
+
+// The code is typed on tarjim's page, and going there closes this popup: so the page opens behind
+// it, and the code also stays in a notification until the request is answered.
+function noticeCode(code) {
+  chrome.notifications.create(CODE_NOTICE, { type: "basic", iconUrl: "icons/128.png", title: t("appName"),
+    message: `${t("pairWaiting")} ${code}`, requireInteraction: true });
+}
+
+async function showPage() {
+  const shown = pageTab && await chrome.tabs.update(pageTab.id, { active: true }).catch(() => null);
+  if (!shown) await openPage();
+}
+
+async function answer(code) {
+  for (let i = 0; i < ATTEMPTS; i += 1) {
+    await wait(1500);
+    const result = await claimPending();
+    if (result === "unreachable") $("pair-waiting").textContent = t("pairUnreachable");
+    else if (result === "waiting") showCode(code);
+    else return result;
+  }
+  return "none";
+}
 
 export async function autoPair(ready) {
   show("pair");
   const asked = await askToPair();
   if (!asked?.id) return show("offline");
   showCode(asked.code);
+  noticeCode(asked.code);
   $("open-tarjim").hidden = false;
-  chrome.tabs.create({ url: `${await serverBase()}/` });
-  for (let i = 0; i < ATTEMPTS; i += 1) {
-    await wait(1500);
-    const result = await claimPending();
-    if (result === "paired") {
-      await sendWaitingJob();
-      return ready();
-    }
-    if (result !== "waiting") break;
-  }
-  $("pair-waiting").textContent = t("pairDenied");
+  pageTab = await openPage("", false);
+  const result = await answer(asked.code);
+  chrome.notifications.clear(CODE_NOTICE);
+  if (result !== "paired") return void ($("pair-waiting").textContent = t(ENDED[result] || "pairExpired"));
+  await sendWaitingJob();
+  return ready();
 }
+
 async function fillSummary() {
   const box = $("connection-summary");
   box.textContent = t("loading");
   const [now, phone] = await Promise.all([api("/connections/current").catch(() => null),
     api("/phone").catch(() => null)]);
-  if (!now) return;
+  if (!now) return void (box.textContent = t("summaryFailed"));
   const row = (label, value) => [Object.assign(document.createElement("dt"), { textContent: label }),
     Object.assign(document.createElement("dd"), { textContent: value })];
   box.replaceChildren(...row(t("summaryTranslate"), now.model ? `${now.name} · ${now.model}` : now.name),
@@ -79,28 +103,41 @@ export async function openSettings() {
   await fillSummary();
 }
 
-async function openSetup() {
-  chrome.tabs.create({ url: `${await serverBase()}/#setup` });
-}
+const openSetup = () => openPage("#setup");
 
 async function saveSettings(event) {
   event.preventDefault();
   await remember({ server: $("server").value.trim(), token: $("settings-token").value.trim() });
-  $("settings-notice").textContent = t("keyChecking");
-  const problem = await saveKey("fish", $("settings-fish").value);
+  const typed = $("settings-fish").value.trim();
+  $("settings-notice").textContent = typed ? t("keyChecking") : "";
+  const problem = await saveKey("fish", typed).catch(() => t("keyFailed"));
   $("settings-notice").textContent = problem || t("saved");
+  if (typed && !problem) {
+    $("settings-fish").value = "";
+    $("settings-fish").placeholder = t("keySet");
+  }
+}
+
+// "Try again" and "I finished" say so when nothing changed, instead of showing the same screen.
+function againOn(view, note, words, back) {
+  return async () => {
+    $(note).textContent = t("loading");
+    await back();
+    $(note).textContent = $(`view-${view}`).hidden ? "" : t(words);
+  };
 }
 
 export function wirePanels({ ready, back, leave }) {
   $("pair-form").addEventListener("submit", (event) => pair(event, ready));
   $("pair-auto").addEventListener("click", () => autoPair(ready));
-  $("open-tarjim").addEventListener("click", async () => chrome.tabs.create({ url: `${await serverBase()}/` }));
+  $("open-tarjim").addEventListener("click", showPage);
   $("open-setup").addEventListener("click", openSetup);
-  $("open-phone").addEventListener("click", async () => chrome.tabs.create({ url: `${await serverBase()}/#phone` }));
+  $("open-keys-settings").addEventListener("click", () => openPage("#connect"));
+  $("open-phone").addEventListener("click", () => openPage("#phone"));
   $("open-full-setup").addEventListener("click", openSetup);
-  $("setup-done").addEventListener("click", back);
+  $("setup-done").addEventListener("click", againOn("setup", "setup-note", "setupNotDone", back));
   $("settings-form").addEventListener("submit", saveSettings);
-  $("retry-connect").addEventListener("click", back);
+  $("retry-connect").addEventListener("click", againOn("offline", "offline-note", "stillOffline", back));
   $("close-settings").addEventListener("click", back);
   $("open-settings").addEventListener("click", () => { leave(); openSettings(); });
 }

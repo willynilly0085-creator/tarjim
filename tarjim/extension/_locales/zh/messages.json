@@ -102,10 +102,10 @@
     "message": "重试"
   },
   "errQuota": {
-    "message": "今天的 Gemini 免费额度已用完。明天早上会恢复。"
+    "message": "今天的免费额度已用完。明天会恢复，你也可以改用本地模式。"
   },
   "errKey": {
-    "message": "尚未设置 Gemini 密钥。请在设置中添加。"
+    "message": "密钥缺失或被拒绝。请在设置中检查。"
   },
   "errDownload": {
     "message": "无法从该链接下载视频。请检查链接是否有效。"
@@ -201,7 +201,7 @@
     "message": "Fish 声音克隆（发送声音样本）"
   },
   "keyChecking": {
-    "message": "正在向 Google 验证密钥"
+    "message": "正在向服务商验证"
   },
   "keyShape": {
     "message": "这看起来不像密钥。请检查是否完整复制。"
@@ -210,7 +210,7 @@
     "message": "Fish 密钥（可选，用于云端配音）"
   },
   "keyRejected": {
-    "message": "Google 拒绝了这个密钥。请检查是否完整复制。"
+    "message": "服务商拒绝了这个密钥。请检查是否完整复制。"
   },
   "keySet": {
     "message": "已设置。输入新密钥即可替换。"
@@ -493,5 +493,71 @@
         "content": "$1"
       }
     }
+  },
+  "needsKey": {
+    "message": "需要密钥"
+  },
+  "keyUnreachable": {
+    "message": "暂时无法验证密钥：服务商没有响应，或已达到用量上限。密钥本身可能没问题，请稍后再试。"
+  },
+  "keyFailed": {
+    "message": "密钥没有保存。请确认 tarjim 正在运行，然后重试。"
+  },
+  "engineKeys": {
+    "message": "Gemini 密钥和其他 AI 密钥请在 tarjim 页面中添加。"
+  },
+  "addKey": {
+    "message": "添加密钥"
+  },
+  "keysButton": {
+    "message": "翻译服务和 AI 密钥"
+  },
+  "voiceKeys": {
+    "message": "需要密钥的声音，在 tarjim 页面添加密钥后即可使用。"
+  },
+  "actionOffline": {
+    "message": "tarjim 没有响应。请确认它正在运行，然后重试。"
+  },
+  "actionMissing": {
+    "message": "找不到文件。它可能已被删除或移出了文件夹。"
+  },
+  "actionChanged": {
+    "message": "这条翻译在此期间已变化，列表马上会更新。"
+  },
+  "actionFailed": {
+    "message": "没有成功，请重试。"
+  },
+  "opened": {
+    "message": "已在你的电脑上打开。"
+  },
+  "sendTooBig": {
+    "message": "这个文件超过 8 GB，这是 tarjim 能接收的上限。"
+  },
+  "sendBadLink": {
+    "message": "这不是视频链接。请复制以 https:// 开头的完整链接。"
+  },
+  "sendFile": {
+    "message": "文件没有完整传到。请重试。"
+  },
+  "sendFailed": {
+    "message": "翻译没有开始。请重试，如果反复出现请更新 tarjim。"
+  },
+  "pairExpired": {
+    "message": "连接请求已过期。请再按一次“自动连接”。"
+  },
+  "pairUnreachable": {
+    "message": "tarjim 暂时没有响应，正在等待…"
+  },
+  "pairManualTitle": {
+    "message": "用安全令牌手动连接"
+  },
+  "summaryFailed": {
+    "message": "无法从 tarjim 读取设置。请确认它正在运行。"
+  },
+  "stillOffline": {
+    "message": "仍然没有响应。请确认它正在运行，稍后再试。"
+  },
+  "setupNotDone": {
+    "message": "设置还没完成。请在 tarjim 页面中把步骤走到最后。"
   }
 }

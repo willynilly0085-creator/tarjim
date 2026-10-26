@@ -4,7 +4,7 @@ saved through /keys like every other key; here are the choices that are not secr
 import re
 from typing import Any
 
-from tarjim.config import save, setting
+from tarjim.config import api_key, save, setting
 
 Query = dict[str, list[str]]
 VOICE_ID = re.compile(r"^[\w-]{1,64}$")
@@ -29,7 +29,7 @@ def view() -> dict[str, Any]:
     from tarjim.dub import eleven
 
     key = setting("eleven_api_key")
-    keyed = {name: {"has_key": bool(setting(secret))} for name, secret in KEYED.items()}
+    keyed = {name: {"has_key": bool(api_key(secret))} for name, secret in KEYED.items()}
     return {**keyed, "speech": speech_view(),
             "eleven": {"has_key": bool(key), "voices": eleven.view(key),
                        "voice": setting("eleven_voice")}}

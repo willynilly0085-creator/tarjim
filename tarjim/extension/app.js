@@ -8,7 +8,7 @@ import { showEngine } from "./engine.js";
 import { claimPending } from "./pairing.js";
 import { showLinkedVoices } from "./keys.js";
 import { autoPair, openSettings, showPair, wirePanels } from "./panels.js";
-import { isMedia, upload } from "./upload.js";
+import { isMedia, sendProblem, showProgress, tooBig, upload } from "./upload.js";
 
 const params = new URLSearchParams(location.search);
 const pageMode = params.get("page") === "1";
@@ -102,14 +102,8 @@ function sourceReady() {
 
 const refreshButton = () => { $("go").disabled = !sourceReady(); };
 
-function progress(fraction) {
-  $("upload").hidden = false;
-  $("upload-bar").style.transform = `scaleX(${fraction})`;
-  $("upload-text").textContent = `${t("uploading")} ${Math.round(fraction * 100)}%`;
-}
-
 async function send(options) {
-  if (pageMode && state.file) return upload(state.file, options, progress);
+  if (pageMode && state.file) return upload(state.file, options, showProgress);
   const url = pageMode ? $("link").value.trim() : state.url;
   return startJob({ url, ...options, quality: chosenQuality() });
 }
@@ -121,13 +115,16 @@ async function submit(event) {
   await remember({ ...options, voice: $("voice").value });
   $("go").disabled = true;
   $("go").textContent = t("sending");
+  $("notice").textContent = "";
   try {
     await send(options);
     $("notice").textContent = t("started");
     await clearPending();
     clearSource();
   } catch (error) {
-    return error.kind === "token" ? showPair() : connect();
+    if (error.kind === "token") return showPair();
+    if (error.kind === "offline") return connect();
+    $("notice").textContent = sendProblem(error);  // e.g. a link tarjim cannot take
   } finally {
     $("go").textContent = t("translate");
     $("upload").hidden = true;
@@ -145,8 +142,8 @@ function clearSource() {
 }
 
 function takeFile(file) {
-  if (!isMedia(file)) {
-    $("notice").textContent = t("badFile");
+  if (!isMedia(file) || tooBig(file)) {
+    $("notice").textContent = t(isMedia(file) ? "sendTooBig" : "badFile");
     return;
   }
   state.file = file;

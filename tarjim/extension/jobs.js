@@ -20,10 +20,41 @@ function trackFor(job, list) {
   list.replaceChildren(...steps.map((stage, index) => stepItem(stage, index, current, !job.finished)));
 }
 
-function steering(job, refresh) {
+// What a press on a job's button led to, said on that job: the global "tarjim is not running"
+// screen is only for when tarjim itself cannot be reached at all.
+const PROBLEMS = { offline: "actionOffline", 404: "actionChanged", 409: "actionChanged" };
+
+function say(row, text, kind = "") {
+  const note = row.querySelector(".job-note");
+  note.textContent = text;
+  note.dataset.kind = kind;
+  note.hidden = !text;
+}
+
+function sayFor(row, text, ms) {
+  say(row, text);
+  setTimeout(() => { if (row.querySelector(".job-note").textContent === text) say(row, ""); }, ms);
+}
+
+// words: { done } said after it worked, { missing } said when the file is gone.
+function guarded(row, call, words = {}) {
+  return async () => {
+    say(row, "");
+    try {
+      await call();
+      if (words.done) sayFor(row, t(words.done), 5000);
+    } catch (error) {
+      if (error.kind === "token") throw error;  // the pairing screen
+      const missing = error.status === 404 && words.missing;
+      say(row, t(missing || PROBLEMS[error.kind] || PROBLEMS[error.status] || "actionFailed"), "problem");
+    }
+  };
+}
+
+function steering(job, act, refresh) {
   const steer = (action) => () => post(`/jobs/${job.id}/${action}`).then(refresh);
-  return [actionButton(t(job.paused ? "resume" : "pause"), steer(job.paused ? "resume" : "pause")),
-    actionButton(t("cancel"), steer("cancel"))];
+  return [act(t(job.paused ? "resume" : "pause"), steer(job.paused ? "resume" : "pause")),
+    act(t("cancel"), steer("cancel"))];
 }
 
 function actionButton(label, onClick) {
@@ -52,15 +83,15 @@ function askFirst(button) {
   }, 5000);
 }
 
-function removeButton(job, refresh) {
-  const button = actionButton(t("remove"), async () => {
+function removeButton(job, row, refresh) {
+  const button = actionButton(t("remove"), guarded(row, async () => {
     if (job.stage === "done" && !button.dataset.sure) return askFirst(button);
-    await post(`/jobs/${job.id}/remove`).catch(() => null);
+    await post(`/jobs/${job.id}/remove`);
     rows.delete(job.id);
     document.getElementById("announcer").textContent = t("removed");
     if (document.activeElement === button) document.getElementById("recent-title").focus();
     refresh();
-  });
+  }));
   button.classList.add("job-remove");
   named(button, t("removeLabel"));
   return button;
@@ -72,12 +103,15 @@ function actionsFor(job, box, refresh) {
   if (box.dataset.for === wanted) return;
   box.dataset.for = wanted;
   box.hidden = false;
+  const row = box.closest(".job");
+  const act = (label, call, words) => actionButton(label, guarded(row, call, words));
+  const opened = { done: "opened", missing: "actionMissing" };
   const buttons = wanted === "done"
-    ? [actionButton(t("play"), () => post(`/open/${job.id}`)),
-       actionButton(t("openFolder"), () => post(`/reveal/${job.id}`))]
-    : wanted === "again" ? [actionButton(t("retry"), () => post(`/retry/${job.id}`).then(refresh))]
-      : steering(job, refresh);
-  box.replaceChildren(...buttons, ...(job.finished ? [removeButton(job, refresh)] : []));
+    ? [act(t("play"), () => post(`/open/${job.id}`), opened),
+       act(t("openFolder"), () => post(`/reveal/${job.id}`), opened)]
+    : wanted === "again" ? [act(t("retry"), () => post(`/retry/${job.id}`).then(refresh))]
+      : steering(job, act, refresh);
+  box.replaceChildren(...buttons, ...(job.finished ? [removeButton(job, row, refresh)] : []));
 }
 
 function metaText(job, languages) {
@@ -87,6 +121,7 @@ function metaText(job, languages) {
 }
 
 function paint(row, job, languages, refresh) {
+  if (row.dataset.stage && row.dataset.stage !== job.stage) say(row, "");  // old news for this job
   row.dataset.stage = job.stage;
   row.dataset.paused = String(Boolean(job.paused));
   row.querySelector(".job-title").textContent = job.title;

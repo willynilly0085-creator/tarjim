@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.0.44 (2026-10-27)
+
+- **The extension says where AI keys go.** Under the translator in the popup, a line now says that
+  Gemini and other AI keys are added on tarjim's page, with "Add a key" opening the page right on
+  its key settings (`#connect`, the "API key" tab). Settings in the popup has the same button.
+- **A failed press says why, on that video.** Play, Show in folder, Pause, Cancel, Try again and
+  Remove used to show "tarjim is not running" for any failure, or nothing at all, and Remove said
+  "removed" even when it was not. Each now says what happened under its own video.
+- **A translation tarjim refuses says why**, for example a file over 8 GB (now caught before it
+  uploads) or a link that is not a video link.
+- **Key and quota messages no longer blame Gemini** when another provider is used; they say the
+  same as tarjim's page in every language, and checking a Fish key no longer says "with Google".
+  Saving the settings with no key typed no longer says it is checking one.
+- **Voices that need a key you have not saved** are marked "needs a key" in the popup and cannot be
+  picked, with a link to add the key; the right-click menu leaves them out until the key is saved.
+  A Gemini key kept only in `GEMINI_API_KEY` counts here too.
+- **"Connect automatically" keeps the popup open.** tarjim's page opens behind it, and the code also
+  stays in a notification until the request is answered. An expired request or a tarjim that stops
+  answering is now said as such, not as "denied".
+- **Smaller fixes in the popup:** the settings summary says when it could not be read instead of
+  "Loading…" forever; "Try again" and "I finished" say so when nothing changed; Arabic calls the
+  program ترجم throughout; manual pairing with the security token sits under its own heading, and
+  the `tarjim-serve` command is no longer shown on Windows.
+
 ## 1.0.43 (2026-10-27)
 
 - **A Gemini key can be saved again.** Since an update of Google's library, checking a Gemini key

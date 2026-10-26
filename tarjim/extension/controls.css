@@ -19,3 +19,8 @@
 .job-actions .job-remove[data-sure] { border-color: var(--muted); color: var(--text); }
 .section-title:focus { outline: none; }
 .job-actions { flex-wrap: wrap; }
+
+/* Where keys are added: one quiet line with a link-like button, under the translator and the voice. */
+.engine-keys { grid-column: 1 / -1; }
+.keys-line .text-button { margin-inline-start: 2px; }
+.job-note[data-kind="problem"] { color: var(--danger); }

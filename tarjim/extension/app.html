@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>tarjim</title>
+  <title data-i18n="appName">tarjim</title>
   <link rel="stylesheet" href="app.css">
   <link rel="stylesheet" href="brand.css">
   <link rel="stylesheet" href="controls.css">
@@ -15,7 +15,7 @@
         <rect x="3" y="8" width="18" height="3.2" rx="1.6" class="mark-top"/>
         <rect x="6" y="13.6" width="12" height="3.2" rx="1.6" class="mark-bottom"/>
       </svg>
-      <span>tarjim</span>
+      <span data-i18n="appName">tarjim</span>
     </h1>
     <p class="link-state" id="link-state" data-state="unknown"><span class="dot" aria-hidden="true"></span><span id="link-text"></span></p>
     <button class="icon-button" id="open-settings" type="button" data-i18n-label="settings">
@@ -81,15 +81,16 @@
         <div class="field" id="voice-field" hidden>
           <label class="field-label" for="voice" data-i18n="voice"></label>
           <select id="voice" class="select">
-            <option value="gemini" data-i18n="voiceNatural"></option>
+            <option value="gemini" data-key="gemini" data-i18n="voiceNatural"></option>
             <option value="clone" data-i18n="voiceClone"></option>
             <option value="studio" data-i18n="voiceStudio"></option>
-            <option value="fish" data-i18n="voiceFish"></option>
-            <option value="fishvoice" id="voice-narrator" data-i18n="voiceNarrator"></option>
+            <option value="fish" data-key="fish" data-i18n="voiceFish"></option>
+            <option value="fishvoice" id="voice-narrator" data-key="fish" data-i18n="voiceNarrator"></option>
             <option value="eleven" data-linked="eleven" data-i18n="voiceEleven" hidden></option>
             <option value="elevenclone" data-linked="eleven" data-i18n="voiceElevenClone" hidden></option>
             <option value="speech" data-linked="speech" data-i18n="voiceSpeech" hidden></option>
           </select>
+          <p class="meta keys-line" id="voice-keys" hidden><span data-i18n="voiceKeys"></span> <button class="text-button" id="open-voice-keys" type="button" data-i18n="addKey"></button></p>
         </div>
 
         <div class="upload" id="upload" hidden>
@@ -108,6 +109,7 @@
               <select class="select" id="engine-model"></select>
             </div>
             <p class="meta engine-note" id="engine-note" role="status" aria-live="polite"></p>
+            <p class="meta keys-line engine-keys"><span data-i18n="engineKeys"></span> <button class="text-button" id="open-keys" type="button" data-i18n="addKey"></button></p>
           </div>
         </details>
         <button class="primary" id="go" type="submit" data-i18n="translate"></button>
@@ -127,6 +129,7 @@
       <code class="command not-windows" dir="ltr">tarjim-serve</code>
       <p class="windows-only" data-i18n="offlineWindows"></p>
       <button class="primary" id="retry-connect" type="button" data-i18n="tryAgain"></button>
+      <p class="notice" id="offline-note" role="status" aria-live="polite"></p>
     </section>
 
     <section class="view panel" id="view-pair" hidden>
@@ -134,14 +137,17 @@
       <button class="primary" id="pair-auto" type="button" data-i18n="pairAuto"></button>
       <p class="notice" id="pair-waiting" role="status" hidden></p>
       <button class="text-button" id="open-tarjim" type="button" data-i18n="openTarjim" hidden></button>
-      <p class="meta" data-i18n="pairManual"></p>
-      <code class="command" dir="ltr">tarjim-serve --show-token</code>
-      <form id="pair-form" class="stack" novalidate>
-        <label class="field-label" for="token" data-i18n="tokenLabel"></label>
-        <input class="text-input" id="token" type="password" dir="ltr" autocomplete="off" spellcheck="false" required>
-        <p class="error" id="pair-error" role="alert" hidden data-i18n="pairWrong"></p>
-        <button class="primary" type="submit" data-i18n="pair"></button>
-      </form>
+      <details class="advanced">
+        <summary data-i18n="pairManualTitle"></summary>
+        <p class="meta not-windows" data-i18n="pairManual"></p>
+        <code class="command not-windows" dir="ltr">tarjim-serve --show-token</code>
+        <form id="pair-form" class="stack" novalidate>
+          <label class="field-label" for="token" data-i18n="tokenLabel"></label>
+          <input class="text-input" id="token" type="password" dir="ltr" autocomplete="off" spellcheck="false" required>
+          <p class="error" id="pair-error" role="alert" hidden data-i18n="pairWrong"></p>
+          <button class="primary" type="submit" data-i18n="pair"></button>
+        </form>
+      </details>
     </section>
 
     <section class="view panel" id="view-setup" hidden>
@@ -149,11 +155,13 @@
       <p data-i18n="setupBody"></p>
       <button class="primary" id="open-setup" type="button" data-i18n="setupOpen"></button>
       <button class="text-button" id="setup-done" type="button" data-i18n="setupDone"></button>
+      <p class="notice" id="setup-note" role="status" aria-live="polite"></p>
     </section>
 
     <section class="view panel" id="view-settings" hidden>
       <h2 class="panel-title" data-i18n="settings"></h2>
       <dl class="summary" id="connection-summary"></dl>
+      <button class="button-quiet wide" id="open-keys-settings" type="button" data-i18n="keysButton"></button>
       <button class="button-quiet wide" id="open-phone" type="button" data-i18n="phoneLinkButton"></button>
       <button class="primary wide" id="open-full-setup" type="button" data-i18n="setupFull"></button>
       <details class="advanced">
@@ -191,6 +199,7 @@
       <p class="meta job-meta"></p>
       <ol class="track" aria-hidden="true"></ol>
       <p class="error job-error" hidden></p>
+      <p class="meta job-note" role="status" hidden></p>
       <div class="job-actions" hidden></div>
     </li>
   </template>

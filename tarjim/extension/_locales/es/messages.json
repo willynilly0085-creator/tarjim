@@ -102,10 +102,10 @@
     "message": "Reintentar"
   },
   "errQuota": {
-    "message": "Se agotó la cuota gratuita de Gemini de hoy. Vuelve mañana por la mañana."
+    "message": "Se agotó la cuota gratuita de hoy. Vuelve mañana, o usa el modo local."
   },
   "errKey": {
-    "message": "La clave de Gemini no está configurada. Agrégala en Ajustes."
+    "message": "Falta la clave o fue rechazada. Revísala en Ajustes."
   },
   "errDownload": {
     "message": "No se pudo descargar el video de ese enlace. Comprueba que el enlace funciona."
@@ -201,7 +201,7 @@
     "message": "Clonación con Fish (envía una muestra de voz)"
   },
   "keyChecking": {
-    "message": "Comprobando la clave con Google"
+    "message": "Comprobando con el proveedor"
   },
   "keyShape": {
     "message": "Eso no parece una clave. Comprueba que la copiaste completa."
@@ -210,7 +210,7 @@
     "message": "Clave de Fish (opcional, para doblaje en la nube)"
   },
   "keyRejected": {
-    "message": "Google rechazó esta clave. Comprueba que la copiaste completa."
+    "message": "El proveedor rechazó esta clave. Comprueba que la copiaste completa."
   },
   "keySet": {
     "message": "Lista. Escribe una clave nueva para reemplazarla."
@@ -493,5 +493,71 @@
         "content": "$1"
       }
     }
+  },
+  "needsKey": {
+    "message": "necesita una clave"
+  },
+  "keyUnreachable": {
+    "message": "No pudimos comprobar la clave ahora: el proveedor no respondió o se alcanzó un límite de uso. La clave puede estar bien; inténtalo de nuevo en un momento."
+  },
+  "keyFailed": {
+    "message": "La clave no se guardó. Comprueba que tarjim esté en marcha e inténtalo de nuevo."
+  },
+  "engineKeys": {
+    "message": "La clave de Gemini y las demás claves de IA se agregan en la página de tarjim."
+  },
+  "addKey": {
+    "message": "Agregar una clave"
+  },
+  "keysButton": {
+    "message": "Traductor y claves de IA"
+  },
+  "voiceKeys": {
+    "message": "Las voces que necesitan una clave funcionan cuando agregas su clave en la página de tarjim."
+  },
+  "actionOffline": {
+    "message": "tarjim no respondió. Asegúrate de que esté abierto e inténtalo de nuevo."
+  },
+  "actionMissing": {
+    "message": "No se encontró el archivo. Puede que se haya borrado o movido de su carpeta."
+  },
+  "actionChanged": {
+    "message": "Esta traducción cambió mientras tanto; la lista se actualiza en un momento."
+  },
+  "actionFailed": {
+    "message": "No funcionó. Inténtalo de nuevo."
+  },
+  "opened": {
+    "message": "Abierto en tu computadora."
+  },
+  "sendTooBig": {
+    "message": "Este archivo pesa más de 8 GB, lo máximo que acepta tarjim."
+  },
+  "sendBadLink": {
+    "message": "Eso no es un enlace de video. Copia el enlace completo, que empieza con https://"
+  },
+  "sendFile": {
+    "message": "El archivo no llegó completo. Inténtalo de nuevo."
+  },
+  "sendFailed": {
+    "message": "La traducción no empezó. Inténtalo de nuevo y, si se repite, actualiza tarjim."
+  },
+  "pairExpired": {
+    "message": "La solicitud de conexión caducó. Pulsa “Conectar automáticamente” otra vez."
+  },
+  "pairUnreachable": {
+    "message": "tarjim no responde ahora mismo, esperándolo…"
+  },
+  "pairManualTitle": {
+    "message": "Conectar a mano con el token de seguridad"
+  },
+  "summaryFailed": {
+    "message": "No se pudieron leer los ajustes de tarjim. Asegúrate de que esté abierto."
+  },
+  "stillOffline": {
+    "message": "Sigue sin responder. Asegúrate de que esté abierto e inténtalo en un momento."
+  },
+  "setupNotDone": {
+    "message": "La configuración aún no termina. Sigue los pasos en la página de tarjim hasta el final."
   }
 }

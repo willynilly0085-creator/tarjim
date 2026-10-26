@@ -102,10 +102,10 @@
     "message": "Coba lagi"
   },
   "errQuota": {
-    "message": "Kuota Gemini gratis hari ini sudah habis. Kuota kembali besok pagi."
+    "message": "Kuota gratis hari ini sudah habis. Kuota kembali besok, atau pakai mode lokal."
   },
   "errKey": {
-    "message": "Kunci Gemini belum diatur. Tambahkan di Pengaturan."
+    "message": "Kunci tidak ada atau ditolak. Periksa di Pengaturan."
   },
   "errDownload": {
     "message": "Tidak bisa mengunduh video dari tautan itu. Pastikan tautannya berfungsi."
@@ -201,7 +201,7 @@
     "message": "Kloning Fish (mengirim sampel suara)"
   },
   "keyChecking": {
-    "message": "Memeriksa kunci ke Google"
+    "message": "Memeriksa ke penyedia"
   },
   "keyShape": {
     "message": "Itu tidak terlihat seperti kunci. Pastikan kamu menyalin semuanya."
@@ -210,7 +210,7 @@
     "message": "Kunci Fish (opsional, untuk sulih suara cloud)"
   },
   "keyRejected": {
-    "message": "Google menolak kunci ini. Pastikan kamu menyalin semuanya."
+    "message": "Penyedia menolak kunci ini. Pastikan kamu menyalin semuanya."
   },
   "keySet": {
     "message": "Sudah diatur. Ketik kunci baru untuk menggantinya."
@@ -493,5 +493,71 @@
         "content": "$1"
       }
     }
+  },
+  "needsKey": {
+    "message": "butuh kunci"
+  },
+  "keyUnreachable": {
+    "message": "Kunci belum bisa diperiksa sekarang: penyedia tidak menjawab atau batas pemakaian tercapai. Kuncinya sendiri mungkin benar; coba lagi sebentar lagi."
+  },
+  "keyFailed": {
+    "message": "Kunci tidak tersimpan. Pastikan tarjim berjalan, lalu coba lagi."
+  },
+  "engineKeys": {
+    "message": "Kunci Gemini dan kunci AI lainnya ditambahkan di halaman tarjim."
+  },
+  "addKey": {
+    "message": "Tambah kunci"
+  },
+  "keysButton": {
+    "message": "Penerjemah dan kunci AI"
+  },
+  "voiceKeys": {
+    "message": "Suara yang butuh kunci bisa dipakai setelah kuncinya ditambahkan di halaman tarjim."
+  },
+  "actionOffline": {
+    "message": "tarjim tidak menjawab. Pastikan tarjim berjalan, lalu coba lagi."
+  },
+  "actionMissing": {
+    "message": "Filenya tidak ditemukan. Mungkin sudah dihapus atau dipindah dari foldernya."
+  },
+  "actionChanged": {
+    "message": "Terjemahan ini sudah berubah; daftarnya diperbarui sebentar lagi."
+  },
+  "actionFailed": {
+    "message": "Tidak berhasil. Coba lagi."
+  },
+  "opened": {
+    "message": "Dibuka di komputermu."
+  },
+  "sendTooBig": {
+    "message": "File ini lebih dari 8 GB, batas terbesar yang diterima tarjim."
+  },
+  "sendBadLink": {
+    "message": "Itu bukan tautan video. Salin seluruh tautannya, yang diawali https://"
+  },
+  "sendFile": {
+    "message": "Filenya tidak sampai utuh. Coba lagi."
+  },
+  "sendFailed": {
+    "message": "Terjemahan tidak dimulai. Coba lagi, dan perbarui tarjim kalau terus terjadi."
+  },
+  "pairExpired": {
+    "message": "Permintaan sambungan sudah kedaluwarsa. Tekan “Sambungkan otomatis” lagi."
+  },
+  "pairUnreachable": {
+    "message": "tarjim belum menjawab, menunggu…"
+  },
+  "pairManualTitle": {
+    "message": "Sambungkan manual dengan token keamanan"
+  },
+  "summaryFailed": {
+    "message": "Pengaturan dari tarjim tidak bisa dibaca. Pastikan tarjim berjalan."
+  },
+  "stillOffline": {
+    "message": "Masih belum ada jawaban. Pastikan tarjim berjalan dan coba lagi sebentar lagi."
+  },
+  "setupNotDone": {
+    "message": "Penyiapan belum selesai. Ikuti langkah-langkah di halaman tarjim sampai akhir."
   }
 }

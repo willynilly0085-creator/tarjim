@@ -102,10 +102,10 @@
     "message": "再試行"
   },
   "errQuota": {
-    "message": "本日の Gemini 無料枠を使い切りました。明日の朝に回復します。"
+    "message": "本日の無料枠を使い切りました。明日には回復します。または、ローカルモードを使ってください。"
   },
   "errKey": {
-    "message": "Gemini キーが設定されていません。設定で追加してください。"
+    "message": "キーがないか、拒否されました。設定で確認してください。"
   },
   "errDownload": {
     "message": "そのリンクから動画をダウンロードできませんでした。リンクが有効か確認してください。"
@@ -201,7 +201,7 @@
     "message": "Fish のボイスクローン（音声サンプルを送信）"
   },
   "keyChecking": {
-    "message": "Google にキーを確認しています"
+    "message": "プロバイダーに確認しています"
   },
   "keyShape": {
     "message": "キーの形式ではないようです。すべてコピーできているか確認してください。"
@@ -210,7 +210,7 @@
     "message": "Fish キー（任意、クラウド吹き替え用）"
   },
   "keyRejected": {
-    "message": "Google がこのキーを拒否しました。すべてコピーできているか確認してください。"
+    "message": "プロバイダーがこのキーを拒否しました。すべてコピーできているか確認してください。"
   },
   "keySet": {
     "message": "設定済みです。置き換えるには新しいキーを入力してください。"
@@ -493,5 +493,71 @@
         "content": "$1"
       }
     }
+  },
+  "needsKey": {
+    "message": "キーが必要"
+  },
+  "keyUnreachable": {
+    "message": "今はキーを確認できませんでした。提供元が応答しないか、利用上限に達しています。キー自体は正しい可能性があります。少し待ってからもう一度お試しください。"
+  },
+  "keyFailed": {
+    "message": "キーを保存できませんでした。tarjim が動いているか確認して、もう一度お試しください。"
+  },
+  "engineKeys": {
+    "message": "GeminiなどのAIキーはtarjimのページで追加します。"
+  },
+  "addKey": {
+    "message": "キーを追加"
+  },
+  "keysButton": {
+    "message": "翻訳AIとAIキー"
+  },
+  "voiceKeys": {
+    "message": "キーが必要な音声は、tarjimのページでキーを追加すると使えます。"
+  },
+  "actionOffline": {
+    "message": "tarjimから応答がありません。起動しているか確認して、もう一度お試しください。"
+  },
+  "actionMissing": {
+    "message": "ファイルが見つかりません。削除されたか、フォルダから移動された可能性があります。"
+  },
+  "actionChanged": {
+    "message": "この翻訳はその間に変わりました。一覧はまもなく更新されます。"
+  },
+  "actionFailed": {
+    "message": "うまくいきませんでした。もう一度お試しください。"
+  },
+  "opened": {
+    "message": "パソコンで開きました。"
+  },
+  "sendTooBig": {
+    "message": "このファイルは8 GBを超えています。tarjimが受け取れるのは8 GBまでです。"
+  },
+  "sendBadLink": {
+    "message": "動画のリンクではありません。https:// で始まるリンクを丸ごとコピーしてください。"
+  },
+  "sendFile": {
+    "message": "ファイルが最後まで届きませんでした。もう一度お試しください。"
+  },
+  "sendFailed": {
+    "message": "翻訳が始まりませんでした。もう一度試して、繰り返す場合はtarjimを更新してください。"
+  },
+  "pairExpired": {
+    "message": "接続リクエストの期限が切れました。もう一度「自動で接続」を押してください。"
+  },
+  "pairUnreachable": {
+    "message": "tarjimが今は応答していません。待っています…"
+  },
+  "pairManualTitle": {
+    "message": "セキュリティトークンで手動接続"
+  },
+  "summaryFailed": {
+    "message": "tarjimから設定を読み込めませんでした。起動しているか確認してください。"
+  },
+  "stillOffline": {
+    "message": "まだ応答がありません。起動しているか確認して、少ししてからお試しください。"
+  },
+  "setupNotDone": {
+    "message": "セットアップがまだ終わっていません。tarjimのページで最後まで進めてください。"
   }
 }

@@ -102,10 +102,10 @@
     "message": "Tekrar dene"
   },
   "errQuota": {
-    "message": "Ücretsiz Gemini kotası bugünlük doldu. Yarın sabah yenilenir."
+    "message": "Ücretsiz kota bugünlük doldu. Yarın yenilenir ya da yerel modu kullan."
   },
   "errKey": {
-    "message": "Gemini anahtarı ayarlanmamış. Ayarlar'dan ekle."
+    "message": "Anahtar eksik veya reddedildi. Ayarlar'dan kontrol et."
   },
   "errDownload": {
     "message": "Video bu bağlantıdan indirilemedi. Bağlantının çalıştığından emin ol."
@@ -201,7 +201,7 @@
     "message": "Fish klonlama (bir ses örneği gönderir)"
   },
   "keyChecking": {
-    "message": "Anahtar Google ile kontrol ediliyor"
+    "message": "Sağlayıcıyla kontrol ediliyor"
   },
   "keyShape": {
     "message": "Bu bir anahtara benzemiyor. Tamamını kopyaladığından emin ol."
@@ -210,7 +210,7 @@
     "message": "Fish anahtarı (isteğe bağlı, bulutta dublaj için)"
   },
   "keyRejected": {
-    "message": "Google bu anahtarı reddetti. Tamamını kopyaladığından emin ol."
+    "message": "Sağlayıcı bu anahtarı reddetti. Tamamını kopyaladığından emin ol."
   },
   "keySet": {
     "message": "Ayarlandı. Değiştirmek için yeni bir anahtar yaz."
@@ -493,5 +493,71 @@
         "content": "$1"
       }
     }
+  },
+  "needsKey": {
+    "message": "anahtar gerekiyor"
+  },
+  "keyUnreachable": {
+    "message": "Anahtar şu an doğrulanamadı: sağlayıcı yanıt vermedi ya da kullanım sınırına ulaşıldı. Anahtarın kendisi doğru olabilir; birazdan tekrar dene."
+  },
+  "keyFailed": {
+    "message": "Anahtar kaydedilmedi. tarjim'in çalıştığından emin ol ve tekrar dene."
+  },
+  "engineKeys": {
+    "message": "Gemini anahtarı ve diğer yapay zekâ anahtarları tarjim sayfasından eklenir."
+  },
+  "addKey": {
+    "message": "Anahtar ekle"
+  },
+  "keysButton": {
+    "message": "Çevirmen ve yapay zekâ anahtarları"
+  },
+  "voiceKeys": {
+    "message": "Anahtar isteyen sesler, anahtarını tarjim sayfasından ekleyince çalışır."
+  },
+  "actionOffline": {
+    "message": "tarjim yanıt vermedi. Çalıştığından emin ol ve tekrar dene."
+  },
+  "actionMissing": {
+    "message": "Dosya bulunamadı. Silinmiş ya da klasöründen taşınmış olabilir."
+  },
+  "actionChanged": {
+    "message": "Bu çeviri bu arada değişti; liste birazdan güncellenir."
+  },
+  "actionFailed": {
+    "message": "Olmadı. Tekrar dene."
+  },
+  "opened": {
+    "message": "Bilgisayarında açıldı."
+  },
+  "sendTooBig": {
+    "message": "Bu dosya 8 GB'tan büyük; tarjim'in alabildiği en büyük boyut bu."
+  },
+  "sendBadLink": {
+    "message": "Bu bir video bağlantısı değil. https:// ile başlayan bağlantının tamamını kopyala."
+  },
+  "sendFile": {
+    "message": "Dosya eksiksiz ulaşmadı. Tekrar dene."
+  },
+  "sendFailed": {
+    "message": "Çeviri başlamadı. Tekrar dene; yine olursa tarjim'i güncelle."
+  },
+  "pairExpired": {
+    "message": "Bağlantı isteğinin süresi doldu. “Otomatik bağla”ya tekrar bas."
+  },
+  "pairUnreachable": {
+    "message": "tarjim şu an yanıt vermiyor, bekleniyor…"
+  },
+  "pairManualTitle": {
+    "message": "Güvenlik anahtarıyla elle bağla"
+  },
+  "summaryFailed": {
+    "message": "Ayarlar tarjim'den okunamadı. Çalıştığından emin ol."
+  },
+  "stillOffline": {
+    "message": "Hâlâ yanıt yok. Çalıştığından emin ol ve biraz sonra tekrar dene."
+  },
+  "setupNotDone": {
+    "message": "Kurulum henüz bitmedi. tarjim sayfasındaki adımları sonuna kadar tamamla."
   }
 }
