@@ -43,6 +43,7 @@ def test_the_page_is_told_what_is_out_and_whether_this_copy_can_install_it(
         home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(update, "ask_latest", lambda: "v1.3.0")
     monkeypatch.setattr(update, "installed_by_uv", lambda: False)
+    monkeypatch.setattr(update, "from_source", lambda: False)
     state = update.view()
     assert (state["current"], state["latest"], state["available"]) == ("1.2.3", "1.3.0", True)
     assert state["automatic"] and not state["can_install"] and not state["failed"]
@@ -50,11 +51,13 @@ def test_the_page_is_told_what_is_out_and_whether_this_copy_can_install_it(
     assert not update.view()["automatic"]
 
 
-def test_a_copy_run_from_source_is_never_replaced(home: Path,
-                                                  monkeypatch: pytest.MonkeyPatch) -> None:
+def test_a_copy_neither_installed_nor_cloned_is_never_replaced(
+        home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """A clone updates itself (test_source_update.py); a folder of files without git cannot."""
     started: list[list[str]] = []
     monkeypatch.setattr(installer, "start_detached", lambda command, _log: started.append(command))
     monkeypatch.setattr(update, "installed_by_uv", lambda: False)
+    monkeypatch.setattr(update, "from_source", lambda: False)
     assert not update.start("v1.3.0", 17653) and started == []
 
 

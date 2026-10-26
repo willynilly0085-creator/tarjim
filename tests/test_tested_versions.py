@@ -166,13 +166,13 @@ def test_an_install_off_the_tested_versions_is_repaired_once(engine: list[str]) 
     assert engine == ["v1.2.3"] and config.setting("repaired_for") == "1.2.3"
 
 
-@pytest.mark.parametrize("why", ["matches", "source copy", "automatic off", "newer release"])
+@pytest.mark.parametrize("why", ["matches", "cannot install", "automatic off", "newer release"])
 def test_no_repair_when_not_needed_or_not_allowed(
         engine: list[str], monkeypatch: pytest.MonkeyPatch, why: str) -> None:
     if why == "matches":
         monkeypatch.setattr(pins, "drift", lambda: [])
-    if why == "source copy":
-        monkeypatch.setattr(update, "installed_by_uv", lambda: False)
+    if why == "cannot install":
+        monkeypatch.setattr(update, "can_install", lambda: False)
     if why == "automatic off":
         config.save("auto_update", "no")
     if why == "newer release":

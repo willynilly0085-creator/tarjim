@@ -2,8 +2,9 @@
 
 Once a day the engine asks GitHub for the number of the latest release: one request that carries
 nothing about the person or their videos. With automatic updates on (the person's choice), a newer
-release is installed when no job is running; otherwise the page offers a button. An update needs
-the copy that uv installed; a copy run from source is updated with git instead.
+release is installed when no job is running; otherwise the page offers a button. The copy uv
+installed is replaced by the installer; a copy run from source (a git clone with uv beside it) is
+moved to the release's tag by source_updater.py, which also brings its libraries along.
 """
 import json
 import os
@@ -62,6 +63,19 @@ def installed_by_uv() -> bool:
     return (Path(sys.prefix) / "uv-receipt.toml").is_file() and bool(shutil.which("uv"))
 
 
+SOURCE = Path(__file__).resolve().parent.parent
+
+
+def from_source() -> bool:
+    """A git clone run with its own environment, which source_updater.py can move forward."""
+    return ((SOURCE / ".git").exists() and (SOURCE / "pyproject.toml").is_file()
+            and bool(shutil.which("git")) and bool(shutil.which("uv")))
+
+
+def can_install() -> bool:
+    return installed_by_uv() or from_source()
+
+
 def automatic() -> bool:
     return config.setting("auto_update") != "no"
 
@@ -88,7 +102,7 @@ def view() -> dict[str, Any]:
     from tarjim import downloader, ffmpeg_update, known_issues, node_update, python_update
 
     return {"current": __version__, "latest": found.lstrip("v"), "available": newer(found),
-            "automatic": automatic(), "can_install": installed_by_uv(),
+            "automatic": automatic(), "can_install": can_install(),
             "failed": newer(found) and progress().get("state") == "failed",
             "extension": extension_version(), "downloader": downloader.view(),
             "node": node_update.view(), "ffmpeg": ffmpeg_update.view(),
@@ -105,8 +119,10 @@ def start(tag: str, port: int) -> bool:
     from tarjim import installer, release_pins
 
     uv = shutil.which("uv")
-    if not uv or not installed_by_uv() or not number(tag):
+    if not uv or not number(tag):
         return False
+    if not installed_by_uv():
+        return from_source() and start_from_source(tag, port)
     copy = config.HOME / "updater.py"
     shutil.copyfile(release_pins.__file__, config.HOME / "release_pins.py")
     shutil.copyfile(installer.__file__, copy)
@@ -117,10 +133,25 @@ def start(tag: str, port: int) -> bool:
     return True
 
 
+def start_from_source(tag: str, port: int) -> bool:
+    """The same hand-over for a clone: its updater runs on this environment's Python without the
+    environment's own libraries (-S), which it replaces, beside its copies of what it imports."""
+    from tarjim import installer, release_pins, source_updater
+    from tarjim.autostart import quiet_python
+
+    for module in (installer, release_pins, source_updater):
+        shutil.copyfile(str(module.__file__), config.HOME / Path(str(module.__file__)).name)
+    engine = [*installer.module_command("tarjim.server", quiet_python()), "--port", str(port)]
+    installer.record("starting", tag, installer.UPDATE_STATE)
+    command = [sys.executable, "-E", "-S", str(config.HOME / "source_updater.py"), str(SOURCE),
+               tag, sys.prefix, json.dumps(engine), "--after", str(os.getpid())]
+    return installer.start_detached(command, config.HOME / "update.log")
+
+
 def repair_due() -> bool:
-    """An engine whose update was installed by an older installer kept the libraries it had;
-    it is brought onto the versions tested with it, once per version."""
-    return (automatic() and installed_by_uv() and config.setting("repaired_for") != __version__
+    """An engine whose update was installed by an older installer (or a clone moved by hand) kept
+    the libraries it had; it is brought onto the versions tested with it, once per version."""
+    return (automatic() and can_install() and config.setting("repaired_for") != __version__
             and bool(pins.drift()))
 
 

@@ -27,6 +27,7 @@ PIN = re.compile(r"^([A-Za-z0-9_.-]+)==([^\s;]+)")
 NPM = {"Claude Code": "@anthropic-ai/claude-code", "Codex": "@openai/codex",
        "Copilot": "@github/copilot"}
 TIMEOUT = 20
+OUR_MINOR = 11  # tarjim runs on Python 3.11
 
 
 def run(*command: str) -> str:
@@ -42,12 +43,20 @@ def numbers(version: str) -> tuple[int, ...]:
     return tuple(int(n) for n in re.findall(r"\d+", version)[:4])
 
 
-def pypi(name: str) -> str:
+def pypi(name: str) -> tuple[str, str]:
+    """The newest version and the Pythons it supports."""
     try:
-        return str(requests.get(f"https://pypi.org/pypi/{name}/json", timeout=TIMEOUT)
-                   .json()["info"]["version"])
+        info = requests.get(f"https://pypi.org/pypi/{name}/json", timeout=TIMEOUT).json()["info"]
     except (requests.RequestException, ValueError, KeyError):
-        return ""
+        return "", ""
+    return str(info.get("version") or ""), str(info.get("requires_python") or "")
+
+
+def needs(supported: str) -> str:
+    """Why a newer version cannot be taken yet: tarjim runs on Python 3.11, and many libraries'
+    newest versions start at 3.12 (numpy 2.5, scipy 1.18, librosa 1.0, networkx 3.7)."""
+    found = re.search(r">=\s*3\.(\d+)", supported)
+    return f" (تحتاج بايثون 3.{found[1]})" if found and int(found[1]) > OUR_MINOR else ""
 
 
 def vulnerabilities() -> list[str]:
@@ -65,7 +74,8 @@ def outdated() -> list[str]:
             if (m := PIN.match(line))]
     with ThreadPoolExecutor(max_workers=16) as pool:
         newest = list(pool.map(pypi, [name for name, _ in pins]))
-    return [f"{name} {have} ← {new}" for (name, have), new in zip(pins, newest, strict=True)
+    return [f"{name} {have} ← {new}{needs(supported)}"
+            for (name, have), (new, supported) in zip(pins, newest, strict=True)
             if new and numbers(new) > numbers(have)]
 
 

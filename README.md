@@ -211,7 +211,9 @@ release: one request that carries nothing about you or your videos. With **Updat
 automatically** on (offered during setup, and changeable in Settings), a newer release is installed
 in the background while no job is running, and tarjim comes back by itself in a few minutes; the
 browser extension reloads itself to match. With it off, the page shows a notice and an **Update
-now** button. A copy you run from source is updated with `git pull`.
+now** button. A copy you run from source (a git clone with uv) updates the same way: it moves to
+the release's tag and installs the libraries tested with it. It only moves forward: a clone with
+commits of its own is left for you to update with git.
 
 ### How its parts stay current
 
@@ -223,8 +225,11 @@ now** button. A copy you run from source is updated with `git pull`.
   vulnerabilities before a release takes them. PyTorch follows the build uv picks for your
   graphics card.
 
-Turning **Update tarjim automatically** off stops both. A copy you run from source gets the tested
-versions with `uv pip install -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dub]"`.
+Turning **Update tarjim automatically** off stops both. Some libraries' newest versions need
+Python 3.12 or later (numpy 2.5, scipy 1.18, librosa 1.0), and tarjim runs on 3.11, so they wait;
+the weekly check for known vulnerabilities covers the versions tarjim uses. To bring a clone's
+libraries onto the tested versions by hand:
+`uv pip install -c tarjim/constraints.txt --overrides tarjim/overrides.txt -e ".[dub]"`.
 
 ### Known library issues
 
