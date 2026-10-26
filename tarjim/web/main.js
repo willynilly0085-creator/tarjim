@@ -4,7 +4,7 @@ import { fillLanguageMenu, guessLanguage } from "./languages.js";
 import { watchPairing } from "./pairing.js";
 import { repaint, startSettings, startWizard, wireWizard } from "./wizard.js";
 import { repaintAssistant, startAssistant } from "./assistant.js";
-import { openWorkspace } from "./workspace.js";
+import { openWorkspace, repaintWorkspace } from "./workspace.js";
 import { repaintQuality } from "./quality.js";
 import { preferKeys } from "./connect.js";
 import { showSection } from "./ui.js";
@@ -24,6 +24,7 @@ async function boot() {
     repaint();
     repaintAssistant();
     repaintQuality();
+    repaintWorkspace();
   });
   const manual = (from) => startWizard(setup, openWorkspace, from);
   const settings = async () => {

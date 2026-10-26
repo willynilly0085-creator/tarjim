@@ -27,7 +27,8 @@ GET_ROUTES = table([
     (r"^/phone$", "phone_state"), (r"^/update$", "update_state"),
     (r"^/voices$", "voices_state")])
 POST_ROUTES = table([
-    (r"^/jobs$", "create_json"), (r"^/links/qualities$", "link_qualities"),
+    (r"^/jobs$", "create_json"), (r"^/jobs/check$", "check_order"),
+    (r"^/links/qualities$", "link_qualities"),
     (r"^/upload$", "upload"), (rf"^/reveal/{JOB}$", "reveal"),
     (rf"^/open/{JOB}$", "play"), (rf"^/retry/{JOB}$", "retry"), (r"^/keys$", "save_key"),
     (r"^/setup$", "save_setup"), (r"^/tools/([a-z_]+)$", "get_tool"), (r"^/pair$", "ask_pair"),

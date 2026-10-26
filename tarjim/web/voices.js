@@ -10,13 +10,16 @@ const HINTS = { gemini: "voiceGeminiHint", eleven: "voiceElevenHint", fish: "voi
 const CUSTOM = "custom";
 let view = { gemini: {}, fish: {}, eleven: { voices: [] }, speech: { presets: [] } };
 let opened = "";
+let known = false;
 
 export const linkedVoices = () => [
   ...(view.eleven.has_key ? ["eleven", "elevenclone"] : []), ...(view.speech.has_key ? ["speech"] : [])];
 export const speechName = () => view.speech.name || "";
+export const hasKey = (id) => Boolean(view[id]?.has_key);
+export const voicesKnown = () => known;  // false until /voices answered once
 
 export async function loadVoices() {
-  view = await api("/voices").catch(() => view);
+  view = await api("/voices").then((fresh) => { known = true; return fresh; }).catch(() => view);
   return view;
 }
 

@@ -16,7 +16,7 @@ HUMAN_ONLY = {"save_key", "phone_connect", "phone_forget", "ask_pair", "decide_p
 NOT_SETTINGS = {"ping", "home", "asset", "legacy", "upload", "create_local", "send_output",
                 "system", "ui_language", "local_models", "scan_part", "reveal", "play",
                 "current_connection", "signed_in", "sign_in_code", "local_program",
-                "link_assistant", "phone_link", "key_status"}
+                "link_assistant", "phone_link", "key_status", "check_order"}
 
 
 @pytest.fixture

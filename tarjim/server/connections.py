@@ -6,6 +6,7 @@ from typing import Any
 from tarjim.config import api_key, save, setting
 from tarjim.engines.catalog import API, BY_ID, LOCAL, SUBSCRIPTION, Provider, of_method
 from tarjim.engines.choice import LISTENERS, chosen, has_key, usable
+from tarjim.server.translator_check import translator_works, works_now
 
 MODEL_NAME = re.compile(r"^[\w.:/@+\[\]-]{1,120}$")
 ADDRESS = re.compile(r"^https?://[\w.-]+(:\d{1,5})?(/[\w./-]*)?$")
@@ -82,11 +83,7 @@ def current_view() -> dict[str, Any]:
         name, model = BY_ID[translate].name, setting(BY_ID[translate].model_name)
     listener = "" if listen == LOCAL else BY_ID[listen].name
     return {"translate": translate, "name": name, "model": pretty(model) if model else "",
-            "listen": listen, "listen_name": listener}
-
-
-def method_of(provider: str) -> str:
-    return BY_ID[provider].method if provider in BY_ID else LOCAL
+            "listen": listen, "listen_name": listener, "works": works_now(translate)}
 
 
 def listener_for(provider: str) -> str:
@@ -138,8 +135,11 @@ class ConnectionRoutes:
         self.reply(200, model_view(provider) if provider in BY_ID else {"models": []})
 
     def use_connection(self, _query: Query) -> None:
-        saved = remember_choice(self.read_json())
-        self.reply(200 if saved else 400, overview())
+        data = self.read_json()
+        works = translator_works(str(data.get("provider", "")), str(data.get("server", "ollama")))
+        saved = works and remember_choice(data)
+        refused = {} if works else {"error": "unusable"}
+        self.reply(200 if saved else 400, {**overview(), **refused})
 
     def save_address(self, _query: Query) -> None:
         url = str(self.read_json().get("url", "")).rstrip("/")

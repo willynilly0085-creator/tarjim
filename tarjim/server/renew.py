@@ -5,26 +5,22 @@ keeps running the code it started with (same_code.py) and, once a minute in the 
 compares its files' sizes and times with those it read at start. New code that has stopped
 changing for a few seconds and compiles is taken up the way an update is: the engine starts a copy
 of itself with the same command line, which waits for this one to close before taking the port,
-then closes. The list of jobs goes along, so a failed job keeps its Try again. The new engine reads
-the new code at its own start, so it sees nothing to restart for: no loop.
+then closes. The list of jobs goes along (job_record.py), so a failed job keeps its Try again.
+The new engine reads the new code at its own start, so it sees nothing to restart for: no loop.
 """
-import json
 import os
 import re
 import sys
 import time
-from dataclasses import asdict
 from pathlib import Path
-from typing import Any
 
 from tarjim import same_code
 from tarjim.config import HOME
 from tarjim.installer import module_command, start_detached
-from tarjim.server.jobs import Board, Order, Task
+from tarjim.server.job_record import write_down
+from tarjim.server.jobs import Board
 
 SETTLE_SECONDS = 5.0
-JOBS = "jobs.json"
-FIELDS = ("id", "error", "error_code", "failed_at", "created")
 
 
 def own_arguments(argv: list[str]) -> list[str]:
@@ -57,33 +53,6 @@ def version_on_disk(root: Path) -> str:
     except OSError:
         return "?"
     return found.group(1) if found else "?"
-
-
-def write_down(board: Board, folder: Path) -> None:
-    rows = [{**{name: getattr(t, name) for name in FIELDS}, "stage": t.stage,
-             "order": asdict(t.order), "video": str(t.video or ""),
-             "outputs": [str(p) for p in t.outputs]} for t in board.recent() if t.finished]
-    (folder / JOBS).write_text(json.dumps(rows), encoding="utf-8")
-
-
-def task_from(row: dict[str, Any]) -> Task:
-    task = Task(Order(**row["order"]), **{name: row[name] for name in FIELDS})
-    task.video = Path(row["video"]) if row["video"] else None
-    task.outputs = [Path(p) for p in row["outputs"]]
-    task.stage = row["stage"]  # last: nothing changes a cancelled task
-    return task
-
-
-def restore(board: Board, folder: Path = HOME) -> None:
-    path = folder / JOBS
-    try:
-        rows = json.loads(path.read_text(encoding="utf-8"))
-        path.unlink()
-        tasks = [task_from(row) for row in rows]
-    except (OSError, ValueError, KeyError, TypeError):
-        return
-    with board.lock:
-        board.tasks.update((task.id, task) for task in tasks)
 
 
 class Renewal:

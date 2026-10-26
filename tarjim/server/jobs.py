@@ -7,6 +7,7 @@ from pathlib import Path
 from queue import Empty, Queue
 
 from tarjim.children import Family, watch
+from tarjim.server import reasons
 
 DUBBING = {"dub-gemini": "gemini", "dub-clone": "clone", "dub-studio": "studio", "dub-fish": "fish",
            "dub-fishvoice": "fish:saved", "dub-eleven": "eleven", "dub-elevenclone": "eleven:clone",
@@ -17,28 +18,13 @@ PAUSE_TICK = 0.5
 IDLE_SECONDS = 300.0
 ENDED = ("done", "failed", "cancelled")
 CONTROLS = {"pause": "paused", "resume": "run", "cancel": "cancelled"}
-SIGNED_OUT = ("Failed to authenticate", "OAuth session expired", "ot logged in", "run /login",
-              "login required", "ign in again")
-REFUSED_ACCOUNT = ("not eligible", "Eligibility check failed", "erify your account")
-NOT_MEDIA = ("not a video or sound file",)
-TOO_LONG = ("longer than six hours of sound",)
-A_LIST = ("this link is a list of videos",)
-UPDATED = ("from 'tarjim.", "named 'tarjim.")  # its code changed on disk while it ran
-REASONS = [("updated", UPDATED), ("media", NOT_MEDIA), ("long", TOO_LONG), ("list", A_LIST),
-           ("account", REFUSED_ACCOUNT), ("quota", ("QuotaExhausted", "quota", " 429:")),
-           ("signin", SIGNED_OUT),
-           ("key", ("API key missing", "API key not valid", " 401:", " 403:")),
-           ("download", ("DownloadError", "download")), ("tools", ("not found; install",)),
-           ("dub", ("DubUnavailable", "VoiceError"))]
+
+
+classify = reasons.classify  # where the rest of tarjim looks for it
 
 
 class Stopped(Exception):
     pass
-
-
-def classify(error: Exception) -> str:
-    text = f"{type(error).__name__} {error}"
-    return next((code for code, marks in REASONS if any(m in text for m in marks)), "unknown")
 
 
 @dataclass
@@ -121,6 +107,7 @@ class Board:
         self.work = work
         self.idle, self.idle_after, self.busy_since_idle = idle, idle_after, False
         self.lock = threading.Lock()
+        self.saved: Callable[[], None] = lambda: None  # job_record.keep writes the list down
         watch()
         threading.Thread(target=self.loop, daemon=True).start()
 
@@ -164,6 +151,7 @@ class Board:
             if task is None or not task.finished:
                 return False
             del self.tasks[task_id]
+        self.saved()
         return True
 
     def get(self, task_id: str) -> Task | None:
@@ -196,3 +184,4 @@ class Board:
             task = self.next_task()
             self.busy_since_idle = True
             carry(task, self.work, self.may_undo)
+            self.saved()

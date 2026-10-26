@@ -8,7 +8,7 @@ from typing import Any
 import pytest
 
 from tarjim import same_code
-from tarjim.server import engine, renew, update_routes
+from tarjim.server import engine, job_record, renew, update_routes
 from tarjim.server.jobs import Board, Order, Task, classify
 from tarjim.ui_languages import FOLDER, codes
 
@@ -116,11 +116,11 @@ def test_the_jobs_list_survives_the_restart(
     failed.error, failed.error_code, failed.failed_at = "cannot import", "updated", "hearing"
     failed.outputs, failed.stage = [tmp_path / "v.srt"], "failed"
     old.tasks[failed.id] = failed
-    renew.write_down(old, tmp_path)
+    job_record.write_down(old, tmp_path)
     new = Board(lambda task: None)
-    renew.restore(new, tmp_path)
+    job_record.restore(new, tmp_path)
     assert new.get(failed.id).view() == failed.view()  # type: ignore[union-attr]
-    assert new.retry(failed.id) is not None and not (tmp_path / renew.JOBS).exists()
+    assert new.retry(failed.id) is not None and (tmp_path / job_record.JOBS).exists()
 
 
 @pytest.mark.parametrize("error", [

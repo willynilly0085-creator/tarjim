@@ -1,4 +1,5 @@
-/* Quiet controls around the order: the translator line above Translate, and Remove on a job. */
+/* Quiet controls around the order: the translator line above Translate, the chosen file, and the
+   buttons on a job with the reasons they could not act. */
 .engine { display: grid; gap: var(--space-sm); }
 .engine summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; width: fit-content; max-width: 100%;
   padding-block: 2px; border-radius: 6px; color: var(--muted); font-size: var(--text-meta); list-style: none; cursor: pointer; }
@@ -13,8 +14,18 @@
 .engine-body .select:disabled { color: var(--muted); cursor: default; }
 .engine-note { grid-column: 1 / -1; }
 .engine-note:empty { display: none; }
+.engine-stopped { color: var(--danger); font-weight: 550; }
+.engine-retry { justify-self: start; }
 
 .job-actions .job-remove { margin-inline-start: auto; border-color: transparent; color: var(--muted); }
 .job-actions .job-remove:hover { border-color: var(--line); color: var(--text); }
-.job-actions .job-remove[data-sure] { border-color: var(--muted); color: var(--text); }
+.job-actions [data-sure] { border-color: var(--muted); color: var(--text); }
 .section-title:focus { outline: none; }
+
+.drop-file-row { display: flex; align-items: center; gap: var(--space-sm); }
+.drop-file-row .drop-file { flex: 1; min-width: 0; }
+.notice.error { color: var(--danger); }
+.job-error, .notice { white-space: pre-line; }
+/* On a phone the stage names would be cut to a letter or two; the stage above the track names
+   the one running, so the dashes alone show how far along it is. */
+@media (max-width: 479px) { .job .track .dash-label { display: none; } }

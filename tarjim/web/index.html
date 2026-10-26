@@ -20,7 +20,7 @@
       </svg>
       <span>tarjim</span>
     </p>
-    <label class="visually-hidden" for="ui-language">Language</label>
+    <label class="visually-hidden" for="ui-language" data-t="uiLanguage">Language</label>
     <select id="ui-language" class="select compact"></select>
     <button class="button-quiet" id="open-settings" type="button" data-t="settings" hidden></button>
   </header>
@@ -152,7 +152,10 @@
         <span class="drop-hint" data-t="dropHint"></span>
         <span class="button-quiet" data-t="chooseFile"></span>
       </label>
-      <p class="drop-file" id="drop-file" hidden></p>
+      <div class="drop-file-row" id="drop-file-row" hidden>
+        <p class="drop-file" id="drop-file"></p>
+        <button class="button-quiet" id="drop-clear" type="button" data-t="fileRemove"></button>
+      </div>
       <label class="field"><span class="field-label" data-t="linkLabel"></span>
         <input class="text-input" id="link" type="url" inputmode="url" dir="ltr" placeholder="https://"></label>
       <div class="field quality" id="quality-field" hidden>
@@ -184,11 +187,12 @@
         </select><span class="meta" id="voice-more" data-t="voiceMore"></span></label>
       <div class="upload" id="upload" hidden><div class="meter"><span id="upload-bar"></span></div><p class="meta" id="upload-text"></p></div>
       <details class="engine" id="engine">
-        <summary><span class="engine-with" data-t="engineWith"></span> <bdi class="engine-now" id="engine-now"></bdi><span class="engine-change" data-t="engineChange"></span></summary>
+        <summary><span class="engine-with" data-t="engineWith"></span> <bdi class="engine-now" id="engine-now"></bdi><span class="engine-stopped" id="engine-stopped" data-t="engineStopped" hidden></span><span class="engine-change" data-t="engineChange"></span></summary>
         <div class="engine-body">
           <label class="field"><span class="field-label" data-t="engineProvider"></span><select class="select" id="engine-provider"></select></label>
           <label class="field"><span class="field-label" data-t="engineModel"></span><select class="select" id="engine-model"></select></label>
           <p class="meta engine-note" id="engine-note" role="status" aria-live="polite"></p>
+          <button class="button-quiet engine-retry" id="engine-retry" type="button" data-t="retry" hidden></button>
         </div>
       </details>
       <button class="primary" id="go" type="submit" data-t="translate" disabled></button>
@@ -207,6 +211,7 @@
       <p class="meta job-meta"></p>
       <ol class="track" aria-hidden="true"></ol>
       <p class="error job-error" hidden></p>
+      <p class="error job-problem" role="alert" hidden></p>
       <div class="row job-actions" hidden></div>
     </li>
   </template>

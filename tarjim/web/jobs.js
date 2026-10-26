@@ -1,7 +1,9 @@
 import { $, api, post } from "./api.js";
 import { t } from "./i18n.js";
+import { problem } from "./problems.js";
 
 const STAGES = ["downloading", "hearing", "timing", "translating", "writing", "burning", "dubbing"];
+const ACTION = { gone: "actionGone", job: "actionStale", open: "actionOpen" };
 const ERRORS = ["updated", "media", "long", "list", "account", "quota", "signin", "key", "download", "tools", "dub"];
 const rows = new Map();
 const seen = new Map();
@@ -34,10 +36,19 @@ function button(label, action) {
   return el;
 }
 
-function steering(job, refresh) {
-  const steer = (action) => () => post(`/jobs/${job.id}/${action}`).then(refresh);
-  return [button(t(job.paused ? "resume" : "pause"), steer(job.paused ? "resume" : "pause")),
-    button(t("cancel"), steer("cancel"))];
+// A button whose request fails says why under its job, instead of doing nothing.
+function guarded(job, work) {
+  return async () => {
+    const box = rows.get(job.id)?.querySelector(".job-problem");
+    if (box) box.hidden = true;
+    try {
+      await work();
+    } catch (error) {
+      if (!box) return;
+      box.textContent = problem(error, ACTION);
+      box.hidden = false;
+    }
+  };
 }
 
 function named(el, label) {
@@ -45,27 +56,37 @@ function named(el, label) {
   el.title = label;
 }
 
-// A finished video is one press from gone from view, so it asks once; its files stay either way.
-function askFirst(el) {
+// A press that cannot be undone asks once: [label, question, spoken label] of the button.
+function askFirst(el, [label, sure, spoken]) {
   el.dataset.sure = "yes";
-  el.textContent = t("removeSure");
-  named(el, t("removeSure"));
+  el.textContent = t(sure);
+  named(el, t(sure));
   setTimeout(() => {
     delete el.dataset.sure;
-    el.textContent = t("remove");
-    named(el, t("removeLabel"));
+    el.textContent = t(label);
+    named(el, t(spoken));
   }, 5000);
 }
 
+// Cancel deletes what the job made so far, so it asks first.
+function steering(job, refresh) {
+  const steer = (action) => guarded(job, () => post(`/jobs/${job.id}/${action}`).then(refresh));
+  const words = ["cancel", "cancelSure", "cancelLabel"];
+  const stop = button(t("cancel"), () => (stop.dataset.sure ? steer("cancel")() : askFirst(stop, words)));
+  named(stop, t("cancelLabel"));
+  return [button(t(job.paused ? "resume" : "pause"), steer(job.paused ? "resume" : "pause")), stop];
+}
+
+// A finished video is one press from gone from view, so it asks once; its files stay either way.
 function removeButton(job, refresh) {
-  const el = button(t("remove"), async () => {
-    if (job.stage === "done" && !el.dataset.sure) return askFirst(el);
-    await post(`/jobs/${job.id}/remove`).catch(() => null);
+  const el = button(t("remove"), guarded(job, async () => {
+    if (job.stage === "done" && !el.dataset.sure) return askFirst(el, ["remove", "removeSure", "removeLabel"]);
+    await post(`/jobs/${job.id}/remove`);
     rows.delete(job.id);
     $("announcer").textContent = t("removed");
     if (document.activeElement === el) $("recent-title").focus();
     refresh();
-  });
+  }));
   el.classList.add("job-remove");
   named(el, t("removeLabel"));
   return el;
@@ -77,10 +98,18 @@ function actions(job, box, refresh) {
   if (box.dataset.kind === kind) return;
   box.dataset.kind = kind;
   box.hidden = false;
-  box.replaceChildren(...(kind === "done"
-    ? [button(t("play"), () => post(`/open/${job.id}`)), button(t("openFolder"), () => post(`/reveal/${job.id}`))]
-    : kind === "again" ? [button(t("retry"), () => post(`/retry/${job.id}`).then(refresh))] : steering(job, refresh)),
+  box.closest(".job").querySelector(".job-problem").hidden = true;  // a new state, a fresh start
+  box.replaceChildren(...(kind === "done" ? opening(job)
+    : kind === "again" ? [button(t("retry"), guarded(job, () => post(`/retry/${job.id}`).then(refresh)))]
+      : steering(job, refresh)),
   ...(job.finished ? [removeButton(job, refresh)] : []));
+}
+
+// A subtitle file alone opens as text, so its button says so rather than "Play".
+function opening(job) {
+  const play = job.mode === "srt" ? "openSrt" : "play";
+  return [button(t(play), guarded(job, () => post(`/open/${job.id}`))),
+    button(t("openFolder"), guarded(job, () => post(`/reveal/${job.id}`)))];
 }
 function modeText(mode) {
   return t(mode.startsWith("dub") ? "outputDub" : mode === "srt" ? "outputSrt" : "outputBurn");

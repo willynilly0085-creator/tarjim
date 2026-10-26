@@ -10,7 +10,7 @@ from typing import Any
 
 import pytest
 
-from tarjim.server import renew
+from tarjim.server import job_record
 from tarjim.server.app import Handler
 from tarjim.server.jobs import Board, Order, Task
 from tarjim.ui_languages import FOLDER, codes
@@ -81,11 +81,12 @@ def test_removing_needs_the_token(board: Board, port: int) -> None:
 def test_a_removed_job_does_not_come_back_after_a_restart(board: Board, tmp_path: Path) -> None:
     kept, gone = ended(board, "failed"), ended(board, "done")
     assert board.remove(gone.id)
-    renew.write_down(board, tmp_path)
-    rows: list[dict[str, Any]] = json.loads((tmp_path / renew.JOBS).read_text(encoding="utf-8"))
+    job_record.write_down(board, tmp_path)
+    record = (tmp_path / job_record.JOBS).read_text(encoding="utf-8")
+    rows: list[dict[str, Any]] = json.loads(record)
     assert [row["id"] for row in rows] == [kept.id]
     again = Board(lambda task: None)
-    renew.restore(again, tmp_path)
+    job_record.restore(again, tmp_path)
     assert again.get(kept.id) is not None and again.get(gone.id) is None
 
 

@@ -1,13 +1,11 @@
 import json
 import shutil
 import urllib.parse
-from collections.abc import Callable
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, ClassVar
 
 from tarjim.languages import LANGUAGES
-from tarjim.server import desktop
 from tarjim.server.connections import ConnectionRoutes
 from tarjim.server.guard import (
     allowed_origin,
@@ -18,7 +16,8 @@ from tarjim.server.guard import (
     safe_name,
     token_ok,
 )
-from tarjim.server.jobs import MODES, Board, Order, Task
+from tarjim.server.job_routes import JobRoutes, refusal
+from tarjim.server.jobs import Board, Order, Task
 from tarjim.server.orders import body_size, copy_limited, first, json_body, order_from
 from tarjim.server.pages import PageRoutes
 from tarjim.server.pairing import Pairing
@@ -31,10 +30,9 @@ PORT = 17653
 MAX_UPLOAD = 8 * 1024**3
 BLOCK = 1024 * 1024
 TOKEN_HEADERS = ("X-Tarjim-Token", "X-Trans-Token")
-LEGACY = {"dub": "dub-gemini"}
 
 
-class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoutes):
+class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoutes, JobRoutes):
     board: ClassVar[Board]
     token: ClassVar[str]
     uploads: ClassVar[Path]
@@ -127,15 +125,18 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoute
         self.accept(order_from(str(path.resolve()), data, path.name))
 
     def accept(self, order: Order) -> None:
-        if order.mode not in MODES:
-            return self.reply(400, {"error": "mode"})
+        refused = refusal(order)
+        if refused:
+            return self.reply(400, {"error": refused})
         self.reply(200, self.board.submit(order).view())
 
     def upload(self, query: Query) -> None:
         name = safe_name(first(query, "name"))
         size = body_size(self.headers)
-        if name is None or not 0 < size <= MAX_UPLOAD:
-            return self.reply(400, {"error": "file"})
+        options = {k: first(query, k) for k in ("target", "mode", "dialect")}
+        refused = refusal(order_from("", options))
+        if name is None or not 0 < size <= MAX_UPLOAD or refused:
+            return self.reply(400, {"error": refused or ("big" if size > MAX_UPLOAD else "file")})
         folder = self.uploads / Task(Order("")).id
         folder.mkdir(parents=True, exist_ok=True)
         with (folder / name).open("wb") as out:
@@ -143,7 +144,6 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoute
         if not whole:
             shutil.rmtree(folder, ignore_errors=True)
             return self.reply(400, {"error": "file"})
-        options = {k: first(query, k) for k in ("target", "mode", "dialect")}
         self.accept(order_from(str(folder / name), options, name))
 
     def show(self, _query: Query, task_id: str) -> None:
@@ -164,31 +164,6 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoute
         self.end_headers()
         with match.open("rb") as source:
             shutil.copyfileobj(source, self.wfile, BLOCK)
-
-    def reveal(self, _query: Query, task_id: str) -> None:
-        self.on_output(task_id, desktop.reveal)
-
-    def play(self, _query: Query, task_id: str) -> None:
-        self.on_output(task_id, desktop.open_file)
-
-    def on_output(self, task_id: str, action: Callable[[Path], None]) -> None:
-        task = self.board.get(task_id)
-        if not task or not task.outputs:
-            return self.reply(404, {"error": "job"})
-        action(task.outputs[0])
-        self.reply(200, {"ok": True})
-
-    def steer_job(self, _query: Query, task_id: str, action: str) -> None:
-        task = self.board.steer(task_id, action, self.headers.get("Origin") or "chat or script")
-        self.reply(200, task.view()) if task else self.reply(409, {"error": "job"})
-
-    def remove_job(self, _query: Query, task_id: str) -> None:
-        removed = self.board.remove(task_id)  # the list only: its files stay in their folder
-        self.reply(200 if removed else 409, {"removed": removed})
-
-    def retry(self, _query: Query, task_id: str) -> None:
-        task = self.board.retry(task_id)
-        self.reply(200, task.view()) if task else self.reply(404, {"error": "job"})
 
     def log_message(self, format: str, *args: Any) -> None:
         return None
