@@ -4,14 +4,14 @@ saved through /keys like every other key; here are the choices that are not secr
 import re
 from typing import Any
 
-from tarjim.config import api_key, save, setting
+from tarjim.config import SPOKEN, api_key, save, setting
 
 Query = dict[str, list[str]]
 VOICE_ID = re.compile(r"^[\w-]{1,64}$")
 ADDRESS = re.compile(r"^https?://[\w.-]+(:\d{1,5})?(/[\w./-]*)?$")
 MODEL = re.compile(r"^[\w.:/@+-]{0,120}$")
 NAMES = re.compile(r"^([\w .:@+-]{1,40}(,[\w .:@+-]{1,40}){0,29})?$")
-KEYED = {"gemini": "gemini_api_key", "fish": "fish_api_key"}
+KEYED = {"gemini": SPOKEN, "fish": "fish_api_key"}
 
 
 def speech_view() -> dict[str, Any]:

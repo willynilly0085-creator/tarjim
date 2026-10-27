@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from tarjim import shortcut, vault
+from tarjim import config, shortcut, vault
 
 
 class MemoryVault:
@@ -30,3 +30,11 @@ def own_desktop(monkeypatch: pytest.MonkeyPatch, tmp_path_factory: pytest.TempPa
     monkeypatch.setattr(shortcut, "desktop", lambda: folder / "Desktop")
     monkeypatch.setattr(shortcut, "start_menu", lambda: folder / "Programs")
     return folder
+
+
+@pytest.fixture(autouse=True)
+def no_outside_keys(monkeypatch: pytest.MonkeyPatch) -> None:
+    """No test reads the Google keys kept in this computer's own environment."""
+    monkeypatch.setattr(config, "user_variable", lambda _name: "")
+    for name in ("VERTEX_API_KEY", "GEMINI_API_KEY"):
+        monkeypatch.delenv(name, raising=False)

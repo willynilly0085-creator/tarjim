@@ -6,7 +6,7 @@ from typing import Protocol
 import numpy as np
 
 from tarjim import media
-from tarjim.config import api_key, setting
+from tarjim.config import SPOKEN, api_key, setting
 from tarjim.dub.audio import cut, write_wav
 from tarjim.dub.clone import LANGUAGES as CLONE_LANGUAGES
 from tarjim.dub.lines import Line, lines_from
@@ -23,7 +23,7 @@ FIRST_SECONDS = 10.0
 SAFE = re.compile(r"[^\w.-]")
 NUMBER = re.compile(r"\d+")
 PLAIN_TEXT = ("gemini", "clone", "eleven", "speech")
-KEYS = {"gemini": "gemini_api_key", "fish": "fish_api_key"}
+KEYS = {"gemini": SPOKEN, "fish": "fish_api_key"}
 LINKED = {"eleven": ("eleven_api_key", "ElevenLabs"), "speech": ("speech_api_key", "voice service")}
 
 

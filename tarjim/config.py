@@ -2,12 +2,14 @@ import contextlib
 import json
 import os
 import secrets
+import sys
 import tempfile
 import threading
 import time
 from pathlib import Path
 
 from tarjim import vault
+from tarjim.google_ai import vertex
 
 HOME = Path(os.environ.get("TARJIM_HOME", Path.home() / ".tarjim"))
 CONFIG = HOME / "config.json"
@@ -131,16 +133,44 @@ def prepare_environment() -> None:
         os.environ["PATH"] = f"{tools}{os.pathsep}{os.environ.get('PATH', '')}"
 
 
-# Gemini CLI and Google's own samples keep a key in GEMINI_API_KEY. It is used only when none is
-# saved on tarjim's page: a key the person saves there is the one every part of tarjim uses (an
-# older key left in the environment once kept translation on an exhausted free key).
-ENVIRONMENT_KEYS = {"gemini_api_key": "GEMINI_API_KEY"}
+# Gemini CLI and Google's own samples keep a key in GEMINI_API_KEY, and a Vertex AI key is often
+# kept in VERTEX_API_KEY. A Vertex key goes first wherever it is found: it is billed, with no free
+# daily quota, so whoever made one meant Gemini to use it (on 2026-10-27 the owner's free key, saved
+# on the page, ran out on gemini-3.8-flash while a Vertex key with credit sat in VERTEX_API_KEY).
+# Otherwise a key saved on tarjim's page wins over the environment's.
+GEMINI = "gemini_api_key"
+SPOKEN = "gemini_voice_key"  # the Gemini API key alone: Vertex AI has no voices for tarjim
+
+
+def user_variable(name: str) -> str:
+    """A variable set in Windows' own settings counts without restarting tarjim, which keeps the
+    environment it was started with."""
+    if sys.platform != "win32":
+        return ""
+    import winreg
+
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as found:
+            return str(winreg.QueryValueEx(found, name)[0])
+    except OSError:
+        return ""
+
+
+def google_keys() -> list[str]:
+    places = (setting(GEMINI), *(os.environ.get(v) or user_variable(v)
+                                 for v in ("VERTEX_API_KEY", "GEMINI_API_KEY")))
+    return [key for key in places if key]
 
 
 def api_key(name: str) -> str:
-    outside = ENVIRONMENT_KEYS.get(name)
-    return setting(name) or (os.environ.get(outside, "") if outside else "")
+    if name not in (GEMINI, SPOKEN):
+        return setting(name)
+    found = google_keys()
+    studio = [key for key in found if not vertex(key)]
+    if name == SPOKEN:
+        return studio[0] if studio else ""
+    return next((key for key in found if vertex(key)), studio[0] if studio else "")
 
 
 def gemini_key() -> str:
-    return api_key("gemini_api_key")
+    return api_key(GEMINI)

@@ -9,7 +9,7 @@ from typing import Any
 
 import numpy as np
 
-from tarjim.config import api_key
+from tarjim.config import SPOKEN, api_key
 from tarjim.dub.audio import RATE, decode
 from tarjim.dub.lines import Line
 from tarjim.dub.split import split_lines
@@ -77,7 +77,7 @@ class GeminiVoices:
         options = types.HttpOptions(timeout=REQUEST_MS,
                                     retry_options=types.HttpRetryOptions(
                                         attempts=1, http_status_codes=[BUSY]))
-        self.client: Any = genai.Client(api_key=api_key("gemini_api_key"), http_options=options)
+        self.client: Any = genai.Client(api_key=api_key(SPOKEN), http_options=options)
         self.voices = cast(references) or {"": LOW_VOICES[0]}
         self.language = language
         self.style = style_for(language, dialect)

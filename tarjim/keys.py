@@ -1,9 +1,12 @@
 import re
 from collections.abc import Callable
+from typing import Any
 
 from tarjim.config import api_key, save
 from tarjim.engines.catalog import BY_ID, compatible
 from tarjim.engines.catalog import PROVIDERS as CATALOG
+from tarjim.gemini_client import MODELS
+from tarjim.google_ai import google_client, vertex
 
 KEY_SHAPE = re.compile(r"^[A-Za-z0-9._-]{16,256}$")
 PROVIDERS = {**{p.id: p.key_name for p in CATALOG if p.key_name}, "fish": "fish_api_key",
@@ -19,18 +22,25 @@ def well_formed(key: str) -> bool:
 REFUSED_BY_GOOGLE = (400, 401, 403)
 
 
+def ask_google(client: Any, key: str) -> None:
+    """A Vertex AI key may not list models (401 for a good key too), so it counts two tokens."""
+    if vertex(key):
+        client.models.count_tokens(model=MODELS[0], contents="hi")
+    else:
+        next(iter(client.models.list()), None)
+
+
 def gemini_verdict(key: str) -> str:
     """"" when Google accepts the key, "rejected" when Google refuses it, "unreachable" when Google
     could not be asked (no internet, a timeout, a limit reached): that is not the key's fault, and
     calling it a bad key sent people hunting for a typo in a good one."""
-    from google import genai
     from google.genai import errors, types
 
-    # The client is kept in a name while the list is read: google-genai 2.33 closes a client the
+    # The client is kept in a name while Google is asked: google-genai 2.33 closes a client the
     # moment nothing holds it, so the inline form failed every key ("client has been closed").
-    client = genai.Client(api_key=key, http_options=types.HttpOptions(timeout=CHECK_MS))
+    client = google_client(key, types.HttpOptions(timeout=CHECK_MS))
     try:
-        next(iter(client.models.list()), None)
+        ask_google(client, key)
     except errors.APIError as error:
         return "rejected" if error.code in REFUSED_BY_GOOGLE else "unreachable"
     except Exception:

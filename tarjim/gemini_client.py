@@ -5,6 +5,7 @@ from collections.abc import Iterator
 from typing import Any
 
 from tarjim.config import gemini_key, setting
+from tarjim.google_ai import google_client
 
 MODELS = ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash",
           "gemini-flash-latest", "gemini-3-flash-preview"]
@@ -74,7 +75,6 @@ class GeminiClient:
     hears = True
 
     def __init__(self, api_key: str | None = None, listening: bool = False) -> None:
-        from google import genai
         from google.genai import types
 
         key = api_key or gemini_key()
@@ -83,8 +83,7 @@ class GeminiClient:
         # One attempt per call: the library's own silent retries waited minutes on a model Google
         # reported as overloaded (503), while the next model in the list answered in seconds.
         once = types.HttpRetryOptions(attempts=1)
-        self.client = genai.Client(api_key=key, http_options=types.HttpOptions(
-            timeout=REQUEST_MS, retry_options=once))
+        self.client = google_client(key, types.HttpOptions(timeout=REQUEST_MS, retry_options=once))
         self.listening = listening
         self.models = asked_last_if_stalled(chosen_first())
         self.model_used = ""

@@ -31,10 +31,14 @@ def codex_rows() -> list[Row]:
 
 
 def gemini_rows(key: str) -> list[Row]:
-    from google import genai
     from google.genai import types
 
-    client = genai.Client(api_key=key, http_options=types.HttpOptions(timeout=TIMEOUT * 1000))
+    from tarjim.gemini_client import MODELS
+    from tarjim.google_ai import google_client, vertex
+
+    if vertex(key):  # Vertex AI does not list models for a key: tarjim's own list is offered
+        return [(model, "", "") for model in MODELS]
+    client = google_client(key, types.HttpOptions(timeout=TIMEOUT * 1000))
     return [(str(m.name).rsplit("/", maxsplit=1)[-1], str(m.display_name or ""), "")
             for m in client.models.list() if "generateContent" in (m.supported_actions or [])]
 

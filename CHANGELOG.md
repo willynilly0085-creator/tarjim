@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.48 (2026-10-27)
+
+- **Gemini works with a Vertex AI key.** A Vertex AI key (it starts with `AQ.`) reaches the same
+  Gemini models billed to your Google Cloud project, without the free key's daily limit per model.
+  Paste it in the Gemini key field on tarjim's page, or keep it in the `VERTEX_API_KEY`
+  environment variable; tarjim finds a variable set in Windows' settings without a restart. When
+  tarjim has both kinds, translation and listening use the Vertex key. Gemini voices for dubbing
+  still need a Gemini API key from AI Studio, because Vertex AI does not offer them.
+
 ## 1.0.47 (2026-10-27)
 
 - **A Gemini failure names every model and why.** When a free key had used up its day on the
