@@ -115,7 +115,7 @@
   "stage_failed": "Non terminé",
   "play": "Lire",
   "openFolder": "Afficher dans le dossier",
-  "err_quota": "Le quota gratuit est épuisé pour aujourd'hui. Il revient demain, ou utilisez le mode local.",
+  "err_quota": "Le quota gratuit de ta clé est épuisé pour aujourd'hui. Ajoute une clé payante dans les réglages, reviens demain ou utilise le mode local.",
   "err_key": "La clé est manquante ou a été refusée. Vérifiez-la dans les Réglages.",
   "err_download": "Impossible de télécharger la vidéo depuis ce lien. Vérifiez que le lien fonctionne.",
   "err_tools": "ffmpeg n'est pas installé sur cet ordinateur.",

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.47 (2026-10-27)
+
+- **A Gemini failure names every model and why.** When a free key had used up its day on the
+  newer models (Gemini 3.8 Flash down to 3.5) and the last one left was busy, the error listed only
+  that last model, four times, so it looked as if tarjim had chosen it over 3.8. Now it lists each
+  model once with its reason ("daily quota used up" or Google's code), and the page says the free
+  quota is used up, with what to do: add a paid key in Settings, come back tomorrow, or use local
+  mode. Gemini 3.8 Flash stays the first model asked, and the model picked in Settings goes before
+  it.
+
 ## 1.0.46 (2026-10-27)
 
 - **Updates take effect again.** tarjim downloaded new versions but could keep running the old

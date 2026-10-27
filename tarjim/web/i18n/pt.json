@@ -115,7 +115,7 @@
   "stage_failed": "Não terminou",
   "play": "Reproduzir",
   "openFolder": "Mostrar na pasta",
-  "err_quota": "A cota gratuita de hoje acabou. Ela volta amanhã, ou use o modo local.",
+  "err_quota": "A cota gratuita de hoje da sua chave acabou. Adicione uma chave paga nas Configurações, volte amanhã ou use o modo local.",
   "err_key": "A chave está faltando ou foi recusada. Confira em Configurações.",
   "err_download": "Não foi possível baixar o vídeo desse link. Confira se o link funciona.",
   "err_tools": "O ffmpeg não está instalado neste computador.",

@@ -27,6 +27,7 @@ LONG_WAIT = 30.0
 STALLED_FOR = 20 * 60.0
 STALLED: dict[str, float] = {}
 TOO_MANY = 429
+USED_UP = "daily quota used up"
 REFUSED = (400, 401, 403)
 DAILY = re.compile(r"per ?day", re.IGNORECASE)
 DELAY = re.compile(r"retryDelay'?\"?:\s*'?\"?(\d+(?:\.\d+)?)s")
@@ -92,18 +93,27 @@ class GeminiClient:
         self.cooling: dict[str, float] = {}
 
     def ask(self, prompt: str, audio: bytes | None, schema: dict[str, Any]) -> Any:
-        errors: list[str] = []
+        failed: dict[str, str] = {}  # each model's last reason, so the error names every one
         for model in self.turns():
             self.wait_for(model)
             started = time.monotonic()
             try:
                 return self.call(model, prompt, audio, schema)
             except Exception as error:
-                errors.append(f"{model}: {getattr(error, 'code', type(error).__name__)}")
+                failed[model] = USED_UP if used_up_today(error) else str(
+                    getattr(error, "code", type(error).__name__))
                 self.note(model, error, time.monotonic() - started)
+        raise self.gave_up(failed)
+
+    def gave_up(self, failed: dict[str, str]) -> RuntimeError:
+        """Seen 2026-10-27: a free key had used up its day on gemini-3.8 to 3.5, and the error
+        named only the last model left, busy four times over, as if tarjim had picked it."""
         if len(self.spent) == len(self.models):
-            raise QuotaExhausted("Gemini free quota is used up for today on every model")
-        raise RuntimeError("all Gemini models failed: " + "; ".join(errors[-4:]))
+            return QuotaExhausted("Gemini free quota is used up for today on every model")
+        reasons = "; ".join(f"{model}: {why}" for model, why in failed.items())
+        if USED_UP in failed.values():  # still a RuntimeError: listening falls back to local
+            return RuntimeError(f"Gemini free daily quota is used up, the rest are busy: {reasons}")
+        return RuntimeError(f"all Gemini models failed: {reasons}")
 
     def turns(self) -> Iterator[str]:
         """Three rounds over the models that answer; the ones that kept us waiting only when every

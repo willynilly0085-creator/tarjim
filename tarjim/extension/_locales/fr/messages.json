@@ -102,7 +102,7 @@
     "message": "Réessayer"
   },
   "errQuota": {
-    "message": "Le quota gratuit est épuisé pour aujourd'hui. Il revient demain, ou utilisez le mode local."
+    "message": "Le quota gratuit de ta clé est épuisé pour aujourd'hui. Ajoute une clé payante dans les réglages, reviens demain ou utilise le mode local."
   },
   "errKey": {
     "message": "La clé est manquante ou a été refusée. Vérifiez-la dans les Réglages."

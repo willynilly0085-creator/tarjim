@@ -102,7 +102,7 @@
     "message": "Tentar de novo"
   },
   "errQuota": {
-    "message": "A cota gratuita de hoje acabou. Ela volta amanhã, ou use o modo local."
+    "message": "A cota gratuita de hoje da sua chave acabou. Adicione uma chave paga nas Configurações, volte amanhã ou use o modo local."
   },
   "errKey": {
     "message": "A chave está faltando ou foi recusada. Confira em Configurações."

@@ -115,7 +115,7 @@
   "stage_failed": "Nicht abgeschlossen",
   "play": "Abspielen",
   "openFolder": "Im Ordner anzeigen",
-  "err_quota": "Das kostenlose Kontingent ist für heute aufgebraucht. Es steht morgen wieder bereit, oder nutze den lokalen Modus.",
+  "err_quota": "Das kostenlose Kontingent deines Schlüssels ist für heute aufgebraucht. Hinterlege in den Einstellungen einen bezahlten Schlüssel, versuche es morgen wieder oder nutze den lokalen Modus.",
   "err_key": "Der Schlüssel fehlt oder wurde abgelehnt. Prüfe ihn in den Einstellungen.",
   "err_download": "Das Video konnte über diesen Link nicht heruntergeladen werden. Prüfe, ob der Link funktioniert.",
   "err_tools": "ffmpeg ist auf diesem Computer nicht installiert.",

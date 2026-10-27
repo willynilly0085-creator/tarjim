@@ -115,7 +115,7 @@
   "stage_failed": "Tidak selesai",
   "play": "Putar",
   "openFolder": "Tampilkan di folder",
-  "err_quota": "Kuota gratis hari ini sudah habis. Kuota kembali besok, atau pakai mode lokal.",
+  "err_quota": "Kuota gratis kuncimu untuk hari ini sudah habis. Tambahkan kunci berbayar di Pengaturan, kembali besok, atau pakai mode lokal.",
   "err_key": "Kunci tidak ada atau ditolak. Periksa di Pengaturan.",
   "err_download": "Tidak bisa mengunduh video dari tautan itu. Pastikan tautannya berfungsi.",
   "err_tools": "ffmpeg belum terpasang di komputer ini.",

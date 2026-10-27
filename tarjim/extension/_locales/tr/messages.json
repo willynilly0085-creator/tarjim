@@ -102,7 +102,7 @@
     "message": "Tekrar dene"
   },
   "errQuota": {
-    "message": "Ücretsiz kota bugünlük doldu. Yarın yenilenir ya da yerel modu kullan."
+    "message": "Anahtarının bugünkü ücretsiz kotası doldu. Ayarlardan ücretli bir anahtar ekle, yarın tekrar dene ya da yerel modu kullan."
   },
   "errKey": {
     "message": "Anahtar eksik veya reddedildi. Ayarlar'dan kontrol et."

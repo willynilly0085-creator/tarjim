@@ -115,7 +115,7 @@
   "stage_failed": "Did not finish",
   "play": "Play",
   "openFolder": "Show in folder",
-  "err_quota": "The free quota is used up for today. It comes back tomorrow, or use local mode.",
+  "err_quota": "Your key's free quota is used up for today. Add a paid key in Settings, come back tomorrow, or use local mode.",
   "err_key": "The key is missing or was refused. Check it in Settings.",
   "err_download": "Could not download the video from that link. Check that the link works.",
   "err_tools": "ffmpeg is not installed on this computer.",

@@ -115,7 +115,7 @@
   "stage_failed": "No terminó",
   "play": "Reproducir",
   "openFolder": "Mostrar en la carpeta",
-  "err_quota": "Se agotó la cuota gratuita de hoy. Vuelve mañana, o usa el modo local.",
+  "err_quota": "Tu clave agotó la cuota gratuita de hoy. Añade una clave de pago en Ajustes, vuelve mañana o usa el modo local.",
   "err_key": "Falta la clave o fue rechazada. Revísala en Ajustes.",
   "err_download": "No se pudo descargar el video de ese enlace. Comprueba que el enlace funciona.",
   "err_tools": "ffmpeg no está instalado en esta computadora.",

@@ -102,7 +102,7 @@
     "message": "Erneut versuchen"
   },
   "errQuota": {
-    "message": "Das kostenlose Kontingent ist für heute aufgebraucht. Es steht morgen wieder bereit, oder nutze den lokalen Modus."
+    "message": "Das kostenlose Kontingent deines Schlüssels ist für heute aufgebraucht. Hinterlege in den Einstellungen einen bezahlten Schlüssel, versuche es morgen wieder oder nutze den lokalen Modus."
   },
   "errKey": {
     "message": "Der Schlüssel fehlt oder wurde abgelehnt. Prüfe ihn in den Einstellungen."

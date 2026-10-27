@@ -115,7 +115,7 @@
   "stage_failed": "Tamamlanmadı",
   "play": "Oynat",
   "openFolder": "Klasörde göster",
-  "err_quota": "Ücretsiz kota bugünlük doldu. Yarın yenilenir ya da yerel modu kullan.",
+  "err_quota": "Anahtarının bugünkü ücretsiz kotası doldu. Ayarlardan ücretli bir anahtar ekle, yarın tekrar dene ya da yerel modu kullan.",
   "err_key": "Anahtar eksik veya reddedildi. Ayarlar'dan kontrol et.",
   "err_download": "Video bu bağlantıdan indirilemedi. Bağlantının çalıştığından emin ol.",
   "err_tools": "Bu bilgisayarda ffmpeg yüklü değil.",

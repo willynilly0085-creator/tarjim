@@ -102,7 +102,7 @@
     "message": "Reintentar"
   },
   "errQuota": {
-    "message": "Se agotó la cuota gratuita de hoy. Vuelve mañana, o usa el modo local."
+    "message": "Tu clave agotó la cuota gratuita de hoy. Añade una clave de pago en Ajustes, vuelve mañana o usa el modo local."
   },
   "errKey": {
     "message": "Falta la clave o fue rechazada. Revísala en Ajustes."

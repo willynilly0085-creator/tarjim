@@ -102,7 +102,7 @@
     "message": "Coba lagi"
   },
   "errQuota": {
-    "message": "Kuota gratis hari ini sudah habis. Kuota kembali besok, atau pakai mode lokal."
+    "message": "Kuota gratis kuncimu untuk hari ini sudah habis. Tambahkan kunci berbayar di Pengaturan, kembali besok, atau pakai mode lokal."
   },
   "errKey": {
     "message": "Kunci tidak ada atau ditolak. Periksa di Pengaturan."
