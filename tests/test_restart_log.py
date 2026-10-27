@@ -36,3 +36,15 @@ def test_a_free_log_still_receives_the_output(
     monkeypatch.setattr(installer.subprocess, "Popen", lambda *_a, **kw: started.append(kw))
     assert installer.start_detached(["program"], tmp_path / "server.log", here=tmp_path)
     assert Path(started[0]["stdout"].name).name == "server.log"
+
+
+def test_the_new_engine_gets_a_console_that_is_never_shown(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """On 2026-10-27 a restart after an update opened a Windows Terminal window: the venv's
+    pythonw.exe (uv's) is a console launcher, and with DETACHED its Python got a visible console."""
+    started: list[dict[str, Any]] = []
+    monkeypatch.setattr(installer.subprocess, "Popen", lambda *_a, **kw: started.append(kw))
+    assert installer.start_detached(["pythonw.exe"], tmp_path / "server.log", here=tmp_path)
+    flags = started[0]["creationflags"]
+    assert flags & installer.NO_WINDOW == installer.NO_WINDOW
+    assert not flags & 0x00000008  # DETACHED_PROCESS, under which NO_WINDOW is ignored

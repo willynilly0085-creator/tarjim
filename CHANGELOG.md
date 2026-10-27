@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.49 (2026-10-27)
+
+- **No console window after an update.** When tarjim restarted itself to use new code, Windows
+  could open a terminal window titled `pythonw.exe` and leave it open while tarjim ran. The new
+  engine now gets a console that is never shown. If a window like that is open now, you can close
+  it once this version is in: tarjim starts again without it.
+
 ## 1.0.48 (2026-10-27)
 
 - **Gemini works with a Vertex AI key.** A Vertex AI key (it starts with `AQ.`) reaches the same

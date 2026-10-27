@@ -26,7 +26,6 @@ STATE = HOME / "install.json"
 UPDATE_STATE = HOME / "update.json"
 LOG = HOME / "install.log"
 NO_WINDOW = 0x08000000 if sys.platform == "win32" else 0
-DETACHED = 0x00000008 if sys.platform == "win32" else 0
 BREAKAWAY = 0x01000000 if sys.platform == "win32" else 0
 EXIT_WAIT, STILL_ACTIVE = 90, 259
 
@@ -131,7 +130,10 @@ def start_detached(command: list[str], log: Path, here: Path | None = None) -> b
     except PermissionError:  # held shut by the cmd `>>` the running engine was started with
         out = log.with_name(f"{log.stem}-restart{log.suffix}").open("ab")
     with out:
-        for flags in (NO_WINDOW | DETACHED | BREAKAWAY, NO_WINDOW | DETACHED):
+        # A console of its own that is never shown, not none at all: uv makes a virtual
+        # environment's pythonw.exe a console launcher, and the Python it starts opened a
+        # window when it found no console to share (Windows ignores NO_WINDOW with DETACHED).
+        for flags in (NO_WINDOW | BREAKAWAY, NO_WINDOW):
             try:
                 subprocess.Popen(command, stdout=out, stderr=out, stdin=subprocess.DEVNULL,
                                  cwd=here or log.parent, env=child_environment(),
