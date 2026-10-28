@@ -228,7 +228,7 @@
     "message": "または、セキュリティトークンを手動で貼り付け："
   },
   "pairWaiting": {
-    "message": "tarjim のページでこのコードを入力し、「許可」を押してください："
+    "message": "tarjim のページを開き、接続リクエストで「許可」を押してください。"
   },
   "menuRootArabic": {
     "message": "アラビア語に翻訳"

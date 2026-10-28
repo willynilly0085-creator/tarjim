@@ -228,7 +228,7 @@
     "message": "Oder füge den Sicherheitstoken von Hand ein:"
   },
   "pairWaiting": {
-    "message": "Gib diesen Code auf der tarjim-Seite ein und klicke auf Erlauben:"
+    "message": "Öffnen Sie die tarjim-Seite und klicken Sie bei der Verbindungsanfrage auf Erlauben."
   },
   "menuRootArabic": {
     "message": "Ins Arabische übersetzen"

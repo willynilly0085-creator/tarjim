@@ -5,7 +5,7 @@ export async function serverBase() {
 }
 
 // tarjim's page, on one of its sections ("#connect" for keys); in the background when the popup
-// must stay open, e.g. to keep showing a pairing code.
+// must stay open, e.g. to keep showing that a pairing request waits.
 export async function openPage(section = "", active = true) {
   return chrome.tabs.create({ url: `${await serverBase()}/${section}`, active });
 }
@@ -13,7 +13,7 @@ export async function openPage(section = "", active = true) {
 export async function askToPair() {
   const reply = await fetch(`${await serverBase()}/pair`, { method: "POST" }).catch(() => null);
   const asked = reply?.ok ? await reply.json() : null;
-  if (asked?.id) await remember({ pairId: asked.id, pairCode: asked.code });
+  if (asked?.id) await remember({ pairId: asked.id });
   return asked;
 }
 
@@ -25,11 +25,11 @@ export async function claimPending() {
   if (!reply.ok) return "waiting";
   const state = await reply.json();
   if (state.token) {
-    await remember({ token: state.token, pairId: "", pairCode: "" });
+    await remember({ token: state.token, pairId: "" });
     return "paired";
   }
   if (state.state === "pending") return "waiting";
-  await remember({ pairId: "", pairCode: "" });
+  await remember({ pairId: "" });
   return state.state === "denied" ? "denied" : "none";
 }
 

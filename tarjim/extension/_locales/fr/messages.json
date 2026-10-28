@@ -228,7 +228,7 @@
     "message": "Ou collez le jeton de sécurité à la main :"
   },
   "pairWaiting": {
-    "message": "Sur la page tarjim, saisissez ce code et cliquez sur Autoriser :"
+    "message": "Ouvrez la page tarjim et cliquez sur Autoriser pour la demande de connexion."
   },
   "menuRootArabic": {
     "message": "Traduire en arabe"

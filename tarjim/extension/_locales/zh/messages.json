@@ -228,7 +228,7 @@
     "message": "或者手动粘贴安全令牌："
   },
   "pairWaiting": {
-    "message": "在 tarjim 页面输入这个验证码，然后点击“允许”："
+    "message": "打开 tarjim 页面，在连接请求上按“允许”。"
   },
   "menuRootArabic": {
     "message": "翻译成阿拉伯语"

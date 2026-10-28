@@ -1,4 +1,5 @@
-"""Pairing is decided by the code the extension shows the person, never by a blind Allow."""
+"""Pairing is the person's Allow or Deny on tarjim's page (no code, the owner's choice), and
+no extension can lock another out by asking again and again."""
 import pytest
 
 from tarjim.server import pairing as pairing_module
@@ -8,37 +9,20 @@ OURS = "chrome-extension://pbfjcnbdlokmgmldbkbmihnalfnhjjgp"
 STRANGER = "chrome-extension://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 
-def test_allowing_needs_the_code_the_extension_shows() -> None:
+def test_the_persons_allow_connects_without_any_code() -> None:
     pairing = Pairing()
     request = pairing.ask(OURS)
     assert request is not None
-    wrong = "0000" if request.code != "0000" else "0001"
-    assert not pairing.decide(request.id, True)
-    assert not pairing.decide(request.id, True, wrong)
     assert pairing.claim(request.id, "TOKEN") == {"state": "pending"}
-    assert pairing.decide(request.id, True, request.code)
+    assert pairing.decide(request.id, True)
     assert pairing.claim(request.id, "TOKEN") == {"state": "allowed", "token": "TOKEN"}
 
 
-def test_the_strangers_code_does_not_allow_ours() -> None:
-    pairing = Pairing()
-    stranger, ours = pairing.ask(STRANGER), pairing.ask(OURS)
-    assert stranger is not None and ours is not None
-    assert not pairing.decide(stranger.id, True, ours.code)
-    assert pairing.claim(stranger.id, "TOKEN") == {"state": "pending"}
-
-
-def test_denying_needs_no_code() -> None:
+def test_deny_refuses_the_request() -> None:
     pairing = Pairing()
     request = pairing.ask(STRANGER)
     assert request is not None and pairing.decide(request.id, False)
     assert pairing.claim(request.id, "TOKEN") == {"state": "denied"}
-
-
-def test_a_code_in_another_alphabet_is_just_wrong() -> None:
-    pairing = Pairing()
-    request = pairing.ask(OURS)
-    assert request is not None and not pairing.decide(request.id, True, "٤٥٦٧")
 
 
 def test_strangers_waiting_cannot_lock_another_extension_out() -> None:

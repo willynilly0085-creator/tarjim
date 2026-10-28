@@ -64,17 +64,14 @@ def test_assets_never_leave_the_web_folder(port: int) -> None:
 def test_extension_pairs_only_after_the_person_allows_it_and_gets_the_token_once(port: int) -> None:
     assert call(port, "POST /pair", headers={"Origin": "https://evil.example"}).status == 403
     asked = json.loads(call(port, "POST /pair", headers={"Origin": EXTENSION}).read())
-    request_id, code = asked["id"], asked["code"]
+    request_id = asked["id"]
     assert json.loads(call(port, f"GET /pair/{request_id}").read()) == {"state": "pending"}
     owner = {"X-Tarjim-Token": TOKEN, "Content-Type": "application/json"}
     assert [p["id"] for p in json.loads(call(port, "GET /pairs", headers=owner).read())] == [
         request_id]
-    assert call(port, f"POST /pairs/{request_id}/allow", headers=owner).status == 404
-    wrong = json.dumps({"code": "0000" if code != "0000" else "0001"}).encode()
-    assert call(port, f"POST /pairs/{request_id}/allow", wrong, owner).status == 404
+    assert call(port, f"POST /pairs/{request_id}/allow").status == 403  # the page's token only
     assert json.loads(call(port, f"GET /pair/{request_id}").read()) == {"state": "pending"}
-    right = json.dumps({"code": code}).encode()
-    assert call(port, f"POST /pairs/{request_id}/allow", right, owner).status == 200
+    assert call(port, f"POST /pairs/{request_id}/allow", headers=owner).status == 200
     first = json.loads(call(port, f"GET /pair/{request_id}").read())
     assert first == {"state": "allowed", "token": TOKEN}
     assert json.loads(call(port, f"GET /pair/{request_id}").read()) == {"state": "allowed"}

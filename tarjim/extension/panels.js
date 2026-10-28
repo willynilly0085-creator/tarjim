@@ -23,29 +23,29 @@ async function pair(event, ready) {
   }
 }
 
-function showCode(code) {
+function showWaiting() {
   $("pair-waiting").hidden = false;
-  $("pair-waiting").textContent = `${t("pairWaiting")} \u2066${code}\u2069`;
+  $("pair-waiting").textContent = t("pairWaiting");
 }
 
-// The code stays on the pairing screen until the request is answered, even after the popup closed.
+// The waiting note stays on the pairing screen until the request is answered.
 export async function showPair() {
   show("pair");
-  const { pairId, pairCode } = await chrome.storage.local.get(["pairId", "pairCode"]);
-  if (pairId && pairCode) showCode(pairCode);
+  const { pairId } = await chrome.storage.local.get(["pairId"]);
+  if (pairId) showWaiting();
 }
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const ATTEMPTS = 400;
 const ENDED = { denied: "pairDenied", none: "pairExpired" };
-const CODE_NOTICE = "pair-code";
+const NOTICE = "pair-waiting";
 let pageTab = null;
 
-// The code is typed on tarjim's page, and going there closes this popup: so the page opens behind
-// it, and the code also stays in a notification until the request is answered.
-function noticeCode(code) {
-  chrome.notifications.create(CODE_NOTICE, { type: "basic", iconUrl: "icons/128.png", title: t("appName"),
-    message: `${t("pairWaiting")} ${code}`, requireInteraction: true });
+// Allow is pressed on tarjim's page, and going there closes this popup: so the page opens behind
+// it, and a notification says what to do until the request is answered.
+function notice() {
+  chrome.notifications.create(NOTICE, { type: "basic", iconUrl: "icons/128.png", title: t("appName"),
+    message: t("pairWaiting"), requireInteraction: true });
 }
 
 async function showPage() {
@@ -53,12 +53,12 @@ async function showPage() {
   if (!shown) await openPage();
 }
 
-async function answer(code) {
+async function answer() {
   for (let i = 0; i < ATTEMPTS; i += 1) {
     await wait(1500);
     const result = await claimPending();
     if (result === "unreachable") $("pair-waiting").textContent = t("pairUnreachable");
-    else if (result === "waiting") showCode(code);
+    else if (result === "waiting") showWaiting();
     else return result;
   }
   return "none";
@@ -68,12 +68,12 @@ export async function autoPair(ready) {
   show("pair");
   const asked = await askToPair();
   if (!asked?.id) return show("offline");
-  showCode(asked.code);
-  noticeCode(asked.code);
+  showWaiting();
+  notice();
   $("open-tarjim").hidden = false;
   pageTab = await openPage("", false);
-  const result = await answer(asked.code);
-  chrome.notifications.clear(CODE_NOTICE);
+  const result = await answer();
+  chrome.notifications.clear(NOTICE);
   if (result !== "paired") return void ($("pair-waiting").textContent = t(ENDED[result] || "pairExpired"));
   await sendWaitingJob();
   return ready();

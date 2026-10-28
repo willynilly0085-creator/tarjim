@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.51 (2026-10-28)
+
+- **No code to connect the browser extension.** When the tarjim extension asks to connect, tarjim's
+  page now shows only Allow and Deny: press Allow if you asked from tarjim's extension, Deny if
+  not. The 4 digits are gone from the extension and the page, in the 14 languages.
+
 ## 1.0.50 (2026-10-28)
 
 - **The extension's connection request says where its code is.** When the tarjim browser extension

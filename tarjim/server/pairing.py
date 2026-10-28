@@ -61,13 +61,11 @@ class Pairing:
             self.tidy()
             return [r for r in self.requests.values() if r.state == "pending"]
 
-    def decide(self, request_id: str, allow: bool, code: str = "") -> bool:
-        """Allowing needs the code the extension showed the person; denying never does."""
+    def decide(self, request_id: str, allow: bool) -> bool:
+        """The person's Allow or Deny on tarjim's page; no code is asked (the owner's choice)."""
         with self.lock:
             request = self.requests.get(request_id)
             if request is None or request.state != "pending":
-                return False
-            if allow and not secrets.compare_digest(code.encode(), request.code.encode()):
                 return False
             request.state = "allowed" if allow else "denied"
             return True
