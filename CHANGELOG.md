@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.50 (2026-10-28)
+
+- **The extension's connection request says where its code is.** When the tarjim browser extension
+  asks to connect, the page now says to click the extension's icon at the top of the browser,
+  where its 4 digits show, to type them and press Allow, and to press Deny if you did not ask for
+  it. Before, it only said "type the code", without saying where to find it. In the 14 languages.
+
 ## 1.0.49 (2026-10-27)
 
 - **No console window after an update.** When tarjim restarted itself to use new code, Windows
