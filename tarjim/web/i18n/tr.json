@@ -71,7 +71,7 @@
   "extStep3": "Eklentiyi aç ve Otomatik bağlan'a bas. Sonra gösterilen kodu buraya yaz ve İzin ver'e bas.",
   "copy": "Kopyala",
   "copied": "Kopyalandı",
-  "pairAsk": "Bir tarayıcı eklentisi tarjim'e bağlanmak istiyor. tarjim eklentinde görünen kodu yaz.",
+  "pairAsk": "Bir tarayıcı uzantısı tarjim'e bağlanmak istiyor. Tarayıcının üstündeki tarjim uzantısı simgesine tıklayın: 4 rakam gösterir. Onları buraya yazıp İzin ver'e basın. Bunu siz istemediyseniz Reddet'e basın.",
   "pairCode": "Eklentideki kod",
   "pairWrongCode": "Bu koda sahip bekleyen bir istek yok. tarjim eklentindeki kodu kontrol et ya da Reddet'e bas.",
   "allow": "İzin ver",

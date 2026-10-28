@@ -71,7 +71,7 @@
   "extStep3": "Open the extension and press Connect automatically, then type the code it shows here and press Allow.",
   "copy": "Copy",
   "copied": "Copied",
-  "pairAsk": "A browser extension wants to connect to tarjim. Type the code your tarjim extension shows.",
+  "pairAsk": "A browser extension wants to connect to tarjim. Click the tarjim extension's icon at the top of your browser: it shows 4 digits. Type them here and press Allow. If you did not ask for this, press Deny.",
   "pairCode": "Code from the extension",
   "pairWrongCode": "No waiting request has that code. Check the code in your tarjim extension, or press Deny.",
   "allow": "Allow",

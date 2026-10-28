@@ -71,7 +71,7 @@
   "extStep3": "Buka ekstensi dan tekan Hubungkan otomatis, lalu ketik di sini kode yang ditampilkan dan tekan Izinkan.",
   "copy": "Salin",
   "copied": "Disalin",
-  "pairAsk": "Sebuah ekstensi browser ingin terhubung ke tarjim. Ketik kode yang ditampilkan ekstensi tarjim kamu.",
+  "pairAsk": "Sebuah ekstensi browser ingin terhubung ke tarjim. Klik ikon ekstensi tarjim di bagian atas browser: ia menampilkan 4 angka. Ketik angka itu di sini lalu tekan Izinkan. Jika Anda tidak memintanya, tekan Tolak.",
   "pairCode": "Kode dari ekstensi",
   "pairWrongCode": "Tidak ada permintaan yang menunggu dengan kode itu. Periksa kode di ekstensi tarjim kamu, atau tekan Tolak.",
   "allow": "Izinkan",

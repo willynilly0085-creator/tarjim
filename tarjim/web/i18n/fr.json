@@ -71,7 +71,7 @@
   "extStep3": "Ouvrez l'extension et cliquez sur Se connecter automatiquement, puis saisissez ici le code affiché et cliquez sur Autoriser.",
   "copy": "Copier",
   "copied": "Copié",
-  "pairAsk": "Une extension de navigateur veut se connecter à tarjim. Saisissez le code affiché par votre extension tarjim.",
+  "pairAsk": "Une extension du navigateur veut se connecter à tarjim. Cliquez sur l'icône de l'extension tarjim, en haut du navigateur : elle affiche 4 chiffres. Saisissez-les ici et cliquez sur Autoriser. Si vous ne l'avez pas demandé, cliquez sur Refuser.",
   "pairCode": "Code de l'extension",
   "pairWrongCode": "Aucune demande en attente n'a ce code. Vérifiez le code dans votre extension tarjim ou cliquez sur Refuser.",
   "allow": "Autoriser",
