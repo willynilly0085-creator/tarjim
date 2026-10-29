@@ -10,6 +10,7 @@ BUDGET seconds is left out; the moments are taken in an order that keeps any par
 over the whole video."""
 import subprocess
 import time
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -24,6 +25,8 @@ FEWEST_SPOKEN = 6
 AT_ONCE = 4
 BUDGET = 5.0
 GRACE = 1.0
+# The key frame at or just before the moment, and nothing else decoded.
+QUICK = ["-skip_frame", "nokey", "-noaccurate_seek"]
 Frame = np.ndarray
 
 
@@ -41,11 +44,13 @@ def spread(times: list[float]) -> list[float]:
     return [times[i] for first in (0, 2, 1, 3) for i in range(first, len(times), 4)]
 
 
-def grab(video: Path, at: float, limit: float = BUDGET) -> Frame | None:
-    args = [tool("ffmpeg"), "-hide_banner", "-loglevel", "error", "-threads", "1",
-            "-skip_frame", "nokey", "-noaccurate_seek", "-ss", f"{at:.2f}", *source(video), "-an",
-            "-frames:v", "1", "-vf", f"scale={WIDTH}:-2:flags=area,format=gray", "-f", "rawvideo",
-            "-"]
+def command(video: Path, at: float, seek: list[str]) -> list[str]:
+    return [tool("ffmpeg"), "-hide_banner", "-loglevel", "error", "-threads", "1", *seek,
+            "-ss", f"{at:.2f}", *source(video), "-an", "-frames:v", "1",
+            "-vf", f"scale={WIDTH}:-2:flags=area,format=gray", "-f", "rawvideo", "-"]
+
+
+def frame_from(args: list[str], limit: float) -> Frame | None:
     try:
         done = subprocess.run(args, capture_output=True, check=False, timeout=limit)
     except subprocess.TimeoutExpired:
@@ -56,15 +61,31 @@ def grab(video: Path, at: float, limit: float = BUDGET) -> Frame | None:
     return np.frombuffer(raw, np.uint8).reshape(-1, WIDTH)
 
 
-def sample(video: Path, times: list[float]) -> list[Frame]:
-    """The frames that could be read within BUDGET seconds, each once: two moments in one long
-    shot give one frame."""
+def grab(video: Path, at: float, limit: float = BUDGET) -> Frame | None:
+    return frame_from(command(video, at, QUICK), limit)
+
+
+def exact(video: Path, at: float, limit: float = BUDGET) -> Frame | None:
+    """The frame shown at that very moment: ffmpeg decodes from the key frame before it, so it
+    costs up to one key frame's spacing of decoding (render/moments.py takes few of them)."""
+    return frame_from(command(video, at, []), limit)
+
+
+def within_budget(times: list[float], take: Callable[[float, float], Frame | None]
+                  ) -> list[Frame | None]:
+    """take(moment, seconds left) for each moment, AT_ONCE at a time, for BUDGET seconds."""
     deadline = time.monotonic() + BUDGET
 
     def within(at: float) -> Frame | None:
         left = deadline - time.monotonic()
-        return grab(video, at, left + GRACE) if left > 0 else None
+        return take(at, left + GRACE) if left > 0 else None
 
     with ThreadPoolExecutor(AT_ONCE) as pool:
-        grabbed = list(pool.map(within, spread(times)))
+        return list(pool.map(within, times))
+
+
+def sample(video: Path, times: list[float]) -> list[Frame]:
+    """The frames that could be read within BUDGET seconds, each once: two moments in one long
+    shot give one frame."""
+    grabbed = within_budget(spread(times), lambda at, limit: grab(video, at, limit))
     return list({f.tobytes(): f for f in grabbed if f is not None}.values())

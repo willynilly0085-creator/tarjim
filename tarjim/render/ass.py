@@ -24,6 +24,11 @@ BOX_COLOUR = "&H3A141414"
 BOX_PADDING = 0.22
 BOTTOM_CENTRE, TOP_CENTRE = 2, 8
 SOFT_EDGE = "\\blur0.8"  # a slightly soft outline reads as a studio's, not a hard sticker
+TOP_LINE = "{\\an8}"
+# One line drawn somewhere other than the video's place (render/moments.py): its start and end,
+# then its distance from the bottom edge, or from the top edge when the flag is set.
+Move = tuple[float, float, int, bool]
+Spot = tuple[int, bool]
 
 HEADER = """[Script Info]
 ScriptType: v4.00+
@@ -57,6 +62,7 @@ class Canvas:
     # The picture's own text bands (render/text_bands.py), for tarjim's mark (render/mark.py).
     # They say what the picture holds, not where the subtitle goes, so equality leaves them out.
     bands: tuple[tuple[float, float], ...] = field(default=(), compare=False)
+    moves: tuple[Move, ...] = ()
 
     @property
     def portrait(self) -> bool:
@@ -98,7 +104,7 @@ def render_ass(cues: list[Cue], canvas: Canvas, rules: Rules = DEFAULT_RULES) ->
         mv=canvas.margin_v, charset=RIGHT_TO_LEFT if rules.rtl else 1, main=MAIN,
     )
     look = Look(LETTERS_ONLY if canvas.bright else EVERYTHING, voices(cues),
-                "" if canvas.bright else SOFT_EDGE)
+                "" if canvas.bright else SOFT_EDGE, {(s, e): (m, t) for s, e, m, t in canvas.moves})
     events = [line for cue in cues if cue.text.strip() for line in event_lines(cue, rules, look)]
     return header + "\n".join(events) + "\n"
 
@@ -108,6 +114,7 @@ class Look:
     alphas: tuple[str, str] = EVERYTHING
     voices: Voices = field(default_factory=dict)
     edge: str = ""
+    spots: dict[tuple[float, float], Spot] = field(default_factory=dict)
 
 
 def event_lines(cue: Cue, rules: Rules, look: Look | None = None) -> list[str]:
@@ -116,19 +123,23 @@ def event_lines(cue: Cue, rules: Rules, look: Look | None = None) -> list[str]:
     shown = display_lines(cue.text, rules)
     lines = [f"{colour}{mark}{clean(line)}{mark}"
              for colour, line in zip(line_voices(cue, len(shown), look.voices), shown, strict=True)]
-    moment = reveal_at(cue)
+    moment, spot = reveal_at(cue), look.spots.get((cue.start, cue.end))
     if moment is None:
-        return [event(cue.start, cue.end, fade(FADE_MS, FADE_MS, look.edge) + "\\N".join(lines))]
+        return [event(cue.start, cue.end, fade(FADE_MS, FADE_MS, look.edge) + "\\N".join(lines),
+                      spot)]
     hide, show = look.alphas
     *first, last = lines
     waiting = "\\N".join([*first, f"{{{hide}}}" + last])
     arriving = "\\N".join([*first, f"{{{hide}\\t(0,{FADE_MS},{show})}}" + last])
-    return [event(cue.start, moment, fade(FADE_MS, 0, look.edge) + waiting),
-            event(moment, cue.end, fade(0, FADE_MS, look.edge) + arriving)]
+    return [event(cue.start, moment, fade(FADE_MS, 0, look.edge) + waiting, spot),
+            event(moment, cue.end, fade(0, FADE_MS, look.edge) + arriving, spot)]
 
 
-def event(start: float, end: float, body: str) -> str:
-    return f"Dialogue: 0,{ass_time(start)},{ass_time(end)},Default,,0,0,0,,{body}"
+def event(start: float, end: float, body: str, spot: Spot | None = None) -> str:
+    """A line in the style's place (MarginV 0), or in a place of its own."""
+    margin, top = spot or (0, False)
+    tag = TOP_LINE if top else ""
+    return f"Dialogue: 0,{ass_time(start)},{ass_time(end)},Default,,0,0,{margin},,{tag}{body}"
 
 
 def fade(fade_in: int, fade_out: int, edge: str = "") -> str:

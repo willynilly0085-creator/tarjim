@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.54 (2026-10-29)
+
+- **A subtitle no longer covers text the video shows for a few seconds.** An editor's note, a
+  name caption or a slide that appears for a moment used to be missed, and the subtitle was drawn
+  over it. Now tarjim reads every key frame of the video and lifts just the lines said while such
+  text shows (to the top when there is no room above it); every other line stays in the video's
+  one place. An hour of video takes seconds to look at, and looking never fails a job.
+
 ## 1.0.53 (2026-10-29)
 
 - **Cancelling a dub stops the paid voices at once.** ElevenLabs, Fish Audio and the other

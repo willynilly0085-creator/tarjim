@@ -57,7 +57,15 @@ def text_bands(frames: list[Frame]) -> list[Band]:
     if len(frames) < FEWEST:
         raise ValueError(f"only {len(frames)} frames could be read")
     share = np.mean([stripes(frame) for frame in frames], axis=0)
-    height = len(share)
+    return bands_of(share >= SHARE)
+
+
+def frame_bands(frame: Frame) -> list[Band]:
+    """The text bands of one frame on its own (render/moments.py)."""
+    return bands_of(stripes(frame))
+
+
+def bands_of(rows: np.ndarray) -> list[Band]:
+    height = len(rows)
     return [(max(0.0, (start - REACH * (end - start)) / height),
-             min(1.0, (end + REACH * (end - start)) / height))
-            for start, end in runs(share >= SHARE)]
+             min(1.0, (end + REACH * (end - start)) / height)) for start, end in runs(rows)]

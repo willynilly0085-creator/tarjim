@@ -10,6 +10,7 @@ from tarjim.qa import Issue, check
 from tarjim.render.ass import Canvas, render_ass
 from tarjim.render.burn import burn
 from tarjim.render.mark import Mark, mark_for
+from tarjim.render.moments import moved
 from tarjim.render.placement import placed
 from tarjim.render.srt import render_srt
 from tarjim.segment import build_cues
@@ -89,9 +90,10 @@ def write_picture(job: Job, cues: list[Cue], report: Report) -> Path | None:
         return None
     canvas = placed(job, cues, Canvas(info.width, info.height, job.font_name,
                                       media.bright_bottom(job.video)), info.duration)
+    mark = mark_for(canvas)
+    canvas = moved(job, cues, canvas, mark)
     subtitles = render_ass(cues, canvas, job.rules)
     job.output(".ass").write_text(subtitles, encoding="utf-8")
-    mark = mark_for(canvas)
     if job.burn:
         report("burning")
         burn(job.video, subtitles, job.output(".mp4"), mark)

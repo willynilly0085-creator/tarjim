@@ -4,7 +4,8 @@ One place for the whole video, so the subtitle never jumps from line to line: in
 when that is clear; lifted to sit just above the picture's text when that is not; at the top when
 lifting would take it past the middle of the picture; in its usual place again when the top is
 taken as well. The size never changes, and a portrait video keeps its larger bottom margin (the
-apps' buttons sit there), so a lifted subtitle only ever moves up from it.
+apps' buttons sit there), so a lifted subtitle only ever moves up from it. Text that shows only
+for a while does not move this place; render/moments.py moves the lines said over it.
 
 Looking is a few seconds at most and never fails a job: when anything goes wrong the subtitle
 keeps its usual place. The decision is kept in the job's folder, and a re-run reuses it."""
