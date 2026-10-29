@@ -18,13 +18,13 @@ import json
 import re
 import subprocess
 import tempfile
-from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 from tarjim.config import setting
-from tarjim.engines.subscription import HIDDEN, launcher, run, strict
-from tarjim.engines.web import EngineError, unwrap, wrap
+from tarjim.engines.bounded import bounded
+from tarjim.engines.subscription import launcher, run, strict
+from tarjim.engines.web import EngineError, TimedOut, unwrap, wrap
 
 PLAIN = ("--sandbox", "--disable-slash-commands")
 # The effort is part of the model's id here. On a 24-line clip Flash (Low) took 10 s, (Medium)
@@ -42,6 +42,9 @@ SOUND = "sound.mp3"
 HEAR = (f"The audio to work on is the file {SOUND} in the current folder. Open it with your file "
         "viewer and listen to it; do not run any terminal command, script or program.\n\n")
 NOT_SIGNED_IN = "not logged in: open Antigravity and sign in with your Google account"
+# The account's models, kept once the program has listed some: a listing that failed or came
+# back empty is asked again next time, and a fresh scan or a sign-in forgets them.
+LISTED: list[tuple[str, str, str]] = []
 
 
 class AntigravityAsker:
@@ -60,6 +63,8 @@ class AntigravityAsker:
     def twice(self, prompt: str, audio: bytes | None, schema: dict[str, Any], model: str) -> Any:
         try:
             return self.once(prompt, audio, schema, model)
+        except TimedOut:
+            raise  # after 15 minutes, a second try would only keep the job waiting as long
         except EngineError as error:
             if NOT_SIGNED_IN in str(error):
                 raise
@@ -76,16 +81,24 @@ class AntigravityAsker:
         return unwrap(answer_of(done.returncode, done.stdout, done.stderr))
 
 
-@lru_cache(maxsize=8)
+def known_rows() -> list[tuple[str, str, str]]:
+    if not LISTED:
+        LISTED.extend(rows(listing()))
+    return LISTED
+
+
+def forget() -> None:
+    LISTED.clear()
+
+
 def light_variant(model: str) -> str:
     lighter = EFFORT.sub("-low", model)
-    listed = {slug for slug, _name, _note in rows(listing())} if lighter != model else set()
+    listed = {slug for slug, _name, _note in known_rows()} if lighter != model else set()
     return lighter if lighter in listed else model
 
 
-@lru_cache(maxsize=1)
 def hearing_model() -> str:
-    return suggested(rows(listing())) or setting("antigravity_model")
+    return suggested(known_rows()) or setting("antigravity_model")
 
 
 def answer_of(code: int, printed: str, complaint: str) -> Any:
@@ -94,12 +107,14 @@ def answer_of(code: int, printed: str, complaint: str) -> Any:
         answer = json.loads(printed[printed.find("{"):]) if "{" in printed else {}
     except ValueError:
         answer = {}
-    problem = str(answer.get("error") or complaint or printed)
-    if SIGN_IN in problem.lower() or "authentication required" in problem.lower():
+    if answer.get("status") == "SUCCESS" and "structured_output" in answer:
+        return answer["structured_output"]
+    # Only the program's own complaint can say it is signed out: a translation may say "sign in".
+    # What it printed counts only when it is no JSON answer at all, so holds no translation.
+    told = f"{answer.get('error') or ''} {complaint} {'' if answer else printed}".lower()
+    if SIGN_IN in told or "authentication required" in told:
         raise EngineError("antigravity", code, NOT_SIGNED_IN)
-    if answer.get("status") != "SUCCESS" or "structured_output" not in answer:
-        raise EngineError("antigravity", code, problem)
-    return answer["structured_output"]
+    raise EngineError("antigravity", code, str(answer.get("error") or complaint or printed))
 
 
 def listing() -> str:
@@ -108,9 +123,7 @@ def listing() -> str:
     if not program:
         return ""
     try:
-        done = subprocess.run([*program, "models"], capture_output=True, text=True,
-                              encoding="utf-8", errors="replace", timeout=LIST_SECONDS,
-                              stdin=subprocess.DEVNULL, creationflags=HIDDEN, check=False)
+        done = bounded([*program, "models"], "", LIST_SECONDS)
     except (OSError, subprocess.TimeoutExpired):
         return ""
     return done.stdout

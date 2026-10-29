@@ -109,7 +109,8 @@ class Service:
     def __init__(self) -> None:
         self.bodies: list[dict[str, Any]] = []
 
-    def post(self, _provider: str, _url: str, _headers: dict[str, str], json: Any) -> Any:
+    def post(self, _provider: str, _url: str, _headers: dict[str, str], json: Any,
+             **_options: Any) -> Any:
         self.bodies.append(json)
         if "temperature" in json or "response_format" in json:
             raise web.EngineError("deepseek", 400, "temperature is not supported")
@@ -152,7 +153,7 @@ def test_antigravity_translates_with_the_light_variant_and_no_tools(
         return subprocess.CompletedProcess(command, 0, json.dumps(envelope), "")
 
     config.save("antigravity_model", "gemini-3.8-flash-high")
-    antigravity.light_variant.cache_clear()
+    antigravity.forget()
     monkeypatch.setattr(antigravity, "listing", lambda: LISTING)
     monkeypatch.setattr(antigravity, "launcher", lambda _name: ["agy"])
     monkeypatch.setattr(antigravity, "run", fake_run)

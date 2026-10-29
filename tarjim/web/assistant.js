@@ -5,7 +5,8 @@ import { planScreen } from "./assistant_plan.js";
 import { progressScreen, readyScreen } from "./assistant_finish.js";
 import { scanScreen } from "./assistant_scan.js";
 import { preferKeys } from "./connect.js";
-import { el } from "./ui.js";
+import { problem } from "./problems.js";
+import { button, el } from "./ui.js";
 
 const flow = { finish: null, manual: null };
 
@@ -35,10 +36,22 @@ function welcome() {
 
 async function scan() {
   await scanScreen(screen);
-  const [{ plan, scan: found }, view] = await Promise.all([api("/setup/plan"), api("/connections")]);
-  const apiModels = Object.fromEntries(await Promise.all(found.keys.saved.map(async (provider) =>
-    [provider, await post("/connections/models", { provider }).catch(() => ({ models: [] }))])));
-  planScreen(screen, { plan, scan: found, view, apiModels }, { back: welcome, apply: progress, manual: flow.manual });
+  await showPlan();
+}
+
+// A plan that cannot be read says why under the scan and offers to read it again.
+async function showPlan() {
+  const nav = document.querySelector("#assistant .step-nav");
+  nav?.querySelectorAll("button").forEach((pressed) => { pressed.disabled = true; });
+  try {
+    const [{ plan, scan: found }, view] = await Promise.all([api("/setup/plan"), api("/connections")]);
+    const apiModels = Object.fromEntries(await Promise.all(found.keys.saved.map(async (provider) =>
+      [provider, await post("/connections/models", { provider }).catch(() => ({ models: [] }))])));
+    planScreen(screen, { plan, scan: found, view, apiModels }, { back: welcome, apply: progress, manual: flow.manual });
+  } catch (error) {
+    nav?.replaceChildren(el("p", { className: "error", role: "alert", textContent: problem(error) }),
+      button(t("tryAgain"), showPlan, "primary"));
+  }
 }
 
 function ai() {

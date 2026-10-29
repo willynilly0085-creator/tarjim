@@ -1,10 +1,13 @@
 """Find AI programs already running on this computer and the models each one has."""
+import json
 import socket
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from typing import Any
 
 from tarjim.config import setting
 from tarjim.engines.compatible import CompatibleAsker, list_models
+from tarjim.engines.web import LOCAL_CUES, local_seconds
 
 KNOWN = (("ollama", "Ollama", "http://127.0.0.1:11434"),
          ("lmstudio", "LM Studio", "http://127.0.0.1:1234"),
@@ -65,14 +68,23 @@ def discover() -> list[LocalServer]:
         return [found for found in pool.map(probe, KNOWN) if found]
 
 
+class LocalAsker(CompatibleAsker):
+    """A program on this computer, maybe on the processor alone: small batches, more time."""
+
+    most_cues = LOCAL_CUES
+
+    def seconds(self, body: dict[str, Any]) -> float:
+        return local_seconds(json.dumps(body["messages"], ensure_ascii=False))
+
+
 def chosen_server() -> str:
     picked = setting("local_server")
     return picked if picked in BY_ID else OLLAMA
 
 
-def local_asker() -> CompatibleAsker | None:
+def local_asker() -> LocalAsker | None:
     server = chosen_server()
     if server == OLLAMA:
         return None
     _name, url = BY_ID[server]
-    return CompatibleAsker(server, f"{url}/v1", "", setting("local_model"))
+    return LocalAsker(server, f"{url}/v1", "", setting("local_model"))

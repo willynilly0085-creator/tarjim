@@ -98,6 +98,9 @@
   "play": {
     "message": "재생"
   },
+  "openSrt": {
+    "message": "자막 열기"
+  },
   "retry": {
     "message": "다시 시도"
   },
@@ -311,6 +314,12 @@
   },
   "cancel": {
     "message": "취소"
+  },
+  "cancelSure": {
+    "message": "취소할까요? 지금까지 한 작업이 삭제됩니다"
+  },
+  "cancelLabel": {
+    "message": "이 작업을 취소합니다. 지금까지 만든 것은 삭제됩니다."
   },
   "stageCancelled": {
     "message": "취소됨"
@@ -541,6 +550,17 @@
   },
   "sendFailed": {
     "message": "번역이 시작되지 않았어요. 다시 시도하고, 계속되면 tarjim을 업데이트하세요."
+  },
+  "sendDubLanguage": {
+    "message": "이 컴퓨터의 음성은 $LANGUAGE$를 말하지 못합니다. Gemini 음성이나 연결한 음성 서비스를 고르거나 자막 파일로 만드세요.",
+    "placeholders": {
+      "language": {
+        "content": "$1"
+      }
+    }
+  },
+  "sendDubKey": {
+    "message": "이 음성에는 키가 필요합니다. 설정에서 추가하거나 다른 음성을 고르세요."
   },
   "pairExpired": {
     "message": "연결 요청이 만료됐어요. “자동으로 연결”을 다시 누르세요."

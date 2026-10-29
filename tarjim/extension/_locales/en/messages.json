@@ -98,6 +98,9 @@
   "play": {
     "message": "Play"
   },
+  "openSrt": {
+    "message": "Open subtitles"
+  },
   "retry": {
     "message": "Try again"
   },
@@ -311,6 +314,12 @@
   },
   "cancel": {
     "message": "Cancel"
+  },
+  "cancelSure": {
+    "message": "Cancel? Work so far is deleted"
+  },
+  "cancelLabel": {
+    "message": "Cancel this job. What it has made so far is deleted."
   },
   "stageCancelled": {
     "message": "Cancelled"
@@ -541,6 +550,17 @@
   },
   "sendFailed": {
     "message": "The translation didn't start. Try again, and update tarjim if it keeps happening."
+  },
+  "sendDubLanguage": {
+    "message": "The voices on this computer don't speak $LANGUAGE$. Pick the Gemini voice or a linked voice service, or make a subtitle file.",
+    "placeholders": {
+      "language": {
+        "content": "$1"
+      }
+    }
+  },
+  "sendDubKey": {
+    "message": "This voice needs its key. Add it in Settings or pick another voice."
   },
   "pairExpired": {
     "message": "The connection request expired. Press “Connect automatically” again."

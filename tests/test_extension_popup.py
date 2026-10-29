@@ -56,7 +56,7 @@ def test_a_failed_press_on_a_job_is_said_on_that_job() -> None:
 
 
 def test_a_translate_that_tarjim_refuses_says_why() -> None:
-    assert "sendProblem(error)" in source("app.js")
+    assert "sendProblem(error, " in source("app.js")
     assert '"bad url": "sendBadLink"' in source("upload.js")
 
 

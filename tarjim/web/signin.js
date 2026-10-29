@@ -23,20 +23,25 @@ function codeForm(provider, note) {
     el("button", { type: "submit", className: "button-quiet", textContent: t("signInCodeSend") }));
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    await post("/connections/sign-in/code", { provider, code: input.value.trim() }).catch(() => null);
-    input.value = "";
-    note.textContent = t("signInWaiting");
+    const sent = await post("/connections/sign-in/code", { provider, code: input.value.trim() })
+      .then(() => true, () => false);
+    if (sent) input.value = "";
+    note.textContent = t(sent ? "signInWaiting" : "signInFailed");
   });
   return form;
 }
 
-function watch(provider, note, done) {
+// Watches for about five minutes; then the sign-in is taken as failed and can be started again.
+function watch(provider, note, { done, gaveUp }) {
   clearInterval(watching);
   let rounds = 0;
   watching = setInterval(async () => {
     rounds += 1;
-    if (rounds > WATCH_LIMIT || !note.isConnected) clearInterval(watching);
-    else if (await isSignedIn(provider)) {
+    if (!note.isConnected) clearInterval(watching);
+    else if (rounds > WATCH_LIMIT) {
+      clearInterval(watching);
+      gaveUp();
+    } else if (await isSignedIn(provider)) {
       clearInterval(watching);
       done();
     }
@@ -51,6 +56,11 @@ export function signInPanel(provider, onSigned = () => {}) {
     box.replaceChildren(el("p", { className: "meta ok", role: "status", textContent: t("signedIn") }));
     onSigned();
   };
+  const gaveUp = () => {
+    note.textContent = t("signInFailed");
+    button.textContent = t("tryAgain");
+    box.replaceChildren(note, button);
+  };
   isSignedIn(provider.id).then((yes) => { if (yes) signedIn(); });
   button.addEventListener("click", async () => {
     const { mode } = await post("/connections/sign-in", { provider: provider.id }).catch(() => ({}));
@@ -60,7 +70,7 @@ export function signInPanel(provider, onSigned = () => {}) {
     }
     note.textContent = t(mode === "browser" ? "signInWaiting" : "signInConsole");
     if (mode === "browser") box.replaceChildren(note, codeForm(provider.id, note));
-    watch(provider.id, note, signedIn);
+    watch(provider.id, note, { done: signedIn, gaveUp });
   });
   return box;
 }

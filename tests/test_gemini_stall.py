@@ -14,7 +14,7 @@ class Busy(Exception):
 
 def bare_client(outcomes: dict[str, Any]) -> GeminiClient:
     client = GeminiClient.__new__(GeminiClient)
-    client.spent, client.model_used, client.cooling = set(), "", {}
+    client.spent, client.model_used, client.cooling, client.refused = set(), "", {}, set()
     client.models, client.slow = list(MODELS), set()
 
     def call(model: str, *_: Any) -> Any:

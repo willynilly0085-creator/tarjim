@@ -140,9 +140,32 @@ function paint(row, job, languages, refresh) {
   if (before && before !== job.stage && job.finished) $("announcer").textContent = `${job.title}: ${t(`stage_${job.stage}`)}`;
 }
 
+// After a few polls in a row that cannot reach tarjim the page says so, and the jobs dim, since
+// their state is the last one known and not what happens now.
+const MISSES = 3;
+let misses = 0;
+
+// failed: the error of this poll, or null when it worked.
+function reachable(failed) {
+  misses = failed ? misses + 1 : 0;
+  const down = misses >= MISSES;
+  let banner = $("jobs-offline");
+  if (!banner && down) {
+    banner = Object.assign(document.createElement("p"), { id: "jobs-offline", className: "error", role: "alert" });
+    $("jobs").before(banner);
+  }
+  if (banner) {
+    banner.textContent = down ? problem(failed) : "";
+    banner.hidden = !down;
+  }
+  $("jobs").classList.toggle("stale", down);
+}
+
 export function watchJobs(languages) {
   const refresh = async () => {
-    const jobs = await api("/jobs").catch(() => null);
+    let failed = null;
+    const jobs = await api("/jobs").catch((error) => { failed = error; return null; });
+    reachable(failed);
     if (!jobs) return;
     $("empty").hidden = jobs.length > 0;
     const list = $("jobs");

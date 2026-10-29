@@ -98,6 +98,9 @@
   "play": {
     "message": "再生"
   },
+  "openSrt": {
+    "message": "字幕を開く"
+  },
   "retry": {
     "message": "再試行"
   },
@@ -311,6 +314,12 @@
   },
   "cancel": {
     "message": "キャンセル"
+  },
+  "cancelSure": {
+    "message": "中止しますか？ここまでの作業は削除されます"
+  },
+  "cancelLabel": {
+    "message": "このジョブを中止します。ここまでに作ったものは削除されます。"
   },
   "stageCancelled": {
     "message": "キャンセル済み"
@@ -541,6 +550,17 @@
   },
   "sendFailed": {
     "message": "翻訳が始まりませんでした。もう一度試して、繰り返す場合はtarjimを更新してください。"
+  },
+  "sendDubLanguage": {
+    "message": "このコンピューターの音声は$LANGUAGE$を話せません。Gemini の音声か連携した音声サービスを選ぶか、字幕ファイルにしてください。",
+    "placeholders": {
+      "language": {
+        "content": "$1"
+      }
+    }
+  },
+  "sendDubKey": {
+    "message": "この音声にはキーが必要です。設定で追加するか、別の音声を選んでください。"
   },
   "pairExpired": {
     "message": "接続リクエストの期限が切れました。もう一度「自動で接続」を押してください。"

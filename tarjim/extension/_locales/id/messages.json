@@ -98,6 +98,9 @@
   "play": {
     "message": "Putar"
   },
+  "openSrt": {
+    "message": "Buka subtitle"
+  },
   "retry": {
     "message": "Coba lagi"
   },
@@ -311,6 +314,12 @@
   },
   "cancel": {
     "message": "Batal"
+  },
+  "cancelSure": {
+    "message": "Batalkan? Hasil sejauh ini dihapus"
+  },
+  "cancelLabel": {
+    "message": "Batalkan pekerjaan ini. Hasil yang sudah dibuat akan dihapus."
   },
   "stageCancelled": {
     "message": "Dibatalkan"
@@ -541,6 +550,17 @@
   },
   "sendFailed": {
     "message": "Terjemahan tidak dimulai. Coba lagi, dan perbarui tarjim kalau terus terjadi."
+  },
+  "sendDubLanguage": {
+    "message": "Suara di komputer ini tidak berbicara $LANGUAGE$. Pilih suara Gemini atau layanan suara yang ditautkan, atau buat file subtitle.",
+    "placeholders": {
+      "language": {
+        "content": "$1"
+      }
+    }
+  },
+  "sendDubKey": {
+    "message": "Suara ini memerlukan kuncinya. Tambahkan di Pengaturan atau pilih suara lain."
   },
   "pairExpired": {
     "message": "Permintaan sambungan sudah kedaluwarsa. Tekan “Sambungkan otomatis” lagi."

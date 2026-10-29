@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 
 from tarjim.languages import Language, language
-from tarjim.models import Cue
+from tarjim.models import Cue, join_words
 from tarjim.rules import DEFAULT_RULES, Rules
+from tarjim.translate.clean import MARKS
 
 DIALECTS = {
     "saudi": "اللهجة السعودية البيضاء العفوية كما يتكلمها الناس يومياً "
@@ -50,11 +51,13 @@ Slots:
 {items}"""
 
 KNOWN_SPEAKERS = {
-    "ar": "الخانة اللي فيها جزءان مفصولان بـ || هي حوار بين شخصين مختلفين مؤكد: "
-          "أرجع ترجمة الاثنين مفصولة بـ || وبنفس الترتيب بدون شرطة، ولا تحذف أي جزء.",
+    "ar": "الخانة اللي فيها جزءان مفصولان بـ || هي حوار بين شخصين مختلفين مؤكد، وكل جزء "
+          "يبدأ بعلامته [A] أو [B]: أرجع ترجمة الاثنين مفصولة بـ || وبنفس الترتيب، وابدأ "
+          "ترجمة كل جزء بنفس علامته، بدون شرطة، ولا تحذف أي جزء.",
     "any": "A slot with two parts separated by || is a confirmed exchange between two "
-           "different people: return both translations separated by || in the same order, "
-           "without dashes, and never drop a part.",
+           "different people, each part starting with its mark [A] or [B]: return both "
+           "translations separated by || in the same order, each starting with the same "
+           "mark, without dashes, and never drop a part.",
 }
 GUESSED_SPEAKERS = {
     "ar": "الخانة اللي فيها جزءان مفصولان بـ || يُحتمل أنها حوار: اسمع الصوت، فإن "
@@ -112,4 +115,14 @@ def format_item(number: int, cue: Cue, brief: Brief) -> str:
     budget = brief.rules.char_budget(cue.duration)
     start, end = cue.start - brief.offset, cue.end - brief.offset
     unit = "ث" if brief.arabic else "s"
-    return f"{number}. [{start:.1f}-{end:.1f}{unit} | budget={budget}] {cue.source}"
+    return f"{number}. [{start:.1f}-{end:.1f}{unit} | budget={budget}] {marked(cue)}"
+
+
+def marked(cue: Cue) -> str:
+    """Each part of an exchange carries its speaker's mark, so a model that puts the reply first
+    in its translation is caught and set right (clean.in_order): the colour and the moment a
+    line appears follow the parts' order."""
+    if not cue.is_dialogue:
+        return cue.source
+    return " || ".join(f"[{mark}] {join_words(part)}" for mark, part in zip(MARKS, cue.parts,
+                                                                          strict=False))

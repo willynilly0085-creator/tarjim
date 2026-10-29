@@ -7,6 +7,7 @@ import contextlib
 import re
 import secrets
 import time
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -21,9 +22,9 @@ from tarjim.phone.choice import (
     modes_keyboard,
 )
 from tarjim.phone.links import first_link
-from tarjim.phone.meter import shown
 from tarjim.phone.progress import Follower
 from tarjim.phone.quality_step import QualityStep
+from tarjim.phone.starting import Starting, in_background, target
 from tarjim.phone.telegram import FETCH_LIMIT, Bot, TelegramError
 from tarjim.phone.words import result_name, say
 from tarjim.server.guard import safe_name
@@ -52,20 +53,11 @@ def owner() -> int:
     return int(setting("phone_chat") or 0)
 
 
-def order_for(source: str, item: dict[str, Any], mode: str, dialect: str) -> Any:
-    from tarjim.server.jobs import Order
-
-    return Order(source, target(), mode, dialect, item["name"], item.get("quality", ""))
-
-
-def target() -> str:
-    return setting("phone_target") or "ar"
-
-
-class Inbox(QualityStep):
+class Inbox(QualityStep, Starting):
     def __init__(self, follower: Follower, uploads: Path, pairing: Pairing) -> None:
         self.follower, self.uploads, self.pairing = follower, uploads, pairing
         self.waiting = Waiting()
+        self.later: Callable[..., None] = in_background
 
     def handle(self, bot: Bot, update: dict[str, Any]) -> None:
         if "callback_query" in update:
@@ -117,20 +109,6 @@ class Inbox(QualityStep):
         self.ask(bot, chat, {"file_id": str(video["file_id"]), "name": name, "chat": chat,
                              "message": video["message"] if big else 0})
 
-    def fetched(self, bot: Bot, item: dict[str, Any]) -> str:
-        if "file_id" not in item:
-            return str(item["source"])
-        folder = self.uploads / f"telegram-{secrets.token_hex(6)}"
-        folder.mkdir(parents=True, exist_ok=True)
-        def tell(done: int, total: int) -> None:
-            bot.edit(item["chat"], item["status"], shown(say("stage_downloading"), done, total))
-
-        if item.get("message"):
-            large.fetch(item["chat"], item["message"], folder / item["name"], tell)
-        else:
-            bot.fetch(item["file_id"], folder / item["name"], tell)
-        return str(folder / item["name"])
-
     def start_choice(self, bot: Bot, chat: int, message: int, choice: str) -> None:
         """A link asks its quality next (quality_step.py), all on the same message."""
         mode, _, key = choice.partition(":")
@@ -152,24 +130,6 @@ class Inbox(QualityStep):
             save("phone_dialect", dialect)
             self.begin(bot, (chat, message), (mode, key, dialect))
 
-    def begin(self, bot: Bot, where: tuple[int, int], choice: tuple[str, str, str]) -> None:
-        (chat, message), (mode, key, dialect) = where, choice
-        item = self.waiting.take(key) if mode in MODES else None
-        if item is None:
-            bot.edit(chat, message, say("phone_choice_expired"))
-            return
-        save("phone_mode", mode)
-        if "file_id" in item:
-            item["status"] = message
-            bot.edit(chat, message, say("stage_downloading"))
-        try:
-            source = self.fetched(bot, item)
-        except (TelegramError, OSError):
-            bot.edit(chat, message, say("phone_fetch_failed"))
-            return
-        task = self.follower.jobs.submit(order_for(source, item, mode, dialect))
-        self.follower.adopt(bot, chat, message, task)
-
     def pressed(self, bot: Bot, press: dict[str, Any]) -> None:
         chat = int((press.get("message") or {}).get("chat", {}).get("id", 0))
         kind, _, value = str(press.get("data", "")).partition(":")
@@ -180,7 +140,7 @@ class Inbox(QualityStep):
         message = int(press["message"]["message_id"])
         steps = {"go": self.start_choice, "dl": self.chosen_dialect, "q": self.chosen_quality}
         if kind in steps:
-            steps[kind](bot, chat, message, value)
+            self.later(steps[kind], bot, chat, message, value)
         elif kind == "mode" and value in MODES:
             save("phone_mode", value)
             bot.edit(chat, message, say("phone_mode_saved", mode=result_name(value)))

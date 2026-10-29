@@ -98,6 +98,9 @@
   "play": {
     "message": "Abspielen"
   },
+  "openSrt": {
+    "message": "Untertitel öffnen"
+  },
   "retry": {
     "message": "Erneut versuchen"
   },
@@ -311,6 +314,12 @@
   },
   "cancel": {
     "message": "Abbrechen"
+  },
+  "cancelSure": {
+    "message": "Abbrechen? Bisherige Arbeit wird gelöscht"
+  },
+  "cancelLabel": {
+    "message": "Diesen Auftrag abbrechen. Was bisher entstanden ist, wird gelöscht."
   },
   "stageCancelled": {
     "message": "Abgebrochen"
@@ -541,6 +550,17 @@
   },
   "sendFailed": {
     "message": "Die Übersetzung hat nicht begonnen. Versuch es noch einmal und aktualisiere tarjim, wenn es wieder passiert."
+  },
+  "sendDubLanguage": {
+    "message": "Die Stimmen auf diesem Computer sprechen kein $LANGUAGE$. Wähle die Gemini-Stimme oder einen verknüpften Sprachdienst, oder erstelle eine Untertiteldatei.",
+    "placeholders": {
+      "language": {
+        "content": "$1"
+      }
+    }
+  },
+  "sendDubKey": {
+    "message": "Diese Stimme braucht ihren Schlüssel. Füge ihn in den Einstellungen hinzu oder wähle eine andere Stimme."
   },
   "pairExpired": {
     "message": "Die Verbindungsanfrage ist abgelaufen. Drück noch einmal auf „Automatisch verbinden“."

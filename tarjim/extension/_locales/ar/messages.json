@@ -98,6 +98,9 @@
   "play": {
     "message": "شغّل"
   },
+  "openSrt": {
+    "message": "افتح ملف الترجمة"
+  },
   "retry": {
     "message": "حاول مرة ثانية"
   },
@@ -311,6 +314,12 @@
   },
   "cancel": {
     "message": "إلغاء"
+  },
+  "cancelSure": {
+    "message": "تلغيها؟ ينمسح اللي انسوى"
+  },
+  "cancelLabel": {
+    "message": "ألغِ المهمة، وينمسح اللي سوّته لين الحين."
   },
   "stageCancelled": {
     "message": "انلغت"
@@ -541,6 +550,17 @@
   },
   "sendFailed": {
     "message": "ما بدأت الترجمة. جرّب مرة ثانية، ولو تكرر حدّث ترجم."
+  },
+  "sendDubLanguage": {
+    "message": "أصوات الجهاز ما تتكلم $LANGUAGE$. اختر صوت Gemini أو خدمة صوت مربوطة، أو خلّها ملف ترجمة.",
+    "placeholders": {
+      "language": {
+        "content": "$1"
+      }
+    }
+  },
+  "sendDubKey": {
+    "message": "هذا الصوت يحتاج مفتاحه. أضفه من الإعدادات أو اختر صوت ثاني."
   },
   "pairExpired": {
     "message": "انتهت مهلة طلب الربط. اضغط «اربط تلقائياً» مرة ثانية."

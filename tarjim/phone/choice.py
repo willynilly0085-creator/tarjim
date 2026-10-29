@@ -6,13 +6,15 @@ import secrets
 import threading
 from typing import Any
 
-from tarjim.config import setting
+from tarjim.config import SPOKEN, api_key, setting
 from tarjim.phone.words import result_name, say
 
-ALWAYS = ("burn", "srt", "dub-gemini", "dub-clone", "dub-studio")
 LINKED = {"dub-eleven": "eleven_api_key", "dub-elevenclone": "eleven_api_key",
           "dub-speech": "speech_api_key"}
-MODES = (*ALWAYS, *LINKED)
+MODES = ("burn", "srt", "dub-gemini", "dub-clone", "dub-studio", *LINKED)
+# A voice that needs a key is offered once the key is there: without it the natural voice would
+# quietly become the cloned one (dub/make.py choose).
+KEYED = {"dub-gemini": SPOKEN, **LINKED}
 DIALECTS = {"saudi": "dialectSaudi", "msa": "dialectMsa"}
 KEEP = 50
 
@@ -55,7 +57,7 @@ class Waiting:
 
 def offered() -> list[str]:
     """Voices that need the person's own key are offered once that key is saved."""
-    return [*ALWAYS, *[mode for mode, key in LINKED.items() if setting(key)]]
+    return [mode for mode in MODES if mode not in KEYED or api_key(KEYED[mode])]
 
 
 def ordered_modes() -> list[str]:

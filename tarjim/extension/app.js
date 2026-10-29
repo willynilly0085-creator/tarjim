@@ -133,7 +133,7 @@ async function submit(event) {
   } catch (error) {
     if (error.kind === "token") return showPair();
     if (error.kind === "offline") return connect();
-    $("notice").textContent = sendProblem(error);  // e.g. a link tarjim cannot take
+    $("notice").textContent = sendProblem(error, state.languages.get(options.target));  // e.g. a link it cannot take
   } finally {
     $("go").textContent = t("translate");
     $("upload").hidden = true;

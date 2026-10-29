@@ -1,8 +1,9 @@
 // Which post a right-clicked video belongs to. Sites like X play videos from a temporary blob:
-// address, and the page itself may be a feed, so neither can be downloaded. The clicked video is
-// found by that blob address and the nearest link to its post is used instead.
+// address, TikTok from its own video servers, and the page itself may be a feed, so none of them
+// can be downloaded. The clicked video is found by that address and the nearest link to its post
+// is used instead. Facebook's player is facebook.com/watch/?v=, with the slash.
 
-const POST = /\/status\/\d+|\/watch\?v=|youtu\.be\/|\/shorts\/|\/reels?\/|\/p\/[\w-]+|\/video\/\d+|\/videos\/\d+/;
+const POST = /\/status\/\d+|\/watch\/?\?v=|youtu\.be\/|\/shorts\/|\/reels?\/|\/p\/[\w-]+|\/video\/\d+|\/videos\/\d+/;
 const FEEDS = /^https?:\/\/([\w-]+\.)?(x|twitter|youtube|instagram|tiktok|facebook)\.com\//i;
 
 export function isPost(url) {
@@ -16,7 +17,7 @@ export function downloadable(url) {
 
 // Runs inside the page (chrome.scripting), so it must not use anything from outside itself.
 export function postOfVideo(src) {
-  const post = /\/status\/\d+|\/watch\?v=|youtu\.be\/|\/shorts\/|\/reels?\/|\/p\/[\w-]+|\/video\/\d+|\/videos\/\d+/;
+  const post = /\/status\/\d+|\/watch\/?\?v=|youtu\.be\/|\/shorts\/|\/reels?\/|\/p\/[\w-]+|\/video\/\d+|\/videos\/\d+/;
   const video = [...document.querySelectorAll("video")].find((v) => v.currentSrc === src || v.src === src);
   for (let node = video; node && node !== document.documentElement; node = node.parentElement) {
     const link = [...node.querySelectorAll("a[href]")].find((a) => post.test(a.href));
@@ -26,7 +27,7 @@ export function postOfVideo(src) {
 }
 
 export async function clickedPost(info, tab) {
-  if (!tab?.id || !info.srcUrl?.startsWith("blob:")) return "";
+  if (!tab?.id || !info.srcUrl || downloadable(info.srcUrl)) return "";
   try {
     const [found] = await chrome.scripting.executeScript({
       target: { tabId: tab.id, frameIds: [info.frameId ?? 0] }, func: postOfVideo, args: [info.srcUrl] });

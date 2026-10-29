@@ -98,6 +98,9 @@
   "play": {
     "message": "播放"
   },
+  "openSrt": {
+    "message": "打开字幕"
+  },
   "retry": {
     "message": "重试"
   },
@@ -311,6 +314,12 @@
   },
   "cancel": {
     "message": "取消"
+  },
+  "cancelSure": {
+    "message": "取消吗？已完成的部分会被删除"
+  },
+  "cancelLabel": {
+    "message": "取消这个任务。到目前为止生成的内容会被删除。"
   },
   "stageCancelled": {
     "message": "已取消"
@@ -541,6 +550,17 @@
   },
   "sendFailed": {
     "message": "翻译没有开始。请重试，如果反复出现请更新 tarjim。"
+  },
+  "sendDubLanguage": {
+    "message": "这台电脑上的语音不会说$LANGUAGE$。请选择 Gemini 语音或已关联的语音服务，或者生成字幕文件。",
+    "placeholders": {
+      "language": {
+        "content": "$1"
+      }
+    }
+  },
+  "sendDubKey": {
+    "message": "这个语音需要它的密钥。请在设置中添加，或选择其他语音。"
   },
   "pairExpired": {
     "message": "连接请求已过期。请再按一次“自动连接”。"

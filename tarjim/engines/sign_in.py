@@ -9,8 +9,9 @@ import re
 import subprocess
 import sys
 
+from tarjim.engines.bounded import HIDDEN, bounded
 from tarjim.engines.catalog import BY_ID, SUBSCRIPTION
-from tarjim.engines.subscription import HIDDEN, launcher
+from tarjim.engines.subscription import launcher
 
 BROWSER = {"claude": (("auth", "login", "--claudeai"), ("auth", "status")),
            "codex": (("login",), ("login", "status")),
@@ -63,10 +64,7 @@ def signed_in(provider: str) -> bool:
     if not program:
         return False
     try:
-        done = subprocess.run([*program, *status], capture_output=True, text=True,
-                              stdin=subprocess.DEVNULL,
-                              encoding="utf-8", errors="replace", timeout=STATUS_SECONDS,
-                              creationflags=HIDDEN, check=False)
+        done = bounded([*program, *status], "", STATUS_SECONDS)
     except (OSError, subprocess.TimeoutExpired):
         return False
     return says_signed_in(provider, done)

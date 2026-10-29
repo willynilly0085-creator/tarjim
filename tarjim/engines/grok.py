@@ -11,7 +11,8 @@ from pathlib import Path
 from typing import Any
 
 from tarjim.config import setting
-from tarjim.engines.subscription import HIDDEN, launcher, run, strict
+from tarjim.engines.bounded import bounded
+from tarjim.engines.subscription import launcher, run, strict
 from tarjim.engines.web import EngineError, unwrap, wrap
 
 # `--tools ""` removes the built-in tools only; `--deny MCPTool` refuses the person's MCP servers
@@ -51,9 +52,7 @@ def listing() -> str:
     if not program:
         return ""
     try:
-        done = subprocess.run([*program, "models"], capture_output=True, text=True,
-                              encoding="utf-8", errors="replace", timeout=LIST_SECONDS,
-                              creationflags=HIDDEN, check=False)
+        done = bounded([*program, "models"], "", LIST_SECONDS)
     except (OSError, subprocess.TimeoutExpired):
         return ""
     return done.stdout if done.returncode == 0 else ""

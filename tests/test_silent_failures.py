@@ -108,8 +108,8 @@ def test_the_chosen_engine_names_the_failure_and_a_bad_reply_moves_on(
     job: Any = type("Job", (), {"language": language("fr"), "dialect": "", "target": "fr",
                                 "rules": DEFAULT_RULES, "video": tmp_path / "v.mp4"})()
     monkeypatch.setattr(choice, "chain", lambda _task: ["claude", "local"])
-    askers = {"claude": Answers(RuntimeError("claude: sign in again")),
-              "local": Answers(KeyError("choices"))}
+    askers = {"claude": Answers(*[RuntimeError("claude: sign in again")] * 2),
+              "local": Answers(KeyError("choices"), KeyError("choices"))}
     monkeypatch.setattr(choice, "asker", lambda provider: askers[provider])
     with pytest.raises(RuntimeError, match="sign in again"):
         pipeline.translate(job, cues())

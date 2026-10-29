@@ -117,7 +117,10 @@ def own_list(provider: str) -> list[Model]:
 
 
 def forget() -> None:
+    from tarjim.engines.antigravity import forget as forget_antigravity
+
     KEPT.clear()
+    forget_antigravity()
 
 
 def model_in_use(provider: str, default: str = "") -> str:

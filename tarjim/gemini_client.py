@@ -29,12 +29,14 @@ STALLED_FOR = 20 * 60.0
 STALLED: dict[str, float] = {}
 TOO_MANY = 429
 USED_UP = "daily quota used up"
-REFUSED = (400, 401, 403)
+# A 400 or 403 is about one model (not offered to this key, or not able to do this request): the
+# next one is asked. A 401, or one that names the key ("API key not valid" comes as a 400), is the
+# key itself, which no other model will accept either.
+REFUSED = (400, 403)
+BAD_KEY = 401
+KEY = re.compile(r"api[ _]?key", re.IGNORECASE)
 DAILY = re.compile(r"per ?day", re.IGNORECASE)
 DELAY = re.compile(r"retryDelay'?\"?:\s*'?\"?(\d+(?:\.\d+)?)s")
-
-
-BAD = 400
 
 
 def chosen_first() -> list[str]:
@@ -87,7 +89,8 @@ class GeminiClient:
         self.listening = listening
         self.models = asked_last_if_stalled(chosen_first())
         self.model_used = ""
-        self.spent: set[str] = set()
+        self.spent: set[str] = set()  # daily quota used up
+        self.refused: set[str] = set()  # this model will not take the request
         self.slow: set[str] = set()  # did not answer in time: not asked again for this job
         self.cooling: dict[str, float] = {}
 
@@ -110,6 +113,9 @@ class GeminiClient:
         if len(self.spent) == len(self.models):
             return QuotaExhausted("Gemini free quota is used up for today on every model")
         reasons = "; ".join(f"{model}: {why}" for model, why in failed.items())
+        codes = set(failed.values())
+        if codes and codes <= {str(code) for code in REFUSED}:  # " 403:" names a key problem
+            return RuntimeError(f"Gemini {max(codes)}: every model refused: {reasons}")
         if USED_UP in failed.values():  # still a RuntimeError: listening falls back to local
             return RuntimeError(f"Gemini free daily quota is used up, the rest are busy: {reasons}")
         return RuntimeError(f"all Gemini models failed: {reasons}")
@@ -118,17 +124,17 @@ class GeminiClient:
         """Three rounds over the models that answer; the ones that kept us waiting only when every
         other has failed."""
         for model in self.models * ROUNDS:
-            if model not in self.spent and model not in self.slow:
+            if model not in self.spent | self.slow | self.refused:
                 yield model
-        yield from (model for model in self.models if model not in self.spent)
+        yield from (model for model in self.models if model not in self.spent | self.refused)
 
     def note(self, model: str, error: Exception, waited: float = 0.0) -> None:
         code = getattr(error, "code", None)
-        if code == BAD and model not in MODELS:  # a chosen model that cannot do this: the rest can
-            self.spent.add(model)
-            return
-        if code in REFUSED:
+        if code == BAD_KEY or (code in REFUSED and KEY.search(str(error))):
             raise RuntimeError(f"Gemini {code}: {str(error)[:160]}") from error
+        if code in REFUSED:  # not counted as a used-up quota: the next model is asked
+            self.refused.add(model)
+            return
         if waited >= LONG_WAIT or "timeout" in type(error).__name__.lower():
             self.slow.add(model)
             STALLED[model] = time.monotonic() + STALLED_FOR

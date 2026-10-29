@@ -98,6 +98,9 @@
   "play": {
     "message": "Reproduzir"
   },
+  "openSrt": {
+    "message": "Abrir legendas"
+  },
   "retry": {
     "message": "Tentar de novo"
   },
@@ -311,6 +314,12 @@
   },
   "cancel": {
     "message": "Cancelar"
+  },
+  "cancelSure": {
+    "message": "Cancelar? O que foi feito é apagado"
+  },
+  "cancelLabel": {
+    "message": "Cancelar este trabalho. O que ele fez até agora é apagado."
   },
   "stageCancelled": {
     "message": "Cancelado"
@@ -541,6 +550,17 @@
   },
   "sendFailed": {
     "message": "A tradução não começou. Tente de novo e, se continuar, atualize o tarjim."
+  },
+  "sendDubLanguage": {
+    "message": "As vozes deste computador não falam $LANGUAGE$. Escolha a voz do Gemini ou um serviço de voz vinculado, ou faça um arquivo de legendas.",
+    "placeholders": {
+      "language": {
+        "content": "$1"
+      }
+    }
+  },
+  "sendDubKey": {
+    "message": "Esta voz precisa da sua chave. Adicione-a nas Configurações ou escolha outra voz."
   },
   "pairExpired": {
     "message": "O pedido de conexão expirou. Toque em “Conectar automaticamente” de novo."

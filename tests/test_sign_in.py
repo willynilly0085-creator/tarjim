@@ -60,11 +60,12 @@ def test_only_subscriptions_can_be_signed_into(started: list[FakeProcess]) -> No
 def test_sign_in_state_is_read_from_each_program(monkeypatch: pytest.MonkeyPatch) -> None:
     replies = {"claude": (0, json.dumps({"loggedIn": True})), "codex": (1, "Not logged in")}
 
-    def run(command: list[str], **_options: Any) -> subprocess.CompletedProcess[str]:
+    def run(command: list[str], _given: str, _seconds: float,
+            **_options: Any) -> subprocess.CompletedProcess[str]:
         code, text = replies["claude" if "auth" in command else "codex"]
         return subprocess.CompletedProcess(command, code, text, "")
 
     monkeypatch.setattr(sign_in, "launcher", lambda name: [name])
-    monkeypatch.setattr(sign_in.subprocess, "run", run)
+    monkeypatch.setattr(sign_in, "bounded", run)
     assert sign_in.signed_in("claude") is True
     assert sign_in.signed_in("codex") is False

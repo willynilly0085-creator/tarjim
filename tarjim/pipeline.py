@@ -15,7 +15,6 @@ from tarjim.render.srt import render_srt
 from tarjim.segment import build_cues
 
 Report = Callable[[str], None]
-BAD_REPLY = (RuntimeError, ValueError, LookupError, TypeError)
 
 
 def first_failure(failures: list[Exception]) -> RuntimeError:
@@ -44,7 +43,7 @@ def cuts_for(job: Job) -> list[float]:
 
 def translate(job: Job, cues: list[Cue]) -> list[Cue]:
     from tarjim.engines.choice import asker, chain
-    from tarjim.translate.gemini import Translator
+    from tarjim.translate.gemini import BAD_REPLY, Translator
     from tarjim.translate.prompt import Brief
 
     def audio(start: float, end: float) -> bytes:
@@ -56,8 +55,10 @@ def translate(job: Job, cues: list[Cue]) -> list[Cue]:
     failures: list[Exception] = []
     for provider in chain("translate"):
         checkpoint()  # a backup engine is never started for a job that was cancelled
+        left = [cue for cue in cues if not cue.text.strip()]  # a backup never redoes good lines
         try:
-            return Translator(asker(provider)).translate(cues, audio, brief)
+            Translator(asker(provider)).translate(left, audio, brief)
+            return cues
         except BAD_REPLY as error:
             failures.append(error)
     raise first_failure(failures)

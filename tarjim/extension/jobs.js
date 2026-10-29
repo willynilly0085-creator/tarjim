@@ -51,10 +51,15 @@ function guarded(row, call, words = {}) {
   };
 }
 
+// Cancel deletes what the job made so far, so it asks first, as tarjim's page does.
 function steering(job, act, refresh) {
   const steer = (action) => () => post(`/jobs/${job.id}/${action}`).then(refresh);
-  return [act(t(job.paused ? "resume" : "pause"), steer(job.paused ? "resume" : "pause")),
-    act(t("cancel"), steer("cancel"))];
+  const stop = act(t("cancel"), async () => {
+    if (!stop.dataset.sure) return askFirst(stop, ["cancel", "cancelSure", "cancelLabel"]);
+    return steer("cancel")();
+  });
+  named(stop, t("cancelLabel"));
+  return [act(t(job.paused ? "resume" : "pause"), steer(job.paused ? "resume" : "pause")), stop];
 }
 
 function actionButton(label, onClick) {
@@ -71,21 +76,22 @@ function named(button, label) {
   button.title = label;
 }
 
-// A finished video is one press from gone from view, so it asks once; its files stay either way.
-function askFirst(button) {
+// A press that cannot be undone asks once: [label, question, spoken label] of the button.
+function askFirst(button, [label, sure, spoken]) {
   button.dataset.sure = "yes";
-  button.textContent = t("removeSure");
-  named(button, t("removeSure"));
+  button.textContent = t(sure);
+  named(button, t(sure));
   setTimeout(() => {
     delete button.dataset.sure;
-    button.textContent = t("remove");
-    named(button, t("removeLabel"));
+    button.textContent = t(label);
+    named(button, t(spoken));
   }, 5000);
 }
 
+// A finished video is one press from gone from view, so it asks once; its files stay either way.
 function removeButton(job, row, refresh) {
   const button = actionButton(t("remove"), guarded(row, async () => {
-    if (job.stage === "done" && !button.dataset.sure) return askFirst(button);
+    if (job.stage === "done" && !button.dataset.sure) return askFirst(button, ["remove", "removeSure", "removeLabel"]);
     await post(`/jobs/${job.id}/remove`);
     rows.delete(job.id);
     document.getElementById("announcer").textContent = t("removed");
@@ -107,7 +113,7 @@ function actionsFor(job, box, refresh) {
   const act = (label, call, words) => actionButton(label, guarded(row, call, words));
   const opened = { done: "opened", missing: "actionMissing" };
   const buttons = wanted === "done"
-    ? [act(t("play"), () => post(`/open/${job.id}`), opened),
+    ? [act(t(job.mode === "srt" ? "openSrt" : "play"), () => post(`/open/${job.id}`), opened),
        act(t("openFolder"), () => post(`/reveal/${job.id}`), opened)]
     : wanted === "again" ? [act(t("retry"), () => post(`/retry/${job.id}`).then(refresh))]
       : steering(job, act, refresh);

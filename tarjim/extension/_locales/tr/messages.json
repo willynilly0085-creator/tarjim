@@ -98,6 +98,9 @@
   "play": {
     "message": "Oynat"
   },
+  "openSrt": {
+    "message": "Altyazıyı aç"
+  },
   "retry": {
     "message": "Tekrar dene"
   },
@@ -311,6 +314,12 @@
   },
   "cancel": {
     "message": "İptal"
+  },
+  "cancelSure": {
+    "message": "İptal edilsin mi? Yapılanlar silinir"
+  },
+  "cancelLabel": {
+    "message": "Bu işi iptal et. Şimdiye kadar yaptıkları silinir."
   },
   "stageCancelled": {
     "message": "İptal edildi"
@@ -541,6 +550,17 @@
   },
   "sendFailed": {
     "message": "Çeviri başlamadı. Tekrar dene; yine olursa tarjim'i güncelle."
+  },
+  "sendDubLanguage": {
+    "message": "Bu bilgisayardaki sesler $LANGUAGE$ konuşmuyor. Gemini sesini ya da bağlı bir ses hizmetini seç veya altyazı dosyası yap.",
+    "placeholders": {
+      "language": {
+        "content": "$1"
+      }
+    }
+  },
+  "sendDubKey": {
+    "message": "Bu ses kendi anahtarını istiyor. Ayarlar'dan ekle ya da başka bir ses seç."
   },
   "pairExpired": {
     "message": "Bağlantı isteğinin süresi doldu. “Otomatik bağla”ya tekrar bas."

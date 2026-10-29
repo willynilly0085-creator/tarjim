@@ -2,15 +2,15 @@
 import json
 import re
 import subprocess
-import sys
 import tempfile
 from pathlib import Path
 from typing import Any
 
 from tarjim.config import save, setting
 from tarjim.engines import own_node, programs
+from tarjim.engines.bounded import bounded
 from tarjim.engines.catalog import BY_ID, SUBSCRIPTION, of_method
-from tarjim.engines.web import EngineError, parse_json, unwrap, wrap
+from tarjim.engines.web import EngineError, TimedOut, parse_json, unwrap, wrap
 
 TIMEOUT = 900
 LONGEST_ARGUMENT = 24000
@@ -27,7 +27,6 @@ ALONE = ("--ignore-user-config", "--ignore-rules",
          *[part for name in NO_TOOLS for part in ("-c", f"features.{name}=false")])
 TOO_OLD = "this Codex cannot run without its tools; update it: npm install -g @openai/codex"
 REFUSED = "not supported"
-HIDDEN = 0x08000000 if sys.platform == "win32" else 0
 
 
 OWN_FOLDERS = (Path(".local") / "bin", Path(".grok") / "bin",
@@ -62,10 +61,10 @@ def installed() -> list[str]:
 def run(command: list[str], prompt: str, folder: str,
         env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
     try:
-        return subprocess.run(command, input=prompt, capture_output=True, text=True,
-                              encoding="utf-8", errors="replace", timeout=TIMEOUT, cwd=folder,
-                              creationflags=HIDDEN, check=False, env=env)
-    except (OSError, subprocess.TimeoutExpired) as error:
+        return bounded(command, prompt, TIMEOUT, cwd=folder, env=env)
+    except subprocess.TimeoutExpired as error:
+        raise TimedOut(command[0], 0, str(error)) from error
+    except OSError as error:
         raise EngineError(command[0], 0, str(error)) from error
 
 

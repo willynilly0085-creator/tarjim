@@ -98,6 +98,9 @@
   "play": {
     "message": "Lire"
   },
+  "openSrt": {
+    "message": "Ouvrir les sous-titres"
+  },
   "retry": {
     "message": "Réessayer"
   },
@@ -311,6 +314,12 @@
   },
   "cancel": {
     "message": "Annuler"
+  },
+  "cancelSure": {
+    "message": "Annuler ? Le travail fait sera supprimé"
+  },
+  "cancelLabel": {
+    "message": "Annuler cette tâche. Ce qu'elle a produit jusqu'ici est supprimé."
   },
   "stageCancelled": {
     "message": "Annulé"
@@ -541,6 +550,17 @@
   },
   "sendFailed": {
     "message": "La traduction n'a pas démarré. Réessayez, et mettez tarjim à jour si cela se répète."
+  },
+  "sendDubLanguage": {
+    "message": "Les voix de cet ordinateur ne parlent pas $LANGUAGE$. Choisissez la voix Gemini ou un service vocal relié, ou créez un fichier de sous-titres.",
+    "placeholders": {
+      "language": {
+        "content": "$1"
+      }
+    }
+  },
+  "sendDubKey": {
+    "message": "Cette voix a besoin de sa clé. Ajoutez-la dans les Réglages ou choisissez une autre voix."
   },
   "pairExpired": {
     "message": "La demande de connexion a expiré. Appuyez à nouveau sur « Connecter automatiquement »."

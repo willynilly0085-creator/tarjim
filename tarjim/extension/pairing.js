@@ -1,4 +1,4 @@
-import { remember, settings, startJob } from "./shared.js";
+import { remember, settings } from "./shared.js";
 
 export async function serverBase() {
   return (await settings()).server.replace(/\/+$/, "");
@@ -33,11 +33,10 @@ export async function claimPending() {
   return state.state === "denied" ? "denied" : "none";
 }
 
-// A right-click made before the extension was paired is kept and sent the moment pairing succeeds.
+// Nothing writes waitingJob any more: a right-clicked link waits as pendingLink (source.js) and is
+// sent from the window once its quality is picked. Kept as a no-op only because background.js and
+// panels.js still call it; remove those calls and this function together.
 export async function sendWaitingJob() {
-  const { waitingJob } = await chrome.storage.local.get("waitingJob");
-  if (!waitingJob) return false;
-  await remember({ waitingJob: null });
-  await startJob(waitingJob).catch(() => null);
-  return true;
+  await chrome.storage.local.remove("waitingJob");  // left by an older version, never to be sent
+  return false;
 }

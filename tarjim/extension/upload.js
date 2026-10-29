@@ -3,12 +3,14 @@ import { ApiError, settings, t } from "./shared.js";
 
 const MEDIA = /\.(mp4|mkv|webm|mov|avi|m4v|mp3|m4a|wav|flac|ogg|opus|aac)$/i;
 const LARGEST = 8 * 1024 ** 3;  // the most tarjim takes in one upload (MAX_UPLOAD)
-// Why tarjim did not take a translation, by the reason it gave.
-const REFUSED = { "bad url": "sendBadLink", file: "sendFile" };
+// Why tarjim did not take a translation, by the reason it gave (the same words as its page).
+const REFUSED = { "bad url": "sendBadLink", file: "sendFile", big: "sendTooBig", list: "errList",
+  dub_language: "sendDubLanguage", dub_key: "sendDubKey", mode: "sendFailed" };
 
 export const isMedia = (file) => Boolean(file) && MEDIA.test(file.name);
 export const tooBig = (file) => file.size > LARGEST;
-export const sendProblem = (error) => t(REFUSED[error.body?.error] || "sendFailed");
+// language: the name of the language asked for, said when no voice speaks it.
+export const sendProblem = (error, language = "") => t(REFUSED[error.body?.error] || "sendFailed", language);
 
 export function showProgress(fraction) {
   $("upload").hidden = false;

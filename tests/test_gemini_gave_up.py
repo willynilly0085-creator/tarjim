@@ -23,7 +23,7 @@ class Failure(Exception):
 
 def failing(outcomes: dict[str, Exception]) -> GeminiClient:
     client = GeminiClient.__new__(GeminiClient)
-    client.spent, client.model_used, client.cooling = set(), "", {}
+    client.spent, client.model_used, client.cooling, client.refused = set(), "", {}, set()
     client.models, client.slow, client.listening = list(MODELS), set(), False
 
     def call(model: str, *_: Any) -> Any:

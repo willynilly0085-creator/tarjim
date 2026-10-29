@@ -8,6 +8,7 @@ from tarjim.config import api_key, setting
 from tarjim.engines.catalog import BY_ID
 from tarjim.engines.web import (
     BAD_REQUEST,
+    TIMEOUT,
     EngineError,
     parse_json,
     post,
@@ -66,6 +67,7 @@ def list_models(base_url: str, key: str = "") -> list[str]:
 
 class CompatibleAsker:
     hears = False
+    most_cues = 0  # a service on the web takes a whole five-minute batch
 
     def __init__(self, name: str, base_url: str, key: str, model: str) -> None:
         self.name, self.base_url, self.key, self.model = name, base_url, key, model
@@ -85,7 +87,10 @@ class CompatibleAsker:
 
     def send(self, body: dict[str, Any]) -> Any:
         return post(self.name, f"{self.base_url}/chat/completions", headers(self.key, self.name),
-                    json=body)
+                    json=body, timeout=self.seconds(body))
+
+    def seconds(self, _body: dict[str, Any]) -> float:
+        return TIMEOUT
 
 
 def api_asker(provider: str) -> CompatibleAsker:

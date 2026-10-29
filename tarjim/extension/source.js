@@ -4,10 +4,11 @@ import { $ } from "./dom.js";
 import { downloadable } from "./posts.js";
 import { askQuality, heardLink, qualityTitle } from "./quality.js";
 
-const FRESH = 2 * 60 * 1000;
+const FRESH = 10 * 60 * 1000;
 
 // The right-click menu opens this window with its link instead of starting at once, so the
-// quality is picked here (the owner, 2026-10-24); the link waits two minutes at most.
+// quality is picked here (the owner, 2026-10-24). The link waits ten minutes, as long as a
+// pairing request may wait for its Allow on the computer, so a first right-click is not lost.
 async function pending() {
   const { pendingLink } = await chrome.storage.local.get("pendingLink");
   return pendingLink?.url && Date.now() - pendingLink.at < FRESH ? pendingLink.url : "";

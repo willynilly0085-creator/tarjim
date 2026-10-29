@@ -51,7 +51,7 @@ def test_a_dub_where_every_line_is_silent_is_a_failure() -> None:
 
 def test_a_rejected_key_stops_at_once_and_is_named(monkeypatch: pytest.MonkeyPatch) -> None:
     client: Any = object.__new__(gemini_client.GeminiClient)
-    client.spent, client.cooling, calls = set(), {}, []
+    client.spent, client.cooling, client.refused, calls = set(), {}, set(), []
     client.models, client.slow = list(gemini_client.MODELS), set()
 
     def refuse(model: str, *_rest: Any) -> Any:

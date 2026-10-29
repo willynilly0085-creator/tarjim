@@ -6,6 +6,10 @@ TOO_MANY = 429
 BAD_REQUEST = 400
 OK = 200
 RESULT = "result"
+# A computer's own model may run on the processor alone: a few words a second. It is given small
+# batches, and time that grows with the prompt (about a second for every five characters).
+LOCAL_CUES = 40
+LOCAL_CHARS_PER_SECOND = 5
 
 
 class EngineError(RuntimeError):
@@ -13,6 +17,14 @@ class EngineError(RuntimeError):
         super().__init__(f"{provider} {status}: {detail[:200]}")
         self.provider = provider
         self.status = status
+
+
+class TimedOut(EngineError):
+    """A program that ran out of time: asking it again would only wait as long once more."""
+
+
+def local_seconds(prompt: str) -> float:
+    return float(TIMEOUT + len(prompt) // LOCAL_CHARS_PER_SECOND)
 
 
 def wrap(schema: dict[str, Any]) -> dict[str, Any]:
@@ -47,8 +59,9 @@ def reply_text(provider: str, answer: Any) -> str:
 def post(provider: str, url: str, headers: dict[str, str], **payload: Any) -> Any:
     import requests
 
+    seconds = payload.pop("timeout", TIMEOUT)
     try:
-        response = requests.post(url, headers=headers, timeout=TIMEOUT, **payload)
+        response = requests.post(url, headers=headers, timeout=seconds, **payload)
     except requests.RequestException as error:
         raise EngineError(provider, 0, str(error)) from error
     if response.status_code != OK:

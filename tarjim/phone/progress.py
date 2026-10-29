@@ -1,5 +1,6 @@
 """Keep one message per job up to date as a checklist of its steps, and send the result when it
 is ready."""
+import contextlib
 import json
 import threading
 from dataclasses import dataclass
@@ -49,10 +50,16 @@ class Follower:
         self.lock = threading.Lock()
 
     def adopt(self, bot: Bot, chat: int, message: int, task: Any) -> None:
-        """Turn the question message into this job's status message."""
+        """Turn the question message into this job's status message. The same link sent again
+        gets the job already making it (jobs.py running_twin): its progress moves to the newer
+        message, and the older one says so instead of freezing with a Cancel that does nothing."""
         watch = Watch(chat, message)
         with self.lock:
+            before = self.watching.get(task.id)
             self.watching[task.id] = watch
+        if before is not None and before.message != message:
+            with contextlib.suppress(TelegramError):
+                bot.edit(before.chat, before.message, say("phone_same_job"))
         text = status_text(task, watch)
         try:
             bot.edit(chat, message, text, reply_markup=cancel_button(task.id))

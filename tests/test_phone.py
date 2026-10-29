@@ -74,7 +74,9 @@ def message(chat: int, text: str = "", kind: str = "private", **extra: Any) -> d
 
 def setup_inbox(home: Path) -> tuple[Inbox, FakeBot, FakeJobs, Pairing]:
     jobs, pairing = FakeJobs(), Pairing()
-    return Inbox(Follower(jobs), home, pairing), FakeBot(), jobs, pairing
+    inbox = Inbox(Follower(jobs), home, pairing)
+    inbox.later = lambda work, *args: work(*args)  # each step at once, so tests read in order
+    return inbox, FakeBot(), jobs, pairing
 
 
 def test_only_the_person_with_the_fresh_code_can_pair_and_only_once(home: Path) -> None:
