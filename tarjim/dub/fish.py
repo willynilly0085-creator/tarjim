@@ -7,6 +7,7 @@ import numpy as np
 
 from tarjim.dub.audio import decode
 from tarjim.dub.lines import Line
+from tarjim.job import per_line
 
 BACKEND = "s2.1-pro"
 PARALLEL = 4
@@ -48,7 +49,7 @@ class FishVoices:
     def speak_all(self, lines: list[Line]) -> list[np.ndarray]:
         try:
             with ThreadPoolExecutor(max_workers=PARALLEL) as pool:
-                speech = list(pool.map(self.speak, lines))
+                speech = list(pool.map(per_line(self.speak), lines))
         finally:
             self.close()
         if lines and not any(wav.size for wav in speech):

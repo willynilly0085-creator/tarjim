@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.53 (2026-10-29)
+
+- **Cancelling a dub stops the paid voices at once.** ElevenLabs, Fish Audio and the other
+  ready voices kept being asked for every remaining line after a cancel; now no new line is sent.
+
 ## 1.0.52 (2026-10-29)
 
 A full review of tarjim, prompted by a clip whose last seconds had no subtitles.

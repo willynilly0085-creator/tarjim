@@ -1,9 +1,10 @@
 import json
 import shutil
 from collections.abc import Callable
-from contextvars import ContextVar
+from contextvars import ContextVar, copy_context
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TypeVar
 
 from tarjim.languages import Language, language
 from tarjim.rules import Rules, rules_for
@@ -23,6 +24,26 @@ def progress(done: int, total: int) -> None:
 def checkpoint() -> None:
     """Between long steps: where the person's pause or cancel takes effect."""
     CHECKPOINT.get()()
+
+
+Item = TypeVar("Item")
+Made = TypeVar("Made")
+
+
+def per_line(work: Callable[[Item], Made]) -> Callable[[Item], Made]:
+    """For a pool thread working through lines: each line runs as part of the job, so a cancel
+    stops the lines not yet started. Before this, a cancelled dub kept asking the paid voice
+    service for every remaining line (a pool thread does not carry the job's context)."""
+    job = copy_context()
+
+    def one(item: Item) -> Made:
+        def inside() -> Made:
+            checkpoint()
+            return work(item)
+
+        return job.copy().run(inside)
+
+    return one
 
 
 @dataclass(frozen=True)

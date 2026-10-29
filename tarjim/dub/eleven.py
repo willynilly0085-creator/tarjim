@@ -13,6 +13,7 @@ import numpy as np
 
 from tarjim.dub.cast import VoiceError, ask, assign, sound
 from tarjim.dub.lines import Line
+from tarjim.job import per_line
 
 API = "https://api.elevenlabs.io"
 NAME = "ElevenLabs"
@@ -67,7 +68,7 @@ class ElevenVoices:
     def speak_all(self, lines: list[Line]) -> list[np.ndarray]:
         try:
             with ThreadPoolExecutor(max_workers=PARALLEL) as pool:
-                return list(pool.map(self.speak, lines))
+                return list(pool.map(per_line(self.speak), lines))
         finally:
             self.close()
 

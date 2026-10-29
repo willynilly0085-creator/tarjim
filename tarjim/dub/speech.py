@@ -13,6 +13,7 @@ import numpy as np
 from tarjim.config import setting
 from tarjim.dub.cast import VoiceError, ask, assign, sound
 from tarjim.dub.lines import Line
+from tarjim.job import per_line
 
 PARALLEL = 3
 CUSTOM = "custom"
@@ -105,4 +106,4 @@ class SpeechVoices:
 
     def speak_all(self, lines: list[Line]) -> list[np.ndarray]:
         with ThreadPoolExecutor(max_workers=PARALLEL) as pool:
-            return list(pool.map(self.speak, lines))
+            return list(pool.map(per_line(self.speak), lines))
