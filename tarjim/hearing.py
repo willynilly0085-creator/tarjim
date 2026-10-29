@@ -107,6 +107,7 @@ def listen_and_align(job: Job, audio: Path,
     import soundfile
 
     from tarjim.asr.align import shared_aligner
+    from tarjim.asr.anchor import anchor
     from tarjim.asr.fuse import fuse
     from tarjim.memory import heavy
 
@@ -119,10 +120,12 @@ def listen_and_align(job: Job, audio: Path,
     if not utterances:
         return None
     report("timing")
-    wav, _ = soundfile.read(str(audio), dtype="float32")
+    wav, rate = soundfile.read(str(audio), dtype="float32")
+    heard = second_opinion(audio)  # first: its times correct a cloud listener's drift
+    utterances = anchor(utterances, heard, len(wav) / rate)
     with heavy():
         words = shared_aligner().align(wav, utterances, language)
-    words = fuse(words, utterances, second_opinion(audio))
+    words = fuse(words, utterances, heard)
     return Transcript(language=language, text=" ".join(u.text for u in utterances), words=words)
 
 

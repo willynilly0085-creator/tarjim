@@ -4,6 +4,7 @@ from tarjim.lines import display_lines
 from tarjim.models import Cue
 from tarjim.render.stages import reveal_at
 from tarjim.render.timecode import ass_time
+from tarjim.render.voices import MAIN, Voices, line_voices, voices
 from tarjim.rules import DEFAULT_RULES, Rules
 
 RLM = chr(0x200F)
@@ -19,6 +20,7 @@ OUTLINE_COLOUR = "&H00141414"
 BOX_COLOUR = "&H3A141414"
 BOX_PADDING = 0.22
 BOTTOM_CENTRE, TOP_CENTRE = 2, 8
+SOFT_EDGE = "\\blur0.8"  # a slightly soft outline reads as a studio's, not a hard sticker
 
 HEADER = """[Script Info]
 ScriptType: v4.00+
@@ -31,7 +33,7 @@ ScaledBorderAndShadow: yes
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, \
 BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, \
 BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,{font},{size},&H00FFFFFF,&H00FFFFFF,{edge},{back},-1,0,0,0,\
+Style: Default,{font},{size},{main},{main},{edge},{back},-1,0,0,0,\
 100,100,0,0,{border},{outline},{shadow},{align},{mh},{mh},{mv},{charset}
 
 [Events]
@@ -90,33 +92,44 @@ def render_ass(cues: list[Cue], canvas: Canvas, rules: Rules = DEFAULT_RULES) ->
         edge=BOX_COLOUR if canvas.bright else OUTLINE_COLOUR,
         back=BOX_COLOUR if canvas.bright else SHADOW_COLOUR,
         align=TOP_CENTRE if canvas.top else BOTTOM_CENTRE, mh=canvas.margin_h,
-        mv=canvas.margin_v, charset=ARABIC_CHARSET if rules.rtl else 1,
+        mv=canvas.margin_v, charset=ARABIC_CHARSET if rules.rtl else 1, main=MAIN,
     )
-    alphas = LETTERS_ONLY if canvas.bright else EVERYTHING
-    events = [line for cue in cues if cue.text.strip() for line in event_lines(cue, rules, alphas)]
+    look = Look(LETTERS_ONLY if canvas.bright else EVERYTHING, voices(cues),
+                "" if canvas.bright else SOFT_EDGE)
+    events = [line for cue in cues if cue.text.strip() for line in event_lines(cue, rules, look)]
     return header + "\n".join(events) + "\n"
 
 
-def event_lines(cue: Cue, rules: Rules, alphas: tuple[str, str] = EVERYTHING) -> list[str]:
+@dataclass(frozen=True)
+class Look:
+    alphas: tuple[str, str] = EVERYTHING
+    voices: Voices = field(default_factory=dict)
+    edge: str = ""
+
+
+def event_lines(cue: Cue, rules: Rules, look: Look | None = None) -> list[str]:
+    look = look or Look()
     mark = RLM if rules.rtl else ""
-    lines = [f"{mark}{clean(line)}{mark}" for line in display_lines(cue.text, rules)]
+    shown = display_lines(cue.text, rules)
+    lines = [f"{colour}{mark}{clean(line)}{mark}"
+             for colour, line in zip(line_voices(cue, len(shown), look.voices), shown, strict=True)]
     moment = reveal_at(cue)
     if moment is None:
-        return [event(cue.start, cue.end, fade(FADE_MS, FADE_MS) + "\\N".join(lines))]
-    hide, show = alphas
+        return [event(cue.start, cue.end, fade(FADE_MS, FADE_MS, look.edge) + "\\N".join(lines))]
+    hide, show = look.alphas
     *first, last = lines
     waiting = "\\N".join([*first, f"{{{hide}}}" + last])
     arriving = "\\N".join([*first, f"{{{hide}\\t(0,{FADE_MS},{show})}}" + last])
-    return [event(cue.start, moment, fade(FADE_MS, 0) + waiting),
-            event(moment, cue.end, fade(0, FADE_MS) + arriving)]
+    return [event(cue.start, moment, fade(FADE_MS, 0, look.edge) + waiting),
+            event(moment, cue.end, fade(0, FADE_MS, look.edge) + arriving)]
 
 
 def event(start: float, end: float, body: str) -> str:
     return f"Dialogue: 0,{ass_time(start)},{ass_time(end)},Default,,0,0,0,,{body}"
 
 
-def fade(fade_in: int, fade_out: int) -> str:
-    return f"{{\\fad({fade_in},{fade_out})}}"
+def fade(fade_in: int, fade_out: int, edge: str = "") -> str:
+    return f"{{\\fad({fade_in},{fade_out}){edge}}}"
 
 
 def clean(text: str) -> str:
