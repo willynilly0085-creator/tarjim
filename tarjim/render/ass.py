@@ -8,7 +8,10 @@ from tarjim.render.voices import MAIN, Voices, line_voices, voices
 from tarjim.rules import DEFAULT_RULES, Rules
 
 RLM = chr(0x200F)
-ARABIC_CHARSET = 178
+# libass runs the full bidi algorithm only for Encoding -1: with 178 (Arabic), a line holding a
+# Latin word ("افتح YouTube ثم") came out in scrambled order.
+RIGHT_TO_LEFT = -1
+LOOKALIKE_BACKSLASH = "⧵"  # a "\" in the text would start an ASS command such as \N
 FADE_MS = 90
 EVERYTHING = ("\\alpha&HFF&", "\\alpha&H00&")
 LETTERS_ONLY = ("\\1a&HFF&\\3a&HFF&", "\\1a&H00&\\3a&H00&")
@@ -26,7 +29,7 @@ HEADER = """[Script Info]
 ScriptType: v4.00+
 PlayResX: {w}
 PlayResY: {h}
-WrapStyle: 2
+WrapStyle: 0
 ScaledBorderAndShadow: yes
 
 [V4+ Styles]
@@ -92,7 +95,7 @@ def render_ass(cues: list[Cue], canvas: Canvas, rules: Rules = DEFAULT_RULES) ->
         edge=BOX_COLOUR if canvas.bright else OUTLINE_COLOUR,
         back=BOX_COLOUR if canvas.bright else SHADOW_COLOUR,
         align=TOP_CENTRE if canvas.top else BOTTOM_CENTRE, mh=canvas.margin_h,
-        mv=canvas.margin_v, charset=ARABIC_CHARSET if rules.rtl else 1, main=MAIN,
+        mv=canvas.margin_v, charset=RIGHT_TO_LEFT if rules.rtl else 1, main=MAIN,
     )
     look = Look(LETTERS_ONLY if canvas.bright else EVERYTHING, voices(cues),
                 "" if canvas.bright else SOFT_EDGE)
@@ -133,4 +136,5 @@ def fade(fade_in: int, fade_out: int, edge: str = "") -> str:
 
 
 def clean(text: str) -> str:
-    return text.replace("{", "(").replace("}", ")").replace("\n", " ")
+    return (text.replace("\\", LOOKALIKE_BACKSLASH).replace("{", "(").replace("}", ")")
+            .replace("\n", " "))

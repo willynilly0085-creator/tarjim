@@ -1,10 +1,10 @@
 import json
 import shutil
 import urllib.parse
-from http.server import ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, ClassVar
 
+from tarjim import native_setup
 from tarjim.languages import LANGUAGES
 from tarjim.server.connections import ConnectionRoutes
 from tarjim.server.guard import (
@@ -18,6 +18,7 @@ from tarjim.server.guard import (
 )
 from tarjim.server.job_routes import JobRoutes, refusal
 from tarjim.server.jobs import Board, Order, Task
+from tarjim.server.listener import OnlyListener
 from tarjim.server.orders import body_size, copy_limited, first, json_body, order_from
 from tarjim.server.pages import PageRoutes
 from tarjim.server.pairing import Pairing
@@ -73,7 +74,10 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoute
         given = next((self.headers.get(h, "") for h in TOKEN_HEADERS if self.headers.get(h)), "")
         cookie = cookie_token(self.headers.get("Cookie", "")) if from_the_page(
             self.headers) else ""
-        return token_ok(given, self.token) or token_ok(cookie, page_key(self.token))
+        if token_ok(given, self.token):
+            native_setup.remember(allowed_origin(self.headers.get("Origin", "")))
+            return True
+        return token_ok(cookie, page_key(self.token))
 
     def do_GET(self) -> None:
         self.dispatch(GET_ROUTES)
@@ -169,7 +173,8 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoute
         return None
 
 
-def serve(board: Board, token: str, uploads: Path, port: int = PORT) -> None:
+def serve(listener: OnlyListener, board: Board, token: str, uploads: Path) -> None:
+    """Answers on a port taken earlier (listener.take_port), before the engine's other work."""
     Handler.board, Handler.token, Handler.uploads = board, token, uploads
     Handler.shelf, Handler.pairing = shelf(), Pairing()
-    ThreadingHTTPServer(("127.0.0.1", port), Handler).serve_forever()
+    listener.serve_forever()

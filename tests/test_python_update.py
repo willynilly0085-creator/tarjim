@@ -143,7 +143,8 @@ def test_the_watch_closes_the_engine_only_for_a_rebuild_that_started(
     from tarjim.server import update_routes
 
     closed: list[bool] = []
-    monkeypatch.setattr(update_routes, "close_soon", closed.append)
+    monkeypatch.setattr(update_routes, "close_soon",
+                        lambda started, _board=None: closed.append(started))
     for part in (update_routes.downloader, update_routes.node_update, update_routes.ffmpeg_update):
         monkeypatch.setattr(part, "refresh", lambda idle: "")
     monkeypatch.setattr(update_routes.python_update, "refresh", lambda idle, port: idle)

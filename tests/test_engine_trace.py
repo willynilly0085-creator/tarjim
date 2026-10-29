@@ -90,3 +90,19 @@ def test_a_console_or_a_chosen_file_is_left_alone(home: Path) -> None:
 def test_the_options_are_never_written(home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(sys, "argv", ["tarjim-serve", "--gemini-key", "AIza-secret"])
     assert "AIza-secret" not in ends(home, monkeypatch, lambda: 0)
+
+
+def test_a_hidden_console_still_writes_to_the_log_when_asked(
+        home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """uv's pythonw.exe is a console launcher: the engine gets a console no one sees."""
+    import io
+
+    with monkeypatch.context() as patch:
+        patch.setattr(sys, "stdout", io.StringIO())
+        patch.setattr(sys, "stderr", io.StringIO())
+        patch.setenv("TARJIM_LOG_TO_FILE", "1")
+        boot.open_log()
+        boot.note("starting")
+        log = sys.stdout
+        log.close()
+    assert "engine: starting" in (home / "server.log").read_text(encoding="utf-8")

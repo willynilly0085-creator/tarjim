@@ -559,5 +559,8 @@
   },
   "setupNotDone": {
     "message": "Setup isn't finished yet. Go through the steps on tarjim's page to the end."
+  },
+  "waking": {
+    "message": "tarjim was off; starting it now. One moment…"
   }
 }

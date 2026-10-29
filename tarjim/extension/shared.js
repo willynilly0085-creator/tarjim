@@ -82,15 +82,37 @@ export const post = (path, body) => api(path, {
   method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body ?? {}),
 });
 
+const pause = (ms) => new Promise((done) => setTimeout(done, ms));
+const WAKER = "sa.tarjim.wake";
+
+// A stopped engine is started through the small program tarjim registers for this extension
+// (native messaging, tarjim/native_host.py), then awaited. False when the program is not there
+// yet (tarjim older than 1.0.52, or this extension never connected) or the engine never answered.
+export async function wakeEngine(seconds = 60) {
+  try {
+    const reply = await chrome.runtime.sendNativeMessage(WAKER, { wake: true });
+    if (!reply?.started && !reply?.running) return false;
+  } catch {
+    return false;
+  }
+  for (let left = seconds; left > 0; left -= 1) {
+    if (await api("/ping").then(() => true, () => false)) return true;
+    await pause(1000);
+  }
+  return false;
+}
+
 // tarjim restarts by itself after an update (a few seconds); a job asked for in that moment
-// waits for it instead of failing as "offline".
+// waits for it instead of failing as "offline", and a stopped engine is started first.
 export async function startJob(body, seconds = 20) {
+  let woken = false;
   for (let left = seconds; ; left -= 1) {
     try {
       return await post("/jobs", body);
     } catch (error) {
       if (error.kind !== "offline" || left <= 1) throw error;
-      await new Promise((done) => setTimeout(done, 1000));
+      if (!woken) woken = await wakeEngine();
+      await pause(1000);
     }
   }
 }

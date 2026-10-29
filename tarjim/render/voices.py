@@ -15,6 +15,7 @@ from tarjim.models import Cue, Word
 # ASS colours are blue, green, red. Off-white F7F5F0, then yellow FFE066, cyan 8FE3F5, green A8E6A1.
 MAIN = "&H00F0F5F7"
 OTHERS = ("&H66E0FF&", "&HF5E38F&", "&HA1E6A8&")
+BACK_TO_MAIN = "&HF0F5F7&"  # a colour holds to the end of the subtitle, so main lines say theirs
 PASS_TAG = re.compile(r"(?:^|(?<=\.))p\d+\.")  # the voting pass that found a line, not a speaker
 
 Voices = dict[str, str]
@@ -38,4 +39,6 @@ def line_voices(cue: Cue, count: int, known: Voices) -> list[str]:
     speakers = [who(part[0]) for part in cue.parts if part] or [who(w) for w in cue.words[:1]]
     if len(speakers) != count:
         speakers = (speakers[:1] or [""]) * count
-    return [f"{{\\c{known[s]}}}" if s in known else "" for s in speakers]
+    if not known:
+        return [""] * count
+    return [f"{{\\c{known.get(s, BACK_TO_MAIN)}}}" for s in speakers]

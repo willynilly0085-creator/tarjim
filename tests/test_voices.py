@@ -1,7 +1,7 @@
 """Each speaker's lines keep a colour of their own; the main speaker stays off-white."""
 from tarjim.models import Cue, Word
 from tarjim.render.ass import Canvas, render_ass
-from tarjim.render.voices import MAIN, OTHERS, voices
+from tarjim.render.voices import BACK_TO_MAIN, MAIN, OTHERS, voices
 
 YELLOW = OTHERS[0]
 
@@ -35,7 +35,7 @@ def test_each_line_of_a_dialogue_takes_its_own_speaker_colour() -> None:
     event = next(e for e in render_ass([cue, main], Canvas(1920, 1080)).splitlines()
                  if "نفس" in e)
     top, bottom = event.split("\\N")
-    assert YELLOW in top and "\\c&H" not in bottom
+    assert YELLOW in top and YELLOW not in bottom and BACK_TO_MAIN in bottom
 
 
 def test_speakers_are_ranked_within_each_piece_of_a_long_video() -> None:

@@ -559,5 +559,8 @@
   },
   "setupNotDone": {
     "message": "설정이 아직 끝나지 않았어요. tarjim 페이지에서 마지막 단계까지 진행하세요."
+  },
+  "waking": {
+    "message": "tarjim이 꺼져 있어서 지금 켜는 중입니다. 잠시만요…"
   }
 }

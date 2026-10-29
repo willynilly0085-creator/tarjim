@@ -559,5 +559,8 @@
   },
   "setupNotDone": {
     "message": "Kurulum henüz bitmedi. tarjim sayfasındaki adımları sonuna kadar tamamla."
+  },
+  "waking": {
+    "message": "tarjim kapalıydı; şimdi başlatılıyor. Bir dakika…"
   }
 }

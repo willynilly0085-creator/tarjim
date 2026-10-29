@@ -559,5 +559,8 @@
   },
   "setupNotDone": {
     "message": "Penyiapan belum selesai. Ikuti langkah-langkah di halaman tarjim sampai akhir."
+  },
+  "waking": {
+    "message": "tarjim sedang mati; sekarang sedang dinyalakan. Sebentar…"
   }
 }

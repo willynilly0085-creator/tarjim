@@ -10,6 +10,6 @@
   "action": { "default_popup": "app.html", "default_title": "__MSG_appName__" },
   "options_ui": { "page": "app.html?view=settings", "open_in_tab": true },
   "background": { "service_worker": "background.js", "type": "module" },
-  "permissions": ["contextMenus", "storage", "alarms", "notifications", "activeTab", "scripting"],
+  "permissions": ["contextMenus", "storage", "alarms", "notifications", "activeTab", "scripting", "nativeMessaging"],
   "host_permissions": ["http://127.0.0.1/*", "http://localhost/*"]
 }

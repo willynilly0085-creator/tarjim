@@ -71,3 +71,16 @@ def test_a_boxed_dialogue_hides_only_the_letters_of_the_line_still_to_come() -> 
     boxed = render_ass([cue], Canvas(1920, 1080, bright=True))
     assert r"\1a&HFF&\3a&HFF&" in boxed and r"\alpha" not in boxed
     assert r"\alpha&HFF&" in render_ass([cue], Canvas(1920, 1080))
+
+
+def test_arabic_subtitles_let_libass_order_mixed_latin_words() -> None:
+    ass = render_ass([Cue(0, 2, text="افتح YouTube الآن")], Canvas(1280, 720))
+    style = next(line for line in ass.splitlines() if line.startswith("Style:"))
+    assert style.endswith(",-1")
+    assert "WrapStyle: 0" in ass  # a line too wide for the picture still wraps
+
+
+def test_a_backslash_in_the_text_is_not_an_ass_command() -> None:
+    ass = render_ass([Cue(0, 2, text=r"C:\Next \N folder")], Canvas(1280, 720))
+    event = next(line for line in ass.splitlines() if line.startswith("Dialogue:"))
+    assert "\\" not in event.split(",,", 1)[1].split("}", 1)[1]

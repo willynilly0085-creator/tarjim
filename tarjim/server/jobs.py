@@ -108,6 +108,7 @@ class Board:
         self.idle, self.idle_after, self.busy_since_idle = idle, idle_after, False
         self.lock = threading.Lock()
         self.saved: Callable[[], None] = lambda: None  # job_record.keep writes the list down
+        self.closing = False  # set just before the engine closes for an update or restart
         watch()
         threading.Thread(target=self.loop, daemon=True).start()
 
@@ -120,6 +121,9 @@ class Board:
             self.tasks[task.id] = task
             for old in sorted(self.tasks.values(), key=lambda t: t.created)[:-KEEP]:
                 self.tasks.pop(old.id, None)
+        if self.closing:  # written down instead: the next engine starts it (job_record.py)
+            self.saved()
+            return task
         self.queue.put(task)
         return task
 
@@ -180,8 +184,11 @@ class Board:
     def loop(self) -> None:
         from tarjim.server.carry import carry
 
-        while True:
-            task = self.next_task()
-            self.busy_since_idle = True
-            carry(task, self.work, self.may_undo)
-            self.saved()
+        while True:  # an error in one pass never stops the jobs that follow
+            try:
+                task = self.next_task()
+                self.busy_since_idle = True
+                carry(task, self.work, self.may_undo)
+                self.saved()
+            except Exception as error:
+                print(f"job board: {type(error).__name__}: {error}", flush=True)

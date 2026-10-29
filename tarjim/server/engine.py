@@ -8,9 +8,10 @@ from tarjim.config import HOME, prepare_environment, private_home, save, setting
 from tarjim.fetch import is_url, resolve
 from tarjim.installer import module_command, wait_for_exit
 from tarjim.job import CHECKPOINT, PROGRESS, Job
-from tarjim.server.app import PORT, serve
+from tarjim.server.app import PORT, Handler, serve
 from tarjim.server.housekeeping import Undo
 from tarjim.server.jobs import DUBBING, Board, Task
+from tarjim.server.listener import Taken, take_port
 
 DOWNLOADS = Path.home() / "Downloads" / "tarjim"
 
@@ -58,12 +59,13 @@ def attach_output() -> None:
 
 
 def start_up() -> None:
-    from tarjim import autostart
+    from tarjim import autostart, native_setup
     from tarjim.quiet import hide_child_windows
 
     hide_child_windows()
     attach_output()
     autostart.refresh()
+    native_setup.register()  # the browser's way to start this engine, for a moved folder too
     save("server_command", json.dumps(module_command("tarjim.server")))
     prepare_environment()
 
@@ -90,16 +92,20 @@ def run_alongside(port: int) -> Board:
     return board
 
 
-def main(argv: list[str] | None = None) -> int:
-    same_code.hold()  # first: every module imported later comes from the code read now
-    start_up()
+def options(argv: list[str] | None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="tarjim-serve", description="Local server for "
                                      "the tarjim browser extension")
     parser.add_argument("--port", type=int, default=PORT)
     parser.add_argument("--show-token", action="store_true")
     parser.add_argument("--gemini-key", default="", help="save your Gemini API key")
     parser.add_argument("--after", type=int, default=0, help=argparse.SUPPRESS)
-    args = parser.parse_args(sys.argv[1:] if argv is None else argv)
+    return parser.parse_args(sys.argv[1:] if argv is None else argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    same_code.hold()  # first: every module imported later comes from the code read now
+    start_up()
+    args = options(argv)
     if args.gemini_key:
         save("gemini_api_key", args.gemini_key.strip())
         print("saved")
@@ -109,8 +115,13 @@ def main(argv: list[str] | None = None) -> int:
         print(secret)
         return 0
     wait_for_exit(args.after)  # the engine this one replaces lets go of the port
+    try:
+        listener = take_port(args.port, Handler)  # first: a second engine starts nothing
+    except Taken as busy:
+        print(busy, flush=True)
+        return 1
     board = run_alongside(args.port)
     print(f"tarjim server on http://127.0.0.1:{args.port}", flush=True)
-    serve(board, secret, HOME / "uploads", args.port)
+    serve(listener, board, secret, HOME / "uploads")
     return 0
 

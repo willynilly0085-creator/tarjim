@@ -559,5 +559,8 @@
   },
   "setupNotDone": {
     "message": "La configuration n'est pas terminée. Suivez les étapes sur la page de tarjim jusqu'au bout."
+  },
+  "waking": {
+    "message": "tarjim était arrêté ; démarrage en cours. Un instant…"
   }
 }

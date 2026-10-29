@@ -5,6 +5,7 @@ Windows: a small script in the Startup folder. macOS: a LaunchAgent. Linux: an a
 """
 import contextlib
 import os
+import re
 import sys
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -13,24 +14,36 @@ from tarjim.config import HOME
 
 STARTUP = Path("Microsoft") / "Windows" / "Start Menu" / "Programs" / "Startup"
 WINDOWS = """Set shell = CreateObject("WScript.Shell")
+Set files = CreateObject("Scripting.FileSystemObject")
 engine = {launch}
-Note "starting the engine"
-shell.Run engine, 0, False
-WScript.Sleep 60000
-On Error Resume Next
-Set found = GetObject("winmgmts:").ExecQuery("select ProcessId from Win32_Process where " & _
-  "CommandLine like '%-m tarjim.server%' or CommandLine like '%tarjim-serve%'")
-running = found.Count
-If Err.Number <> 0 Then running = 1
-On Error GoTo 0
-If running = 0 Then
-  Note "the engine was gone a minute later; starting it once more"
+shell.Environment("PROCESS").Item("TARJIM_LOG_TO_FILE") = "1"
+Start "starting the engine"
+pause = 60000
+Do
+  WScript.Sleep pause
+  pause = 300000
+  If Not files.FileExists(WScript.ScriptFullName) Then Exit Do
+  If Not Running() Then Start "the engine was not running; starting it again"
+Loop
+
+Sub Start(reason)
+  Note reason
+  On Error Resume Next
   shell.Run engine, 0, False
-End If
+  If Err.Number <> 0 Then Note "could not start " & engine & ": " & Err.Description
+End Sub
+
+Function Running()
+  On Error Resume Next
+  Set found = GetObject("winmgmts:").ExecQuery("select ProcessId from Win32_Process where " & _
+    "CommandLine like '%-m tarjim.server%' or CommandLine like '%tarjim-serve%'")
+  Running = found.Count > 0
+  If Err.Number <> 0 Then Running = True
+End Function
 
 Sub Note(text)
   On Error Resume Next
-  Set trace = CreateObject("Scripting.FileSystemObject").OpenTextFile("{log}", 8, True)
+  Set trace = files.OpenTextFile("{log}", 8, True)
   trace.WriteLine Now & " sign-in launch: " & text
   trace.Close
 End Sub
@@ -62,9 +75,18 @@ def launch(python: str) -> str:
 
 
 def windows_script(python: str) -> str:
-    """Writes a dated line to server.log, starts the engine, and a minute later starts it once
-    more if no engine process is left: on 2026-10-24 the one started at sign-in was gone."""
+    """Writes a dated line to server.log and starts the engine; then, while the person is signed
+    in, starts it again whenever no engine is running (after a minute, then every five), so one
+    that failed at sign-in or stopped later comes back. It ends when the script is removed.
+    TARJIM_LOG_TO_FILE: a virtual environment's pythonw.exe may be a console launcher, whose
+    hidden console swallowed everything the engine printed (boot.py)."""
     return WINDOWS.replace("{launch}", launch(python)).replace("{log}", str(HOME / "server.log"))
+
+
+def starts_anything(script: str) -> bool:
+    """False when the Python the script names is gone: tarjim's folder was moved or rebuilt."""
+    found = re.search(r'engine = """(.+?)""', script)
+    return found is not None and Path(found.group(1)).exists()
 
 
 def refresh() -> None:
@@ -73,7 +95,7 @@ def refresh() -> None:
         return
     with contextlib.suppress(OSError):
         text, wanted = entry().read_text(encoding="utf-8"), windows_script(quiet_python())
-        if text != wanted and launch(quiet_python()) in text:
+        if text != wanted and (launch(quiet_python()) in text or not starts_anything(text)):
             entry().write_text(wanted, encoding="utf-8")
 
 

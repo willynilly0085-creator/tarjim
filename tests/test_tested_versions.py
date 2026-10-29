@@ -156,8 +156,13 @@ def engine(home: Path, monkeypatch: pytest.MonkeyPatch) -> list[str]:
 
 
 class Idle:
+    closing = False
+
     def recent(self) -> list[Any]:
         return []
+
+    def saved(self) -> None:
+        return None
 
 
 def test_an_install_off_the_tested_versions_is_repaired_once(engine: list[str]) -> None:

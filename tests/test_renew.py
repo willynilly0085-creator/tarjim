@@ -68,7 +68,7 @@ def started(code: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> list
     monkeypatch.setattr(renew, "HOME", tmp_path)
     monkeypatch.setattr(renew, "start_detached", lambda command, _log, here: calls.append(
         command) or True)
-    monkeypatch.setattr(update_routes, "close_soon", lambda started: started)
+    monkeypatch.setattr(update_routes, "close_soon", lambda started, _board=None: started)
     monkeypatch.setattr(update_routes, "look", lambda *_args: None)
     return calls
 

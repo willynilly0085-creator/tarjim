@@ -1,7 +1,9 @@
 """The list of recent jobs, kept on disk so it outlives a restart of the engine or of the computer.
 
-It is written each time a job ends or leaves the list, and read when the engine starts. Only ended
-jobs are kept: a job running when the computer went off does not come back half done."""
+It is written each time a job ends or leaves the list, and read when the engine starts. Ended jobs
+are kept, and jobs still waiting their turn, which the next engine starts: one asked for while
+this engine was closing for an update, or waiting when the computer went off. A job running at
+that moment does not come back half done."""
 import json
 import os
 import threading
@@ -20,7 +22,8 @@ WRITING = threading.Lock()
 def write_down(board: Board, folder: Path) -> None:
     rows = [{**{name: getattr(t, name) for name in FIELDS}, "stage": t.stage,
              "order": asdict(t.order), "video": str(t.video or ""),
-             "outputs": [str(p) for p in t.outputs]} for t in board.recent() if t.finished]
+             "outputs": [str(p) for p in t.outputs]} for t in board.recent()
+            if t.finished or t.stage == "queued"]
     with WRITING:
         draft = folder / f"{JOBS}.part"
         try:
@@ -46,6 +49,9 @@ def restore(board: Board, folder: Path = HOME) -> None:
         return
     with board.lock:
         board.tasks.update((task.id, task) for task in tasks)
+    for task in tasks:
+        if task.stage == "queued":
+            board.queue.put(task)
 
 
 def keep(board: Board, folder: Path = HOME) -> None:

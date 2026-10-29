@@ -1,5 +1,7 @@
 import { watchJobs } from "./jobs.js";
-import { api, loadWords, remember, settings, startJob, t, uiDirection, uiLanguage } from "./shared.js";
+import {
+  api, loadWords, remember, settings, startJob, t, uiDirection, uiLanguage, wakeEngine,
+} from "./shared.js";
 import { downloadable } from "./posts.js";
 import { chosenQuality, forgetQuality, heardLink, onQuality, qualityBlocked, soundOnly } from "./quality.js";
 import { clearPending, describeSource } from "./source.js";
@@ -31,14 +33,21 @@ function linkState(online) {
   $("link-text").textContent = t(online ? "statusOnline" : "statusOffline");
 }
 
+// A stopped engine is started from here when tarjim registered the way to (shared.js wakeEngine);
+// the offline panel says so while it starts, and stays only if it could not.
+async function reachEngine() {
+  if (await api("/ping").then(() => true, () => false)) return true;
+  linkState(false);
+  show("offline");
+  $("offline-note").textContent = t("waking");
+  const woken = await wakeEngine();
+  $("offline-note").textContent = "";
+  return woken;
+}
+
 async function connect() {
   clearInterval(state.poll);
-  try {
-    await api("/ping");
-  } catch {
-    linkState(false);
-    return show("offline");
-  }
+  if (!(await reachEngine())) return show("offline");
   linkState(true);
   await claimPending();
   try {

@@ -559,5 +559,8 @@
   },
   "setupNotDone": {
     "message": "设置还没完成。请在 tarjim 页面中把步骤走到最后。"
+  },
+  "waking": {
+    "message": "tarjim 未运行，正在启动，请稍候…"
   }
 }

@@ -33,12 +33,15 @@ def test_windows_starts_the_engine_without_a_window(home: Path,
     assert "pythonw" in script.lower() and ", 0, False" in script
 
 
-def test_windows_tries_once_more_when_the_engine_is_gone(home: Path,
-                                                         monkeypatch: pytest.MonkeyPatch) -> None:
+def test_windows_starts_the_engine_again_whenever_it_is_gone(
+        home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     script = autostart.windows_script(r"C:\py\pythonw.exe")
-    assert script.count('shell.Run engine, 0, False') == 2
+    assert script.count('shell.Run engine, 0, False') == 1  # one Start, used by the watch too
     assert r'engine = """C:\py\pythonw.exe"" -P -m tarjim.server"' in script
-    assert "WScript.Sleep 60000" in script and "Win32_Process" in script
+    assert "pause = 60000" in script and "pause = 300000" in script and "\nDo\n" in script
+    assert "Win32_Process" in script
+    assert "If Not files.FileExists(WScript.ScriptFullName)" in script
+    assert '("TARJIM_LOG_TO_FILE") = "1"' in script
     assert str(autostart.HOME / "server.log") in script and "{" not in script
 
 
@@ -58,8 +61,23 @@ def test_a_startup_script_for_another_python_is_left_alone(
         home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(autostart.sys, "platform", "win32")
     monkeypatch.setattr(autostart, "quiet_python", lambda: r"C:\copy\pythonw.exe")
+    other = home / "py" / "pythonw.exe"
+    other.parent.mkdir()
+    other.touch()
     entry = autostart.entry()
     entry.parent.mkdir(parents=True)
-    entry.write_text(autostart.windows_script(r"C:\py\pythonw.exe"), encoding="utf-8")
+    entry.write_text(autostart.windows_script(str(other)), encoding="utf-8")
     autostart.refresh()
-    assert entry.read_text(encoding="utf-8") == autostart.windows_script(r"C:\py\pythonw.exe")
+    assert entry.read_text(encoding="utf-8") == autostart.windows_script(str(other))
+
+
+def test_a_startup_script_whose_python_is_gone_is_repaired(
+        home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(autostart.sys, "platform", "win32")
+    monkeypatch.setattr(autostart, "quiet_python", lambda: r"C:\copy\pythonw.exe")
+    entry = autostart.entry()
+    entry.parent.mkdir(parents=True)
+    entry.write_text(autostart.windows_script(str(home / "moved" / "pythonw.exe")),
+                     encoding="utf-8")
+    autostart.refresh()
+    assert entry.read_text(encoding="utf-8") == autostart.windows_script(r"C:\copy\pythonw.exe")

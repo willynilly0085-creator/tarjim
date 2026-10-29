@@ -22,16 +22,20 @@ def idle(board: Board) -> bool:
     return all(task.finished for task in board.recent())
 
 
-def close_soon(started: bool) -> bool:
-    """The installer started waits for this engine to close before it replaces it."""
+def close_soon(started: bool, board: Board | None = None) -> bool:
+    """The installer started waits for this engine to close before it replaces it. A job asked
+    for in the meantime is written down for the next engine instead of being lost."""
     if started:
+        if board is not None:
+            board.closing = True
+            board.saved()
         threading.Timer(CLOSE_AFTER, os._exit, (0,)).start()
     return started
 
 
-def replace_engine(port: int) -> bool:
+def replace_engine(port: int, board: Board) -> bool:
     """Start the installer for the latest release, then close this engine so it can be replaced."""
-    return close_soon(update.start(update.latest(), port))
+    return close_soon(update.start(update.latest(), port), board)
 
 
 def look(board: Board, port: int) -> None:
@@ -39,9 +43,9 @@ def look(board: Board, port: int) -> None:
         return
     state = update.view()
     if state["available"] and state["automatic"] and state["can_install"]:
-        replace_engine(port)
+        replace_engine(port, board)
     elif update.repair_due():
-        close_soon(update.repair(port))
+        close_soon(update.repair(port), board)
     else:
         keep_current(board, port)
 
@@ -51,7 +55,7 @@ def keep_current(board: Board, port: int) -> None:
     downloader.refresh(idle=True)
     node_update.refresh(idle=idle(board))
     ffmpeg_update.refresh(idle=idle(board))
-    close_soon(python_update.refresh(idle(board), port))
+    close_soon(python_update.refresh(idle(board), port), board)
 
 
 def settle_after_update() -> None:
@@ -77,7 +81,7 @@ def upgrade_listening(board: Board) -> None:
 
 def tick(board: Board, port: int, renewal: Renewal, count: int) -> None:
     if idle(board) and renewal.due() and idle(board):
-        close_soon(renewal.restart(board))
+        close_soon(renewal.restart(board), board)
         return
     if count % LOOK_EVERY == 0:
         look(board, port)
@@ -111,5 +115,5 @@ class UpdateRoutes:
             return self.reply(409, {"error": "update"})
         if not idle(self.board):
             return self.reply(409, {"error": "busy"})
-        started = replace_engine(int(self.server.server_address[1]))
+        started = replace_engine(int(self.server.server_address[1]), self.board)
         self.reply(200 if started else 409, {"started": started})

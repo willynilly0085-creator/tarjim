@@ -21,8 +21,10 @@ def log_path() -> Path:
 
 
 def open_log() -> None:
-    """Under pythonw both outputs go to the log; a console or a file the starter chose stays."""
-    if sys.stdout is not None:
+    """Under pythonw both outputs go to the log; a console or a file the starter chose stays.
+    The sign-in script asks for the log by name: the pythonw.exe uv writes into a virtual
+    environment is a console launcher, so the engine got a hidden console that swallowed it all."""
+    if sys.stdout is not None and not os.environ.get("TARJIM_LOG_TO_FILE"):
         return
     path = log_path()
     try:
