@@ -12,17 +12,23 @@ A little more than the source counted in H.264's bits, though: most videos from 
 other sites come as AV1 or VP9, which draw the same picture with about half and two thirds of
 H.264's bits. Capped at the source's own rate, a 1080p AV1 download came out visibly softer
 (the owner: "do not compress the video and spoil its quality"), so the cap is weighed by the
-source's codec. The result stays H.264, which every phone and editor plays."""
+source's codec. The result stays H.264, which every phone and editor plays, in the 8-bit 4:2:0
+picture every phone and browser decodes, with a sound an MP4 player plays."""
 import tempfile
 from pathlib import Path
 
 from tarjim.media import picture, run, source, tool, video_kbps
 from tarjim.render.encoders import for_quality
 from tarjim.render.mark import LOGO, Mark, overlay, with_mark
+from tarjim.whole import whole
 
 PLAIN = "subtitles.ass"
 HEADROOM = 1.15
 WEIGHTS = {"av1": 2.0, "vp9": 1.6, "hevc": 1.6}
+# Left as it is, a 10-bit or 4:2:2 source gives an H.264 that phones and browsers refuse.
+PLAYABLE = ",format=yuv420p"
+# Sound every MP4 player plays as it is; Vorbis, Opus or PCM in an MP4 is silent on many.
+COPIED = {"aac", "mp3", "ac3", "eac3"}
 
 
 def burn(video: Path, subtitles: str, target: Path, mark: Mark | None = None) -> Path:
@@ -34,9 +40,21 @@ def burn(video: Path, subtitles: str, target: Path, mark: Mark | None = None) ->
 
 def drawing(mark: Mark | None) -> list[str]:
     if mark is None:
-        return ["-vf", f"ass={PLAIN}"]
+        return ["-vf", f"ass={PLAIN}{PLAYABLE}"]
     return [*picture(LOGO), "-filter_complex", f"[0:v]ass={PLAIN}[subtitled];"
-            + overlay(mark, "subtitled")]
+            + overlay(mark, "subtitled") + PLAYABLE]
+
+
+def sound_codecs(video: Path) -> list[str]:
+    out = run([tool("ffprobe"), "-v", "error", "-select_streams", "a", "-show_entries",
+               "stream=codec_name", "-of", "csv=p=0", *source(video)])
+    return [name.strip().lower() for name in out.stdout.splitlines() if name.strip()]
+
+
+def sound(codecs: list[str]) -> list[str]:
+    if set(codecs) <= COPIED:
+        return ["-c:a", "copy"]
+    return ["-c:a", "aac", "-b:a", "192k"]
 
 
 def ceiling(rate: int) -> list[str]:
@@ -58,13 +76,18 @@ def ceiling_kbps(video: Path) -> int:
 
 def encode(video: Path, target: Path, folder: Path, mark: Mark | None) -> Path:
     base = [tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", *source(video),
-            *drawing(mark), "-c:a", "copy", "-movflags", "+faststart"]
+            *drawing(mark), *sound(sound_codecs(video)), "-movflags", "+faststart"]
     rate = ceiling_kbps(video)
+    with whole(target) as part:
+        first_that_works(base, rate, part, folder)
+    return target
+
+
+def first_that_works(base: list[str], rate: int, part: Path, folder: Path) -> None:
     errors, limit = [], ceiling(rate)
     for encoder in for_quality(rate):
-        result = run([*base, *encoder, *limit, str(target)], cwd=folder)
-        if result.returncode == 0 and target.exists() and target.stat().st_size > 0:
-            return target
+        result = run([*base, *encoder, *limit, str(part)], cwd=folder)
+        if result.returncode == 0 and part.exists() and part.stat().st_size > 0:
+            return
         errors.append(result.stderr.strip()[-200:])
-    target.unlink(missing_ok=True)
     raise RuntimeError("burn failed: " + " | ".join(errors))

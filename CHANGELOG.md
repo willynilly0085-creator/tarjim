@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.0.52 (2026-10-29)
+
+A full review of tarjim, prompted by a clip whose last seconds had no subtitles.
+
+- **Subtitles stay on time to the very end.** The cloud listener's times could drift up to
+  11 seconds on longer clips, leaving the end without subtitles; they are now corrected from what
+  the computer itself heard before timing.
+- **Each speaker has a colour.** The main speaker stays white; the next ones are yellow, cyan
+  and green. A reply said over someone else's sentence now shows at its own moment, and an
+  exchange keeps its order even when the model swaps the lines.
+- **Arabic lines with English words read in the right order**, long lines wrap instead of
+  leaving the frame, and the outline is softer.
+- **tarjim keeps running.** After sign-in it is started again whenever it stops, a second copy
+  can no longer run beside it, a request made during an update or before a shutdown is not lost,
+  and the browser extension starts tarjim by itself when it is off.
+- **Translation is sturdier.** Subscription programs (Codex, Grok, Antigravity) can no longer
+  hang a job; one failed batch is retried instead of discarding the work; a backup engine only
+  fills what is missing; local engines get smaller batches and more time.
+- **Video and sound.** Phone videos filmed upright, audio that starts late, 10-bit sources,
+  non-standard audio, dubs shorter than the video, and long videos' voice separation are all
+  handled; a cancelled or failed run no longer leaves a broken file or deletes a good one.
+- **Page, extension and phone bot.** The bot checks a request before downloading and never
+  blocks while fetching; the page says when tarjim is off; the extension finds TikTok and
+  Facebook feed videos, explains refusals and asks before cancelling.
+- Chinese, Japanese and Thai are timed by character, sounds-only and music-only clips no longer
+  fail, and audio files can be dubbed.
+
 ## 1.0.51 (2026-10-28)
 
 - **No code to connect the browser extension.** When the tarjim extension asks to connect, tarjim's

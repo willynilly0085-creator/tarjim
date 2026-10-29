@@ -5,6 +5,7 @@ import numpy as np
 from tarjim.dub.audio import RATE, ffmpeg, fit, speed_up, trim
 from tarjim.dub.lines import Line
 from tarjim.media import source
+from tarjim.whole import whole
 
 HEADROOM = 0.97
 VOICE_GAIN = 1.0
@@ -33,8 +34,14 @@ def mix(lines: list[Line], speech: list[np.ndarray], background: np.ndarray) -> 
     return track * (HEADROOM / peak) if peak > HEADROOM else track
 
 
-def mux(picture: Path, sound: Path, target: Path) -> Path:
-    ffmpeg(["-y", *source(picture), *source(sound), "-map", "0:v:0", "-map", "1:a:0",
-            "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart",
-            "-shortest", str(target)])
+def mux(picture: Path | None, sound: Path, target: Path) -> Path:
+    """The dubbed sound on the picture, padded with silence so the picture's length decides where
+    the video ends; a file with no picture is dubbed into sound alone."""
+    sound_out = ["-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart"]
+    with whole(target) as part:
+        if picture is None:
+            ffmpeg(["-y", *source(sound), "-map", "0:a:0", *sound_out, str(part)])
+        else:
+            ffmpeg(["-y", *source(picture), *source(sound), "-map", "0:v:0", "-map", "1:a:0",
+                    "-c:v", "copy", "-af", "apad", *sound_out, "-shortest", str(part)])
     return target

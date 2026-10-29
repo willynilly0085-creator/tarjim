@@ -19,3 +19,8 @@ def test_long_text_splits_into_two_balanced_lines() -> None:
 def test_prefers_breaking_after_punctuation() -> None:
     top, _ = balance_lines("على الأقل مرة بالشهر، وبعضهم يقول كل ثلاث شهور تقريباً")
     assert top.endswith("،")
+
+
+def test_one_word_longer_than_a_line_stays_whole() -> None:
+    link = "https://example.com/a/very/long/address/that/cannot/be/broken/at/a/space"
+    assert balance_lines(link) == [link]

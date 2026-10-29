@@ -33,6 +33,7 @@ def test_a_burn_without_nvidia_or_x264_uses_openh264(
     monkeypatch.setattr(burn, "run", fake_ffmpeg("libopenh264", tried))
     monkeypatch.setattr(burn, "video_kbps", lambda _video: 2000)
     monkeypatch.setattr(burn, "codec", lambda _video: "h264")
+    monkeypatch.setattr(burn, "sound_codecs", lambda _video: ["aac"])
     monkeypatch.setattr(burn, "tool", lambda _name: "ffmpeg")
     target = burn.encode(tmp_path / "in.mp4", tmp_path / "out.mp4", tmp_path, None)
     assert target.read_bytes() == b"video" and tried[-1] == "libopenh264"

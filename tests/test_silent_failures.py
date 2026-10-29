@@ -61,15 +61,16 @@ def test_a_title_with_an_apostrophe_is_burned(tmp_path: Path,
 
     def fake_run(args: list[str], cwd: Path | None = None) -> Any:
         graph = args[args.index("-vf") + 1]
-        name = graph.removeprefix("ass=")
+        name = graph.removeprefix("ass=").removesuffix(burning.PLAYABLE)
         seen.append(graph)
         assert cwd is not None and (cwd / name).read_text(encoding="utf-8") == "[Script Info]"
-        target.write_bytes(b"video")
+        Path(args[-1]).write_bytes(b"video")  # beside the target until it is whole
         return type("Done", (), {"returncode": 0, "stderr": ""})()
 
     monkeypatch.setattr(burning, "run", fake_run)
     monkeypatch.setattr(burning, "tool", lambda name: name)
     monkeypatch.setattr(burning, "video_kbps", lambda _video: 0)
+    monkeypatch.setattr(burning, "sound_codecs", lambda _video: ["aac"])
     assert burning.burn(folder / "Don't stop.mp4", "[Script Info]", target) == target
     assert seen and all(mark not in seen[0] for mark in "'\\:")
 
@@ -124,8 +125,9 @@ def test_a_missing_second_listener_does_not_stop_the_job(monkeypatch: pytest.Mon
 
     monkeypatch.setattr(hearing, "qwen_transcript", missing)
     assert hearing.second_opinion(Path("a.wav")) == []
-    with pytest.raises(RuntimeError, match="local listener"):
-        hearing.local_transcript(Path("a.wav"))
+    with pytest.raises(RuntimeError, match="API key not valid"):
+        hearing.local_transcript(Path("a.wav"), RuntimeError("gemini 400: API key not valid"))
+    assert hearing.local_transcript(Path("a.wav")).words == []
 
 
 def test_a_number_at_the_start_is_placed_just_before_the_next_word() -> None:

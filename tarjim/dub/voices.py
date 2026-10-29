@@ -1,4 +1,8 @@
+from dataclasses import replace
+
+from tarjim.dub.lines import Line
 from tarjim.models import Word
+from tarjim.speakers import ranked, who
 
 WANTED = 10.0
 LONGEST = 12.0
@@ -36,6 +40,15 @@ def pick(spans: list[Span]) -> list[Span]:
         chosen.append((start, start + take))
         total += take
     return sorted(chosen)
+
+
+def one_voice_each(words: list[Word], lines: list[Line]) -> tuple[list[Word], list[Line]]:
+    """Listener labels become voices: "voice1" for the speaker who talks most in each piece of
+    the video, so one person is not handed a new voice in every piece or voting pass."""
+    ranks = ranked(words)
+    names = {w.speaker: f"voice{ranks[who(w.speaker)] + 1}" for w in words if w.speaker}
+    return ([replace(w, speaker=names.get(w.speaker, w.speaker)) for w in words],
+            [replace(line, speaker=names.get(line.speaker, line.speaker)) for line in lines])
 
 
 def reference_spans(words: list[Word]) -> dict[str, list[Span]]:

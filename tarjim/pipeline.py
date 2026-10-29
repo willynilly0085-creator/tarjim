@@ -73,9 +73,20 @@ def save_review(job: Job, cues: list[Cue]) -> None:
 
 def write_outputs(job: Job, cues: list[Cue], words: list[Word], report: Report) -> None:
     job.output(".srt").write_text(render_srt(cues, job.rules), encoding="utf-8-sig")
+    picture = write_picture(job, cues, report)
+    if job.dub:
+        from tarjim.dub.make import dub_video
+
+        report("dubbing")
+        dub_video(job, cues, words, picture)  # no picture: the sound alone is dubbed
+
+
+def write_picture(job: Job, cues: list[Cue], report: Report) -> Path | None:
+    """The subtitles drawn for the picture, burned when asked; what a dub is laid on, or None
+    for a file with no picture."""
     info = media.probe(job.video)
     if not info.has_picture:
-        return
+        return None
     canvas = placed(job, cues, Canvas(info.width, info.height, job.font_name,
                                       media.bright_bottom(job.video)), info.duration)
     subtitles = render_ass(cues, canvas, job.rules)
@@ -84,11 +95,7 @@ def write_outputs(job: Job, cues: list[Cue], words: list[Word], report: Report) 
     if job.burn:
         report("burning")
         burn(job.video, subtitles, job.output(".mp4"), mark)
-    if job.dub:
-        from tarjim.dub.make import dub_video
-
-        report("dubbing")
-        dub_video(job, cues, words, picture_for(job, canvas, mark))
+    return picture_for(job, canvas, mark) if job.dub else None
 
 
 def picture_for(job: Job, canvas: Canvas, mark: Mark | None) -> Path:

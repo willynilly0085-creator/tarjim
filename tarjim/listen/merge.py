@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from tarjim.gemini_client import QuotaExhausted
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.vote import AGREE, vote
+from tarjim.models import Word
 
 PASSES = 3
 CLOSE = 0.9
@@ -18,6 +19,8 @@ class Heard:
     language: str
     utterances: list[Utterance]
     passes: list[list[Utterance]]
+    # the words the local listener heard, when it was the listener: its own second opinion
+    local_words: list[Word] | None = None
 
 
 def listen_many(listen: Listen, passes: int = PASSES) -> Heard:

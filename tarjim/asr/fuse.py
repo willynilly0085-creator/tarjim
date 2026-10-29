@@ -1,19 +1,23 @@
+import bisect
 from difflib import SequenceMatcher
 
-from tarjim.asr.align import longest
+from tarjim.asr.align import longest, overlapping
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.vote import norm
 from tarjim.models import Word
+from tarjim.scripts import split_words
 
 SLACK = 0.3
 SEARCH = 2.0
 INF = float("inf")
 
+Limits = tuple[float, float]
+
 
 def split_by(words: list[Word], utterances: list[Utterance]) -> list[list[Word]]:
     groups, cursor = [], 0
     for utterance in utterances:
-        size = len(utterance.text.split())
+        size = len(split_words(utterance.text))
         groups.append(words[cursor:cursor + size])
         cursor += size
     return groups
@@ -59,15 +63,43 @@ def capped(group: list[Word]) -> list[Word]:
     return [Word(w.text, max(w.start, w.end - longest(w.text)), w.end, w.speaker) for w in group]
 
 
+def room(index: int, groups: list[list[Word]], over: list[bool], floor: float) -> Limits:
+    """Where a retimed utterance may go: between the turns around it, or anywhere near its own
+    time when it was said over another turn."""
+    if over[index]:
+        return 0.0, INF
+    later = (g[0].start for g, said_over in zip(groups[index + 1:], over[index + 1:], strict=True)
+             if g and not said_over)
+    return floor, next(later, INF)
+
+
+def retimed(group: list[Word], utterance: Utterance, heard: list[Word],
+            limits: Limits) -> list[Word]:
+    better = retime(group, utterance, heard)
+    return capped(better) if better and fits(better, *limits) else group
+
+
 def fuse(words: list[Word], utterances: list[Utterance], heard: list[Word]) -> list[Word]:
     groups = split_by(words, utterances)
-    result: list[Word] = []
+    over = overlapping(utterances)
+    result: list[list[Word]] = []
+    said_over: list[list[Word]] = []
+    floor = 0.0
     for index, (group, utterance) in enumerate(zip(groups, utterances, strict=True)):
         if group and not inside(group[0].start, utterance):
-            ceiling = next((g[0].start for g in groups[index + 1:] if g), INF)
-            better = retime(group, utterance, heard)
-            floor = result[-1].end if result else 0.0
-            if better and fits(better, floor, ceiling):
-                group = capped(better)  # noqa: PLW2901
-        result.extend(group)
-    return result
+            group = retimed(group, utterance, heard, room(index, groups, over, floor))  # noqa: PLW2901
+        (said_over if over[index] else result).append(group)
+        if group and not over[index]:
+            floor = group[-1].end
+    return slotted([w for group in result for w in group], said_over)
+
+
+def slotted(turns: list[Word], replies: list[list[Word]]) -> list[Word]:
+    """A short reply said over a turn goes inside it, at its own time, as one piece. Only these
+    move: sorting every word by time would interleave two people talking at once, word by word,
+    into a line per word (seen on 2026-10-29 when a question and its answer overlapped)."""
+    words = list(turns)
+    for reply in (r for r in replies if r):
+        at = bisect.bisect_right([w.start for w in words], reply[0].start)
+        words[at:at] = reply
+    return words

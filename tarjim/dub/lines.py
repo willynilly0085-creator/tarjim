@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from tarjim.models import Cue, Word
+from tarjim.models import Cue, Word, join_words
 
 SEPARATOR = "||"
 TAIL = 1.5
@@ -31,7 +31,7 @@ def pieces(cue: Cue) -> list[tuple[list[Word], str]]:
 
 
 def lines_from(cues: list[Cue], total: float) -> list[Line]:
-    spoken = [(words[0].start, words[0].speaker, text, " ".join(w.text for w in words))
+    spoken = [(words[0].start, words[0].speaker, text, join_words(words))
               for cue in cues for words, text in pieces(cue) if words and text.strip()]
     lines = []
     for index, (start, speaker, text, source) in enumerate(spoken):

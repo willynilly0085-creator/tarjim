@@ -120,8 +120,22 @@ def place(archive: Path, digest: str) -> Path:
     return target / binary.relative_to(files)
 
 
+def in_place(digest: str) -> Path | None:
+    """The ffmpeg.exe of this very build when it is already unpacked and runs. Unpacking it again
+    would first remove the folder a running job may be using."""
+    folder = root() / digest[:16]
+    if installed(folder)[0] != digest:
+        return None
+    binary = next(folder.rglob("ffmpeg.exe"), None)
+    usable = binary and all(map(runs, (binary, binary.with_name("ffprobe.exe"))))
+    return binary if usable else None
+
+
 def build(name: str, digest: str) -> Path:
     """Download, check and unpack a build beside the one in use; gives its ffmpeg.exe."""
+    present = in_place(digest)
+    if present:
+        return present
     staging = root() / ".new"
     shutil.rmtree(staging, ignore_errors=True)
     staging.mkdir(parents=True)

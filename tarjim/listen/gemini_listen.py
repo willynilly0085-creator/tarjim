@@ -3,6 +3,9 @@ from typing import Any, Protocol
 
 from tarjim.gemini_client import GeminiClient
 
+SECONDS_PER_LETTER = 0.07  # about 14 letters a second in ordinary speech
+SHORTEST = 0.3
+
 PROMPT = """Transcribe EVERY spoken word in this audio verbatim, from the first second to the \
 very last second. Include the main speakers, the interviewer or host, and every short \
 question or reaction even if it is a single word ("Never?", "Really?", "Nice.", "Perfect."), \
@@ -48,6 +51,8 @@ def parse(row: Any) -> Utterance | None:
         text = " ".join(str(row["text"]).split())
     except (KeyError, TypeError, ValueError):
         return None
-    if not text or end <= start:
+    if not text or end < start:
         return None
+    if end == start:  # a short reply ("Yes.") is often given one moment, not a length
+        end = start + max(SHORTEST, SECONDS_PER_LETTER * len(text))
     return Utterance(start, end, str(row.get("speaker", "")), text)

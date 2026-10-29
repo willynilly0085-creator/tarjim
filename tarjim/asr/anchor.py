@@ -14,6 +14,7 @@ from tarjim.asr.align import proportional
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.vote import norm
 from tarjim.models import Word
+from tarjim.scripts import split_words
 
 DRIFT = 2.0  # smaller differences are the aligner's to settle (it searches a second either side)
 SHARE = 0.5  # of an utterance's words, heard in the same order by the local listener
@@ -35,7 +36,7 @@ def shifts(utterances: list[Utterance], heard: list[Word]) -> dict[int, list[flo
 
 
 def own_delta(utterance: Utterance, found: list[float]) -> float | None:
-    if len(found) < max(LEAST, SHARE * len(utterance.text.split())):
+    if len(found) < max(LEAST, SHARE * len(split_words(utterance.text))):
         return None
     return median(found)
 

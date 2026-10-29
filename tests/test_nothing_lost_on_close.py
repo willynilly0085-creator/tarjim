@@ -42,3 +42,14 @@ def test_an_error_in_one_job_does_not_stop_the_queue() -> None:
     board.submit(Order("first"))
     board.submit(Order("second"))
     assert done.wait(5)
+
+
+def test_no_restart_while_a_tool_downloads(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    from tarjim.server import update_routes
+    from tarjim.tools import Progress, shelf
+
+    board = Board(lambda task: None)
+    assert update_routes.idle(board)
+    tool = next(iter(shelf().progress))
+    monkeypatch.setitem(shelf().progress, tool, Progress("downloading"))
+    assert not update_routes.idle(board)

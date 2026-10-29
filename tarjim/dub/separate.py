@@ -11,6 +11,10 @@ BACKGROUND_WITHOUT_STEMS = 0.12
 REPO = "adefossez/HTDemucs"
 KLASS = "demucs.htdemucs.HTDemucs"
 PART = re.compile(r"[0-9a-f]{8}")
+# Seconds separated at once: the whole of a long video at once filled the graphics card (5 GB
+# for an hour) or, on the processor, about 15 GB of memory.
+WINDOW = 180.0
+CONTEXT = 5.0
 
 
 @dataclass
@@ -27,7 +31,7 @@ def separate(video: Path) -> Stems:
     try:
         with heavy():
             voices, background = split_voices(mixture)
-    except (ImportError, RuntimeError, OSError) as error:
+    except (ImportError, RuntimeError, OSError, MemoryError) as error:
         print(f"dubbing: voices not separated from the background ({type(error).__name__}); "
               "the original sound is kept quietly under the new voices", flush=True)
         mono = mixture.mean(axis=1)
@@ -76,22 +80,36 @@ def separation_model() -> Any:
 
 
 def split_voices(mixture: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """A window at a time, each heard with CONTEXT on both sides so the joins do not show. The
+    level is the whole sound's, so every window is scaled alike."""
     import torch
-    from demucs.apply import apply_model
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = separation_model().to(device).eval()
     if model.samplerate != RATE:
         raise RuntimeError("unexpected demucs sample rate")
-    wav = torch.from_numpy(mixture.T.copy())
-    reference = wav.mean(0)
-    scale = reference.std() + 1e-8
-    normal = (wav - reference.mean()) / scale
+    centre = float(mixture.mean())
+    scale = float(mixture.mean(axis=1).std()) + 1e-8
+    vocals, background = np.empty_like(mixture), np.empty_like(mixture)
+    step, context = int(WINDOW * RATE), int(CONTEXT * RATE)
+    for start in range(0, len(mixture), step):
+        heard = slice(max(0, start - context), min(len(mixture), start + step + context))
+        stems = separated(model, (mixture[heard] - centre) / scale, device) * scale + centre
+        kept = slice(start - heard.start, start - heard.start + min(step, len(mixture) - start))
+        voice = stems[model.sources.index("vocals")][kept]
+        vocals[start:start + len(voice)] = voice
+        background[start:start + len(voice)] = stems.sum(0)[kept] - voice
+    return vocals, background
+
+
+def separated(model: Any, piece: np.ndarray, device: str) -> np.ndarray:
+    """The stems of one window, as (stem, sample, channel). The sound stays in memory and only
+    the model's own steps run on the device, so the card holds a few seconds at a time."""
+    import torch
+    from demucs.apply import apply_model
+
+    wav = torch.from_numpy(np.ascontiguousarray(piece.T, dtype=np.float32))
     with torch.inference_mode():
-        stems = apply_model(model, normal[None].to(device), device=device, split=True,
-                            overlap=0.25)[0]
-    stems = stems * scale + reference.mean()
-    vocals_at = model.sources.index("vocals")
-    vocals = stems[vocals_at]
-    background = stems.sum(0) - vocals
-    return vocals.cpu().numpy().T, background.cpu().numpy().T
+        stems = apply_model(model, wav[None], device=device, split=True, overlap=0.25)[0]
+    found: np.ndarray = stems.cpu().numpy().transpose(0, 2, 1)
+    return found

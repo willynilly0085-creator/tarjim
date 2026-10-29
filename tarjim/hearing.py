@@ -24,23 +24,41 @@ def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcrip
     audio = job.cache / "audio.wav"
     try:
         media.extract_audio(job.video, audio)
-        transcript = listen_and_align(job, audio, report) or local_transcript(audio)
+        transcript, lasting = hear(job, audio, report)
     finally:
         audio.unlink(missing_ok=True)
-    transcript.save(cached)
+    if lasting:  # a backup's hearing, or hearing nothing, is tried afresh on the next run
+        transcript.save(cached)
     return transcript
 
 
-def heard_for(job: Job, audio: Path) -> tuple[str, list[Utterance]]:
+def hear(job: Job, audio: Path, report: Callable[[str], None]) -> tuple[Transcript, bool]:
+    """The transcript, and whether it is the chosen listener's own and worth keeping."""
+    try:
+        heard = heard_for(job, audio)
+    except QuotaExhausted:
+        raise
+    except RuntimeError as error:
+        return local_transcript(audio, error), False
+    if heard.utterances:
+        return listen_and_align(audio, heard, report), True
+    if heard.local_words is not None:  # the local listener itself heard no speech
+        return Transcript(language=heard.language, text=""), False
+    return local_transcript(audio), False
+
+
+def heard_for(job: Job, audio: Path) -> Heard:
     cached = job.cache / "heard.json"
     if cached.exists():
         data = json.loads(cached.read_text(encoding="utf-8"))
-        return data["language"], [Utterance(**u) for u in data["utterances"]]
+        words = data.get("local_words")
+        return Heard(data["language"], [Utterance(**u) for u in data["utterances"]], [],
+                     None if words is None else [Word(**w) for w in words])
     heard = listen_video(job.video, audio)
-    payload = {"language": heard.language, "utterances": [asdict(u) for u in heard.utterances],
-               "passes": [[asdict(u) for u in run] for run in heard.passes]}
-    cached.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
-    return heard.language, heard.utterances
+    if heard.utterances:  # hearing nothing is not kept: the next run listens again
+        cached.write_text(json.dumps(asdict(heard), ensure_ascii=False, indent=1),
+                          encoding="utf-8")
+    return heard
 
 
 def listen_video(video: Path, audio: Path) -> Heard:
@@ -62,8 +80,8 @@ def listen_with(provider: str, video: Path, audio: Path) -> Heard:
     if provider == "local":
         from tarjim.engines.local_listen import listen_file
 
-        language, utterances = listen_file(audio)
-        return Heard(language, utterances, [utterances])
+        language, utterances, words = listen_file(audio)
+        return Heard(language, utterances, [utterances], words)
     duration = media.wav_seconds(audio)  # the file's header may claim any length it likes
     once = cloud_listener(provider)
 
@@ -102,8 +120,7 @@ def speech_regions_of(audio: Path) -> Regions:
     return speech_regions(wav)
 
 
-def listen_and_align(job: Job, audio: Path,
-                     report: Callable[[str], None] = print) -> Transcript | None:
+def listen_and_align(audio: Path, heard: Heard, report: Callable[[str], None]) -> Transcript:
     import soundfile
 
     from tarjim.asr.align import shared_aligner
@@ -111,22 +128,17 @@ def listen_and_align(job: Job, audio: Path,
     from tarjim.asr.fuse import fuse
     from tarjim.memory import heavy
 
-    try:
-        language, utterances = heard_for(job, audio)
-    except QuotaExhausted:
-        raise
-    except RuntimeError:
-        return None
-    if not utterances:
-        return None
     report("timing")
     wav, rate = soundfile.read(str(audio), dtype="float32")
-    heard = second_opinion(audio)  # first: its times correct a cloud listener's drift
-    utterances = anchor(utterances, heard, len(wav) / rate)
+    # first: its times correct a cloud listener's drift; the local listener is its own
+    local = heard.local_words
+    opinion = second_opinion(audio) if local is None else local
+    utterances = anchor(heard.utterances, opinion, len(wav) / rate)
     with heavy():
-        words = shared_aligner().align(wav, utterances, language)
-    words = fuse(words, utterances, heard)
-    return Transcript(language=language, text=" ".join(u.text for u in utterances), words=words)
+        words = shared_aligner().align(wav, utterances, heard.language)
+    words = fuse(words, utterances, opinion)
+    return Transcript(language=heard.language, text=" ".join(u.text for u in utterances),
+                      words=words)
 
 
 def second_opinion(audio: Path) -> list[Word]:
@@ -136,13 +148,16 @@ def second_opinion(audio: Path) -> list[Word]:
         return []
 
 
-def local_transcript(audio: Path) -> Transcript:
-    """What is left when the chosen listener heard nothing or failed."""
+def local_transcript(audio: Path, failure: RuntimeError | None = None) -> Transcript:
+    """What is left when the chosen listener heard nothing or failed. Without the local
+    listener, the person sees the chosen listener's own error; a video in which it heard no
+    speech (music alone) gets no subtitles."""
     try:
         return qwen_transcript(audio)
     except (OSError, ImportError) as error:
-        raise RuntimeError("no speech was heard, and the local listener is not installed to "
-                           "try again") from error
+        if failure is not None:
+            raise failure from error
+        return Transcript(language="", text="")
 
 
 def qwen_transcript(audio: Path) -> Transcript:

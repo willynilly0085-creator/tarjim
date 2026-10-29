@@ -13,7 +13,7 @@ from tarjim.dub.lines import Line, lines_from
 from tarjim.dub.mix import mix, mux
 from tarjim.dub.separate import Stems, separate
 from tarjim.dub.studio import VOICES
-from tarjim.dub.voices import reference_spans
+from tarjim.dub.voices import one_voice_each, reference_spans
 from tarjim.job import Job, checkpoint
 from tarjim.memory import free_for_voice, heavy
 from tarjim.models import Cue, Word
@@ -153,12 +153,13 @@ def speak(engine: str, job: Job, samples: dict[str, Path], lines: list[Line]) ->
             fallback_spoken(lines, backup, job.target))
 
 
-def dub_video(job: Job, cues: list[Cue], words: list[Word], picture: Path) -> Path:
+def dub_video(job: Job, cues: list[Cue], words: list[Word], picture: Path | None) -> Path:
     engine = choose(job.dub, job.target)
     length = media.sound_seconds(job.video)
     if length > media.LONGEST:
         raise RuntimeError(media.TOO_LONG)
-    lines = spoken(lines_from(cues, length), engine, job)
+    words, said = one_voice_each(words, lines_from(cues, length))
+    lines = spoken(said, engine, job)
     checkpoint()
     free_for_voice()
     stems = separate(job.video)

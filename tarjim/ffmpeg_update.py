@@ -62,7 +62,6 @@ def due(now: float) -> bool:
 
 def renew(folder: Path) -> str:
     """A newer build of the branch in use, or the old one as it was; gives the build's name."""
-    ffmpeg_release.tidy({folder})
     have, name = ffmpeg_release.installed(folder)
     listed = ffmpeg_release.ask()
     found = ffmpeg_release.choose(listed, name or ffmpeg_setup.ARCHIVE)
@@ -81,14 +80,17 @@ def renew(folder: Path) -> str:
 
 
 def refresh(idle: bool, now: float | None = None) -> str:
-    """Called by the update watch; gives the build now in use when it changed."""
+    """Called by the update watch; gives the build now in use when it changed. Builds no longer
+    in use go first, whenever nothing runs, even with automatic updates off: an install from the
+    page leaves the one it replaced, as a job may have been using it."""
     now = time.time() if now is None else now
     folder = own()
-    if folder is None or not allowed(idle) or not due(now):
-        return ""
-    if not ffmpeg_setup.PLACING.acquire(blocking=False):
+    if folder is None or not idle or not ffmpeg_setup.PLACING.acquire(blocking=False):
         return ""
     try:
+        ffmpeg_release.tidy({folder})
+        if not allowed(idle) or not due(now):
+            return ""
         config.save("ffmpeg_checked", str(now))
         return renew(folder)
     finally:

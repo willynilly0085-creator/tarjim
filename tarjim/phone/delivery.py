@@ -38,8 +38,9 @@ def phone_copy(video: Path) -> Path | None:
         return None
     smaller = video.with_name(f"{video.stem}.phone.mp4")
     base = [tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", *source(video),
-            "-vf", "scale='min(1280,iw)':-2", "-maxrate", f"{rate}k", "-bufsize", f"{2 * rate}k",
-            "-c:a", "aac", "-b:a", f"{AUDIO_KBPS}k", "-movflags", "+faststart"]
+            "-vf", "scale='min(1280,iw)':-2,format=yuv420p", "-maxrate", f"{rate}k",
+            "-bufsize", f"{2 * rate}k", "-c:a", "aac", "-b:a", f"{AUDIO_KBPS}k", "-movflags",
+            "+faststart"]
     for encoder in for_rate(rate):  # the first this computer's ffmpeg can use
         if run([*base, *encoder, str(smaller)]).returncode == 0:
             break

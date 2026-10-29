@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 
+from tarjim.scripts import joined
+
 
 @dataclass(frozen=True)
 class Word:
@@ -13,7 +15,7 @@ DIALOGUE_SEPARATOR = " || "
 
 
 def join_words(words: list[Word]) -> str:
-    return " ".join(w.text for w in words).strip()
+    return joined([w.text for w in words])
 
 
 @dataclass

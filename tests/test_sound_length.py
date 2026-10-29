@@ -93,12 +93,11 @@ def test_ordinary_sound_is_extracted_whole(tmp_path: Path) -> None:
 @real_tools
 def test_a_failed_hearing_does_not_leave_the_sound_behind(
         tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    def nothing_heard(_audio: Path) -> None:
+    def nothing_heard(*_args: Any) -> None:
         raise RuntimeError("no speech was heard")
 
     monkeypatch.setattr(tarjim.memory, "free_for_listening", lambda: None)
-    monkeypatch.setattr(hearing, "listen_and_align", lambda *_a: None)
-    monkeypatch.setattr(hearing, "local_transcript", nothing_heard)
+    monkeypatch.setattr(hearing, "hear", nothing_heard)
     job = Job(silence(tmp_path, 2))
     with pytest.raises(RuntimeError):
         hearing.transcript_for(job, lambda _stage: None)

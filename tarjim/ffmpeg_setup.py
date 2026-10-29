@@ -23,12 +23,6 @@ def use(binary: Path) -> None:
     config.prepare_environment()
 
 
-def in_use() -> set[Path]:
-    saved = config.settings()
-    found = (ffmpeg_release.folder_of(saved.get(name, "")) for name in ("ffmpeg", "ffprobe"))
-    return {folder for folder in found if folder}
-
-
 def install_ffmpeg() -> Path:
     if sys.platform != "win32":
         raise RuntimeError(ELSEWHERE)
@@ -39,5 +33,6 @@ def install_ffmpeg() -> Path:
             raise RuntimeError("ffmpeg checksum is not published")
         binary = ffmpeg_release.build(name, listed[name])
         use(binary)
-        ffmpeg_release.tidy(in_use())
+    # The build replaced may still be running a job's ffmpeg: the update watch removes it
+    # once nothing runs (ffmpeg_update.refresh).
     return binary

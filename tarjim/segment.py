@@ -1,9 +1,10 @@
 from tarjim.dialogue import Piece, merge_short
-from tarjim.models import Cue, Word
+from tarjim.models import Cue, Word, join_words
 from tarjim.rules import DEFAULT_RULES, Rules
+from tarjim.speakers import who
 
-SENTENCE_END = (".", "?", "!", "؟")
-SOFT_END = (",", "،", ";", "؛", ":")
+SENTENCE_END = (".", "?", "!", "؟", "。", "？", "！")
+SOFT_END = (",", "،", ";", "؛", ":", "，", "、", "；", "：")
 MIN_SPAN = 1e-6
 EDGE = 0.05
 MIN_SPLITTABLE = 2
@@ -35,7 +36,7 @@ def split_blocks(words: list[Word], cuts: list[float], rules: Rules) -> list[Pie
 
 
 def speaker_changed(prev: Word, word: Word, labelled: bool, at_cut: bool) -> bool:
-    return prev.speaker != word.speaker if labelled else at_cut
+    return who(prev.speaker) != who(word.speaker) if labelled else at_cut
 
 
 def is_break(prev: Word, word: Word, at_cut: bool, rules: Rules) -> bool:
@@ -81,7 +82,7 @@ def split_long(block: Piece, rules: Rules) -> list[Piece]:
 
 def fits(words: list[Word], rules: Rules) -> bool:
     duration = words[-1].end - words[0].start
-    chars = len(" ".join(w.text for w in words))
+    chars = len(join_words(words))
     return duration <= rules.max_duration and chars <= rules.max_source_chars
 
 
@@ -102,12 +103,23 @@ def best_split(block: list[Word]) -> int:
 def fit_timing(cues: list[Cue], rules: Rules, cuts: list[float] | None = None) -> list[Cue]:
     for index, cue in enumerate(cues):
         has_next = index + 1 < len(cues)
+        if has_next:
+            make_room(cue, cues[index + 1], rules)
         limit = cues[index + 1].start - rules.min_gap if has_next else float("inf")
         limit = min(limit, next_cut(cuts or [], cue.end))
         wanted = max(cue.end + rules.linger, cue.start + rules.min_duration)
         wanted = min(wanted, cue.start + rules.max_duration)
         cue.end = max(min(wanted, limit), cue.start + MIN_SPAN)
     return cues
+
+
+def make_room(cue: Cue, following: Cue, rules: Rules) -> None:
+    """Two people talking at once: the next line waits until this one has been up long enough
+    to read, instead of this one being squeezed to nothing (2026-10-29: a question answered
+    over its own end was shown for no time at all)."""
+    needed = cue.start + rules.min_duration + rules.min_gap
+    if following.start < needed:
+        following.start = max(following.start, min(needed, following.end - rules.min_duration))
 
 
 def next_cut(cuts: list[float], after: float) -> float:

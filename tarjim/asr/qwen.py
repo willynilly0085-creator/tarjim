@@ -2,6 +2,7 @@
 times each word, both through Transformers' own classes (tarjim/asr/qwen_load.py), in bfloat16
 on the graphics card or float32 on the processor. Long sound is heard in three-minute pieces."""
 import re
+from dataclasses import replace
 from functools import lru_cache
 from typing import Any
 
@@ -12,6 +13,7 @@ from tarjim.asr.pieces import RATE, Piece, pieces
 from tarjim.asr.qwen_load import ALIGNER_MODEL, ASR_MODEL, EARLIER_ALIGNER, EARLIER_ASR
 from tarjim.asr.qwen_run import BATCH, MAX_TOKENS, Stamp, align, recognise
 from tarjim.models import Word
+from tarjim.scripts import split_words
 
 __all__ = ["ALIGNER_MODEL", "ASR_MODEL", "BATCH", "EARLIER_ALIGNER", "EARLIER_ASR",
            "MAX_TOKENS", "QwenEngine", "shared_engine"]
@@ -74,17 +76,24 @@ def core(text: str) -> str:
     return "".join(CORE.findall(text)).lower()
 
 
+def letters(text: str) -> int:
+    return sum(len(part) for part in CORE.findall(text))
+
+
 def attach_punctuation(text: str, items: list[Any]) -> list[Word]:
-    queue = list(items)
+    """The heard text's own words and punctuation, timed by the aligner's pieces: letter by
+    letter, so a word the aligner split ("it", "s") or several it joined come out right."""
+    timeline = [(float(i.start_time), float(i.end_time))
+                for i in items for _ in range(letters(i.text))]
     words: list[Word] = []
-    for token in text.split():
-        target = core(token)
-        if not target or not queue:
+    cursor = 0
+    for token in split_words(text):
+        size = letters(token)
+        if not size and words:  # "Vraiment ?": the mark ends the word before it
+            words[-1] = replace(words[-1], text=f"{words[-1].text} {token}")
+        if not size or cursor >= len(timeline):
             continue
-        first = last = queue.pop(0)
-        merged = core(first.text)
-        while merged != target and queue and len(merged) < len(target):
-            last = queue.pop(0)
-            merged += core(last.text)
-        words.append(Word(token, float(first.start_time), float(last.end_time)))
+        span = timeline[cursor:cursor + size]
+        words.append(Word(token, span[0][0], span[-1][1]))
+        cursor += size
     return words

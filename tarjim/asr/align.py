@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import lru_cache
-from itertools import pairwise
+from itertools import islice, pairwise
 from typing import Any
 
 import numpy as np
@@ -9,8 +9,11 @@ from tarjim.asr.ctc import FRAME, Emitter, Span, token_spans
 from tarjim.asr.qwen import core
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
+from tarjim.scripts import split_words
 
 CHUNK_SECONDS = 240.0
+OVERLAP = 1.0  # starting this far inside an earlier utterance: said over it, not after it
+SHORT_REPLY = 4  # words: "Really?", "Oh my gosh", not a turn of its own
 PAD = 2.0
 SPECIAL_IDS = 4
 GAP_FALLBACK = 0.2
@@ -29,8 +32,24 @@ class Slot:
     timed: bool = False
 
 
+def short(utterance: Utterance) -> bool:
+    return len(split_words(utterance.text)) <= SHORT_REPLY
+
+
+def overlapping(utterances: list[Utterance]) -> list[bool]:
+    """Which short replies are said over an earlier turn ("Really?" inside the host's turn).
+    Two long turns that overlap stay one after the other: each is read as a whole."""
+    flags: list[bool] = []
+    reach = float("-inf")
+    for utterance in utterances:
+        flags.append(utterance.start < reach - OVERLAP and short(utterance))
+        if not flags[-1]:
+            reach = max(reach, utterance.end)
+    return flags
+
+
 def proportional(utterance: Utterance) -> list[Word]:
-    tokens = utterance.text.split()
+    tokens = split_words(utterance.text)
     weights = [max(1, len(core(token))) for token in tokens]
     step = (utterance.end - utterance.start) / max(1, sum(weights))
     words, cursor = [], utterance.start
@@ -100,7 +119,13 @@ class AlignEngine:
         logp = self.emitter.emissions(wav)
         self.speech = speech_mask(speech_regions(wav), len(logp))
         logp = mute_silence(logp, self.speech)
-        return [w for group in chunks(utterances) for w in self.align_group(logp, group)]
+        over = overlapping(utterances)
+        turns = [u for u, said_over in zip(utterances, over, strict=True) if not said_over]
+        timed = iter([w for group in chunks(turns) for w in self.align_group(logp, group)])
+        # one search keeps words in order, so a reply said over a turn is searched on its own
+        return [w for u, said_over in zip(utterances, over, strict=True)
+                for w in (self.align_group(logp, [u]) if said_over
+                          else islice(timed, len(split_words(u.text))))]
 
     def tokens(self, text: str) -> list[int]:
         vocab = self.emitter.vocab
@@ -110,7 +135,8 @@ class AlignEngine:
     def align_group(self, logp: np.ndarray, group: list[Utterance]) -> list[Word]:
         low = max(0, int((group[0].start - PAD) / FRAME))
         high = min(len(logp), int((max(u.end for u in group) + PAD) / FRAME))
-        slots = [Slot(tok, u.speaker, i) for i, u in enumerate(group) for tok in u.text.split()]
+        slots = [Slot(tok, u.speaker, i) for i, u in enumerate(group)
+                 for tok in split_words(u.text)]
         if not self.time_slots(logp[low:high], slots, group, low):
             return [word for u in group for word in proportional(u)]
         fill_gaps(slots)

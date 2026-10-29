@@ -5,6 +5,7 @@ import subprocess
 import wave
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from tarjim.config import setting
 
@@ -27,6 +28,10 @@ NOT_MEDIA = "not a video or sound file tarjim can open"
 LONGEST = 6 * 3600.0
 TOO_LONG = "this file is longer than six hours of sound, the most tarjim works on"
 COUNT_RATE = 100
+QUARTER = 90
+# Sound laid on the file's own clock: silence where it starts late or skips, so the sound keeps
+# its place against the picture instead of every line arriving early.
+ON_THE_CLOCK = ["-af", "aresample=async=1:first_pts=0"]
 
 
 @dataclass(frozen=True)
@@ -73,17 +78,27 @@ def check_readable(video: Path) -> None:
         raise RuntimeError(f"{NOT_MEDIA}: {done.stderr.strip()[-160:]}")
 
 
+def on_its_side(stream: dict[str, Any]) -> bool:
+    """A phone stores a standing clip lying down with a quarter turn to show it by; ffmpeg turns
+    the picture when it decodes, so the size is the turned one. Older files keep the turn in a
+    rotate tag."""
+    turns = [d.get("rotation") for d in stream.get("side_data_list", [])]
+    turns.append(stream.get("tags", {}).get("rotate"))
+    return any(str(t).lstrip("-").isdigit() and int(t) % 180 == QUARTER for t in turns)
+
+
 def probe(video: Path) -> VideoInfo:
     out = run([tool("ffprobe"), "-v", "error", "-select_streams", "v:0", "-show_entries",
-               "stream=width,height:stream_disposition=attached_pic:format=duration",
-               "-of", "json", *source(video)])
+               "stream=width,height:stream_tags=rotate:stream_side_data=rotation:"
+               "stream_disposition=attached_pic:format=duration", "-of", "json", *source(video)])
     data = json.loads(out.stdout or "{}")
     stream = (data.get("streams") or [{}])[0]
-    cover = bool(stream.get("disposition", {}).get("attached_pic"))
     duration = float(data.get("format", {}).get("duration", 0.0))
-    if cover:
+    if stream.get("disposition", {}).get("attached_pic"):
         return VideoInfo(0, 0, duration)
-    return VideoInfo(int(stream.get("width", 0)), int(stream.get("height", 0)), duration)
+    size = (int(stream.get("width", 0)), int(stream.get("height", 0)))
+    width, height = size[::-1] if on_its_side(stream) else size
+    return VideoInfo(width, height, duration)
 
 
 def video_kbps(video: Path) -> int:
@@ -106,8 +121,8 @@ def extract_audio(video: Path, target: Path) -> Path:
     on disk (-fs as well, in case the file's timestamps confuse -t) or in memory."""
     most = int((LONGEST + 2) * SAMPLE_RATE * 2)
     done = run([tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", *source(video),
-                "-vn", "-ac", "1", "-ar", str(SAMPLE_RATE), *sound_cap(), "-fs", str(most),
-                str(target)])
+                "-vn", *ON_THE_CLOCK, "-ac", "1", "-ar", str(SAMPLE_RATE), *sound_cap(), "-fs",
+                str(most), str(target)])
     if done.returncode != 0 or not target.is_file():
         target.unlink(missing_ok=True)
         raise RuntimeError(f"this file has no sound that can be read: {done.stderr.strip()[-160:]}")
@@ -130,8 +145,8 @@ def sound_seconds(video: Path) -> float:
     """How much sound the file really holds, decoded and counted (up to just past LONGEST)."""
     try:
         done = subprocess.run(
-            [tool("ffmpeg"), "-hide_banner", "-loglevel", "error", *source(video), "-vn", "-ac",
-             "1", "-ar", str(COUNT_RATE), *sound_cap(), "-f", "u8", "-"],
+            [tool("ffmpeg"), "-hide_banner", "-loglevel", "error", *source(video), "-vn",
+             *ON_THE_CLOCK, "-ac", "1", "-ar", str(COUNT_RATE), *sound_cap(), "-f", "u8", "-"],
             capture_output=True, check=False, timeout=RUN_SECONDS)
     except subprocess.TimeoutExpired:
         raise RuntimeError("ffmpeg did not finish within six hours") from None
@@ -142,7 +157,7 @@ def audio_bytes(video: Path, start: float = 0.0, end: float | None = None) -> by
     window = ["-ss", f"{start:.3f}"] + (["-to", f"{end:.3f}"] if end is not None else [])
     result = subprocess.run(
         [tool("ffmpeg"), "-hide_banner", "-loglevel", "error", *window, *source(video), "-vn",
-         "-ac", "1", "-ar", str(SAMPLE_RATE), "-b:a", "48k", "-f", "mp3", "-"],
+         *ON_THE_CLOCK, "-ac", "1", "-ar", str(SAMPLE_RATE), "-b:a", "48k", "-f", "mp3", "-"],
         capture_output=True, check=False)
     return result.stdout
 

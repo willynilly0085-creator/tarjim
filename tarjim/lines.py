@@ -8,6 +8,7 @@ LEADING_DASH = re.compile(r"^\s*[-–—]\s*")
 CLAUSE_END = ("،", ",", ".", "؟", "?", "!", "؛", ":", "。", "，", "、", "！", "？", "：")
 CLAUSE_BONUS = 12
 OVERFLOW_PENALTY = 1000
+MIN_UNITS = 2
 NO_LINE_START = set("、。，．？！：；ー）」』ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮ")
 INSIDE_A_WORD = {("kanji", "kanji"): 30, ("kanji", "hiragana"): 20,
                  ("katakana", "katakana"): 30, ("hiragana", "hiragana"): 6}
@@ -39,6 +40,8 @@ def balance_lines(text: str, rules: Rules = DEFAULT_RULES) -> list[str]:
         return [text]
     joiner = " " if rules.spaced else ""
     units = text.split(" ") if rules.spaced else list(text)
+    if len(units) < MIN_UNITS:  # one word longer than a line (a link, a handle) stays whole
+        return [text]
 
     def cost(index: int) -> float:
         top, bottom = joiner.join(units[:index]), joiner.join(units[index:])

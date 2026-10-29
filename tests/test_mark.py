@@ -111,6 +111,7 @@ def burn_command(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 
     monkeypatch.setattr(burn, "run", fake_run)
     monkeypatch.setattr(burn, "video_kbps", lambda _video: 0)
+    monkeypatch.setattr(burn, "sound_codecs", lambda _video: ["aac"])
     monkeypatch.setattr(burn, "tool", lambda name: name)
     burn.burn(tmp_path / "v.mp4", render_ass(CUES, Canvas(1280, 720)), tmp_path / "out.mp4",
               placed)
@@ -129,7 +130,7 @@ def test_the_burn_overlays_the_logo_only_when_the_mark_is_on(
     assert f"scale={placed.logo}:{placed.logo}" in graph and "-vf" not in argv
     plain, ass = burn_command(tmp_path, monkeypatch, None)
     assert plain.count("-i") == 1 and "-filter_complex" not in plain and "Mark" not in ass
-    assert plain[plain.index("-vf") + 1] == f"ass={burn.PLAIN}"
+    assert plain[plain.index("-vf") + 1] == f"ass={burn.PLAIN}{burn.PLAYABLE}"
 
 
 def test_the_logo_ships_inside_the_package() -> None:
