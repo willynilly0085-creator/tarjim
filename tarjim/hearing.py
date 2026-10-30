@@ -5,10 +5,11 @@ from pathlib import Path
 
 from tarjim import media
 from tarjim.asr.base import Transcript
+from tarjim.asr.sanity import implausible
 from tarjim.gemini_client import QuotaExhausted
 from tarjim.job import Job, checkpoint
 from tarjim.listen.gemini_listen import Utterance
-from tarjim.listen.merge import Heard
+from tarjim.listen.merge import Heard, agreed
 from tarjim.models import Word
 
 Regions = list[tuple[float, float]]
@@ -16,8 +17,8 @@ Regions = list[tuple[float, float]]
 
 def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcript:
     cached = job.cache / "transcript.json"
-    if cached.exists():
-        return Transcript.load(cached)
+    if cached.exists() and not implausible(Transcript.load(cached).words):
+        return Transcript.load(cached)  # a broken timing kept by an older run is made again
     from tarjim.memory import free_for_listening
 
     free_for_listening()
@@ -52,7 +53,9 @@ def heard_for(job: Job, audio: Path) -> Heard:
     if cached.exists():
         data = json.loads(cached.read_text(encoding="utf-8"))
         words = data.get("local_words")
-        return Heard(data["language"], [Utterance(**u) for u in data["utterances"]], [],
+        passes = [[Utterance(**u) for u in run] for run in data.get("passes") or []]
+        voted = agreed(passes) if passes else [Utterance(**u) for u in data["utterances"]]
+        return Heard(data["language"], voted, passes,
                      None if words is None else [Word(**w) for w in words])
     heard = listen_video(job.video, audio)
     if heard.utterances:  # hearing nothing is not kept: the next run listens again
@@ -137,6 +140,10 @@ def listen_and_align(audio: Path, heard: Heard, report: Callable[[str], None]) -
     with heavy():
         words = shared_aligner().align(wav, utterances, heard.language)
     words = fuse(words, utterances, opinion)
+    if implausible(words) and opinion and not implausible(opinion):
+        print(f"timing: {len(words)} words timed faster than speech; using the words this "
+              "computer heard", flush=True)
+        words = opinion
     return Transcript(language=heard.language, text=" ".join(u.text for u in utterances),
                       words=words)
 

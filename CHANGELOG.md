@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.58 (2026-10-31)
+
+- **No more videos that look untranslated.** On a 2-minute Marco Rubio speech every subtitle
+  flashed for a few hundredths of a second at 1:05: one of the three listening passes returned
+  the whole speech as a single line, and the vote built its timing from it. A pass no one could
+  have spoken (a line over a minute, or faster than speech) is now left out of the vote, and if
+  the final timing is still faster than anyone talks, tarjim uses the timing it heard on the
+  computer itself. A broken timing kept from an older run is made again on Try again.
+
 ## 1.0.57 (2026-10-30)
 
 - **Subtitles stay in one place on news clips.** On a Fox News clip the subtitle hopped between

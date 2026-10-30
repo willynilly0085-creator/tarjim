@@ -35,7 +35,20 @@ def listen_many(listen: Listen, passes: int = PASSES) -> Heard:
         raise RuntimeError("every listening pass failed")
     results.sort(key=lambda r: len(r[1]), reverse=True)
     runs = [utterances for _, utterances in results]
-    return Heard(results[0][0], settled(vote(runs, min(AGREE, len(runs))), runs), runs)
+    return Heard(results[0][0], agreed(runs), runs)
+
+
+def sane(run: list[Utterance]) -> bool:
+    from tarjim.asr.sanity import plausible_line
+
+    return all(plausible_line(u.start, u.end, u.text) for u in run)
+
+
+def agreed(runs: list[list[Utterance]]) -> list[Utterance]:
+    """The vote over the passes a person could have spoken: a pass that put the whole speech in
+    one 129-second line once became the vote's base and broke every time (asr/sanity.py)."""
+    kept = [run for run in runs if sane(run)] or runs
+    return settled(vote(kept, min(AGREE, len(kept))), kept)
 
 
 def spoken(run: list[Utterance]) -> int:
