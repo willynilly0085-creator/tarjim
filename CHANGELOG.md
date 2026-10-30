@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.55 (2026-10-30)
+
+- **Subtitles no longer lag one line behind the speaker.** On a U.S. Central Command statement the
+  translation model put half of the first line's meaning into the second line, and every line
+  after it then showed what had just been said. tarjim now tells the model to shorten a line
+  rather than carry it over, notices when the translations have slid down the lines (by how
+  their lengths follow the English, checked on the whole answer and on every 12 lines), asks
+  once more, and keeps the better answer.
+
 ## 1.0.54 (2026-10-29)
 
 - **A subtitle no longer covers text the video shows for a few seconds.** An editor's note, a

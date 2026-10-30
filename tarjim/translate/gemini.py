@@ -1,3 +1,4 @@
+import contextlib
 from collections.abc import Callable
 from dataclasses import replace
 
@@ -7,6 +8,7 @@ from tarjim.gemini_client import GeminiClient, QuotaExhausted
 from tarjim.job import checkpoint
 from tarjim.models import Cue
 from tarjim.translate.clean import map_results
+from tarjim.translate.drift import fit, slid
 from tarjim.translate.prompt import Brief, build_prompt, has_speakers
 
 SCHEMA = {"type": "array", "items": {"type": "object", "properties": {
@@ -25,6 +27,10 @@ def needs_retry(cue: Cue, strict_dialogue: bool) -> bool:
     if not cue.text.strip():
         return any(ch.isalpha() for ch in cue.source)
     return strict_dialogue and cue.is_dialogue and SEPARATOR not in cue.text
+
+
+def fit_of(cues: list[Cue], texts: list[str]) -> float:
+    return fit([replace(cue, text=text) for cue, text in zip(cues, texts, strict=True)])
 
 
 def batches(cues: list[Cue], span: float = BATCH_SECONDS, most: int = 0) -> list[list[Cue]]:
@@ -56,6 +62,7 @@ class Translator:
         """The lines that came back wrong are asked once more; if that fails, the first answer
         stays."""
         self.fill_again(cues, sound, brief)
+        self.unslide(cues, sound, brief)
         strict = has_speakers(cues)
         retry = [cue for cue in cues if needs_retry(cue, strict)]
         if not retry:
@@ -64,6 +71,20 @@ class Translator:
             self.fill(retry, sound, brief)
         except BAD_REPLY:
             return
+
+    def unslide(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
+        """An answer that slid down the slots (drift.py) is asked for once more, told so; the
+        better fitting of the two answers stays."""
+        if not slid(cues):
+            return
+        print(f"translation slid down the slots ({len(cues)} lines); asking again", flush=True)
+        first = [cue.text for cue in cues]
+        checkpoint()
+        with contextlib.suppress(*BAD_REPLY):
+            self.fill(cues, sound, replace(brief, slid=True))
+        if fit(cues) < fit_of(cues, first):
+            for cue, text in zip(cues, first, strict=True):
+                cue.text = text
 
     def fill_again(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
         """One failed answer (a busy service, a dropped stream) costs one more ask on the same

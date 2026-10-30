@@ -18,7 +18,8 @@ ARABIC = """أنت مترجم أفلام ومسلسلات محترف. {have}قا
 - بـ{style}، وبنفس نبرة المتكلم (مزح، تعجب، سخرية، استغراب).
 {listen}- لا تتجاوز عدد الحروف المسموح للخانة (budget) — اختصر واحذف الحشو مثل \
 um و like و you know، مثل الترجمة الاحترافية.
-- ترجم الخانة لوحدها: لا تنقل كلاماً من خانة لخانة، ولا تدمج خانتين.
+- ترجم الخانة لوحدها: لا تنقل كلاماً من خانة لخانة، ولا تدمج خانتين. لو الـ budget ما يكفي \
+جملة الخانة، اختصر ترجمتها هي، ولا ترحّل باقيها للخانة اللي بعدها.
 - {dialogue_rule}
 - أي عدد من 3 وفوق يُكتب بالأرقام اللاتينية 0-9 حتى لو نُطق كلمة \
 (three months ← 3 شهور، 18 times ← 18 مرة)؛ أما مرة ومرتين فتبقى كلمات. \
@@ -39,7 +40,9 @@ For every slot write a {style} subtitle:
 (joking, surprise, sarcasm, doubt).
 {listen}- Never exceed the slot's character budget: condense and drop fillers such as um, like and \
 you know, the way professional subtitlers do.
-- Translate each slot on its own: never move words between slots and never merge slots.
+- Translate each slot on its own: never move words between slots and never merge slots. \
+If a slot's budget is too small for its sentence, shorten that slot's own translation; \
+never carry the rest into the next slot.
 - {dialogue_rule}
 - Write numbers of 3 and above as digits.
 - If a slot is only a meaningless sound, return an empty text.
@@ -87,10 +90,19 @@ class Brief:
     offset: float = 0.0
     hears: bool = True
     glossary: tuple[tuple[str, str], ...] = ()
+    slid: bool = False  # the last answer moved each translation into the next slot (drift.py)
 
     @property
     def arabic(self) -> bool:
         return self.target.code == "ar"
+
+
+SLID = {
+    "ar": "\n\nتنبيه: إجابتك السابقة زحلقت الترجمة، فصارت كل خانة فيها ترجمة الخانة اللي قبلها. "
+          "طابق كل رقم مع جملته الإنجليزية نفسها بالضبط.",
+    "any": "\n\nWarning: your previous answer slid the translations, so each slot held the "
+           "previous slot's translation. Match every id to its own source sentence exactly.",
+}
 
 
 def has_speakers(cues: list[Cue]) -> bool:
@@ -107,8 +119,9 @@ def build_prompt(cues: list[Cue], brief: Brief) -> str:
     style = DIALECTS[brief.dialect] if brief.arabic else brief.target.name
     from tarjim.translate.glossary import instructions
 
+    warning = SLID[key] if brief.slid else ""
     return template.format(style=style, count=len(cues), items=items, dialogue_rule=rule,
-                           have=have, listen=listen) + instructions(brief.glossary)
+                           have=have, listen=listen) + instructions(brief.glossary) + warning
 
 
 def format_item(number: int, cue: Cue, brief: Brief) -> str:
