@@ -84,9 +84,10 @@ def modes_keyboard() -> str:
 
 
 def dialect_keyboard(mode: str, key: str) -> str:
-    """Arabic only: Saudi or standard, the last one first and marked."""
+    """Arabic only: Saudi then standard, always in that order, the last one used marked. The
+    last one used came first before: the buttons swapped places after each choice, and the owner,
+    pressing the same place each time, got Saudi when asking for standard (2026-10-30)."""
     current = setting("phone_dialect") or "saudi"
-    order = [current, *[d for d in DIALECTS if d != current]]
     rows = [[{"text": ("✓ " if d == current else "") + say(DIALECTS[d]),
-              "callback_data": f"dl:{d}:{mode}:{key}"}] for d in order]
+              "callback_data": f"dl:{d}:{mode}:{key}"}] for d in DIALECTS]
     return json.dumps({"inline_keyboard": rows})

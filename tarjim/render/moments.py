@@ -13,10 +13,15 @@ so it costs up to one key frame's spacing; only lines beside text take one, and 
 together get frames.BUDGET seconds. A look that could not be had moves the line anyway: moved
 for nothing, a line stays readable; left in place, it covers the text.
 
-A moved line goes where the video's place would go for that text: just above it, or to the top
-when that passes the middle, clear of tarjim's mark when the mark is at the top. A video whose
-subtitle is already at the top moves no line. What was seen is kept in the job's folder, and
-looking never fails a job."""
+A moved line goes just above that text. It never goes to the top on its own: on 2026-10-30, on a
+news clip, lines flipped between the bottom and the top while the speaker talked, because the
+words on the wall behind him (scene text, moving with the camera) were taken for burned-in text.
+So only steady text counts, seen at the same rows in looks a second or more apart; a line that
+cannot be lifted below the middle stays where it is; and lines moved one after another share
+one height, so they do not jitter. A video whose subtitle already sits off its own steady text
+(a news channel's bar, at the bottom or the top) moves no line: its passing text was scene text
+every time it was looked at.
+What was seen is kept in the job's folder, and looking never fails a job."""
 import json
 from bisect import bisect_left, bisect_right
 from dataclasses import replace
@@ -36,6 +41,9 @@ KEPT = "moments.json"
 NEAR = 10.0
 # An exact look this far inside the line, past its fade in or before its fade out.
 EDGE = 0.1
+STEADY = 0.006  # rows, as a share of the height: burned-in text stays exactly where it is
+APART = 1.0  # seconds between two looks that show it, so one moment is not taken for two
+TOGETHER = 1.5  # seconds between moved lines that share one height
 
 
 def hit(bands: list[Band], canvas: Canvas) -> bool:
@@ -64,13 +72,24 @@ def wanted(seen: Seen, cues: list[Cue], canvas: Canvas) -> list[float]:
     return sorted(looks - set(seen))
 
 
+def same_rows(one: Band, other: Band) -> bool:
+    return abs(one[0] - other[0]) <= STEADY and abs(one[1] - other[1]) <= STEADY
+
+
+def steady(band: Band, seen: Seen, around: float) -> bool:
+    """Shown at the same rows in looks a second or more apart: burned in, not scene text."""
+    times = [t for t, bands in seen.items()
+             if abs(t - around) <= NEAR and any(same_rows(band, b) for b in bands)]
+    return bool(times) and max(times) - min(times) >= APART
+
+
 def evidence(seen: Seen, cue: Cue, canvas: Canvas) -> list[Band]:
-    """Every band of the frames that show text where the line would be drawn."""
+    """Every steady band of the frames that show text where the line would be drawn."""
     showing = [seen[t] for t in seen if cue.start <= t <= cue.end and hit(seen[t], canvas)]
     if not showing:  # a look that could not be had: the frame beside it stands in for it
         showing = [seen[near] for near, look in neighbours(seen, cue)
                    if look not in seen and hit(seen[near], canvas)]
-    return [band for bands in showing for band in bands]
+    return [band for bands in showing for band in bands if steady(band, seen, cue.start)]
 
 
 def mark_band(mark: Mark | None, canvas: Canvas) -> list[Band]:
@@ -87,9 +106,21 @@ def decide(seen: Seen, cues: list[Cue], canvas: Canvas, mark: Mark | None) -> tu
         if not found:
             continue
         spot = place([*found, *canvas.bands, *mark_band(mark, canvas)], canvas)
-        if spot != canvas:
-            moves.append((cue.start, cue.end, spot.margin_v, spot.top))
-    return tuple(moves)
+        if spot != canvas and not spot.top:
+            moves.append((cue.start, cue.end, spot.margin_v, False))
+    return level(moves)
+
+
+def level(moves: list[Move]) -> tuple[Move, ...]:
+    """Lines moved one after another all take the highest of their places."""
+    runs: list[list[Move]] = []
+    for move in moves:
+        if runs and move[0] - runs[-1][-1][1] <= TOGETHER:
+            runs[-1].append(move)
+        else:
+            runs.append([move])
+    return tuple((start, end, max(m[2] for m in run), top)
+                 for run in runs for start, end, _margin, top in run)
 
 
 def kept(record: Path) -> Seen | None:
@@ -119,8 +150,8 @@ def observed(job: Job, cues: list[Cue], canvas: Canvas) -> Seen:
 def moved(job: Job, cues: list[Cue], canvas: Canvas, mark: Mark | None) -> Canvas:
     """The canvas with the lines that would cover the picture's passing text moved off it."""
     spoken = [cue for cue in cues if cue.text.strip()]
-    if canvas.top or not spoken:
-        return canvas
+    if canvas.top or canvas.margin is not None or not spoken:
+        return canvas  # a video with steady text of its own (a news bar) keeps its one place
     try:
         seen = observed(job, spoken, canvas)
     except Exception:  # anything that goes wrong while looking moves no line

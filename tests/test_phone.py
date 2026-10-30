@@ -288,4 +288,5 @@ def test_arabic_asks_saudi_or_standard_and_remembers_it(
     assert config.setting("phone_dialect") == "msa"
     inbox.handle(bot, message(OWNER, "https://youtu.be/def"))
     pick(inbox, bot, "go:burn:")
-    assert bot.keyboards[-1]["inline_keyboard"][0][0]["text"] == "✓ " + say("dialectMsa")
+    rows = bot.keyboards[-1]["inline_keyboard"]  # same places; the mark follows the choice
+    assert [r[0]["text"] for r in rows] == [say("dialectSaudi"), "✓ " + say("dialectMsa")]

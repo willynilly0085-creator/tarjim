@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.57 (2026-10-30)
+
+- **Subtitles stay in one place on news clips.** On a Fox News clip the subtitle hopped between
+  the bottom, a little higher, and the top of the picture, because the words on the wall behind
+  the speaker were taken for text burned into the video. Now a video whose subtitle already sits
+  above its own steady bar keeps that place for every line; elsewhere a line moves only for text
+  that stays at the same rows, never jumps to the top on its own, and lines moved one after
+  another share one height.
+- **The phone bot's Saudi and standard Arabic buttons no longer swap places.** The last choice
+  used to move to the top, so pressing the same place gave the other style; Saudi is now always
+  first and standard second, with a tick on the last one used.
+
 ## 1.0.56 (2026-10-30)
 
 - **A dubbed voice no longer falls silent while the speaker is still talking.** The voice read
