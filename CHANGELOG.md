@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.56 (2026-10-30)
+
+- **A dubbed voice no longer falls silent while the speaker is still talking.** The voice read
+  the subtitle, which is shortened for reading, so a line often lasted a third of the time the
+  speaker talked: on a Bassem Youssef interview the dub was silent for up to 2.75 seconds at a
+  time while his lips still moved. tarjim now tells the voice script how long each speaker
+  talks and asks for about as many words as fill it, everything the speaker said rather than
+  the shortened subtitle.
+
 ## 1.0.55 (2026-10-30)
 
 - **Subtitles no longer lag one line behind the speaker.** On a U.S. Central Command statement the

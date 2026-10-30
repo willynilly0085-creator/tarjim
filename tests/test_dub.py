@@ -1,3 +1,5 @@
+import pytest
+
 from tarjim.dub.lines import lines_from
 from tarjim.dub.voices import reference_spans
 from tarjim.models import Cue, Word
@@ -15,6 +17,25 @@ def test_dialogue_becomes_two_lines_each_with_its_own_speaker_and_start() -> Non
     assert [(line.speaker, line.start, line.text) for line in lines] == [
         ("S5", 44.2, "مرة بالشهر"), ("S1", 46.8, "مرة بالشهر؟")]
     assert lines[0].until == 46.8
+
+
+def test_each_line_knows_how_long_its_speaker_talks() -> None:
+    first, second = lines_from([dialogue()], total=60.0)
+    assert first.talk == pytest.approx(0.9) and first.room == pytest.approx(2.6)
+    assert second.talk == pytest.approx(0.5)
+
+
+def test_the_voice_script_asks_for_a_line_as_long_as_the_speaker_talks() -> None:
+    """2026-10-30: Bassem talked for 5 s while his dubbed line, the subtitle's short "يشرفني أكون
+    في هالمقابلة", lasted 1.6 s; the voice fell silent for 3.3 s while his lips still moved."""
+    from tarjim.dub.lines import Line
+    from tarjim.dub.script import prompt
+
+    line = Line(4.16, 9.64, "S2", "يشرفني أكون في هالمقابلة.",
+                "Oh, uh I'm actually, I'm quite honored to be in this interview. I am,", 9.12)
+    text = prompt([line], "Arabic", "saudi", full_vowels=False)
+    assert "talks for 5.0 seconds: about 12 words" in text
+    assert "never far fewer" in text and "at most" not in text
 
 
 def test_empty_translations_are_not_spoken() -> None:
