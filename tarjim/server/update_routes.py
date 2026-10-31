@@ -19,11 +19,14 @@ CLOSE_AFTER = 1.5
 
 
 def idle(board: Board) -> bool:
-    """No job running and no tool downloading: a restart would cut a model download short."""
+    """No job running, no tool downloading and nothing being sent to a phone: a restart would
+    cut a model download or a video's upload short."""
+    from tarjim.phone.service import service
     from tarjim.tools import shelf
 
     downloading = any(p.state == "downloading" for p in shelf().progress.values())
-    return not downloading and all(task.finished for task in board.recent())
+    return (not downloading and not service.busy()
+            and all(task.finished for task in board.recent()))
 
 
 def close_soon(started: bool, board: Board | None = None) -> bool:

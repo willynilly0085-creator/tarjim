@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.64 (2026-10-31)
+
+- **A video on its way to the phone is no longer cut off.** The engine restarts by itself into
+  new code or a new version only when nothing is running, and a job counted as finished while
+  its video was still uploading to the phone. A restart cut a 78 MB upload at 31 MB and the
+  video never arrived. Results being sent to a phone, and jobs the phone bot still follows, now
+  keep the engine from restarting until they are done.
+
 ## 1.0.63 (2026-10-31)
 
 - **Sharp subtitles on small videos.** Subtitles were drawn at the video's own size, so on a

@@ -15,6 +15,29 @@ from tarjim.phone.words import say
 TICK = 3.0
 
 
+class Sending:
+    """Results on their way to a phone. Their jobs are finished by then, so the engine asks here
+    before it restarts (server/update_routes.idle): on 2026-10-31 it restarted for new code while
+    a 78 MB video was 31 MB into its upload, and the video never arrived."""
+
+    def __init__(self) -> None:
+        self.lock, self.count = threading.Lock(), 0
+
+    def start(self) -> None:
+        with self.lock:
+            self.count += 1
+
+    def end(self) -> None:
+        with self.lock:
+            self.count -= 1
+
+    def any(self) -> bool:
+        return self.count > 0
+
+
+SENDING = Sending()
+
+
 class Jobs(Protocol):
     def submit(self, order: Any) -> Any: ...
     def get(self, task_id: str) -> Any: ...
@@ -86,6 +109,7 @@ class Follower:
                 continue
             self.refresh(bot, task, watch)
             if task.finished:
+                SENDING.start()  # before it is forgotten, so there is no moment it is neither
                 self.forget(task_id)
                 threading.Thread(target=deliver, args=(bot, watch, task), daemon=True).start()
 
@@ -114,3 +138,5 @@ def deliver(bot: Bot, watch: Watch, task: Any) -> None:
     except Exception as error:
         note("sending a result", error)
         sender.tell("phone_send_failed")
+    finally:
+        SENDING.end()

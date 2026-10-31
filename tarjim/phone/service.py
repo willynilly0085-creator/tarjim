@@ -7,7 +7,7 @@ from typing import Any
 from tarjim.config import save, setting
 from tarjim.phone import large
 from tarjim.phone.bot import Inbox, Pairing
-from tarjim.phone.progress import Follower, Jobs
+from tarjim.phone.progress import SENDING, Follower, Jobs
 from tarjim.phone.telegram import Bot, TelegramError, note, well_formed
 from tarjim.phone.words import say
 
@@ -26,6 +26,11 @@ class Service:
     def bot(self) -> Bot | None:
         token = setting("telegram_token")
         return Bot(token) if token and self.problem != "rejected" else None
+
+    def busy(self) -> bool:
+        """A job the bot follows to send its result, or a result on its way to a phone."""
+        follower = self.inbox.follower if self.inbox else None
+        return SENDING.any() or bool(follower and follower.watching)
 
     def begin(self, jobs: Jobs, uploads: Path) -> None:
         if any(thread.is_alive() for thread in self.threads):

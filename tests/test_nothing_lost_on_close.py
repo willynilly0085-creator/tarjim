@@ -53,3 +53,38 @@ def test_no_restart_while_a_tool_downloads(monkeypatch) -> None:  # type: ignore
     tool = next(iter(shelf().progress))
     monkeypatch.setitem(shelf().progress, tool, Progress("downloading"))
     assert not update_routes.idle(board)
+
+
+def test_no_restart_while_a_result_is_on_its_way_to_the_phone() -> None:
+    """The job is finished while its video uploads; a restart cut a 78 MB upload at 31 MB."""
+    from tarjim.phone.progress import SENDING
+    from tarjim.server import update_routes
+
+    board = Board(lambda task: None)
+    assert update_routes.idle(board)
+    SENDING.start()
+    try:
+        assert not update_routes.idle(board)
+    finally:
+        SENDING.end()
+    assert update_routes.idle(board)
+
+
+def test_a_finished_job_counts_as_sending_until_its_delivery_ends(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    from types import SimpleNamespace
+
+    from tarjim.phone import progress
+
+    started: list[object] = []
+    def thread(target: object, args: object, daemon: bool) -> SimpleNamespace:
+        return SimpleNamespace(start=lambda: started.append(args))
+
+    monkeypatch.setattr(progress.threading, "Thread", thread)
+    task = SimpleNamespace(id="j", stage="done", finished=True)
+    follower = progress.Follower(SimpleNamespace(get=lambda _id: task))  # type: ignore[arg-type]
+    follower.watching["j"] = progress.Watch(1, 2)
+    follower.tick(SimpleNamespace())  # type: ignore[arg-type]
+    assert started and progress.SENDING.any() and not follower.watching
+    monkeypatch.setattr(progress, "Sender", lambda *_a: SimpleNamespace(deliver=lambda: None))
+    progress.deliver(*started[0])  # type: ignore[misc]
+    assert not progress.SENDING.any()
