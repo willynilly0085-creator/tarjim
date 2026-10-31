@@ -62,6 +62,7 @@
   "downloading": "İndiriliyor",
   "failed": "İndirme tamamlanmadı",
   "retry": "Tekrar dene",
+  "listenAgain": "Yeniden dinle",
   "sizeGb": "{n} GB",
   "requiredMissing": "Devam etmeden önce temel araçları indir.",
   "extTitle": "Tarayıcı eklentisi",

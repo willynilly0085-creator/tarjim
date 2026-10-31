@@ -35,7 +35,8 @@ def perform(task: Task, downloads: Path) -> None:
     task.moved = (0, 0)
     downloads.mkdir(parents=True, exist_ok=True)
     job = Job(task.video, order.target, order.dialect, burn=order.mode != "srt",
-              dub=DUBBING.get(order.mode, ""), out_dir=downloads, cache_dir=HOME / "cache")
+              dub=DUBBING.get(order.mode, ""), out_dir=downloads, cache_dir=HOME / "cache",
+              relisten=order.relisten)
     task.undo.extend(undo_for(job))
 
     def report(stage: str) -> None:

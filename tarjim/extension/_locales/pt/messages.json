@@ -104,6 +104,9 @@
   "retry": {
     "message": "Tentar de novo"
   },
+  "listenAgain": {
+    "message": "Ouvir de novo"
+  },
   "errQuota": {
     "message": "A cota gratuita de hoje da sua chave acabou. Adicione uma chave paga nas Configurações, volte amanhã ou use o modo local."
   },

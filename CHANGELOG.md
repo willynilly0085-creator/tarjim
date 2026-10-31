@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.0.66 (2026-10-31)
+
+- **Subtitles no longer stop before the speech does.** Cloud listeners sometimes leave out a
+  stretch of speech, at the end of a clip most of all: on a 4-minute clip every listening pass
+  stopped at 2:58 while the speaker went on to 4:00, so the subtitles simply ended. tarjim now
+  checks, for whatever listening engine you picked, that every stretch of speech in the sound has
+  words. A stretch left out is heard again by the same engine on its own; if that brings nothing,
+  the words your computer heard there fill it. Every stretch found, and how it was filled, is in
+  the log.
+- **Long clips are heard in pieces of about 75 seconds**, each cut in a pause, instead of up to
+  six minutes in one request, which is where listeners drifted and skipped. The size is the
+  `listen_chunk_seconds` setting (0 hears the whole clip at once).
+- **"Listen again"** on any finished job (and `--listen-again` on the command line) forgets what
+  was heard for that video and listens to it from scratch. A hearing that still misses speech is
+  no longer kept, so the next run listens again by itself instead of repeating the gap.
+- **An empty, blocked or cut-off reply from any engine now says why**: the reason the service
+  gave (for example finish reason MAX_TOKENS or length, a block reason, a program's exit code and
+  the end of what it printed) and the model, in the log and in the error.
+
 ## 1.0.65 (2026-10-31)
 
 - **A video open in another program no longer fails the job.** Windows refuses to replace a

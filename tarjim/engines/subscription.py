@@ -10,6 +10,7 @@ from tarjim.config import save, setting
 from tarjim.engines import own_node, programs
 from tarjim.engines.bounded import bounded
 from tarjim.engines.catalog import BY_ID, SUBSCRIPTION, of_method
+from tarjim.engines.reply_check import Reason, failed, program_reason
 from tarjim.engines.web import EngineError, TimedOut, parse_json, unwrap, wrap
 
 TIMEOUT = 900
@@ -90,12 +91,15 @@ class ClaudeAsker:
             command += ["--model", setting("claude_model")]
         with tempfile.TemporaryDirectory() as folder:
             done = run(command, prompt, folder)
+        model = setting("claude_model")
         try:
             answer = json.loads(done.stdout or "{}")
         except ValueError as error:
-            raise EngineError("claude", done.returncode, done.stderr or done.stdout) from error
+            raise failed("claude", model, "no answer", program_reason(
+                done.returncode, done.stderr or done.stdout)) from error
         if answer.get("is_error") or "structured_output" not in answer:
-            raise EngineError("claude", done.returncode, str(answer.get("result", done.stderr)))
+            said = f"{answer.get('subtype') or ''} {answer.get('result') or done.stderr}"
+            raise failed("claude", model, "no answer", program_reason(done.returncode, said))
         return unwrap(answer["structured_output"])
 
 
@@ -121,17 +125,17 @@ class CodexAsker:
     hears = False
 
     def ask(self, prompt: str, _audio: bytes | None, schema: dict[str, Any]) -> Any:
-        last = ""
+        last, tried, code = "", "", 1
         for model in codex_models():
             done, reply = self.once(prompt, schema, model)
             if done.returncode == 0 and reply:
                 if model and model != setting("codex_model"):
                     save("codex_model", model)
                 return unwrap(parse_json(reply))
-            last = outdated(done.stderr)
+            last, tried, code = outdated(done.stderr), model, done.returncode
             if REFUSED not in done.stderr:
                 break
-        raise EngineError("codex", 1, last)
+        raise failed("codex", tried, "no answer", Reason(detail=f"exit code {code}; {last}"))
 
     def once(self, prompt: str, schema: dict[str, Any],
              model: str) -> tuple[subprocess.CompletedProcess[str], str]:
@@ -171,7 +175,8 @@ class PromptAsker:
         text = done.stdout.strip()
         start, end = text.find("{"), text.rfind("}")
         if done.returncode != 0 or start < 0:
-            raise EngineError(self.provider.id, done.returncode, done.stderr or text)
+            raise failed(self.provider.id, setting(self.provider.model_name), "no answer",
+                         program_reason(done.returncode, done.stderr or text))
         return unwrap(parse_json(text[start:end + 1]))
 
 

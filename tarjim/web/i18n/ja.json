@@ -62,6 +62,7 @@
   "downloading": "ダウンロード中",
   "failed": "ダウンロードが完了しませんでした",
   "retry": "再試行",
+  "listenAgain": "もう一度聞き取る",
   "sizeGb": "{n} GB",
   "requiredMissing": "続ける前に必須のツールをダウンロードしてください。",
   "extTitle": "ブラウザー拡張機能",

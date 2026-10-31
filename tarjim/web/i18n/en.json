@@ -62,6 +62,7 @@
   "downloading": "Downloading",
   "failed": "Download did not finish",
   "retry": "Try again",
+  "listenAgain": "Listen again",
   "sizeGb": "{n} GB",
   "requiredMissing": "Download the essential tools before continuing.",
   "extTitle": "Browser extension",

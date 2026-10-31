@@ -35,6 +35,7 @@ class Order:
     dialect: str = "saudi"
     name: str = ""
     quality: str = ""  # a link's picked quality (tarjim/qualities.py); empty: 1080p or below
+    relisten: bool = False  # the kept hearing is forgotten and the clip listened to again
 
 
 @dataclass
@@ -136,6 +137,11 @@ class Board:
         old = self.get(task_id)
         again = old and old.stage in ("failed", "cancelled")
         return self.submit(replace(old.order)) if old and again else None
+
+    def relisten(self, task_id: str) -> Task | None:
+        """Any ended job, a finished one too: its subtitles may have missed speech."""
+        old = self.get(task_id)
+        return self.submit(replace(old.order, relisten=True)) if old and old.finished else None
 
     def steer(self, task_id: str, action: str, source: str = "") -> Task | None:
         task = self.get(task_id)

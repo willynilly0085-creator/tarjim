@@ -69,3 +69,7 @@ class JobRoutes:
     def retry(self, _query: Query, task_id: str) -> None:
         task = self.board.retry(task_id)
         self.reply(200, task.view()) if task else self.reply(404, {"error": "job"})
+
+    def relisten(self, _query: Query, task_id: str) -> None:
+        task = self.board.relisten(task_id)
+        self.reply(200, task.view()) if task else self.reply(404, {"error": "job"})

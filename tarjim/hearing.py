@@ -1,6 +1,5 @@
-import json
 from collections.abc import Callable
-from dataclasses import asdict
+from dataclasses import replace
 from pathlib import Path
 
 from tarjim import media
@@ -9,14 +8,17 @@ from tarjim.asr.sanity import implausible
 from tarjim.gemini_client import QuotaExhausted
 from tarjim.job import Job, checkpoint
 from tarjim.listen.gemini_listen import Utterance
-from tarjim.listen.merge import Heard, agreed
+from tarjim.listen.kept import TRANSCRIPT, forget, load_heard
+from tarjim.listen.merge import Heard
 from tarjim.models import Word
 
 Regions = list[tuple[float, float]]
 
 
 def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcript:
-    cached = job.cache / "transcript.json"
+    if job.relisten:  # the person asked: nothing kept from an earlier hearing is used
+        forget(job.cache)
+    cached = job.cache / TRANSCRIPT
     if cached.exists() and not implausible(Transcript.load(cached).words):
         return Transcript.load(cached)  # a broken timing kept by an older run is made again
     from tarjim.memory import free_for_listening
@@ -28,7 +30,8 @@ def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcrip
         transcript, lasting = hear(job, audio, report)
     finally:
         audio.unlink(missing_ok=True)
-    if lasting:  # a backup's hearing, or hearing nothing, is tried afresh on the next run
+    if lasting:  # a backup's hearing, one that left speech out, or hearing nothing, is tried
+        # afresh on the next run
         transcript.save(cached)
     return transcript
 
@@ -42,26 +45,15 @@ def hear(job: Job, audio: Path, report: Callable[[str], None]) -> tuple[Transcri
     except RuntimeError as error:
         return local_transcript(audio, error), False
     if heard.utterances:
-        return listen_and_align(audio, heard, report), True
+        return listen_and_align(job, audio, heard, report)
     if heard.local_words is not None:  # the local listener itself heard no speech
         return Transcript(language=heard.language, text=""), False
     return local_transcript(audio), False
 
 
 def heard_for(job: Job, audio: Path) -> Heard:
-    cached = job.cache / "heard.json"
-    if cached.exists():
-        data = json.loads(cached.read_text(encoding="utf-8"))
-        words = data.get("local_words")
-        passes = [[Utterance(**u) for u in run] for run in data.get("passes") or []]
-        voted = agreed(passes) if passes else [Utterance(**u) for u in data["utterances"]]
-        return Heard(data["language"], voted, passes,
-                     None if words is None else [Word(**w) for w in words])
-    heard = listen_video(job.video, audio)
-    if heard.utterances:  # hearing nothing is not kept: the next run listens again
-        cached.write_text(json.dumps(asdict(heard), ensure_ascii=False, indent=1),
-                          encoding="utf-8")
-    return heard
+    """What was heard before, or a new hearing; kept only once its coverage is checked."""
+    return load_heard(job.cache) or listen_video(job.video, audio)
 
 
 def listen_video(video: Path, audio: Path) -> Heard:
@@ -71,7 +63,7 @@ def listen_video(video: Path, audio: Path) -> Heard:
     for provider in chain("listen"):
         checkpoint()  # a backup engine is never started for a job that was cancelled
         try:
-            return listen_with(provider, video, audio)
+            return replace(listen_with(provider, video, audio), provider=provider)
         except (RuntimeError, OSError) as error:
             failures.append(error)
     raise failures[-1] if failures else RuntimeError("no listening engine")
@@ -115,21 +107,24 @@ def cloud_listener(provider: str) -> Callable[[bytes], Heard]:
 
 
 def speech_regions_of(audio: Path) -> Regions:
+    """Where the pauses are, for cutting; with no voice detector the pieces are cut on time."""
     import soundfile
 
-    from tarjim.asr.vad import speech_regions
+    from tarjim.listen.check import regions_in
 
     wav, _ = soundfile.read(str(audio), dtype="float32")
-    return speech_regions(wav)
+    return regions_in(wav)
 
 
-def listen_and_align(audio: Path, heard: Heard, report: Callable[[str], None]) -> Transcript:
+def listen_and_align(job: Job, audio: Path, heard: Heard,
+                     report: Callable[[str], None]) -> tuple[Transcript, bool]:
+    """The transcript, and whether it covers all the speech, so it is worth keeping."""
     import soundfile
 
     from tarjim.asr.align import shared_aligner
-    from tarjim.asr.anchor import anchor
     from tarjim.asr.fuse import fuse
-    from tarjim.listen.recover import best_heard
+    from tarjim.listen.check import covered, regions_in
+    from tarjim.listen.coverage import Hearing
     from tarjim.memory import heavy
 
     report("timing")
@@ -137,17 +132,31 @@ def listen_and_align(audio: Path, heard: Heard, report: Callable[[str], None]) -
     # first: its times correct a cloud listener's drift; the local listener is its own
     local = heard.local_words
     opinion = second_opinion(audio) if local is None else local
-    chosen = best_heard(heard.utterances, heard.passes, opinion)  # what the audio backs most
-    utterances = anchor(chosen, opinion, len(wav) / rate)
+    utterances = placed(heard, opinion, len(wav) / rate)
+    mended = covered(job, heard, Hearing(utterances, opinion, regions_in(wav)))
     with heavy():
-        words = shared_aligner().align(wav, utterances, heard.language)
-    words = fuse(words, utterances, opinion)
+        words = shared_aligner().align(wav, mended.utterances, heard.language)
+    words = trusted(fuse(words, mended.utterances, opinion), opinion)
+    text = " ".join(u.text for u in mended.utterances)
+    return Transcript(language=heard.language, text=text, words=words), mended.whole
+
+
+def placed(heard: Heard, opinion: list[Word], duration: float) -> list[Utterance]:
+    """The hearing the audio backs most, at the times the audio backs, with what filled the
+    stretches it left out on an earlier run."""
+    from tarjim.asr.anchor import anchor
+    from tarjim.listen.recover import best_heard
+
+    chosen = best_heard(heard.utterances, heard.passes, opinion)
+    return sorted([*anchor(chosen, opinion, duration), *heard.added], key=lambda u: u.start)
+
+
+def trusted(words: list[Word], opinion: list[Word]) -> list[Word]:
     if implausible(words) and opinion and not implausible(opinion):
         print(f"timing: {len(words)} words timed faster than speech; using the words this "
               "computer heard", flush=True)
-        words = opinion
-    return Transcript(language=heard.language, text=" ".join(u.text for u in utterances),
-                      words=words)
+        return opinion
+    return words
 
 
 def second_opinion(audio: Path) -> list[Word]:

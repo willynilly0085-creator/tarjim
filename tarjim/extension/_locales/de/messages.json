@@ -104,6 +104,9 @@
   "retry": {
     "message": "Erneut versuchen"
   },
+  "listenAgain": {
+    "message": "Neu anhören"
+  },
   "errQuota": {
     "message": "Das kostenlose Kontingent deines Schlüssels ist für heute aufgebraucht. Hinterlege in den Einstellungen einen bezahlten Schlüssel, versuche es morgen wieder oder nutze den lokalen Modus."
   },

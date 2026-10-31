@@ -104,6 +104,9 @@
   "retry": {
     "message": "Reintentar"
   },
+  "listenAgain": {
+    "message": "Volver a escuchar"
+  },
   "errQuota": {
     "message": "Tu clave agotó la cuota gratuita de hoy. Añade una clave de pago en Ajustes, vuelve mañana o usa el modo local."
   },

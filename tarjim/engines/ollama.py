@@ -1,6 +1,7 @@
 from typing import Any
 
 from tarjim.config import setting
+from tarjim.engines.reply_check import checked, ollama_reason
 from tarjim.engines.web import LOCAL_CUES, local_seconds, parse_json, post, reachable, unwrap, wrap
 
 BASE = "http://127.0.0.1:11434"
@@ -37,7 +38,9 @@ class OllamaAsker:
                 "messages": [{"role": "user", "content": prompt}]}
         answer = post("local", f"{base_url()}/api/chat", {}, json=body,
                       timeout=local_seconds(prompt))
-        return unwrap(parse_json(answer.get("message", {}).get("content", "")))
+        content = checked("local", str(body["model"]), answer.get("message", {}).get("content", ""),
+                          ollama_reason(answer))
+        return unwrap(parse_json(content))
 
 
 def installed_models() -> list[str]:

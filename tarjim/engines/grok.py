@@ -12,8 +12,9 @@ from typing import Any
 
 from tarjim.config import setting
 from tarjim.engines.bounded import bounded
+from tarjim.engines.reply_check import failed, program_reason
 from tarjim.engines.subscription import launcher, run, strict
-from tarjim.engines.web import EngineError, unwrap, wrap
+from tarjim.engines.web import unwrap, wrap
 
 # `--tools ""` removes the built-in tools only; `--deny MCPTool` refuses the person's MCP servers
 # too (README of 1.0.50, "Permission Rules": a bare prefix matches every call of that kind).
@@ -40,9 +41,11 @@ class GrokAsker:
         try:
             answer = json.loads(done.stdout or "{}")
         except ValueError as error:
-            raise EngineError("grok", done.returncode, done.stderr or done.stdout) from error
+            raise failed("grok", model, "no answer", program_reason(
+                done.returncode, done.stderr or done.stdout)) from error
         if done.returncode != 0 or "structuredOutput" not in answer:
-            raise EngineError("grok", done.returncode, done.stderr or str(answer.get("text", "")))
+            raise failed("grok", model, "no answer", program_reason(
+                done.returncode, done.stderr or str(answer.get("text", ""))))
         return unwrap(answer["structuredOutput"])
 
 

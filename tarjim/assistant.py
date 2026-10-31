@@ -72,12 +72,15 @@ def translation_status(job_id: str, wait_seconds: int = 0) -> Any:
 @tarjim.tool()
 def control_translation(job_id: str, action: str) -> Any:
     """Pause, resume or cancel a running translation, retry one that failed or was cancelled,
-    or remove an ended one from the list (its video and subtitle files stay on the computer).
-    action: pause, resume, cancel, retry or remove."""
+    listen_again to an ended one (forgets what was heard, for subtitles that missed speech), or
+    remove an ended one from the list (its video and subtitle files stay on the computer).
+    action: pause, resume, cancel, retry, listen_again or remove."""
     if action == "retry":
         return call(f"/retry/{job_id}", {})
+    if action == "listen_again":
+        return call(f"/relisten/{job_id}", {})
     if action not in ACTIONS:
-        return {"error": "action must be pause, resume, cancel, retry or remove"}
+        return {"error": "action must be pause, resume, cancel, retry, listen_again or remove"}
     return call(f"/jobs/{job_id}/{action}", {})
 
 

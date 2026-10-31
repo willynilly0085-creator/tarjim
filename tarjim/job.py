@@ -56,6 +56,7 @@ class Job:
     dub: str = ""
     out_dir: Path | None = None
     cache_dir: Path | None = None
+    relisten: bool = False  # forget the kept hearing: listen to the clip again
 
     @property
     def language(self) -> Language:

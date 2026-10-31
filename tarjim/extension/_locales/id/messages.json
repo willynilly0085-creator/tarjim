@@ -104,6 +104,9 @@
   "retry": {
     "message": "Coba lagi"
   },
+  "listenAgain": {
+    "message": "Dengarkan ulang"
+  },
   "errQuota": {
     "message": "Kuota gratis kuncimu untuk hari ini sudah habis. Tambahkan kunci berbayar di Pengaturan, kembali besok, atau pakai mode lokal."
   },

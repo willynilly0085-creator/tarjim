@@ -62,6 +62,7 @@
   "downloading": "다운로드 중",
   "failed": "다운로드가 끝나지 않았어요",
   "retry": "다시 시도",
+  "listenAgain": "다시 듣기",
   "sizeGb": "{n} GB",
   "requiredMissing": "계속하기 전에 필수 도구를 다운로드하세요.",
   "extTitle": "브라우저 확장 프로그램",

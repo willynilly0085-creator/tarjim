@@ -117,7 +117,9 @@ function actionsFor(job, box, refresh) {
        act(t("openFolder"), () => post(`/reveal/${job.id}`), opened)]
     : wanted === "again" ? [act(t("retry"), () => post(`/retry/${job.id}`).then(refresh))]
       : steering(job, act, refresh);
-  box.replaceChildren(...buttons, ...(job.finished ? [removeButton(job, row, refresh)] : []));
+  // Listening again forgets the kept hearing: for subtitles that missed some of the speech.
+  const again = act(t("listenAgain"), () => post(`/relisten/${job.id}`).then(refresh));
+  box.replaceChildren(...buttons, ...(job.finished ? [again, removeButton(job, row, refresh)] : []));
 }
 
 function metaText(job, languages) {

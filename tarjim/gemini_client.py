@@ -168,6 +168,6 @@ class GeminiClient:
         response = self.client.models.generate_content(
             model=model, contents=content, config=config)
         self.model_used = model
-        if not response.text:
-            raise RuntimeError("Gemini returned an empty answer")
-        return json.loads(response.text)
+        from tarjim.engines.reply_check import checked, gemini_reason
+
+        return json.loads(checked("gemini", model, response.text, gemini_reason(response)))

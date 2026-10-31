@@ -62,6 +62,7 @@
   "downloading": "Wird heruntergeladen",
   "failed": "Download nicht abgeschlossen",
   "retry": "Erneut versuchen",
+  "listenAgain": "Neu anhören",
   "sizeGb": "{n} GB",
   "requiredMissing": "Lade zuerst die notwendigen Werkzeuge herunter, bevor du weitermachst.",
   "extTitle": "Browser-Erweiterung",

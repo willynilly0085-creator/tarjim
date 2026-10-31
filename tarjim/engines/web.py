@@ -49,11 +49,15 @@ def parse_json(text: str) -> Any:
 
 
 def reply_text(provider: str, answer: Any) -> str:
-    """The words of a chat-format answer; an answer of another shape is an engine error."""
+    """The words of a chat-format answer; an answer of another shape is an engine error, and an
+    empty, refused or cut-off one says why (engines/reply_check.py)."""
+    from tarjim.engines.reply_check import chat_reason, checked
+
     try:
-        return str(answer["choices"][0]["message"]["content"] or "")
+        content = str(answer["choices"][0]["message"]["content"] or "")
     except (LookupError, TypeError) as error:
         raise EngineError(provider, 0, f"unexpected answer: {str(answer)[:120]}") from error
+    return checked(provider, str(answer.get("model") or ""), content, chat_reason(answer))
 
 
 def post(provider: str, url: str, headers: dict[str, str], **payload: Any) -> Any:

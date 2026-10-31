@@ -62,6 +62,7 @@
   "downloading": "Baixando",
   "failed": "O download não terminou",
   "retry": "Tentar de novo",
+  "listenAgain": "Ouvir de novo",
   "sizeGb": "{n} GB",
   "requiredMissing": "Baixe as ferramentas essenciais antes de continuar.",
   "extTitle": "Extensão do navegador",

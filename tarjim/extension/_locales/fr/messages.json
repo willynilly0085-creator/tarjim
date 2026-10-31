@@ -104,6 +104,9 @@
   "retry": {
     "message": "Réessayer"
   },
+  "listenAgain": {
+    "message": "Réécouter"
+  },
   "errQuota": {
     "message": "Le quota gratuit de ta clé est épuisé pour aujourd'hui. Ajoute une clé payante dans les réglages, reviens demain ou utilise le mode local."
   },

@@ -99,10 +99,12 @@ function actions(job, box, refresh) {
   box.dataset.kind = kind;
   box.hidden = false;
   box.closest(".job").querySelector(".job-problem").hidden = true;  // a new state, a fresh start
+  // Listening again forgets the kept hearing: for subtitles that missed some of the speech.
+  const again = button(t("listenAgain"), guarded(job, () => post(`/relisten/${job.id}`).then(refresh)));
   box.replaceChildren(...(kind === "done" ? opening(job)
     : kind === "again" ? [button(t("retry"), guarded(job, () => post(`/retry/${job.id}`).then(refresh)))]
       : steering(job, refresh)),
-  ...(job.finished ? [removeButton(job, refresh)] : []));
+  ...(job.finished ? [again, removeButton(job, refresh)] : []));
 }
 
 // A subtitle file alone opens as text, so its button says so rather than "Play".

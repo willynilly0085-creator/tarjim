@@ -104,6 +104,9 @@
   "retry": {
     "message": "Tekrar dene"
   },
+  "listenAgain": {
+    "message": "Yeniden dinle"
+  },
   "errQuota": {
     "message": "Anahtarının bugünkü ücretsiz kotası doldu. Ayarlardan ücretli bir anahtar ekle, yarın tekrar dene ya da yerel modu kullan."
   },

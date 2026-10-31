@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from contextvars import copy_context
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from tarjim.gemini_client import QuotaExhausted
 from tarjim.listen.gemini_listen import Utterance
@@ -21,6 +21,8 @@ class Heard:
     passes: list[list[Utterance]]
     # the words the local listener heard, when it was the listener: its own second opinion
     local_words: list[Word] | None = None
+    provider: str = ""  # the engine that heard it: a stretch it left out is asked of it again
+    added: list[Utterance] = field(default_factory=list)  # what filled those stretches
 
 
 def listen_many(listen: Listen, passes: int = PASSES) -> Heard:

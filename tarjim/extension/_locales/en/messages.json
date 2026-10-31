@@ -104,6 +104,9 @@
   "retry": {
     "message": "Try again"
   },
+  "listenAgain": {
+    "message": "Listen again"
+  },
   "errQuota": {
     "message": "Your key's free quota is used up for today. Add a paid key in Settings, come back tomorrow, or use local mode."
   },

@@ -62,6 +62,7 @@
   "downloading": "Mengunduh",
   "failed": "Unduhan tidak selesai",
   "retry": "Coba lagi",
+  "listenAgain": "Dengarkan ulang",
   "sizeGb": "{n} GB",
   "requiredMissing": "Unduh alat utama sebelum lanjut.",
   "extTitle": "Ekstensi browser",

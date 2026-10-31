@@ -23,6 +23,7 @@ from typing import Any
 
 from tarjim.config import setting
 from tarjim.engines.bounded import bounded
+from tarjim.engines.reply_check import failed, program_reason
 from tarjim.engines.subscription import launcher, run, strict
 from tarjim.engines.web import EngineError, TimedOut, unwrap, wrap
 
@@ -78,7 +79,7 @@ class AntigravityAsker:
             if audio:
                 (Path(folder) / SOUND).write_bytes(audio)
             done = run(command, "", folder)
-        return unwrap(answer_of(done.returncode, done.stdout, done.stderr))
+        return unwrap(answer_of(done.returncode, done.stdout, done.stderr, model))
 
 
 def known_rows() -> list[tuple[str, str, str]]:
@@ -101,7 +102,7 @@ def hearing_model() -> str:
     return suggested(known_rows()) or setting("antigravity_model")
 
 
-def answer_of(code: int, printed: str, complaint: str) -> Any:
+def answer_of(code: int, printed: str, complaint: str, model: str = "") -> Any:
     """The structured answer from what the program printed; a sign-in problem is named as one."""
     try:
         answer = json.loads(printed[printed.find("{"):]) if "{" in printed else {}
@@ -114,7 +115,8 @@ def answer_of(code: int, printed: str, complaint: str) -> Any:
     told = f"{answer.get('error') or ''} {complaint} {'' if answer else printed}".lower()
     if SIGN_IN in told or "authentication required" in told:
         raise EngineError("antigravity", code, NOT_SIGNED_IN)
-    raise EngineError("antigravity", code, str(answer.get("error") or complaint or printed))
+    raise failed("antigravity", model, "no answer", program_reason(
+        code, str(answer.get("error") or complaint or printed)))
 
 
 def listing() -> str:

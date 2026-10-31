@@ -21,6 +21,8 @@ def parse(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--font", default="", help="override the language's default font")
     parser.add_argument("--downloads", type=Path, default=DOWNLOADS,
                         help="where links are downloaded")
+    parser.add_argument("--listen-again", action="store_true",
+                        help="forget the kept hearing of each video and listen to it again")
     return parser.parse_args(argv)
 
 
@@ -31,7 +33,7 @@ def main(argv: list[str] | None = None) -> int:
     for source in args.sources:
         video = resolve(source, args.downloads)
         job = Job(video=video, target=args.to, dialect=args.dialect, burn=not args.no_burn,
-                  font=args.font)
+                  font=args.font, relisten=args.listen_again)
         cues, issues = run(job, report=lambda stage: print(f"  .. {stage}", flush=True))
         print(f"{video.name}: {len(cues)} subtitles, {len(issues)} issues")
         for issue in issues:

@@ -1,7 +1,8 @@
 from typing import Any
 
 from tarjim.config import setting
-from tarjim.engines.web import EngineError, post, unwrap, wrap
+from tarjim.engines.reply_check import anthropic_reason, require
+from tarjim.engines.web import post, unwrap, wrap
 
 URL = "https://api.anthropic.com/v1/messages"
 VERSION = "2023-06-01"
@@ -27,6 +28,6 @@ class AnthropicAsker:
                 "messages": [{"role": "user", "content": prompt}]}
         answer = post("anthropic", URL, headers(), json=body)
         blocks = [b for b in answer.get("content", []) if b.get("type") == "tool_use"]
-        if not blocks:
-            raise EngineError("anthropic", 0, f"no answer: {answer.get('stop_reason')}")
+        require("anthropic", str(answer.get("model") or body["model"]), bool(blocks),
+                anthropic_reason(answer))
         return unwrap(blocks[0]["input"])

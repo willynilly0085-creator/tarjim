@@ -17,7 +17,8 @@ def order_from(source: str, data: dict[str, Any], name: str = "") -> Order:
     quality = clean(data.get("quality"))
     sound_only = quality == AUDIO and mode != "srt"  # burning and dubbing need the picture
     return Order(source, str(data.get("target") or "ar"), mode,
-                 str(data.get("dialect") or "saudi"), name, "" if sound_only else quality)
+                 str(data.get("dialect") or "saudi"), name, "" if sound_only else quality,
+                 data.get("relisten") is True)
 
 
 def body_size(headers: Any) -> int:
