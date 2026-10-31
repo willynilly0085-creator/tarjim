@@ -121,11 +121,9 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     """The transcript, and whether it covers all the speech, so it is worth keeping."""
     import soundfile
 
-    from tarjim.asr.align import shared_aligner
-    from tarjim.asr.fuse import fuse
     from tarjim.listen.check import covered, regions_in
     from tarjim.listen.coverage import Hearing
-    from tarjim.memory import heavy
+    from tarjim.listen.timing import Timer
 
     report("timing")
     wav, rate = soundfile.read(str(audio), dtype="float32")
@@ -133,12 +131,11 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     local = heard.local_words
     opinion = second_opinion(audio) if local is None else local
     utterances = placed(heard, opinion, len(wav) / rate)
-    mended = covered(job, heard, Hearing(utterances, opinion, regions_in(wav)))
-    with heavy():
-        words = shared_aligner().align(wav, mended.utterances, heard.language)
-    words = trusted(fuse(words, mended.utterances, opinion), opinion)
-    text = " ".join(u.text for u in mended.utterances)
-    return Transcript(language=heard.language, text=text, words=words), mended.whole
+    timer = Timer(wav, rate, heard.language, opinion)
+    checked = covered(job, heard, Hearing(utterances, opinion, regions_in(wav)), timer)
+    words = trusted(checked.words, opinion)
+    text = " ".join(u.text for u in checked.utterances)
+    return Transcript(language=heard.language, text=text, words=words), not checked.left
 
 
 def placed(heard: Heard, opinion: list[Word], duration: float) -> list[Utterance]:

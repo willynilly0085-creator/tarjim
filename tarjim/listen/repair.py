@@ -66,6 +66,8 @@ def described(gap: Gap) -> str:
 
 
 class Mender:
+    label = ""  # what the log calls the check: "" for lines, "words " after alignment
+
     def __init__(self, hearing: Hearing, relisten: Relisten | None, name: str) -> None:
         self.hearing, self.relisten, self.name = hearing, relisten, name or "the same engine"
 
@@ -80,22 +82,30 @@ class Mender:
                   flush=True)
             return []
 
+    def novel(self, line: Utterance, lines: list[Utterance]) -> bool:
+        return not overlaps(line, lines) and not repeats(line, lines)
+
+    def from_local(self, gap: Gap, _lines: list[Utterance]) -> list[Utterance]:
+        return from_words(gap.words)
+
     def fill(self, gap: Gap, lines: list[Utterance]) -> tuple[list[Utterance], str]:
-        found = self.heard_again(gap)
-        again = [u for u in found if not overlaps(u, lines) and not repeats(u, lines)]
+        again = [u for u in self.heard_again(gap) if self.novel(u, lines)]
         if again:
             return again, f"re-listened with {self.name}: {len(again)} lines"
+        local = self.from_local(gap, lines)
+        if local:
+            return local, f"filled from local words: {len(gap.words)} words"
         if gap.words:
-            return from_words(gap.words), f"filled from local words: {len(gap.words)} words"
+            return [], "the local words here are already in the transcript; left as it is"
         if self.hearing.local:  # the listener on this computer ran and heard no words here
             return [], "no listener heard words here; left as it is"
         return [], "not repaired"
 
-    def mend(self) -> Mended:
+    def mend(self, found: list[Gap] | None = None) -> Mended:
         lines, added, left = list(self.hearing.utterances), [], []
-        for gap in gaps(self.hearing):
+        for gap in gaps(self.hearing) if found is None else found:
             fresh, outcome = self.fill(gap, lines)
-            print(f"coverage: {described(gap)} -> {outcome}", flush=True)
+            print(f"coverage: {self.label}{described(gap)} -> {outcome}", flush=True)
             lines.extend(fresh)
             added.extend(fresh)
             left.extend([gap] if outcome == "not repaired" else [])

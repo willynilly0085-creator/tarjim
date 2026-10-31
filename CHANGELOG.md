@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.67 (2026-10-31)
+
+- **No sentence goes missing in the middle of a clip.** A cloud listener sometimes returns one
+  long line that stretches over a sentence it never wrote down, and the check added in 1.0.66
+  took that stretch as covered. tarjim now checks again after the words are timed: any stretch of
+  speech with no word near it is found, for whatever listening engine you picked. The same engine
+  hears that stretch again on its own, and a line it already wrote is not added twice; if that
+  brings nothing, the words your computer heard there fill it.
+- **Subtitles no longer bunch up when the timing slips.** Sometimes every word of a line was in
+  the transcript but the timing put dozens of them on the same instant, so the subtitles for
+  several seconds were missing and then flashed by all at once. Those words are now timed again
+  inside the stretch where they were said, without losing or repeating any of them.
+- Every stretch found, and what was done about it, is in the log ("coverage: words ...").
+
 ## 1.0.66 (2026-10-31)
 
 - **Subtitles no longer stop before the speech does.** Cloud listeners sometimes leave out a
