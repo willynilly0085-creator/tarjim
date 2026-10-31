@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.62 (2026-10-31)
+
+- **The browser extension updates itself every time.** The extension reloads when the engine
+  reports a newer version, but the folder it loads from was refreshed only when the engine
+  started, so when tarjim's files changed while the engine ran, the extension reloaded the old
+  copy, took it as done, and stayed on the old version. The engine now brings that folder up to
+  date before it reports the version, and a reload that still found old files is tried again
+  after an hour.
+
 ## 1.0.61 (2026-10-31)
 
 - **Numbers are timed like words.** The word aligner hears letters only, so a line's digits

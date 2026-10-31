@@ -61,12 +61,17 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   refresh();
 });
 
-// After the engine updates itself it refreshes this extension's folder; reload once to match it.
+// After the engine updates itself it refreshes this extension's folder; reload to match it. A
+// reload that still found the old files (an engine from before 1.0.62 could report a version it
+// had not copied yet) is tried again after an hour, not given up on.
+const RETRY = 60 * 60 * 1000;
+
 async function matchEngine() {
   const engine = (await api("/update").catch(() => null))?.extension;
-  const { reloadedFor } = await chrome.storage.local.get("reloadedFor");
-  if (!engine || engine === chrome.runtime.getManifest().version || engine === reloadedFor) return;
-  await chrome.storage.local.set({ reloadedFor: engine });
+  const { reloadedFor, reloadedAt = 0 } = await chrome.storage.local.get(["reloadedFor", "reloadedAt"]);
+  if (!engine || engine === chrome.runtime.getManifest().version) return;
+  if (engine === reloadedFor && Date.now() - reloadedAt < RETRY) return;
+  await chrome.storage.local.set({ reloadedFor: engine, reloadedAt: Date.now() });
   chrome.runtime.reload();
 }
 

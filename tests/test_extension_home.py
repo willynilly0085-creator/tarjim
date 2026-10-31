@@ -31,3 +31,19 @@ def test_an_update_refreshes_the_copy_and_drops_files_it_no_longer_ships(home: P
     extension_home.extension_folder()
     assert not stale.exists()
     assert changed.read_bytes() == (extension_home.PACKAGED / "background.js").read_bytes()
+
+
+def test_asking_for_the_update_state_refreshes_the_folder_first(home: Path) -> None:
+    """The extension reloads when the engine reports a newer version; the folder it reloads from
+    must already hold it, even when tarjim's files changed while the engine was running."""
+    from tarjim.server.update_routes import UpdateRoutes
+
+    extension_home.extension_folder()
+    manifest = home / "manifest.json"
+    manifest.write_text('{"version": "0.0.1"}', encoding="utf-8")
+    replies: list[int] = []
+    routes = UpdateRoutes()
+    routes.reply = lambda code, _payload: replies.append(code)  # type: ignore[method-assign]
+    routes.update_state({})
+    assert replies == [200]
+    assert manifest.read_bytes() == (extension_home.PACKAGED / "manifest.json").read_bytes()

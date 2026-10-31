@@ -111,6 +111,11 @@ class UpdateRoutes:
         raise NotImplementedError
 
     def update_state(self, _query: Query) -> None:
+        from tarjim.extension_home import extension_folder
+
+        # The extension reloads when this reports a newer version, so the folder it loads from
+        # is brought up to date first: tarjim's files can change while the engine runs.
+        extension_folder()
         self.reply(200, update.view())
 
     def update_apply(self, _query: Query) -> None:
