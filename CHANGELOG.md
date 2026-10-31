@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.59 (2026-10-31)
+
+- **Subtitles no longer stop before the video ends.** On an Obama rally clip the subtitles ended
+  at 1:36 while he spoke for another 30 seconds: one listening pass heard his whole speech, two
+  stopped before it, and the vote, which keeps only what two passes heard, dropped it. Listeners
+  leave words out far more often than they invent them, so tarjim now keeps the hearing that the
+  audio itself backs most, checked against what it heard on the computer.
+
 ## 1.0.58 (2026-10-31)
 
 - **No more videos that look untranslated.** On a 2-minute Marco Rubio speech every subtitle

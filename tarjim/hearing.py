@@ -129,6 +129,7 @@ def listen_and_align(audio: Path, heard: Heard, report: Callable[[str], None]) -
     from tarjim.asr.align import shared_aligner
     from tarjim.asr.anchor import anchor
     from tarjim.asr.fuse import fuse
+    from tarjim.listen.recover import best_heard
     from tarjim.memory import heavy
 
     report("timing")
@@ -136,7 +137,8 @@ def listen_and_align(audio: Path, heard: Heard, report: Callable[[str], None]) -
     # first: its times correct a cloud listener's drift; the local listener is its own
     local = heard.local_words
     opinion = second_opinion(audio) if local is None else local
-    utterances = anchor(heard.utterances, opinion, len(wav) / rate)
+    chosen = best_heard(heard.utterances, heard.passes, opinion)  # what the audio backs most
+    utterances = anchor(chosen, opinion, len(wav) / rate)
     with heavy():
         words = shared_aligner().align(wav, utterances, heard.language)
     words = fuse(words, utterances, opinion)
