@@ -3,21 +3,44 @@
 On a Persian clip (2026-10-31) the cloud listener's line 77.8-95.8 s held every word, but the
 forced aligner put about 35 of them at 90.1 s: the subtitles for 78-89 s were missing, then all
 flashed at once. Over the whole clip the timing looked sane (asr/sanity.py), so only a local look
-finds it: several words in a row ending within a few hundredths of a second of each other.
+finds it: several words in a row ending within a few hundredths of a second of each other. The
+words squeezed in just before or after (there "و این نشست", 0.1 s apart) belong to the pile too:
+a word that has less time to itself than its letters take at any pace is squeezed, not said.
 """
 from dataclasses import replace
 
 from tarjim.asr.align import longest
+from tarjim.asr.qwen import core
 from tarjim.models import Word
 
 STEP = 0.08  # seconds between two words' ends: closer than anyone speaks
 PILE = 5  # this many words that close in a row were piled, not said
+FASTEST = 0.04  # seconds a letter takes at the least: 25 a second, faster than anyone speaks
 
 Span = tuple[float, float]
 
 
-def piles(words: list[Word]) -> list[tuple[int, int]]:
-    """Each run of piled words, as (first, past)."""
+def held(words: list[Word], index: int) -> float:
+    """The time a word has to itself: from its start, or the word before's end if later."""
+    word = words[index]
+    before = words[index - 1].end if index else word.start
+    return word.end - max(word.start, before)
+
+
+def squeezed(words: list[Word], index: int) -> bool:
+    return held(words, index) < FASTEST * max(len(core(words[index].text)), 1)
+
+
+def grown(words: list[Word], first: int, past: int) -> tuple[int, int]:
+    """A pile with the squeezed words on either side of it."""
+    while first and squeezed(words, first - 1):
+        first -= 1
+    while past < len(words) and squeezed(words, past):
+        past += 1
+    return first, past
+
+
+def cores(words: list[Word]) -> list[tuple[int, int]]:
     found, first = [], 0
     for index in range(1, len(words) + 1):
         if index < len(words) and abs(words[index].end - words[index - 1].end) < STEP:
@@ -25,6 +48,17 @@ def piles(words: list[Word]) -> list[tuple[int, int]]:
         if index - first >= PILE:
             found.append((first, index))
         first = index
+    return found
+
+
+def piles(words: list[Word]) -> list[tuple[int, int]]:
+    """Each run of piled words with the words squeezed against it, as (first, past)."""
+    found: list[tuple[int, int]] = []
+    for first, past in (grown(words, *run) for run in cores(words)):
+        if found and first <= found[-1][1]:
+            found[-1] = (found[-1][0], max(past, found[-1][1]))
+        else:
+            found.append((first, past))
     return found
 
 

@@ -1,7 +1,7 @@
 """The pieces of the check after alignment: piles, what counts as said already, spreading."""
 from tarjim.asr.piles import piles, spread
 from tarjim.listen.gemini_listen import Utterance
-from tarjim.listen.novel import said_before, timed_over
+from tarjim.listen.novel import echoes, said_before, timed_over
 from tarjim.models import Word
 
 
@@ -52,3 +52,18 @@ def test_a_line_already_said_nearby_is_old() -> None:
 def test_a_line_whose_time_timed_words_fill_is_old() -> None:
     line = Utterance(10.0, 12.0, "S1", "x")
     assert timed_over(line, [(9.5, 11.5)]) and not timed_over(line, [(11.5, 13.0)])
+
+
+def test_squeezed_words_next_to_a_pile_join_it() -> None:
+    lead = [Word("w", 9.0, 9.02), Word("ab", 9.02, 9.06), Word("abcd", 9.06, 9.14)]
+    pile = [Word(f"p{i}", 9.5, 9.5) for i in range(6)]
+    said = [Word("x", 1.0, 1.3), *lead, *pile, Word("abc", 9.6, 9.9)]
+    assert piles(said) == [(1, 10)]
+
+
+def test_a_fragment_echoing_the_word_before_is_old() -> None:
+    words = [Word("دیگه", 76.0, 76.6), Word("گفت‌وگوئه.", 76.7, 77.2)]
+    assert echoes(Utterance(76.9, 77.7, "S1", "بگوئه."), words)
+    assert echoes(Utterance(77.3, 77.9, "S1", "گفتوگويه"), words)  # half-space, ي for ی
+    assert not echoes(Utterance(77.3, 78.0, "S1", "سلام"), words)
+    assert not echoes(Utterance(80.5, 81.0, "S1", "بگوئه."), words)  # nothing close by

@@ -5,8 +5,9 @@ long line stretched over a sentence it never wrote (2026-10-31: a Rubio clip los
 as political leaders, we have a vital role to play" inside a 55-71 s line; an 832 s interview
 lost 4 s inside an 80 s line), and the aligner can pile a line's words onto one instant (a
 Persian clip, 78-89 s). Here speech counts as covered only near a timed word. Piled words are
-spread back over their stretch (asr/piles.py); text left out is heard again by the same engine,
-deduplicated by its words and by the timed words, not by line spans; then the local words fill.
+spread back over their stretch (asr/piles.py) first, and a stretch they now fill is not heard
+again; text left out is heard again by the same engine, deduplicated by its words and by the timed
+words, not by line spans; then the local words fill.
 """
 from dataclasses import dataclass, replace
 
@@ -14,7 +15,7 @@ from tarjim.asr.piles import Span, piles, spread
 from tarjim.listen.coverage import EDGE, Gap, Hearing, gaps, speech_of
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.novel import Again, WordMender
-from tarjim.listen.repair import described
+from tarjim.listen.repair import OVERLAP, described
 from tarjim.listen.timing import Timer
 from tarjim.models import Word
 
@@ -34,10 +35,18 @@ def touches(span: Span, gap: Gap) -> bool:
     return span[0] < gap.end and span[1] > gap.start
 
 
-def word_gaps(hearing: Hearing, words: list[Word], tried: list[Gap]) -> list[Gap]:
+def filled(gap: Gap, windows: list[Span]) -> bool:
+    """Most of the gap lies where piled words were re-timed."""
+    inside = sum(max(0.0, min(gap.end, b) - max(gap.start, a)) for a, b in windows)
+    return inside >= OVERLAP * (gap.end - gap.start)
+
+
+def word_gaps(hearing: Hearing, words: list[Word], tried: list[Span],
+              windows: list[Span]) -> list[Gap]:
     lines = [Utterance(w.start, w.end, w.speaker, w.text) for w in words]
     found = gaps(Hearing(lines, hearing.local, hearing.regions))
-    return [g for g in found if not any(touches((t.start, t.end), g) for t in tried)]
+    return [g for g in found
+            if not any(touches(t, g) for t in tried) and not filled(g, windows)]
 
 
 def bounds(words: list[Word], first: int, past: int) -> Span:
@@ -47,10 +56,11 @@ def bounds(words: list[Word], first: int, past: int) -> Span:
 
 
 def room(words: list[Word], run: tuple[int, int], gap: Gap) -> Span:
-    """The gap and the pile together, never past the words around them."""
+    """The gap and the pile together, across the gap to the nearest word timed as said; on the
+    pile's other side its times are rough by EDGE. Never past the words around them."""
     (first, past), (before, after) = run, bounds(words, *run)
-    return (max(before, min(gap.start, words[first].start)),
-            min(after, max(gap.end, words[past - 1].end)))
+    return (max(before, min(gap.start, words[first].start - EDGE)),
+            min(after, max(gap.end, words[past - 1].end + EDGE)))
 
 
 def realigned(pile: list[Word], span: Span, timer: Timer) -> list[Word] | None:
@@ -62,8 +72,10 @@ def realigned(pile: list[Word], span: Span, timer: Timer) -> list[Word] | None:
     return [replace(w, start=a.start, end=a.end) for w, a in zip(pile, again, strict=True)]
 
 
-def unpiled(words: list[Word], found: list[Gap], speech: list[Span], timer: Timer) -> list[Word]:
-    words = list(words)
+def unpiled(words: list[Word], found: list[Gap], speech: list[Span],
+            timer: Timer) -> tuple[list[Word], list[Span]]:
+    """The words with each pile next to a gap re-timed, and the stretches re-timed."""
+    words, windows = list(words), []
     for first, past in piles(words):
         gap = next((g for g in found if touches(bounds(words, first, past), g)), None)
         span = room(words, (first, past), gap) if gap else (0.0, 0.0)
@@ -71,9 +83,10 @@ def unpiled(words: list[Word], found: list[Gap], speech: list[Span], timer: Time
             continue
         pile = words[first:past]
         words[first:past] = realigned(pile, span, timer) or spread(pile, span, speech)
+        windows.append(span)
         print(f"coverage: words {described(gap)} -> timing collapsed: re-timed {len(pile)} "
               f"words into {span[0]:.1f}-{span[1]:.1f} s", flush=True)
-    return words
+    return words, windows
 
 
 def joined(words: list[Word], lines: list[Utterance], timer: Timer) -> list[Word]:
@@ -84,11 +97,12 @@ def joined(words: list[Word], lines: list[Utterance], timer: Timer) -> list[Word
 
 
 def recheck(hearing: Hearing, words: list[Word], timer: Timer, again: Again) -> Checked:
-    found = word_gaps(hearing, words, again.tried)
+    tried = [(t.start, t.end) for t in again.tried]
+    found = word_gaps(hearing, words, tried, [])
     if not found:
         return Checked(hearing.utterances, words, [], [])
-    words = unpiled(words, found, speech_of(hearing), timer)
-    missing = word_gaps(hearing, words, again.tried)
+    words, windows = unpiled(words, found, speech_of(hearing), timer)
+    missing = word_gaps(hearing, words, tried, windows)
     mended = WordMender(hearing, again, words).mend(missing)
     if mended.added:
         words = joined(words, sorted(mended.added, key=lambda u: u.start), timer)

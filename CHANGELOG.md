@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.68 (2026-10-31)
+
+- **Bunched-up subtitles next to a silent stretch are fixed too.** 1.0.67 re-times words the
+  timing put on one instant, but it missed them when a few words squeezed just before the pile
+  stood between it and the empty stretch: on a Persian clip the subtitles for 78-89 s stayed
+  missing and all came at 90 s. The squeezed words now count as part of the pile, and the words
+  are spread back over the whole stretch where they were said, up to the nearest word timed
+  normally. A stretch fixed this way is not sent to be heard again.
+- **No stray word is added when a stretch is heard again.** A listener asked about a short
+  stretch sometimes hears a piece of the word next to it again (there "بگوئه." right after
+  "گفت‌وگوئه."). A line of a word or two that echoes a word close by is now left out, and lines
+  are compared without punctuation, the half-space or letters written more than one way.
+
 ## 1.0.67 (2026-10-31)
 
 - **No sentence goes missing in the middle of a clip.** A cloud listener sometimes returns one
