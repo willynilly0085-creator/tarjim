@@ -7,6 +7,7 @@
   stopped before it, and the vote, which keeps only what two passes heard, dropped it. Listeners
   leave words out far more often than they invent them, so tarjim now keeps the hearing that the
   audio itself backs most, checked against what it heard on the computer.
+- pyasn1 0.6.5, for four security advisories published today against 0.6.4.
 
 ## 1.0.58 (2026-10-31)
 

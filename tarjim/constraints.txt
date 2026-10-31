@@ -85,7 +85,7 @@ propcache==0.5.4
 protobuf==7.36.2 ; sys_platform != 'darwin'
 psutil==7.2.2
 pyaes==1.6.1
-pyasn1==0.6.4
+pyasn1==0.6.5
 pyasn1-modules==0.4.2
 pycparser==3.12 ; implementation_name != 'PyPy'
 pydantic==2.14.1
