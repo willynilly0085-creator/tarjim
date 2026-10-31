@@ -6,6 +6,7 @@ from typing import Any
 import numpy as np
 
 from tarjim.asr.ctc import FRAME, Emitter, Span, token_spans
+from tarjim.asr.numbers import said
 from tarjim.asr.qwen import core
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
@@ -30,6 +31,8 @@ class Slot:
     start: float = 0.0
     end: float = 0.0
     timed: bool = False
+    said: str = ""  # what the aligner listens for: a number spelled out, "" for none
+
 
 
 def short(utterance: Utterance) -> bool:
@@ -90,15 +93,43 @@ def longest(text: str) -> float:
     return WORD_BASE + WORD_PER_LETTER * len(core(text))
 
 
-def fill_gaps(slots: list[Slot]) -> None:
+def runs(slots: list[Slot]) -> list[tuple[int, int]]:
+    """Where each stretch of words the aligner could not place begins and ends."""
+    found: list[tuple[int, int]] = []
     for index, slot in enumerate(slots):
         if slot.timed:
             continue
-        later = [s.start for s in slots[index + 1:] if s.timed]
-        before = max(0.0, later[0] - GAP_FALLBACK) if later else 0.0
-        slot.start = slots[index - 1].end if index else before
-        slot.end = later[0] if later else slot.start + GAP_FALLBACK
-        slot.start = min(slot.start, slot.end)
+        if found and found[-1][1] == index:
+            found[-1] = (found[-1][0], index + 1)
+        else:
+            found.append((index, index + 1))
+    return found
+
+
+def share(run: list[Slot], start: float, end: float) -> None:
+    """The run's words take the time between their neighbours, each by its length."""
+    weights = [longest(slot.text) for slot in run]
+    step, cursor = (end - start) / sum(weights), start
+    for slot, weight in zip(run, weights, strict=True):
+        slot.start, cursor = cursor, cursor + weight * step
+        slot.end = cursor
+    run[-1].end = end
+
+
+def fill_gaps(slots: list[Slot]) -> None:
+    """Words the aligner could not place share the gap between the words around them, so a
+    countdown "2, 1, 0" is not one word on screen for seconds and two crushed after it."""
+    for first, past in runs(slots):
+        count = past - first
+        before = slots[first - 1].end if first else None
+        after = slots[past].start if past < len(slots) else None
+        if before is None:
+            end = after if after is not None else GAP_FALLBACK * count
+            start = max(0.0, end - GAP_FALLBACK * count)
+        else:
+            start = before
+            end = max(start, after) if after is not None else start + GAP_FALLBACK * count
+        share(slots[first:past], start, end)
 
 
 @lru_cache(maxsize=1)
@@ -116,6 +147,7 @@ class AlignEngine:
     def align(self, wav: Any, utterances: list[Utterance], language: str) -> list[Word]:
         from tarjim.asr.vad import mute_silence, speech_mask, speech_regions
 
+        self.language = language
         logp = self.emitter.emissions(wav)
         self.speech = speech_mask(speech_regions(wav), len(logp))
         logp = mute_silence(logp, self.speech)
@@ -137,6 +169,8 @@ class AlignEngine:
         high = min(len(logp), int((max(u.end for u in group) + PAD) / FRAME))
         slots = [Slot(tok, u.speaker, i) for i, u in enumerate(group)
                  for tok in split_words(u.text)]
+        for slot, sound in zip(slots, said([s.text for s in slots], self.language), strict=True):
+            slot.said = sound
         if not self.time_slots(logp[low:high], slots, group, low):
             return [word for u in group for word in proportional(u)]
         fill_gaps(slots)
@@ -144,7 +178,7 @@ class AlignEngine:
 
     def time_slots(
             self, logp: np.ndarray, slots: list[Slot], group: list[Utterance], low: int) -> bool:
-        owners = [(k, t) for k, s in enumerate(slots) for t in self.tokens(s.text)]
+        owners = [(k, t) for k, s in enumerate(slots) for t in self.tokens(s.said)]
         bounds = windows([group[slots[k].owner] for k, _ in owners], low)
         spans = token_spans(logp, [t for _, t in owners], bounds)
         if spans is None:

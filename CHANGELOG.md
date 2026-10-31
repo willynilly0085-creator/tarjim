@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.61 (2026-10-31)
+
+- **Numbers are timed like words.** The word aligner hears letters only, so a line's digits
+  could not be placed: on a Russian countdown ("3 seconds, 2, 1, 0!") "2" stayed on screen for
+  six seconds and "1, 0!" was glued to the next sentence. Numbers are now spelled out in the
+  language that was heard before timing ("4 000" as one number), and any word that still cannot
+  be placed shares the gap with its neighbours instead of taking all of it. num2words, already
+  used by dubbing, is now installed with tarjim itself.
+
 ## 1.0.60 (2026-10-31)
 
 - **Installing Claude Code from tarjim works with npm 12.** npm 12 no longer runs a package's

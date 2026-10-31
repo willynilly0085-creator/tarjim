@@ -1,6 +1,6 @@
 [project]
 name = "tarjim"
-version = "1.0.60"
+version = "1.0.61"
 description = "Subtitles and dubbing for any video, from any language to any language, on your own computer"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0 with Commons Clause 1.0" }
@@ -14,6 +14,7 @@ dependencies = [
     "nagisa",
     "soynlp",
     "uroman",
+    "num2words",
     "silero-vad",
     "yt-dlp",
     "keyring",
@@ -37,8 +38,8 @@ Developer = "https://indicators.sa/"
 # catt-tashkeel needs onnxruntime-gpu, which has no macOS build; without it the voice gets the
 # text without vowel marks, as when the model fails.
 dub = ["torch", "torchcodec", "torchaudio", "demucs", "catt-tashkeel; sys_platform != 'darwin'",
-       "edge-tts", "fish-audio-sdk", "num2words", "librosa", "einops", "soundfile"]
-dev = ["pytest", "pytest-cov", "ruff", "mypy", "num2words"]
+       "edge-tts", "fish-audio-sdk", "librosa", "einops", "soundfile"]
+dev = ["pytest", "pytest-cov", "ruff", "mypy"]
 
 [project.scripts]
 tarjim = "tarjim.cli:main"
