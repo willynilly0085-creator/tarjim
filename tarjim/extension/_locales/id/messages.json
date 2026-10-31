@@ -387,6 +387,9 @@
   "errAccount": {
     "message": "Perusahaan AI menolak akun ini: katanya akun tidak memenuhi syarat atau harus diverifikasi dulu. Ini dari pihak perusahaan, bukan tarjim. Buka program atau situsnya dan selesaikan verifikasi yang diminta, atau pilih AI lain di Pengaturan (kunci Gemini gratis langsung bisa dipakai)."
   },
+  "errInUse": {
+    "message": "File sedang terbuka di program lain (misalnya pemutar video), jadi tarjim tidak bisa menulis versi baru di tempatnya. Tutup program itu lalu coba lagi."
+  },
   "errMedia": {
     "message": "File ini bukan video atau audio yang bisa dibuka tarjim. Pilih file videonya sendiri, bukan playlist atau daftar tautan."
   },

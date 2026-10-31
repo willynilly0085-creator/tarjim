@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.65 (2026-10-31)
+
+- **A video open in another program no longer fails the job.** Windows refuses to replace a
+  file another program holds open (a player showing the earlier result, an antivirus scan, an
+  upload of it), and the job ended in "Access is denied" with the new video lost. tarjim now
+  waits up to 30 seconds for the file to be let go; if it is still held, the job says the file
+  is open in another program, in the person's language, instead of an unexpected error.
+
 ## 1.0.64 (2026-10-31)
 
 - **A video on its way to the phone is no longer cut off.** The engine restarts by itself into

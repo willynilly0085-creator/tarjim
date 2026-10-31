@@ -395,6 +395,7 @@
   "err_media": "File ini bukan video atau audio yang bisa dibuka tarjim. Pilih file videonya sendiri, bukan playlist atau daftar tautan.",
   "err_long": "File ini berisi suara lebih dari enam jam, batas terlama yang dikerjakan tarjim. Potong menjadi bagian paling lama enam jam, lalu terjemahkan tiap bagian sendiri-sendiri.",
   "err_list": "Tautan ini adalah daftar beberapa video, seperti playlist, kanal, atau feed. tarjim mengerjakan satu video setiap kali: buka video yang Anda mau dan kirim tautan video itu sendiri.",
+  "err_in_use": "File sedang terbuka di program lain (misalnya pemutar video), jadi tarjim tidak bisa menulis versi baru di tempatnya. Tutup program itu lalu coba lagi.",
   "err_updated": "tarjim diperbarui saat sedang berjalan dan sebentar lagi memulai ulang sendiri. Setelah itu tekan “Coba lagi”.",
   "failedAt": "Berhenti di “{stage}”.",
   "errorDetail": "Rincian: {detail}",

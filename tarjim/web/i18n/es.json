@@ -395,6 +395,7 @@
   "err_media": "Este archivo no es un vídeo ni un audio que tarjim pueda abrir. Elija el propio archivo de vídeo, no una lista de reproducción ni una lista de enlaces.",
   "err_long": "Este archivo tiene más de seis horas de sonido, el máximo con el que trabaja tarjim. Divídalo en partes de seis horas como mucho y traduzca cada parte por separado.",
   "err_list": "Este enlace es una lista de varios vídeos, como una lista de reproducción, un canal o un feed. tarjim trabaja con un vídeo cada vez: abra el vídeo que quiere y envíe su propio enlace.",
+  "err_in_use": "El archivo está abierto en otro programa (un reproductor de vídeo, por ejemplo), así que tarjim no pudo escribir la nueva versión en su lugar. Cierre ese programa e inténtelo de nuevo.",
   "err_updated": "tarjim se actualizó mientras estaba en marcha y se reinicia solo en un momento. Después pulse «Reintentar».",
   "failedAt": "Se detuvo en «{stage}».",
   "errorDetail": "Detalles: {detail}",
