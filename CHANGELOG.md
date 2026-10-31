@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.60 (2026-10-31)
+
+- **Installing Claude Code from tarjim works with npm 12.** npm 12 no longer runs a package's
+  install script unless it is named, and Claude Code's script is what fetches its program, so
+  an install finished but `claude` said its program was not installed. tarjim now names the
+  program it installs when it runs npm (older npm ignores the option).
+
 ## 1.0.59 (2026-10-31)
 
 - **Subtitles no longer stop before the video ends.** On an Obama rally clip the subtitles ended

@@ -57,7 +57,8 @@ def possible(provider: str) -> bool:
 def command(provider: str) -> list[str]:
     """npm when the person has it, the vendor's installer next, tarjim's own Node.js last."""
     if provider in PACKAGES and npm():
-        return [npm(), "install", "-g", PACKAGES[provider]]
+        package = PACKAGES[provider]
+        return [npm(), "install", "-g", own_node.scripts_for([package]), package]
     return NATIVE[provider] if provider in NATIVE else own_node.install(PACKAGES[provider])
 
 

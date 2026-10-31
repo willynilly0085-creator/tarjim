@@ -38,6 +38,7 @@ def test_a_subscription_program_is_installed_hidden_only_when_node_is_there(
     app_install.running.clear()
     monkeypatch.setattr(app_install, "npm", lambda: "npm.cmd")
     assert app_install.start("codex") == "started"
-    assert started[-1] == ["npm.cmd", "install", "-g", "@openai/codex"]
+    assert started[-1] == ["npm.cmd", "install", "-g", "--allow-scripts=@openai/codex",
+                           "@openai/codex"]
     assert app_install.installing("codex")
     assert app_install.start("gemini") == "unknown"

@@ -144,7 +144,7 @@ def add(folder: Path, packages: list[str]) -> None:
     if not packages:
         return
     command = [str(folder / "npm.cmd"), "install", "-g", "--prefix", str(folder),
-               *(f"{package}@latest" for package in packages)]
+               own_node.scripts_for(packages), *(f"{package}@latest" for package in packages)]
     done = subprocess.run(command, capture_output=True, text=True, timeout=NPM_SECONDS,
                           env=own_node.environment(folder), creationflags=NO_WINDOW, check=False)
     if done.returncode:

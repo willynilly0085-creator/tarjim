@@ -145,6 +145,7 @@ def test_a_checked_release_gets_the_programs_installed_before_it_takes_the_folde
     node_release.build(V, ["@openai/codex", "@github/copilot"])
     staged = own_node.staging() / "node-v24.22.1-win-x64"
     assert commands == [[str(staged / "npm.cmd"), "install", "-g", "--prefix", str(staged),
+                         "--allow-scripts=@openai/codex,@github/copilot",
                          "@openai/codex@latest", "@github/copilot@latest"]]
     assert (folder / "node.exe").read_text(encoding="utf-8") == "v24.22.1 node.exe"
     assert not own_node.staging().exists() and not own_node.retired().exists()

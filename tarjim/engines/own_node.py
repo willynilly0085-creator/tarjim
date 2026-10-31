@@ -25,6 +25,13 @@ def npm() -> str:
     return str(found) if found.is_file() else ""
 
 
+def scripts_for(packages: list[str]) -> str:
+    """npm 12 runs no package's install script unless it is named: Claude Code's fetches its
+    program, and without it `claude` only says its program is not installed (2026-10-31). Older
+    npm warns about the option it does not know and goes on."""
+    return "--allow-scripts=" + ",".join(p[0] + p[1:].split("@")[0] for p in packages)
+
+
 def node() -> str:
     found = FOLDER / "node.exe"
     return str(found) if found.is_file() else ""
@@ -51,7 +58,7 @@ def install(package: str) -> list[str]:
     """Add the package with tarjim's own Node.js, downloading and checking that first when it is
     missing (node_setup, run by this same Python so the check is tarjim's own code)."""
     if npm():
-        return [npm(), "install", "-g", "--prefix", str(FOLDER), package]
+        return [npm(), "install", "-g", "--prefix", str(FOLDER), scripts_for([package]), package]
     return [sys.executable, "-P", "-m", SETUP, package]
 
 

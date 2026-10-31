@@ -95,3 +95,11 @@ def test_the_first_node_install_takes_the_newest_lts_and_only_a_known_program(
     assert node_setup.main(["@github/copilot"]) == 1
     monkeypatch.setattr(node_release, "ask_index", lambda: [])
     assert node_setup.main(["@github/copilot"]) == 1
+
+
+def test_npm_is_allowed_to_run_the_programs_own_install_script() -> None:
+    """npm 12 skips install scripts; Claude Code's fetches its program (2026-10-31)."""
+    from tarjim.engines.own_node import scripts_for
+
+    assert scripts_for(["@anthropic-ai/claude-code"]) == "--allow-scripts=@anthropic-ai/claude-code"
+    assert scripts_for(["@openai/codex@latest", "pkg@1.2"]) == "--allow-scripts=@openai/codex,pkg"
