@@ -13,13 +13,16 @@ other sites come as AV1 or VP9, which draw the same picture with about half and 
 H.264's bits. Capped at the source's own rate, a 1080p AV1 download came out visibly softer
 (the owner: "do not compress the video and spoil its quality"), so the cap is weighed by the
 source's codec. The result stays H.264, which every phone and editor plays, in the 8-bit 4:2:0
-picture every phone and browser decodes, with a sound an MP4 player plays."""
+picture every phone and browser decodes, with a sound an MP4 player plays. A picture smaller
+than 1080p is enlarged before the subtitles are drawn, so its letters are sharp (render/sharp.py).
+"""
 import tempfile
 from pathlib import Path
 
 from tarjim.media import picture, run, source, tool, video_kbps
 from tarjim.render.encoders import for_quality
 from tarjim.render.mark import LOGO, Mark, overlay, with_mark
+from tarjim.render.sharp import Enlarged, drawn_size, enlarged, grown, scale_filter
 from tarjim.whole import whole
 
 PLAIN = "subtitles.ass"
@@ -38,11 +41,18 @@ def burn(video: Path, subtitles: str, target: Path, mark: Mark | None = None) ->
         return encode(video.resolve(), target.resolve(), Path(folder), mark)
 
 
-def drawing(mark: Mark | None) -> list[str]:
+def drawing(mark: Mark | None, by: Enlarged | None = None) -> list[str]:
+    draw = f"{scale_filter(by)}ass={PLAIN}"
     if mark is None:
-        return ["-vf", f"ass={PLAIN}{PLAYABLE}"]
-    return [*picture(LOGO), "-filter_complex", f"[0:v]ass={PLAIN}[subtitled];"
-            + overlay(mark, "subtitled") + PLAYABLE]
+        return ["-vf", f"{draw}{PLAYABLE}"]
+    return [*picture(LOGO), "-filter_complex", f"[0:v]{draw}[subtitled];"
+            + overlay(grown(mark, by), "subtitled") + PLAYABLE]
+
+
+def enlargement(folder: Path) -> Enlarged | None:
+    """How much to enlarge the picture, from the size the subtitle file was laid out for."""
+    drawn = folder / PLAIN
+    return enlarged(drawn_size(drawn.read_text(encoding="utf-8"))) if drawn.is_file() else None
 
 
 def sound_codecs(video: Path) -> list[str]:
@@ -75,9 +85,10 @@ def ceiling_kbps(video: Path) -> int:
 
 
 def encode(video: Path, target: Path, folder: Path, mark: Mark | None) -> Path:
+    by = enlargement(folder)
     base = [tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", *source(video),
-            *drawing(mark), *sound(sound_codecs(video)), "-movflags", "+faststart"]
-    rate = ceiling_kbps(video)
+            *drawing(mark, by), *sound(sound_codecs(video)), "-movflags", "+faststart"]
+    rate = round(ceiling_kbps(video) * (by.factor if by else 1.0))
     with whole(target) as part:
         first_that_works(base, rate, part, folder)
     return target

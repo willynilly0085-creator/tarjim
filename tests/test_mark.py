@@ -113,14 +113,14 @@ def burn_command(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
     monkeypatch.setattr(burn, "video_kbps", lambda _video: 0)
     monkeypatch.setattr(burn, "sound_codecs", lambda _video: ["aac"])
     monkeypatch.setattr(burn, "tool", lambda name: name)
-    burn.burn(tmp_path / "v.mp4", render_ass(CUES, Canvas(1280, 720)), tmp_path / "out.mp4",
+    burn.burn(tmp_path / "v.mp4", render_ass(CUES, Canvas(1920, 1080)), tmp_path / "out.mp4",
               placed)
     return seen[0]
 
 
 def test_the_burn_overlays_the_logo_only_when_the_mark_is_on(
         tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    placed = mark.place_mark(Canvas(1280, 720))
+    placed = mark.place_mark(Canvas(1920, 1080))
     argv, ass = burn_command(tmp_path, monkeypatch, placed)
     assert argv.count("-i") == 2 and str(mark.LOGO) in argv and "Style: Mark," in ass
     logo = argv.index(str(mark.LOGO))

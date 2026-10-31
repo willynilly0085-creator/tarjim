@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.63 (2026-10-31)
+
+- **Sharp subtitles on small videos.** Subtitles were drawn at the video's own size, so on a
+  464-line download each letter had about twenty rows of pixels and looked soft once a phone or
+  a TV enlarged it. A video smaller than 1080p is now enlarged to fit 1920×1080 before the
+  subtitles are drawn: the layout is the same, the letters get two to five times the pixels, and
+  the rate the video may spend grows with its size. A 464p clip went from 2.9 MB to 6.1 MB.
+
 ## 1.0.62 (2026-10-31)
 
 - **The browser extension updates itself every time.** The extension reloads when the engine
