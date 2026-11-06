@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.69 (2026-11-06)
+
+- **Libraries brought up to date** (24 of them), each run through every test and a real
+  listening and translation before release. The largest step is Google's Gemini library, 2.33 to
+  3.0; also Transformers 5.22, Hugging Face Hub 2.4 and Pydantic 2.14.3. None of them fixes a
+  published vulnerability: there is none in tarjim's libraries.
+- This release also carries 1.0.65 to 1.0.68 to everyone: their release pages had not been
+  published, so automatic updates stopped at 1.0.64.
+
 ## 1.0.68 (2026-10-31)
 
 - **Bunched-up subtitles next to a silent stretch are fixed too.** 1.0.67 re-times words the
