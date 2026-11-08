@@ -19,7 +19,6 @@ IDLE_SECONDS = 300.0
 ENDED = ("done", "failed", "cancelled")
 CONTROLS = {"pause": "paused", "resume": "run", "cancel": "cancelled"}
 
-
 classify = reasons.classify  # where the rest of tarjim looks for it
 
 
@@ -48,6 +47,7 @@ class Task:
     failed_at: str = ""
     video: Path | None = None
     outputs: list[Path] = field(default_factory=list)
+    notes: list[dict[str, object]] = field(default_factory=list)  # findings.py: known problems
     created: float = field(default_factory=time.time)
     control: str = "run"
     moved: tuple[int, int] = (0, 0)
@@ -90,7 +90,7 @@ class Task:
                 "target": self.order.target, "mode": self.order.mode,
                 "title": self.order.name or (self.video.stem if self.video else self.order.source),
                 "outputs": [p.name for p in self.outputs], "created": self.created,
-                "progress": list(self.moved),
+                "progress": list(self.moved), "notes": self.notes,
                 "files": [str(p) for p in self.outputs]}
 
 

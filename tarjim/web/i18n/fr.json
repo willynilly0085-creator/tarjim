@@ -479,5 +479,14 @@
   "actionOpen": "Cet ordinateur n'a pas pu ouvrir le fichier. Affichez-le plutôt dans son dossier.",
   "cancelSure": "Annuler ? Le travail fait sera supprimé",
   "cancelLabel": "Annuler cette tâche. Ce qu'elle a produit jusqu'ici est supprimé.",
-  "openSrt": "Ouvrir les sous-titres"
+  "openSrt": "Ouvrir les sous-titres",
+  "stage_doneNotes": "Terminé, avec remarques",
+  "note_speech_left": "Paroles sans sous-titre ({n}) : à {at}",
+  "note_in_source": "Lignes qu'aucun moteur n'a traduites, montrées en version originale ({n}) : à {at}",
+  "note_untranslated": "Lignes sans traduction ({n}) : à {at}",
+  "note_overlap": "Lignes qui chevauchent la suivante ({n}) : à {at}",
+  "note_readability": "Lignes plus longues que leur durée, peut-être difficiles à lire ({n}) : à {at}",
+  "note_timing": "Le minutage peut s'écarter de la voix : seuls {share} % des mots sont là où ils sont placés",
+  "note_sounds": "Simples sons, comme Mm ou Euh, laissés sans sous-titre ({n}) : à {at}",
+  "note_engine_stopped": "Le moteur de traduction s'est arrêté en cours de route, les lignes restantes sont donc montrées en version originale. Raison : {reason}"
 }

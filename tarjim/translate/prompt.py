@@ -91,6 +91,7 @@ class Brief:
     hears: bool = True
     glossary: tuple[tuple[str, str], ...] = ()
     slid: bool = False  # the last answer moved each translation into the next slot (drift.py)
+    context: tuple[Cue, ...] = ()  # translated lines beside the asked ones, shown read only
 
     @property
     def arabic(self) -> bool:
@@ -103,6 +104,20 @@ SLID = {
     "any": "\n\nWarning: your previous answer slid the translations, so each slot held the "
            "previous slot's translation. Match every id to its own source sentence exactly.",
 }
+
+
+CONTEXT = {
+    "ar": "\n\nللفهم فقط، هذي سطور قريبة مترجمة من قبل؛ لا ترجعها ولا تغيّرها:\n",
+    "any": "\n\nFor meaning only, nearby lines already translated; do not return or change them:\n",
+}
+
+
+def context_of(brief: Brief, key: str) -> str:
+    """A slot asked again is asked with its neighbours (2026-11-08), so a short line out of its
+    conversation is still translated in it."""
+    if not brief.context:
+        return ""
+    return CONTEXT[key] + "\n".join(f"- {cue.source} => {cue.text}" for cue in brief.context)
 
 
 def has_speakers(cues: list[Cue]) -> bool:
@@ -121,7 +136,8 @@ def build_prompt(cues: list[Cue], brief: Brief) -> str:
 
     warning = SLID[key] if brief.slid else ""
     return template.format(style=style, count=len(cues), items=items, dialogue_rule=rule,
-                           have=have, listen=listen) + instructions(brief.glossary) + warning
+                           have=have, listen=listen) + instructions(brief.glossary) + warning + \
+        context_of(brief, key)
 
 
 def format_item(number: int, cue: Cue, brief: Brief) -> str:

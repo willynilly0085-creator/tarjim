@@ -22,7 +22,7 @@ WRITING = threading.Lock()
 def write_down(board: Board, folder: Path) -> None:
     rows = [{**{name: getattr(t, name) for name in FIELDS}, "stage": t.stage,
              "order": asdict(t.order), "video": str(t.video or ""),
-             "outputs": [str(p) for p in t.outputs]} for t in board.recent()
+             "outputs": [str(p) for p in t.outputs], "notes": t.notes} for t in board.recent()
             if t.finished or t.stage == "queued"]
     with WRITING:
         draft = folder / f"{JOBS}.part"
@@ -37,6 +37,7 @@ def task_from(row: dict[str, Any]) -> Task:
     task = Task(Order(**row["order"]), **{name: row[name] for name in FIELDS})
     task.video = Path(row["video"]) if row["video"] else None
     task.outputs = [Path(p) for p in row["outputs"]]
+    task.notes = list(row.get("notes") or [])  # a list written before 2026-11-08 has none
     task.stage = row["stage"]  # last: nothing changes a cancelled task
     return task
 

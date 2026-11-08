@@ -5,7 +5,7 @@ from typing import NamedTuple
 
 from tarjim import media
 from tarjim.hearing import transcript_for
-from tarjim.job import Job, checkpoint
+from tarjim.job import Job
 from tarjim.models import Cue, Word
 from tarjim.qa import Issue, check
 from tarjim.render.ass import Canvas, render_ass
@@ -46,26 +46,27 @@ def cuts_for(job: Job) -> list[float]:
 
 
 def translate(job: Job, cues: list[Cue], rules: Rules | None = None) -> list[Cue]:
-    from tarjim.engines.choice import asker, chain
-    from tarjim.translate.gemini import BAD_REPLY, Translator
+    """Every engine of the chain while a line is untranslated (translate/rounds.py). The job
+    fails only when no engine translated anything; otherwise what they did is kept, and why an
+    engine stopped is kept on the job beside the lines left as said."""
+    from tarjim.findings import findings
+    from tarjim.translate.glossary import current
     from tarjim.translate.prompt import Brief
+    from tarjim.translate.rounds import Rounds
 
     def audio(start: float, end: float) -> bytes:
         return media.audio_bytes(job.video, start, end)
 
-    from tarjim.translate.glossary import current
-
-    brief = Brief(job.language, job.dialect, rules or job.rules, glossary=current(job.target))
-    failures: list[Exception] = []
-    for provider in chain("translate"):
-        checkpoint()  # a backup engine is never started for a job that was cancelled
-        left = [cue for cue in cues if not cue.text.strip()]  # a backup never redoes good lines
-        try:
-            Translator(asker(provider)).translate(left, audio, brief)
-            return cues
-        except BAD_REPLY as error:
-            failures.append(error)
-    raise first_failure(failures)
+    shaped = rules or job.rules
+    brief = Brief(job.language, job.dialect, shaped, glossary=current(job.target))
+    rounds = Rounds(cues, audio, brief)
+    failures = rounds.run()
+    if failures and not rounds.translated():
+        raise first_failure(failures)
+    rounds.finish(shaped)
+    if failures:
+        findings().stopped = first_failure(failures)
+    return cues
 
 
 def save_review(job: Job, cues: list[Cue]) -> None:

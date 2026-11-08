@@ -48,7 +48,7 @@ class Timed:
     whole: bool  # it covers all the speech and follows the voice, so it is worth keeping
     agreement: float | None
     added: list[Utterance] = field(default_factory=list)  # what the words' check filled
-    left: list[Gap] = field(default_factory=list)
+    left: list[Gap] = field(default_factory=list)  # speech still without words, shown on the job
     passes: int = 0  # how often the clip's letters were heard so far in this run
 
 

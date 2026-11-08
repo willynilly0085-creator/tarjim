@@ -1,0 +1,158 @@
+"""Every translated slot is checked, a failing one is asked again beside its neighbours, then of
+the next engine, and a line no engine translated still shows the words as they were said."""
+from collections.abc import Iterator
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+from tarjim import pipeline
+from tarjim.engines import choice
+from tarjim.findings import FINDINGS, Findings
+from tarjim.gemini_client import QuotaExhausted
+from tarjim.languages import language
+from tarjim.models import Cue, Word
+from tarjim.rules import DEFAULT_RULES
+from tarjim.translate.gemini import Translator
+from tarjim.translate.prompt import Brief
+
+
+class Answers:
+    def __init__(self, *answers: Any, hears: bool = False) -> None:
+        self.answers, self.hears = list(answers), hears
+        self.prompts: list[str] = []
+        self.sounds: list[bytes | None] = []
+
+    def ask(self, prompt: str, audio: bytes | None, _schema: dict[str, Any]) -> Any:
+        self.prompts.append(prompt)
+        self.sounds.append(audio)
+        answer = self.answers.pop(0)
+        if isinstance(answer, Exception):
+            raise answer
+        return answer
+
+
+@pytest.fixture
+def found() -> Iterator[Findings]:
+    """The job's record, put back as it was after the test."""
+    record = Findings()
+    token = FINDINGS.set(record)
+    yield record
+    FINDINGS.reset(token)
+
+
+def said(start: float, text: str, speaker: str = "") -> Cue:
+    return Cue(start, start + 1.5, [Word(text, start, start + 1.5, speaker)])
+
+
+def exchange(speakers: tuple[str, str] = ("", "")) -> Cue:
+    first, second = [Word("Once.", 0.0, 0.5, speakers[0])], [Word("Yeah?", 0.6, 1.0, speakers[1])]
+    return Cue(0.0, 1.0, first + second, parts=[first, second])
+
+
+def brief() -> Brief:
+    return Brief(language("fr"), "", DEFAULT_RULES)
+
+
+def sound(start: float, end: float) -> bytes:
+    return f"{start:.1f}-{end:.1f}".encode()
+
+
+def job(tmp_path: Path) -> Any:
+    return type("Job", (), {"language": language("fr"), "dialect": "", "target": "fr",
+                            "rules": DEFAULT_RULES, "video": tmp_path / "v.mp4"})()
+
+
+def engines(monkeypatch: pytest.MonkeyPatch, **askers: Answers) -> None:
+    monkeypatch.setattr(choice, "chain", lambda _task: list(askers))
+    monkeypatch.setattr(choice, "asker", lambda provider: askers[provider])
+
+
+def test_a_dropped_slot_is_asked_again_alone_beside_its_neighbours_with_the_same_sound() -> None:
+    lines = [said(t * 2.0, f"Line {t}.") for t in range(7)]
+    first = [{"id": n, "text": f"Ligne {n - 1}."} for n in range(1, 8) if n != 4]
+    engine = Answers(first, [{"id": 1, "text": "Ligne 3."}], hears=True)
+    Translator(engine).translate(lines, sound, brief())
+    assert lines[3].text == "Ligne 3."
+    again = engine.prompts[1]
+    assert "for all 1 slots" in again and "Line 3." in again
+    assert "- Line 0. => Ligne 0." in again and "- Line 6. => Ligne 6." in again
+    assert engine.sounds[0] == engine.sounds[1]
+
+
+@pytest.mark.parametrize("answer", ["Une || fois || oui", "Une fois. || "])
+def test_an_exchange_with_the_wrong_parts_is_cleared_and_asked_again(answer: str) -> None:
+    cue = exchange()
+    engine = Answers([{"id": 1, "text": answer}], [{"id": 1, "text": "Une fois. || Ah oui ?"}])
+    Translator(engine).translate([cue], sound, brief())
+    assert cue.text == "Une fois. || Ah oui ?" and len(engine.prompts) == 2
+
+
+def test_an_exchange_answered_as_one_sentence_is_one_speaker() -> None:
+    cue = exchange()
+    engine = Answers([{"id": 1, "text": "Une fois, oui ?"}])
+    Translator(engine).translate([cue], sound, brief())
+    assert cue.text == "Une fois, oui ?" and len(engine.prompts) == 1
+    assert not cue.is_dialogue and cue.parts == [cue.words]
+
+
+def test_one_speaker_split_in_two_is_joined_back() -> None:
+    cue = said(0.0, "Hello there.")
+    Translator(Answers([{"id": 1, "text": "Bonjour || là."}])).translate([cue], sound, brief())
+    assert cue.text == "Bonjour là."
+
+
+def test_a_sound_answered_empty_is_not_asked_again() -> None:
+    lines = [said(0.0, "Mm-hmm."), said(2.0, "Hello.")]
+    engine = Answers([{"id": 1, "text": ""}, {"id": 2, "text": "Bonjour."}])
+    Translator(engine).translate(lines, sound, brief())
+    assert [c.text for c in lines] == ["", "Bonjour."] and len(engine.prompts) == 1
+
+
+def test_a_line_the_first_engine_left_empty_goes_to_the_backup(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    lines = [said(0.0, "Hello."), said(2.0, "How are you today?")]
+    chosen = Answers([{"id": 1, "text": "Bonjour."}], [{"id": 1, "text": ""}])
+    backup = Answers([{"id": 1, "text": "Comment vas-tu ?"}])
+    engines(monkeypatch, gemini=chosen, local=backup)
+    done = pipeline.translate(job(tmp_path), lines)
+    assert [c.text for c in done] == ["Bonjour.", "Comment vas-tu ?"]
+    assert "How are you today?" in backup.prompts[0] and "- Hello. => Bonjour." in backup.prompts[0]
+
+
+def test_a_used_up_backup_keeps_the_first_engines_lines_and_shows_the_rest_as_said(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path, found: Findings) -> None:
+    lines = [said(0.0, "Hello."), said(2.0, "今日は本当にありがとうございました")]
+    chosen = Answers([{"id": 1, "text": "Bonjour."}], [{"id": 1, "text": ""}])
+    engines(monkeypatch, gemini=chosen, local=Answers(QuotaExhausted("quota used up")))
+    done = pipeline.translate(job(tmp_path), lines)
+    assert [c.text for c in done] == ["Bonjour.", "今日は本当にありがとうございました"]
+    assert found.in_source == [2]
+
+
+@pytest.mark.usefixtures("found")
+def test_an_exchange_no_engine_translated_is_shown_as_said_in_its_two_parts(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    lines = [said(5.0, "Hello."), exchange()]
+    chosen = Answers([{"id": 1, "text": "Bonjour."}], [{"id": 1, "text": "Une || fois || oui"}])
+    engines(monkeypatch, gemini=chosen)
+    done = pipeline.translate(job(tmp_path), lines)
+    assert done[1].text == "Once. || Yeah?"
+
+
+def test_text_over_its_budget_is_kept_and_listed_not_asked_again(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path, found: Findings) -> None:
+    long = "Une traduction bien trop longue pour une seule seconde et demie"
+    chosen = Answers([{"id": 1, "text": long}])
+    engines(monkeypatch, gemini=chosen, local=Answers())
+    done = pipeline.translate(job(tmp_path), [said(0.0, "Hello there.")])
+    assert done[0].text == long and len(chosen.prompts) == 1
+    assert found.over_budget == [1] and found.in_source == []
+
+
+def test_no_engine_answering_at_all_still_fails_the_job_with_its_reason(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    engines(monkeypatch, gemini=Answers(QuotaExhausted("gemini: quota used up")),
+            local=Answers(RuntimeError("busy"), RuntimeError("busy")))
+    with pytest.raises(QuotaExhausted, match="quota"):
+        pipeline.translate(job(tmp_path), [said(0.0, "Hello.")])

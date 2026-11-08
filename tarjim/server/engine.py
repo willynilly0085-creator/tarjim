@@ -1,6 +1,7 @@
 import argparse
 import json
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
 from tarjim import same_code
@@ -43,9 +44,19 @@ def perform(task: Task, downloads: Path) -> None:
         task.stage = stage
         task.checkpoint()
 
+    make(task, job, report)
+
+
+def make(task: Task, job: Job, report: Callable[[str], None]) -> None:
+    """The files, and what the job knows is not right in them: until 2026-11-08 the checks run()
+    returned, the speech left without words and the timing check were dropped here, and the page
+    showed plain success."""
+    from tarjim.findings import collecting
     from tarjim.pipeline import run
 
-    run(job, report)
+    found = collecting()
+    cues, issues = run(job, report)
+    task.notes = found.notes(cues, issues)
     candidates = [job.output(".dub.mp4"), job.output(".mp4"), job.output(".srt")]
     task.outputs = [p for p in candidates if p.exists()]
 

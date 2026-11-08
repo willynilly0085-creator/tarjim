@@ -10,10 +10,17 @@ from tarjim.models import Cue
 from tarjim.translate.clean import map_results
 from tarjim.translate.drift import fit, slid
 from tarjim.translate.prompt import Brief, build_prompt, has_speakers
+from tarjim.translate.slots import (
+    SEPARATOR,
+    accepted,
+    context_for,
+    has_letters,
+    one_speaker,
+    only_a_sound,
+)
 
 SCHEMA = {"type": "array", "items": {"type": "object", "properties": {
     "id": {"type": "integer"}, "text": {"type": "string"}}, "required": ["id", "text"]}}
-SEPARATOR = "||"
 BATCH_SECONDS = 300.0
 PAD = 1.0
 BAD_REPLY = (RuntimeError, ValueError, LookupError, TypeError)
@@ -25,7 +32,7 @@ AudioSlice = Callable[[float, float], bytes]
 
 def needs_retry(cue: Cue, strict_dialogue: bool) -> bool:
     if not cue.text.strip():
-        return any(ch.isalpha() for ch in cue.source)
+        return has_letters(cue.source)
     return strict_dialogue and cue.is_dialogue and SEPARATOR not in cue.text
 
 
@@ -46,8 +53,12 @@ def batches(cues: list[Cue], span: float = BATCH_SECONDS, most: int = 0) -> list
 
 
 class Translator:
-    def __init__(self, client: Asker | None = None) -> None:
+    def __init__(self, client: Asker | None = None, whole: list[Cue] | None = None) -> None:
         self.client: Asker = client or GeminiClient()
+        # every line of the clip, when this engine fills only what another one left: the lines
+        # it is asked for are shown beside their translated neighbours
+        self.whole = whole
+        self.sounds: set[int] = set()  # the lines (by id) answered empty as only a sound
 
     def translate(self, cues: list[Cue], audio: AudioSlice, brief: Brief) -> list[Cue]:
         most = int(getattr(self.client, "most_cues", 0) or 0)
@@ -55,22 +66,24 @@ class Translator:
             checkpoint()  # each part is a step: pause and cancel take effect between them
             start = max(0.0, batch[0].start - PAD)
             sound = audio(start, batch[-1].end + PAD) if self.client.hears else None
-            self.fill_twice(batch, sound, replace(brief, offset=start, hears=self.client.hears))
+            told = replace(brief, offset=start, hears=self.client.hears)
+            if self.whole is not None:
+                told = replace(told, context=context_for(self.whole, batch))
+            self.fill_twice(batch, sound, told)
         return cues
 
     def fill_twice(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
-        """The lines that came back wrong are asked once more; if that fails, the first answer
-        stays."""
+        """The lines that came back wrong are asked once more, alone, beside their neighbours
+        (read only) and with the same sound; if that fails, the first answer stays."""
         self.fill_again(cues, sound, brief)
         self.unslide(cues, sound, brief)
         strict = has_speakers(cues)
-        retry = [cue for cue in cues if needs_retry(cue, strict)]
-        if not retry:
-            return
-        try:
-            self.fill(retry, sound, brief)
-        except BAD_REPLY:
-            return
+        retry = [cue for cue in cues if needs_retry(cue, strict) and id(cue) not in self.sounds]
+        if retry:
+            around = context_for(self.whole or cues, retry)
+            with contextlib.suppress(*BAD_REPLY):
+                self.fill(retry, sound, replace(brief, context=around))
+        one_speaker(cues)
 
     def unslide(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
         """An answer that slid down the slots (drift.py) is asked for once more, told so; the
@@ -98,15 +111,26 @@ class Translator:
             self.fill(cues, sound, brief)
 
     def fill(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
-        """An answer with none of the lines is a failure; lines the model left empty are not,
-        since a slot that is only a sound is meant to come back empty."""
+        """An answer with none of the lines is a failure; a line it left out or got wrong is
+        not, and is asked again (fill_twice)."""
         answer = self.client.ask(build_prompt(cues, brief), sound, SCHEMA)
         items = answer if isinstance(answer, list) else []
         results = map_results(items, len(cues), arabic=brief.arabic)
         if not results:
             raise RuntimeError(f"empty translation: none of {len(cues)} lines came back")
         for number, cue in enumerate(cues, start=1):
-            cue.text = results.get(number) or cue.text  # an empty answer never erases a line
+            self.keep(cue, results.get(number))
+
+    def keep(self, cue: Cue, text: str | None) -> None:
+        """A slot that fails its check (slots.accepted) never erases a line already there. An
+        empty answer is kept only for a sound, which the prompt asks to leave empty; since
+        2026-11-08 an empty answer for words is a failure, so speech is not left unsubtitled."""
+        if text is None:
+            return
+        if not text.strip() and only_a_sound(cue.source):
+            self.sounds.add(id(cue))
+            return
+        cue.text = accepted(cue, text) or cue.text
 
 
 GeminiTranslator = Translator

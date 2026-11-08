@@ -29,3 +29,8 @@
 /* On a phone the stage names would be cut to a letter or two; the stage above the track names
    the one running, so the dashes alone show how far along it is. */
 @media (max-width: 479px) { .job .track .dash-label { display: none; } }
+/* A finished job that knows of problems: its stage in the attention colour, not done's green,
+   and what is wrong listed under it; a readability warning alone stays quiet. */
+.job[data-notes="true"] .job-stage { color: var(--accent-line); }
+.job-notes { display: grid; gap: 2px; margin: 0; padding-inline-start: var(--space-md); font-size: var(--text-meta); white-space: pre-line; }
+.job-notes .note-quiet { color: var(--muted); }

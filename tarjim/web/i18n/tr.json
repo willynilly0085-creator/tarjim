@@ -479,5 +479,14 @@
   "actionOpen": "Bu bilgisayar dosyayı açamadı. Bunun yerine klasöründe göster.",
   "cancelSure": "İptal edilsin mi? Yapılanlar silinir",
   "cancelLabel": "Bu işi iptal et. Şimdiye kadar yaptıkları silinir.",
-  "openSrt": "Altyazıyı aç"
+  "openSrt": "Altyazıyı aç",
+  "stage_doneNotes": "Bitti, notlar var",
+  "note_speech_left": "Altyazısı olmayan konuşma ({n}): {at}",
+  "note_in_source": "Hiçbir motorun çeviremediği, aslıyla gösterilen satırlar ({n}): {at}",
+  "note_untranslated": "Çevirisi olmayan satırlar ({n}): {at}",
+  "note_overlap": "Sonrakiyle çakışan satırlar ({n}): {at}",
+  "note_readability": "Süresinden uzun, okunması zor olabilecek satırlar ({n}): {at}",
+  "note_timing": "Zamanlama sesten kaymış olabilir: kelimelerin yalnızca %{share} kadarı yerinde bulundu",
+  "note_sounds": "Yalnızca ses olan, Hmm ya da Ee gibi, altyazısız bırakılan satırlar ({n}): {at}",
+  "note_engine_stopped": "Çeviri motoru yarıda durdu, bu yüzden kalan satırlar aslıyla gösteriliyor. Nedeni: {reason}"
 }

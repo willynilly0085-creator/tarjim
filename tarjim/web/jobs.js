@@ -1,5 +1,6 @@
 import { $, api, post } from "./api.js";
 import { t } from "./i18n.js";
+import { showNotes, stageLabel } from "./notes.js";
 import { problem } from "./problems.js";
 
 const STAGES = ["downloading", "hearing", "timing", "translating", "writing", "burning", "dubbing"];
@@ -128,18 +129,19 @@ function paint(row, job, languages, refresh) {
   row.dataset.stage = job.stage;
   row.dataset.paused = String(Boolean(job.paused));
   row.querySelector(".job-title").textContent = job.title;
-  row.querySelector(".job-stage").textContent = t(job.paused ? "stage_paused" : `stage_${job.stage}`);
+  row.querySelector(".job-stage").textContent = stageLabel(job);
   const minutes = Math.floor((Date.now() / 1000 - job.created) / 60);
   const since = job.finished ? "" : ` · ${minutes < 1 ? t("agoNow") : t("agoMinutes", { n: minutes })}`;
   row.querySelector(".job-meta").textContent = `${languages.get(job.target) || job.target} · ${modeText(job.mode)}${since}`;
   const error = row.querySelector(".job-error");
   error.hidden = job.stage !== "failed";
   error.textContent = job.stage === "failed" ? failure(job) : "";
+  showNotes(row, job);
   track(job, row.querySelector(".track"));
   actions(job, row.querySelector(".job-actions"), refresh);
   const before = seen.get(job.id);
   seen.set(job.id, job.stage);
-  if (before && before !== job.stage && job.finished) $("announcer").textContent = `${job.title}: ${t(`stage_${job.stage}`)}`;
+  if (before && before !== job.stage && job.finished) $("announcer").textContent = `${job.title}: ${stageLabel(job)}`;
 }
 
 // After a few polls in a row that cannot reach tarjim the page says so, and the jobs dim, since
