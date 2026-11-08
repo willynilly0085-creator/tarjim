@@ -5,6 +5,7 @@ with a part missing, showed half a line in one speaker's colour, and a slot the 
 stayed empty, so the speech went without a subtitle. A slot that fails is cleared, so it is asked
 again and then given to the next engine (translate/rounds.py).
 """
+import re
 import unicodedata
 
 from tarjim.models import Cue, Word, join_words
@@ -20,7 +21,7 @@ NEAR_SECONDS = 30.0
 # A word that is also a sound in some language (er is German for he) is left out.
 FILLERS = frozenset({
     "m", "hm", "mhm", "uh", "um", "uhm", "uhuh", "ah", "eh", "ehm", "erm", "oh", "huh",
-    "euh", "ha", "haha", "hahaha",
+    "euh", "ha", "haha", "hahaha", "whoa", "ugh",
     "اه", "آه", "اوه", "م", "ه",  # Arabic and Urdu: آه, ممم, ههه (not ام, which can be أم)
     "м", "хм", "э", "эм",  # Cyrillic
     "हम्म", "उम्म",  # Devanagari
@@ -28,17 +29,37 @@ FILLERS = frozenset({
     "えー", "あー", "うーん", "んー", "ん",  # Japanese
     "음", "흠",  # Korean
 })
+# Laughter of any length, drawn (haha, hehehe, хаха); one "ha" or "he" alone is not this.
+LAUGH = re.compile(r"(?:[hх][aeioаеио]){2,}[hх]?")
 
 
 def has_letters(text: str) -> bool:
     return any(ch.isalpha() for ch in text)
 
 
+def a_letter(ch: str) -> bool:
+    return ch.isalpha() or unicodedata.category(ch)[0] == "M"
+
+
+def drawn(text: str) -> str:
+    """The letters and marks only, folded, each run of one letter written once (Hmmm is hm)."""
+    kept = [ch.casefold() for ch in text if a_letter(ch)]
+    return "".join(ch for n, ch in enumerate(kept) if not n or ch != kept[n - 1])
+
+
+def a_sound(word: str) -> bool:
+    return word in FILLERS or LAUGH.fullmatch(word) is not None
+
+
 def only_a_sound(source: str) -> bool:
-    """A filler, in any script, however long it is drawn out; never decided by length."""
-    kept = [ch.casefold() for ch in source if ch.isalpha() or unicodedata.category(ch)[0] == "M"]
-    drawn = "".join(ch for n, ch in enumerate(kept) if not n or ch != kept[n - 1])
-    return drawn in FILLERS
+    """A filler, in any script, however long it is drawn out; never decided by length. Since
+    2026-11-08 a line whose every word is a filler or laughter (Ha ha ha, Uh, um, Hmm, hmm) is a
+    sound too: before, the empty answer the prompt asks for was taken for a failure, the backup
+    engine was started for it, and the sound was shown untranslated as a problem."""
+    words = "".join(ch if a_letter(ch) else " " for ch in source).split()
+    if not words:
+        return False
+    return a_sound(drawn(source)) or all(a_sound(drawn(word)) for word in words)
 
 
 def speakers_of(cue: Cue) -> list[list[Word]]:

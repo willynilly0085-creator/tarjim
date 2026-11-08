@@ -17,7 +17,8 @@ ARABIC = """أنت مترجم أفلام ومسلسلات محترف. {have}قا
 المطلوب لكل خانة ترجمة عربية:
 - بـ{style}، وبنفس نبرة المتكلم (مزح، تعجب، سخرية، استغراب).
 {listen}- لا تتجاوز عدد الحروف المسموح للخانة (budget) — اختصر واحذف الحشو مثل \
-um و like و you know، مثل الترجمة الاحترافية.
+um و like و you know، مثل الترجمة الاحترافية. الـ budget المكتوب a+b حدّ لكل جزء من \
+الحوار لوحده، ولو رجّعت الخانة جملة واحدة فلك مجموعهما.
 - ترجم الخانة لوحدها: لا تنقل كلاماً من خانة لخانة، ولا تدمج خانتين. لو الـ budget ما يكفي \
 جملة الخانة، اختصر ترجمتها هي، ولا ترحّل باقيها للخانة اللي بعدها.
 - {dialogue_rule}
@@ -39,7 +40,8 @@ For every slot write a {style} subtitle:
 - Natural, idiomatic, spoken {style} as in professional subtitles, keeping the speaker's tone \
 (joking, surprise, sarcasm, doubt).
 {listen}- Never exceed the slot's character budget: condense and drop fillers such as um, like and \
-you know, the way professional subtitlers do.
+you know, the way professional subtitlers do. A budget written a+b is a limit for each part \
+of an exchange on its own; one sentence for the whole slot may use their sum.
 - Translate each slot on its own: never move words between slots and never merge slots. \
 If a slot's budget is too small for its sentence, shorten that slot's own translation; \
 never carry the rest into the next slot.

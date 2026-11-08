@@ -1,4 +1,3 @@
-import contextlib
 from collections.abc import Callable
 from dataclasses import replace
 
@@ -59,6 +58,7 @@ class Translator:
         # it is asked for are shown beside their translated neighbours
         self.whole = whole
         self.sounds: set[int] = set()  # the lines (by id) answered empty as only a sound
+        self.failures: list[Exception] = []  # the batches that failed twice, and why
 
     def translate(self, cues: list[Cue], audio: AudioSlice, brief: Brief) -> list[Cue]:
         most = int(getattr(self.client, "most_cues", 0) or 0)
@@ -69,8 +69,21 @@ class Translator:
             told = replace(brief, offset=start, hears=self.client.hears)
             if self.whole is not None:
                 told = replace(told, context=context_for(self.whole, batch))
-            self.fill_twice(batch, sound, told)
+            self.batch(batch, sound, told)
         return cues
+
+    def batch(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
+        """A batch that failed twice is noted and its lines go to the backup; the batches after
+        it are still asked. Until 2026-11-08 one busy answer abandoned every later batch, so a
+        single engine showed most of a long video in its source language. Only a used-up quota
+        or a timed-out engine (FINAL) stops the engine."""
+        try:
+            self.fill_twice(cues, sound, brief)
+        except FINAL:
+            raise
+        except BAD_REPLY as error:
+            print(f"translation: a batch of {len(cues)} lines failed: {error}", flush=True)
+            self.failures.append(error)
 
     def fill_twice(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
         """The lines that came back wrong are asked once more, alone, beside their neighbours
@@ -79,11 +92,12 @@ class Translator:
         self.unslide(cues, sound, brief)
         strict = has_speakers(cues)
         retry = [cue for cue in cues if needs_retry(cue, strict) and id(cue) not in self.sounds]
-        if retry:
-            around = context_for(self.whole or cues, retry)
-            with contextlib.suppress(*BAD_REPLY):
-                self.fill(retry, sound, replace(brief, context=around))
-        one_speaker(cues)
+        try:
+            if retry:
+                self.once_more(retry, sound, replace(brief, context=context_for(self.whole or cues,
+                                                                                retry)))
+        finally:
+            one_speaker(cues)
 
     def unslide(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
         """An answer that slid down the slots (drift.py) is asked for once more, told so; the
@@ -93,11 +107,21 @@ class Translator:
         print(f"translation slid down the slots ({len(cues)} lines); asking again", flush=True)
         first = [cue.text for cue in cues]
         checkpoint()
-        with contextlib.suppress(*BAD_REPLY):
-            self.fill(cues, sound, replace(brief, slid=True))
+        self.once_more(cues, sound, replace(brief, slid=True))
         if fit(cues) < fit_of(cues, first):
             for cue, text in zip(cues, first, strict=True):
                 cue.text = text
+
+    def once_more(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
+        """A second ask that fails keeps the first answer. A used-up quota or a timed-out engine
+        is not swallowed here (2026-11-08): it stops the engine and is reported, where before the
+        lines were shown as said with no reason and a timed-out engine was waited on again."""
+        try:
+            self.fill(cues, sound, brief)
+        except FINAL:
+            raise
+        except BAD_REPLY:
+            return
 
     def fill_again(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
         """One failed answer (a busy service, a dropped stream) costs one more ask on the same

@@ -64,8 +64,11 @@ def translate(job: Job, cues: list[Cue], rules: Rules | None = None) -> list[Cue
     if failures and not rounds.translated():
         raise first_failure(failures)
     rounds.finish(shaped)
-    if failures:
-        findings().stopped = first_failure(failures)
+    # Since 2026-11-08 only the last engine that ran explains the lines left as said: a line a
+    # backup left out without failing is listed as such (in_source), not blamed on the quota of
+    # the engine before it.
+    if rounds.stopped:
+        findings().stopped = first_failure(rounds.stopped)
     return cues
 
 
