@@ -18,6 +18,8 @@ def check(cues: list[Cue], rules: Rules = DEFAULT_RULES) -> list[Issue]:
     issues: list[Issue] = []
     for number, cue in enumerate(cues, start=1):
         issues += cue_issues(number, cue, rules)
+        if cue.duration < rules.min_duration - TOLERANCE:
+            issues.append(Issue(number, "too_short", f"{cue.duration:.2f} s"))
         if number < len(cues) and cue.end > cues[number].start - rules.min_gap + TOLERANCE:
             issues.append(Issue(number, "overlap", f"ends {cue.end:.2f}"))
     return issues

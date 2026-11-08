@@ -27,11 +27,19 @@ def join_penalty(before: str, after: str) -> int:
     return INSIDE_A_WORD.get((script_of(before), script_of(after)), 0)
 
 
+def text_parts(text: str) -> list[str]:
+    """The parts of an exchange as the translation wrote them ("a || b"), empty ones left out;
+    none for a text with no separator, which is one translation however it is wrapped."""
+    if SEPARATOR not in text:
+        return []
+    parts = [" ".join(LEADING_DASH.sub("", p).split()) for p in text.split(SEPARATOR)]
+    return [part for part in parts if part]
+
+
 def display_lines(text: str, rules: Rules = DEFAULT_RULES) -> list[str]:
     if SEPARATOR not in text:
         return balance_lines(text, rules)
-    parts = [" ".join(LEADING_DASH.sub("", p).split()) for p in text.split(SEPARATOR)]
-    return [DASH + part for part in parts if part]
+    return [DASH + part for part in text_parts(text)]
 
 
 def balance_lines(text: str, rules: Rules = DEFAULT_RULES) -> list[str]:

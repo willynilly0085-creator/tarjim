@@ -12,7 +12,9 @@ from tarjim.render.burn import burn
 from tarjim.render.mark import Mark, mark_for
 from tarjim.render.moments import moved
 from tarjim.render.placement import placed
+from tarjim.render.room import fitted
 from tarjim.render.srt import render_srt
+from tarjim.rules import Rules
 from tarjim.segment import build_cues
 
 Report = Callable[[str], None]
@@ -42,7 +44,7 @@ def cuts_for(job: Job) -> list[float]:
     return cuts
 
 
-def translate(job: Job, cues: list[Cue]) -> list[Cue]:
+def translate(job: Job, cues: list[Cue], rules: Rules | None = None) -> list[Cue]:
     from tarjim.engines.choice import asker, chain
     from tarjim.translate.gemini import BAD_REPLY, Translator
     from tarjim.translate.prompt import Brief
@@ -52,7 +54,7 @@ def translate(job: Job, cues: list[Cue]) -> list[Cue]:
 
     from tarjim.translate.glossary import current
 
-    brief = Brief(job.language, job.dialect, job.rules, glossary=current(job.target))
+    brief = Brief(job.language, job.dialect, rules or job.rules, glossary=current(job.target))
     failures: list[Exception] = []
     for provider in chain("translate"):
         checkpoint()  # a backup engine is never started for a job that was cancelled
@@ -91,7 +93,7 @@ def write_picture(job: Job, cues: list[Cue], report: Report) -> Path | None:
     canvas = placed(job, cues, Canvas(info.width, info.height, job.font_name), info.duration)
     mark = mark_for(canvas)
     canvas = moved(job, cues, canvas, mark)
-    subtitles = render_ass(cues, canvas, job.rules)
+    subtitles = render_ass(cues, canvas, fitted(job.rules, canvas.width, canvas.height))
     job.output(".ass").write_text(subtitles, encoding="utf-8")
     if job.burn:
         report("burning")
@@ -113,11 +115,19 @@ def run(job: Job, report: Report = quiet) -> tuple[list[Cue], list[Issue]]:
     media.check_readable(job.video)
     report("hearing")
     words = transcript_for(job, report).words
-    cues = build_cues(words, cuts_for(job))
+    # the target language's rules, its lines shortened for the picture's shape: before
+    # 2026-11-08 the cues were cut by the default rules whatever the language
+    rules = picture_rules(job)
+    cues = build_cues(words, cuts_for(job), rules)
     report("translating")
-    cues = translate(job, cues)
+    cues = translate(job, cues, rules)
     save_review(job, cues)
     report("writing")
     write_outputs(job, cues, words, report)
     report("done")
-    return cues, check(cues, job.rules)
+    return cues, check(cues, rules)
+
+
+def picture_rules(job: Job) -> Rules:
+    info = media.probe(job.video)
+    return fitted(job.rules, info.width, info.height)

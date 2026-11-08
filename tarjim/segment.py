@@ -1,19 +1,24 @@
-from tarjim.dialogue import Piece, merge_short
+from tarjim.dialogue import Piece, merge_short, with_replies
+from tarjim.fit import fit_timing
 from tarjim.models import Cue, Word, join_words
 from tarjim.rules import DEFAULT_RULES, Rules
 from tarjim.speakers import who
+from tarjim.tracks import tracks
 
 SENTENCE_END = (".", "?", "!", "؟", "。", "？", "！")
 SOFT_END = (",", "،", ";", "؛", ":", "，", "、", "；", "：")
-MIN_SPAN = 1e-6
+SPAN_FLOOR = 1e-6  # keeps a block of zero-length words from dividing by zero
 EDGE = 0.05
 MIN_SPLITTABLE = 2
 
 
 def build_cues(words: list[Word], cuts: list[float], rules: Rules = DEFAULT_RULES) -> list[Cue]:
-    blocks = split_blocks(words, cuts, rules)
+    """Words in time order on one track, replies said over a turn as parts of its subtitle,
+    then each subtitle's time on screen (2026-11-08)."""
+    main, replies = tracks(words)
+    blocks = split_blocks(main, cuts, rules)
     pieces = [piece for block in blocks for piece in split_long(block, rules)]
-    return fit_timing(merge_short(pieces, rules), rules, cuts)
+    return fit_timing(with_replies(merge_short(pieces, rules), replies, rules), rules, cuts)
 
 
 def ends_sentence(word: Word) -> bool:
@@ -40,7 +45,10 @@ def speaker_changed(prev: Word, word: Word, labelled: bool, at_cut: bool) -> boo
 
 
 def is_break(prev: Word, word: Word, at_cut: bool, rules: Rules) -> bool:
-    return at_cut or ends_sentence(prev) or word.start - prev.end >= rules.long_pause
+    """A shot change, a sentence's end, a long pause, or a turn said at the same time as the
+    one before it (time going back), which is a subtitle of its own."""
+    went_back = word.start < prev.start
+    return at_cut or went_back or ends_sentence(prev) or word.start - prev.end >= rules.long_pause
 
 
 def cuts_between(words: list[Word], cuts: list[float]) -> set[int]:
@@ -88,7 +96,7 @@ def fits(words: list[Word], rules: Rules) -> bool:
 
 def best_split(block: list[Word]) -> int:
     middle = (block[0].start + block[-1].end) / 2
-    span = max(block[-1].end - block[0].start, MIN_SPAN)
+    span = max(block[-1].end - block[0].start, SPAN_FLOOR)
 
     def score(index: int) -> float:
         prev, word = block[index - 1], block[index]
@@ -98,29 +106,3 @@ def best_split(block: list[Word]) -> int:
         return bonus + 2 * (word.start - prev.end) - off_center
 
     return max(range(1, len(block)), key=score)
-
-
-def fit_timing(cues: list[Cue], rules: Rules, cuts: list[float] | None = None) -> list[Cue]:
-    for index, cue in enumerate(cues):
-        has_next = index + 1 < len(cues)
-        if has_next:
-            make_room(cue, cues[index + 1], rules)
-        limit = cues[index + 1].start - rules.min_gap if has_next else float("inf")
-        limit = min(limit, next_cut(cuts or [], cue.end))
-        wanted = max(cue.end + rules.linger, cue.start + rules.min_duration)
-        wanted = min(wanted, cue.start + rules.max_duration)
-        cue.end = max(min(wanted, limit), cue.start + MIN_SPAN)
-    return cues
-
-
-def make_room(cue: Cue, following: Cue, rules: Rules) -> None:
-    """Two people talking at once: the next line waits until this one has been up long enough
-    to read, instead of this one being squeezed to nothing (2026-10-29: a question answered
-    over its own end was shown for no time at all)."""
-    needed = cue.start + rules.min_duration + rules.min_gap
-    if following.start < needed:
-        following.start = max(following.start, min(needed, following.end - rules.min_duration))
-
-
-def next_cut(cuts: list[float], after: float) -> float:
-    return min((cut for cut in cuts if cut > after), default=float("inf"))

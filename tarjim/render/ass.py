@@ -126,7 +126,7 @@ def event_lines(cue: Cue, rules: Rules, look: Look | None = None) -> list[str]:
     shown = display_lines(cue.text, rules)
     lines = [f"{colour}{mark}{clean(line)}{mark}"
              for colour, line in zip(line_voices(cue, len(shown), look.voices), shown, strict=True)]
-    moment, spot = reveal_at(cue), look.spots.get((cue.start, cue.end))
+    moment, spot = reveal_at(cue, rules), look.spots.get((cue.start, cue.end))
     if moment is None:
         return [event(cue.start, cue.end, fade(FADE_MS, FADE_MS, look.edge) + "\\N".join(lines),
                       spot)]
