@@ -44,10 +44,13 @@ def listen_many(listen: Listen, passes: int = PASSES) -> Heard:
 def sane(run: list[Utterance]) -> list[Utterance]:
     """The lines of a pass a person could have spoken. Only the broken line is left out: until
     2026-11-08 one such line cost the vote every other line of its pass, and with it the ending
-    only that pass and one other had heard."""
+    only that pass and one other had heard. A pass whose broken lines held more than a tenth of
+    its words is still left out whole: the line or two it has left would otherwise vote down
+    every line of the good pass they do not cover (2026-11-08)."""
     from tarjim.asr.sanity import plausible_line
 
-    return [u for u in run if plausible_line(u.start, u.end, u.text)]
+    lines = [u for u in run if plausible_line(u.start, u.end, u.text)]
+    return lines if spoken(lines) >= CLOSE * spoken(run) else []
 
 
 def agreed(runs: list[list[Utterance]]) -> list[Utterance]:

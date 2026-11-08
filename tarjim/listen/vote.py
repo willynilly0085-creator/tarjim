@@ -38,6 +38,7 @@ class Ballot:
     votes: list[int]
     starts: list[float] = field(default_factory=list)
     ends: list[float] = field(default_factory=list)
+    passes: set[int] = field(default_factory=set)  # the other passes that backed it, by index
 
 
 def flatten(run: Run) -> list[tuple[int, str]]:
@@ -56,7 +57,8 @@ def near(a: Utterance, b: Utterance) -> bool:
     return a.start < b.end + NEAR and b.start < a.end + NEAR
 
 
-def count_votes(base: Run, ballots: list[Ballot], other: Run) -> tuple[set[int], Pairs]:
+def count_votes(base: Run, ballots: list[Ballot], other: Run,
+                index: int) -> tuple[set[int], Pairs]:
     """The other pass's lines that backed a base word, and which of its speakers sat on which
     of the base's while doing so."""
     left, right = flatten(base), flatten(other)
@@ -70,6 +72,7 @@ def count_votes(base: Run, ballots: list[Ballot], other: Run) -> tuple[set[int],
             mine, theirs = left[i][0], right[j][0]
             if near(base[mine], other[theirs]):
                 record(ballots[mine], i - firsts[mine], other[theirs])
+                ballots[mine].passes.add(index)
                 used.add(theirs)
                 pairs[base[mine].speaker, other[theirs].speaker] += 1
     return used, pairs
@@ -126,15 +129,24 @@ def backers(u: Utterance, leftovers: list[Run], index: int) -> int:
     return sum(any(similar(u, o) for o in run) for k, run in enumerate(leftovers) if k != index)
 
 
-def extras(leftovers: list[Run], agree: int, kept: Run) -> Run:
-    """Lines the base pass missed and enough other passes heard. Each is checked against the
-    lines already kept as well (2026-11-08): a phrase said twice can pair with its far copy in
-    the base, leaving its near copy over, which came back as a second subtitle."""
+Elected = list[tuple[Utterance, set[int]]]
+
+
+def repeat(u: Utterance, index: int, kept: Elected, found: Run) -> bool:
+    """A copy of a line already kept, checked against the kept lines as well (2026-11-08): a
+    phrase said twice can pair with its far copy in the base, leaving its near copy over, which
+    came back as a second subtitle. A pass that backed the kept line with another of its lines
+    heard the phrase twice, so its leftover is the second time it was said (a chant, a refrain)."""
+    return any(similar(u, f) and index not in heard for f, heard in kept) or any(
+        similar(u, f) for f in found)
+
+
+def extras(leftovers: list[Run], agree: int, kept: Elected) -> Run:
+    """Lines the base pass missed and enough other passes heard."""
     found: Run = []
     for index, run in enumerate(leftovers):
         for u in run:
-            if backers(u, leftovers, index) + 1 >= agree and not any(
-                    similar(u, f) for f in kept + found):
+            if backers(u, leftovers, index) + 1 >= agree and not repeat(u, index, kept, found):
                 found.append(u)
     return found
 
@@ -144,9 +156,11 @@ def vote(runs: list[Run], agree: int | None = None) -> Run:
     needed = majority(sum(1 for run in runs if run)) if agree is None else agree
     ballots = [Ballot(u, [1] * len(split_words(u.text))) for u in base]
     leftovers = []
-    for number, other in enumerate(others, start=2):
-        used, pairs = count_votes(base, ballots, other)
+    for index, other in enumerate(others):
+        used, pairs = count_votes(base, ballots, other, index)
         links = linked(pairs)
-        leftovers.append([relabel(u, links, number) for k, u in enumerate(other) if k not in used])
-    kept = [e for b in ballots if (e := elect(b, needed)) is not None]
-    return sorted(kept + extras(leftovers, needed, kept), key=lambda u: u.start)
+        leftovers.append([relabel(u, links, index + 2) for k, u in enumerate(other)
+                          if k not in used])
+    kept = [(e, b.passes) for b in ballots if (e := elect(b, needed)) is not None]
+    found = extras(leftovers, needed, kept)
+    return sorted([u for u, _ in kept] + found, key=lambda u: u.start)
