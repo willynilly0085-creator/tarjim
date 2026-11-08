@@ -16,7 +16,9 @@ that pass's own name for them ("S2~p3", listen/vote.relabel). It names one of th
 not yet known which, so since 2026-11-08 it is never left a speaker of its own (it was drawn in a
 third colour and dubbed in a third voice): the voice check gives it the speaker whose voice is
 nearest (listen/whose.py), and where it could not, it takes the base speaker it overlaps most in
-time, else the nearer base turn.
+time, else the nearer base turn. Only a voice the check found near no base speaker's (a person the
+base pass missed) is kept a speaker of its own, under a name no base speaker has
+(listen/follow.adopted, 2026-11-08).
 """
 import re
 from collections import Counter

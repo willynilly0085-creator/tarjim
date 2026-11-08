@@ -87,3 +87,32 @@ def test_an_unlinked_line_too_short_to_print_still_finds_a_base_speaker(
 def test_a_clip_heard_only_by_unlinked_labels_keeps_their_names() -> None:
     words = [*said(0, "S1~p2"), *said(3, "S2~p2")]
     assert [w.speaker for w in speakers.linked_by_time(words)[::2]] == ["S1", "S2"]
+
+
+def test_a_distinct_voice_the_base_missed_stays_a_speaker_of_its_own(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    # 2026-11-08 review: the base heard only the host, other passes heard the guest ("S2~p2");
+    # forcing the guest's voice onto the one base speaker drew the guest in the host's colour
+    words = [*said(0, "S1"), *said(4, "S2~p2"), *said(8, "S1"), *said(12, "S2~p2"), *said(16, "S1")]
+    timeline = {0.0: HOST, 4.0: GUEST, 8.0: HOST, 12.0: GUEST, 16.0: HOST}
+    monkeypatch.setattr(voiceprint, "print_of", voices_at(timeline))
+    monkeypatch.setattr(voiceprint, "fetched", lambda: True)
+    after = whose.by_voice(words, sound(20))
+    assert [w.speaker for w in after[::2]] == ["S1", "S2", "S1", "S2", "S1"]
+
+
+def test_a_distinct_unlinked_voice_never_takes_a_base_speakers_name(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    third = np.array([0.0, 0.0, 1.0])
+    heard = interview(monkeypatch, third)
+    after = whose.by_voice(heard, sound(24))
+    assert after[-1].speaker not in {"S1", "S2", "S2~p3"}
+    assert {w.speaker for w in after[:-2]} == {"S1", "S2"}
+
+
+def test_two_unlinked_labels_in_one_new_voice_are_one_speaker() -> None:
+    from tarjim.listen.follow import adopted
+
+    voices = {"S1": HOST, "S1~p2": np.array([0.0, 1.0, 0.0]), "S3~p3": np.array([0.1, 1.0, 0.0])}
+    names = adopted(voices, {"S1"})
+    assert names["S1~p2"] == names["S3~p3"] not in {"S1", ""}

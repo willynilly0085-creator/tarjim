@@ -12,14 +12,20 @@ listener heard whose it was.
 A speaker another listening pass heard but the vote could not link to the base pass's ("S2~p3",
 listen/vote.relabel) is one of the base's speakers too. Since 2026-11-08 its lines go, together,
 to the base speaker whose average voice is nearest to theirs: judged alone, a label with one line
-had no average to leave it out of, so it was never moved and stayed a third speaker.
+had no average to leave it out of, so it was never moved and stayed a third speaker. But the base
+pass can miss a person altogether (it heard only the host; other passes heard the guest), so a
+label whose voice is near no base speaker's (under NEAREST) is a speaker of its own, named so it
+never clashes with one of the base's, and unlinked labels in one such new voice are one speaker.
 """
 from bisect import bisect
+from itertools import count
 
 import numpy as np
 
 from tarjim.models import Word
-from tarjim.speakers import Line, lines, unlinked, who
+from tarjim.speakers import UNLINKED, Line, lines, unlinked, who
+
+NEAREST = 0.4  # how alike two voices must be at least to be one speaker
 
 Labels = dict[Line, str]
 
@@ -43,12 +49,31 @@ def followed(words: list[Word], heard: Labels, labels: Labels) -> Labels:
     return found
 
 
-def adopted(voices: dict[str, np.ndarray]) -> dict[str, str]:
+def fresh(label: str, taken: set[str]) -> str:
+    """The label without its pass tag, or the first "S<n>" nobody has when that is taken."""
+    name = UNLINKED.sub("", label)
+    return name if name not in taken else next(
+        f"S{n}" for n in count(1) if f"S{n}" not in taken)
+
+
+def unit(voice: np.ndarray) -> np.ndarray | None:
+    size = float(np.linalg.norm(voice))
+    return voice / size if size > 0 else None
+
+
+def adopted(voices: dict[str, np.ndarray], taken: set[str]) -> dict[str, str]:
     """Each unlinked label among the speakers' average voices as the base speaker whose voice is
-    nearest to its own; none when the clip has no base speaker's voice to go by."""
-    base = {name: voice / np.linalg.norm(voice) for name, voice in voices.items()
-            if not unlinked(name) and np.linalg.norm(voice) > 0}
-    if not base:
-        return {}
-    return {name: max(base, key=lambda known: float(base[known] @ voice))
-            for name, voice in voices.items() if unlinked(name)}
+    nearest to its own, or (2026-11-08) a speaker of its own when no voice is NEAREST to it; none
+    when the clip has no base speaker's voice to go by. Taken are the names already in use."""
+    known = {name: v for name, v in ((n, unit(v)) for n, v in voices.items() if not unlinked(n))
+             if v is not None}
+    found: dict[str, str] = {}
+    for name in sorted(n for n in voices if unlinked(n) and known):
+        voice = unit(voices[name])
+        if voice is None:
+            continue
+        best = max(known, key=lambda other: float(known[other] @ voice))
+        found[name] = best if float(known[best] @ voice) >= NEAREST else fresh(
+            name, taken | set(known))
+        known.setdefault(found[name], voice)
+    return found

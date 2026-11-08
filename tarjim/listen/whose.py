@@ -27,14 +27,13 @@ from typing import Any, NamedTuple
 import numpy as np
 
 from tarjim.asr.voiceprint import RATE
-from tarjim.listen.follow import adopted, followed
+from tarjim.listen.follow import NEAREST, adopted, followed
 from tarjim.models import Word
 from tarjim.speakers import Line, inherited, lines, linked_by_time, span, who
 
 SHORTEST = 0.8  # seconds: a shorter line says too little to know the voice by
 STEADY = 1.5  # seconds: lines this long make up a speaker's average print
 MARGIN = 0.15  # how much closer another speaker's voice must be to take the line
-NEAREST = 0.4  # how close that voice must be at least
 FEWEST = 2  # speakers: one is never checked against nobody
 ROUNDS = 5  # times the lines are judged again on the labels the last round left
 SAME = 0.8  # averages all this alike are one voice under two labels, not two people
@@ -164,7 +163,8 @@ def checked(words: list[Word], wav: Any) -> list[Word]:
     heard = {line: who(words[line[0]].speaker) for line in prints.voices}
     if len(averages(prints, heard)) < FEWEST:
         return words
-    names = adopted(averages(prints, heard))  # 2026-11-08: unlinked "S2~p3" by voice first
+    # 2026-11-08: unlinked "S2~p3" by voice first, a voice near no base speaker's its own speaker
+    names = adopted(averages(prints, heard), {who(w.speaker) for w in words if w.speaker})
     labels = refined(prints, {line: names.get(name, name) for line, name in heard.items()})
     why = unreliable(prints, labels)
     if why:
