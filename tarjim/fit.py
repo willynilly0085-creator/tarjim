@@ -6,27 +6,25 @@ cut to fit, so a line squeezed by the next one was shown for a microsecond and a
 before a shot change flashed, and the next line was pushed up to 0.9 s late to make room. When
 the two promises clash, this tries, in order: running on into the gap after it, starting up to
 LEAD_IN early (never across a shot change or into the line before), joining a neighbour (one
-speaker becomes one part, two become an exchange), running past the shot change, and only
-last, holding the line for rules.shortest and starting the next one after it.
+speaker becomes one part, two become an exchange), running past the shot change, letting the
+next line come up at most LATE_START after its first word, sharing the screen with part of a
+neighbouring turn (crowded.handed), and only last, holding the line for rules.shortest and
+starting the next one after it.
 """
-from dataclasses import dataclass
-
-from tarjim.dialogue import MAX_SPEAKERS, Reply, fits_one_line, last_end, like
-from tarjim.models import Cue, Word, join_words
+from tarjim.crowded import handed
+from tarjim.dialogue import Reply
+from tarjim.joins import TOLERANCE, Frame, joinable, joined, spoken_end
+from tarjim.models import Cue
 from tarjim.rules import Rules
-from tarjim.speakers import who
 
 LEAD_IN = 0.2
-TOLERANCE = 1e-9
+# The most a subtitle comes up after its first word to leave the one before it time, since
+# 2026-11-08: before, a one-word reply held for rules.shortest pushed the answer after it 0.56 s
+# past its first word, and a turn said over the end of another cut that one's last words.
+LATE_START = 0.2
 NEVER = float("inf")
 
-Parts = list[list[Word]]
-
-
-@dataclass(frozen=True)
-class Frame:
-    rules: Rules
-    cuts: list[float]
+__all__ = ["Frame", "fit_timing"]
 
 
 def fit_timing(cues: list[Cue], rules: Rules, cuts: list[float] | None = None) -> list[Cue]:
@@ -40,16 +38,27 @@ def fit_timing(cues: list[Cue], rules: Rules, cuts: list[float] | None = None) -
 
 def settle(cues: list[Cue], index: int, frame: Frame) -> int:
     """Places one subtitle and says which to place next: the same one again after a join."""
+    make_way(cues, index)
     cue, gap = cues[index], frame.rules.min_gap
     floor = cues[index - 1].end + gap if index else 0.0
     ceiling = cues[index + 1].start - gap if index + 1 < len(cues) else NEVER
     if fit(cue, floor, min(ceiling, next_cut(frame.cuts, spoken_end(cue))), frame):
         return index + 1
-    joined = join_around(cues, index, frame)
-    if joined is not None:
-        return joined
-    if not fit(cue, floor, ceiling, frame):
-        hold(cues, index, frame.rules)
+    joined_at = join_around(cues, index, frame)
+    if joined_at is not None:
+        return joined_at
+    if fit(cue, floor, ceiling, frame):
+        return index + 1
+    return crowded(cues, index, frame, floor)
+
+
+def crowded(cues: list[Cue], index: int, frame: Frame, floor: float) -> int:
+    if waited(cues, index, frame, floor):
+        return index + 1
+    handed_at = handed(cues, index, frame)
+    if handed_at is not None:
+        return handed_at
+    hold(cues, index, frame.rules)
     return index + 1
 
 
@@ -73,6 +82,40 @@ def shown_until(cue: Cue, start: float, ceiling: float, rules: Rules) -> float:
     return min(wanted, start + rules.max_duration, ceiling)
 
 
+def make_way(cues: list[Cue], index: int) -> None:
+    """When the next speech starts before this subtitle's words end, the next subtitle comes up
+    a little late, LATE_START at most, so this one's last words are still shown. A reply said
+    over a turn comes up when it is said: it is the reason the turn was cut."""
+    following = cues[index + 1] if index + 1 < len(cues) else None
+    if following and following.words and not (following.parts and isinstance(
+            following.parts[0], Reply)):
+        late = min(spoken_end(cues[index]), first_said(following) + LATE_START)
+        following.start = max(following.start, pushed_to(cues, index + 1, late))
+
+
+def waited(cues: list[Cue], index: int, frame: Frame, floor: float) -> bool:
+    """The line is read in full if the next one comes up LATE_START after its first word."""
+    if index + 1 >= len(cues) or not cues[index + 1].words:
+        return False
+    cue, following, rules = cues[index], cues[index + 1], frame.rules
+    ceiling = following.start - rules.min_gap
+    latest = pushed_to(cues, index + 1, first_said(following) + LATE_START) - rules.min_gap
+    if not fit(cue, floor, max(ceiling, latest), frame):
+        return False
+    cue.end = min(cue.end, max(cue.start + rules.shortest, ceiling))
+    following.start = max(following.start, cue.end + rules.min_gap)
+    return True
+
+
+def pushed_to(cues: list[Cue], index: int, at: float) -> float:
+    """How late the subtitle at index may come up: at, and never after the one after it."""
+    return min(at, cues[index + 1].start) if index + 1 < len(cues) else at
+
+
+def first_said(cue: Cue) -> float:
+    return min(word.start for word in cue.words)
+
+
 def hold(cues: list[Cue], index: int, rules: Rules) -> None:
     """The last resort: the line stays long enough to read and the next one waits for it."""
     cue = cues[index]
@@ -90,62 +133,6 @@ def join_around(cues: list[Cue], index: int, frame: Frame) -> int | None:
         cues[index - 1:index + 1] = [joined(cues[index - 1], cues[index], frame)]
         return index - 1
     return None
-
-
-def joinable(first: Cue, second: Cue, frame: Frame) -> bool:
-    if not (first.words and second.words) or first.text or second.text:
-        return False
-    if replied_after(first, second):
-        return False
-    rules, parts = frame.rules, joined_parts(first, second, frame)
-    span = max(spoken_end(first), spoken_end(second)) - first.start
-    if len(parts) > MAX_SPEAKERS or span > rules.max_duration + TOLERANCE:
-        return False
-    if cut_between(first, second, frame.cuts) and span > rules.cut_dialogue_span:
-        return False
-    if len(parts) == 1:
-        return len(join_words(parts[0])) <= rules.max_source_chars
-    return all(fits_one_line(part, rules) for part in parts)
-
-
-def replied_after(first: Cue, second: Cue) -> bool:
-    """A reply said after the first subtitle ended is not joined back onto it: before
-    2026-11-08 the join stretched that subtitle over the silence, so the reply showed seconds
-    before it was said and was gone before it finished. It goes through lead_in or hold."""
-    head = second.parts[0] if second.parts else second.words
-    return isinstance(head, Reply) and head[0].start > spoken_end(first)
-
-
-def joined_parts(first: Cue, second: Cue, frame: Frame) -> Parts:
-    head, tail = first.parts or [first.words], second.parts or [second.words]
-    # a reply part keeps its own line: before 2026-11-08 an unlabelled reply took the next
-    # subtitle's first words, which were then shown and translated as the replier's
-    replied = isinstance(head[-1], Reply) or isinstance(tail[0], Reply)
-    if not replied and same_voice(head[-1], tail[0], cut_between(first, second, frame.cuts)):
-        return [*head[:-1], head[-1] + tail[0], *tail[1:]]
-    return [*head, *tail]
-
-
-def same_voice(before: list[Word], after: list[Word], at_cut: bool) -> bool:
-    """Labelled words say who speaks; without labels a shot change marks a new speaker, as the
-    cue builder reads them (segment.speaker_changed)."""
-    if any(word.speaker for word in before + after):
-        return who(before[0].speaker) == who(after[0].speaker)
-    return not at_cut
-
-
-def joined(first: Cue, second: Cue, frame: Frame) -> Cue:
-    parts = joined_parts(first, second, frame)
-    words = [word for part in parts for word in part]
-    return Cue(first.start, last_end(words), words, parts=[like(part, part) for part in parts])
-
-
-def cut_between(first: Cue, second: Cue, cuts: list[float]) -> bool:
-    return any(spoken_end(first) <= cut <= second.words[0].start for cut in cuts)
-
-
-def spoken_end(cue: Cue) -> float:
-    return last_end(cue.words) if cue.words else cue.end
 
 
 def next_cut(cuts: list[float], after: float) -> float:

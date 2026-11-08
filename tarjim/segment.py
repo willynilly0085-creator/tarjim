@@ -1,3 +1,4 @@
+from tarjim.breaks import SENTENCE_END, best_split
 from tarjim.dialogue import Piece, merge_short, with_replies
 from tarjim.fit import fit_timing
 from tarjim.models import Cue, Word, join_words
@@ -5,9 +6,6 @@ from tarjim.rules import DEFAULT_RULES, Rules
 from tarjim.speakers import who
 from tarjim.tracks import tracks
 
-SENTENCE_END = (".", "?", "!", "؟", "。", "？", "！")
-SOFT_END = (",", "،", ";", "؛", ":", "，", "、", "；", "：")
-SPAN_FLOOR = 1e-6  # keeps a block of zero-length words from dividing by zero
 EDGE = 0.05
 MIN_SPLITTABLE = 2
 
@@ -92,17 +90,3 @@ def fits(words: list[Word], rules: Rules) -> bool:
     duration = words[-1].end - words[0].start
     chars = len(join_words(words))
     return duration <= rules.max_duration and chars <= rules.max_source_chars
-
-
-def best_split(block: list[Word]) -> int:
-    middle = (block[0].start + block[-1].end) / 2
-    span = max(block[-1].end - block[0].start, SPAN_FLOOR)
-
-    def score(index: int) -> float:
-        prev, word = block[index - 1], block[index]
-        text = prev.text.rstrip()
-        bonus = 2.0 if text.endswith(SENTENCE_END) else 1.0 if text.endswith(SOFT_END) else 0.0
-        off_center = abs((prev.end + word.start) / 2 - middle) / span
-        return bonus + 2 * (word.start - prev.end) - off_center
-
-    return max(range(1, len(block)), key=score)

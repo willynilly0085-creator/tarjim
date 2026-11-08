@@ -113,7 +113,25 @@ def take_reply(cues: list[Cue], reply: list[Word], rules: Rules) -> list[Cue]:
         return cues
     if reply[0].start < host.start:  # said before the turn: nothing of it to cut away
         return [*cues, cue_of([Reply(reply)])]
-    return [*cues[:index], *split_at(host, reply, rules), *cues[index + 1:]]
+    split = handed_over(host, reply, rules) or split_at(host, reply, rules)
+    return [*cues[:index], *split, *cues[index + 1:]]
+
+
+def handed_over(host: Cue, reply: list[Word], rules: Rules) -> list[Cue] | None:
+    """A reply said over the end of its turn takes the turn over: the turn's words still said
+    when it starts share an exchange with it, and the words before keep their own subtitle
+    (2026-11-08). Before, the turn's subtitle ended as the reply's began, so its last words
+    were never shown. A reply said inside a turn that goes on is cut out of it (split_at)."""
+    if last_end(host.words) > last_end(reply) + rules.join_gap:
+        return None
+    at = reply[0].start + EDGE
+    before = [like(part, kept) for part in host.parts if (kept := [w for w in part
+                                                                     if w.end <= at])]
+    during = [like(part, rest) for part in host.parts if (rest := [w for w in part
+                                                                    if w.end > at])]
+    parts = [*during, Reply(reply)]
+    shared = len(parts) <= MAX_SPEAKERS and all(fits_one_line(p, rules) for p in parts)
+    return [cue_of(before), cue_of(parts)] if before and shared else None
 
 
 def host_of(cues: list[Cue], reply: list[Word]) -> int | None:
