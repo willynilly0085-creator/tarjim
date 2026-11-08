@@ -14,7 +14,6 @@ from tarjim.listen.vote import norm
 from tarjim.models import Word
 from tarjim.scripts import split_words
 
-PAD = 0.75  # seconds of sound either side of a stretch, so its first and last words are whole
 OVERLAP = 0.5  # share of a heard-again line inside a line already there: the same speech
 REPEATED = 0.6  # share of its words already said by a line close by: the same speech
 NEAR = 3.0
@@ -24,7 +23,7 @@ TURN_GAP = 0.3  # seconds: a line this close to a turn goes on with it
 MAIN = "S1"  # the speaker of a line with no turn heard anywhere
 NOT_REPAIRED = "not repaired"
 
-Relisten = Callable[[float, float], list[Utterance]]
+Relisten = Callable[[float, float], list[Utterance]]  # asked about a gap, in clip times
 
 
 @dataclass(frozen=True)
@@ -107,13 +106,15 @@ class Mender:
         self.hearing, self.relisten, self.name = hearing, relisten, name or "the same engine"
 
     def heard_again(self, gap: Gap) -> list[Utterance] | None:
-        """What the engine hears in the stretch now; None when no engine is asked about it any
-        more: there is none, or it was asked TRIES times across runs."""
+        """What the engine hears in the stretch now, with a little sound either side (the job's
+        record adds it, listen/kept.py); None when no engine is asked about it any more: there is
+        none, or it answered TRIES times across runs. A failed request is [], so the stretch is
+        left for the next run to ask again."""
         if self.relisten is None:
             return None
         checkpoint()  # a cancel stops before another request
         try:
-            return self.relisten(max(0.0, gap.start - PAD), gap.end + PAD)
+            return self.relisten(gap.start, gap.end)
         except Spent:
             return None
         except (RuntimeError, OSError) as error:

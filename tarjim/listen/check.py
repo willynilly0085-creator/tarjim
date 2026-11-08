@@ -55,8 +55,9 @@ def keep(job: Job, heard: Heard, asked: Asked, left: list[Gap]) -> None:
 
 
 def relistener(provider: str, video: Path, asked: Asked) -> Relisten | None:
-    """The engine that heard the clip, asked about one stretch of it through the job's record;
-    the local listener's words are already at hand, so it is not asked again."""
+    """The engine that heard the clip, asked about one stretch of it (and a little sound either
+    side) through the job's record; the local listener's words are already at hand, so it is not
+    asked again."""
     if provider in ("", "local"):
         return None
     from tarjim.hearing import cloud_listener

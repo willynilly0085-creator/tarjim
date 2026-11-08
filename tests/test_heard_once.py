@@ -34,9 +34,9 @@ def test_a_stretch_inside_one_asked_already_is_answered_from_it(tmp_path: Path) 
         return lines_at(start, end)
 
     again = Asked.load(tmp_path).asking(relisten)
-    assert len(again(9.0, 17.0)) == 2
-    assert again(13.5, 15.5) == [Utterance(14.0, 15.5, "S2", "c d")]  # clipped to the ask
-    assert again(30.0, 35.0) and calls == [(9.0, 17.0), (30.0, 35.0)]
+    assert len(again(9.0, 17.0)) == 2  # the sound asked for is 0.75 s wider either side
+    assert again(13.5, 15.0) == [Utterance(14.0, 15.75, "S2", "c d")]  # clipped to its sound
+    assert again(30.0, 35.0) and calls == [(8.25, 17.75), (29.25, 35.75)]
 
 
 def test_a_failed_request_is_not_made_again_in_the_same_job(tmp_path: Path) -> None:
@@ -49,7 +49,7 @@ def test_a_failed_request_is_not_made_again_in_the_same_job(tmp_path: Path) -> N
     again = Asked.load(tmp_path).asking(failing)
     with pytest.raises(RuntimeError):
         again(9.0, 17.0)
-    assert again(10.0, 16.0) == [] and calls == [9.0]
+    assert again(10.0, 16.0) == [] and calls == [8.25]
 
 
 def test_a_stretch_is_asked_about_twice_across_runs_at_most(tmp_path: Path) -> None:

@@ -156,11 +156,13 @@ def test_without_local_words_the_voice_detector_finds_the_gap(
     assert "(65.0 s of speech, no words) -> re-listened with fakecloud" in capsys.readouterr().out
 
 
-def test_speech_nothing_could_fill_keeps_the_hearing_and_is_asked_again_twice_at_most(
+def test_speech_nothing_could_fill_keeps_the_hearing_and_is_asked_again(
         tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
         capsys: pytest.CaptureFixture[str]) -> None:
     """Changed 2026-11-08: the hearing used to be thrown away, so every later run paid to listen
-    to the whole clip again, and a computer without the local listener did so forever."""
+    to the whole clip again, and a computer without the local listener did so forever. Only the
+    stretch is asked again; a failed request is no try, so it is asked on every run until the
+    engine answers (tests/test_asked_ledger.py has the stretch answered twice with nothing)."""
     engine = Engine([u for u in SPOKEN if u.start < 160.0], again_fails=True)
     job = setup(monkeypatch, tmp_path, engine, local=None)
     transcript = hearing.transcript_for(job, lambda _stage: None)
@@ -169,9 +171,7 @@ def test_speech_nothing_could_fill_keeps_the_hearing_and_is_asked_again_twice_at
     assert max(w.end for w in transcript.words) < 162.0
     assert (job.cache / "heard.json").exists()
     assert not (job.cache / "transcript.json").exists()
-    hearing.transcript_for(job, lambda _stage: None)
-    assert engine.asked == 2 and not (job.cache / "transcript.json").exists()
-    capsys.readouterr()
-    hearing.transcript_for(job, lambda _stage: None)
-    assert "heard by no listener; not asked again" in capsys.readouterr().out
-    assert engine.asked == 2 and (job.cache / "transcript.json").exists()
+    for _run in range(2):
+        hearing.transcript_for(job, lambda _stage: None)
+    assert engine.asked == 3 and not (job.cache / "transcript.json").exists()
+    assert "not asked again" not in capsys.readouterr().out
