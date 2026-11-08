@@ -54,6 +54,14 @@ def sounded(words: list[Word], wav: Any) -> list[Word]:
     return kept.words
 
 
+def doubted(words: list[Word], kept: list[Word]) -> list[tuple[float, float]]:
+    """Where the local words left out were timed: speech the local listener heard, timed off, so
+    a stretch near them is not one it heard nothing in (listen/coverage.heard_nothing,
+    2026-11-08)."""
+    used = set(kept)
+    return [(w.start, w.end) for w in words if w not in used]
+
+
 def told(kept: "Kept") -> None:
     guards.fired("opinion.no_length", kept.no_length)
     guards.fired("opinion.not_found", kept.not_found)

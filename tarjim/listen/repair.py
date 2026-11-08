@@ -18,6 +18,7 @@ from tarjim.listen.coverage import (
     Hearing,
     described,
     gaps,
+    heard_nothing,
     open_gaps,
     still_left,
 )
@@ -166,7 +167,7 @@ class Mender:
         said = self.in_transcript(gap) if gap.words else None
         if said:
             return said
-        if self.hearing.local and not gap.words:  # the listener on this computer ran here
+        if heard_nothing(self.hearing, gap):  # the listener on this computer ran here
             return "no listener heard words here; left as it is"
         if heard is None:
             why = ("the local words here repeat a line timed elsewhere" if gap.words
@@ -185,8 +186,7 @@ class Mender:
         return [], self.unfilled(gap, heard)
 
     def mend(self, found: list[Gap] | None = None) -> Mended:
-        lines, left = list(self.hearing.utterances), []
-        fills: list[Fill] = []
+        lines, left, fills = list(self.hearing.utterances), [], list[Fill]()
         for gap in gaps(self.hearing) if found is None else found:
             fresh, outcome = self.fill(gap, lines)
             print(f"coverage: {self.label}{described(gap)} -> {outcome}", flush=True)

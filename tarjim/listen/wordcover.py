@@ -45,7 +45,7 @@ def filled(gap: Gap, windows: list[Span]) -> bool:
 def word_gaps(hearing: Hearing, words: list[Word], tried: list[Span],
               windows: list[Span]) -> list[Gap]:
     lines = [Utterance(w.start, w.end, w.speaker, w.text) for w in words]
-    found = gaps(Hearing(lines, hearing.local, hearing.regions))
+    found = gaps(replace(hearing, utterances=lines))
     return [g for g in found
             if not any(touches(t, g) for t in tried) and not filled(g, windows)]
 

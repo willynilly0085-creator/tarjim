@@ -7,7 +7,7 @@ computer heard it. The check runs after the times were corrected against the loc
 voice detector found, together with the words this computer heard (either may be missing).
 """
 from bisect import bisect_left, bisect_right
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 
 from tarjim import guards
 from tarjim.listen.gemini_listen import Utterance
@@ -20,6 +20,9 @@ JOIN = 1.0  # speech pieces this close belong to one stretch
 # `still_left` on 2026-11-08, to make room in repair.py; it still offers them)
 NOT_REPAIRED = "not repaired"
 NOT_ASKED = "not asked again"
+# seconds around a stretch where local words left out as unconfirmed say the local listener heard
+# speech there after all, timed elsewhere: Qwen drifted up to 11 s on the Arabic bench (2026-11-08)
+DOUBT = 15.0
 
 Span = tuple[float, float]
 
@@ -45,6 +48,16 @@ class Hearing:
     utterances: list[Utterance]
     local: list[Word]
     regions: list[Span]  # the voice detector's speech; none when it could not run
+    # where the local words the sound did not confirm were timed (listen/opinion.doubted)
+    doubted: list[Span] = field(default_factory=list)
+
+
+def heard_nothing(hearing: Hearing, gap: Gap) -> bool:
+    """The local listener ran and heard no words in the stretch. Since 2026-11-08 a stretch near
+    local words left out as unconfirmed is not one: they were heard, timed off, so it stays open
+    as with the local listener off, where before A1's review it was closed as heard by no one."""
+    return bool(hearing.local) and not gap.words and not any(
+        a - DOUBT < gap.end and b + DOUBT > gap.start for a, b in hearing.doubted)
 
 
 def gap_seconds() -> float:

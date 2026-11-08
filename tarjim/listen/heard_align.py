@@ -20,7 +20,7 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
 
     from tarjim import hearing
     from tarjim.listen import check, settle
-    from tarjim.listen.opinion import sounded
+    from tarjim.listen.opinion import doubted, sounded
     from tarjim.listen.whose import by_voice
 
     report("timing")
@@ -29,8 +29,9 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     # 2026-11-08 its words are used only where the sound confirms them (listen/opinion.sounded)
     local = heard.local_words
     opinion = hearing.second_opinion(audio, heard.language) if local is None else local
-    opinion = sounded(opinion, wav)
-    done = settle.settled(job, heard, settle.Sound(wav, rate, check.regions_in(wav)), opinion)
+    kept = sounded(opinion, wav)
+    sound = settle.Sound(wav, rate, check.regions_in(wav), doubted(opinion, kept))
+    done = settle.settled(job, heard, sound, kept)
     # shown on the job, the stretches given up too (2026-11-08)
     findings().heard(tuple((g.start, g.end) for g in done.left if not g.given_up),
                      done.agreement, tuple((g.start, g.end) for g in done.left if g.given_up))

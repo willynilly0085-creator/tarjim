@@ -48,6 +48,8 @@ class Sound:
     wav: Any
     rate: int
     speech: list[tuple[float, float]]
+    # where the local words the sound left out were timed (listen/opinion.doubted, 2026-11-08)
+    doubted: list[tuple[float, float]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -128,10 +130,11 @@ def settled(job: Job, heard: Heard, sound: Sound, opinion: list[Word]) -> Timed:
     # one budget for every stretch asked again in this job (2026-11-08)
     asked = Asked.load(job.cache, budget.budget_for(heard.provider, seconds,
                                                     rederiving(job.cache)))
-    repair = repaired(job, heard, Hearing(found.moved, opinion, sound.speech), asked)
+    repair = repaired(job, heard, Hearing(found.moved, opinion, sound.speech, sound.doubted), asked)
     fills = [*found.fills, *repair.mended.fills]
     keep(job, replace(heard, added=fills), asked, [])  # before any timing (2026-11-08)
-    first = timed(repair, Hearing(repair.mended.utterances, opinion, sound.speech), sound)
+    mended = Hearing(repair.mended.utterances, opinion, sound.speech, sound.doubted)
+    first = timed(repair, mended, sound)
     lines = by_time([*found.own, *repair.mended.added])
     chosen = better(first, lambda: timed(repair, Hearing(lines, [], sound.speech), sound),
                     bool(opinion))
