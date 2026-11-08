@@ -1,7 +1,7 @@
 import bisect
 from difflib import SequenceMatcher
 
-from tarjim.asr.align import longest, overlapping
+from tarjim.asr.align import Slot, fill_gaps, longest, overlapping
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.vote import norm
 from tarjim.models import Word
@@ -41,18 +41,18 @@ def retime(group: list[Word], utterance: Utterance, heard: list[Word]) -> list[W
     if 2 * len(pairs) < len(group) or not inside(pairs[min(pairs)].start, utterance):
         return None
     times = [(pairs[i].start, pairs[i].end) if i in pairs else None for i in range(len(group))]
-    return [Word(w.text, *span, w.speaker) for w, span in zip(group, fill(times), strict=True)]
+    spans = fill([w.text for w in group], times)
+    return [Word(w.text, *span, w.speaker) for w, span in zip(group, spans, strict=True)]
 
 
-def fill(times: list[tuple[float, float] | None]) -> list[tuple[float, float]]:
-    known = [t for t in times if t is not None]
-    result, previous_end = [], known[0][0]
-    for index, known_span in enumerate(times):
-        later = next((t[0] for t in times[index + 1:] if t is not None), previous_end)
-        span = known_span or (previous_end, max(previous_end, later))
-        result.append(span)
-        previous_end = span[1]
-    return result
+def fill(texts: list[str], times: list[tuple[float, float] | None]) -> list[tuple[float, float]]:
+    """Words the local listener did not hear share the time between the words around them, each
+    by its length, as the aligner's own do (asr/align.fill_gaps). Before 2026-11-08 the second
+    and later of a run all sat on one instant, zero long."""
+    slots = [Slot(text, "", 0, *(span or (0.0, 0.0)), timed=span is not None)
+             for text, span in zip(texts, times, strict=True)]
+    fill_gaps(slots)
+    return [(slot.start, slot.end) for slot in slots]
 
 
 def fits(group: list[Word], floor: float, ceiling: float) -> bool:

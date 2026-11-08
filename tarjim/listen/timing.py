@@ -1,11 +1,13 @@
 """Word times for lines: the forced aligner, then the local listener's times where the aligner put a
 line's words outside it (asr/fuse.py). Lines added after the first alignment are aligned in their
-own stretch of sound, so a long clip is not run through the aligner again in full; lines far
-apart are aligned each in its own stretch, since one search over both pulled the words of a line
-at 130 s to 198 s and 232 s, toward the other line at 234 s (2026-11-08)."""
+own stretch of sound, whose letters are read from those the aligner heard in the whole clip once
+(asr/ctc.Piece), so the clip is never heard again in full or in part (2026-11-08). Lines far apart
+are aligned each in its own stretch, since one search over both pulled the words of a line at
+130 s to 198 s and 232 s, toward the other line at 234 s (2026-11-08)."""
 from dataclasses import dataclass, replace
 from typing import Any
 
+from tarjim.asr.ctc import piece
 from tarjim.asr.fuse import fuse
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
@@ -40,9 +42,9 @@ class Timer:
     def stretch(self, utterances: list[Utterance]) -> list[Word]:
         if not utterances:
             return []
-        low = max(0.0, min(u.start for u in utterances) - MARGIN)
-        high = max(u.end for u in utterances) + MARGIN
-        sound = self.wav[int(low * self.rate):int(high * self.rate)]
+        sound = piece(self.wav, self.rate, min(u.start for u in utterances) - MARGIN,
+                      max(u.end for u in utterances) + MARGIN)
+        low = sound.start
         moved = [replace(u, start=u.start - low, end=u.end - low) for u in utterances]
         words = [replace(w, start=w.start + low, end=w.end + low)
                  for w in self.aligned(sound, moved)]
