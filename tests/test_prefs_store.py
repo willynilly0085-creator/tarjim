@@ -52,6 +52,19 @@ def test_a_refused_change_keeps_nothing_of_itself(prefs_home: Path) -> None:
     assert change({"look.box_opacity": 10}).saved == []
 
 
+def test_a_shared_change_must_hold_for_every_language_s_own_values(prefs_home: Path) -> None:
+    """2026-11-09: a bigger font that French's own longer line no longer fits is refused,
+    naming French, instead of saved and then quietly undone when a French job reads it."""
+    assert change({"text.line_chars": 50}, "fr").saved == ["text.line_chars"]
+    outcome = change({"look.size_wide": 120})
+    assert outcome.saved == [] and "Français" in outcome.refused["look.size_wide"]
+    assert current("fr").text.line_chars == 50 and current("fr").notes == ()
+    works = change({"look.size_wide": 120}).refused["look.size_wide"]
+    smaller = int(works.split(":")[-1].strip(" ."))
+    assert smaller < 120 and change({"look.size_wide": smaller}).saved == ["look.size_wide"]
+    assert current("fr").notes == () and current("fr").look.size_wide == smaller
+
+
 def test_reset_one_setting_one_language_a_group_or_everything(prefs_home: Path) -> None:
     change({"look.size_wide": 110, "look.bold": False, "timing.linger": 0.6})
     change({"text.line_chars": 40, "text.reading_cps": 15})

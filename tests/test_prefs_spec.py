@@ -132,6 +132,26 @@ def test_the_folder_must_be_a_real_folder_of_its_own(tmp_path: Path,
         assert refused(spec, bad).works == spec.default, bad
 
 
+def test_system_folders_and_ones_we_cannot_write_in_are_refused(
+        tmp_path: Path, prefs_home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-09: on Windows os.access only reads the read-only flag, so the gate writes a
+    file to find out, and the system's own folders are refused before that."""
+    from tarjim.prefs import folders
+
+    spec = SPECS["output.folder"]
+    system, programs, mine = tmp_path / "Windows", tmp_path / "Programs", tmp_path / "mine"
+    for place in (system / "System32", programs / "App", mine):
+        place.mkdir(parents=True)
+    monkeypatch.setenv("WINDIR", str(system))
+    monkeypatch.setenv("ProgramFiles", str(programs))
+    for bad in (system, system / "System32", programs, programs / "App"):
+        assert refused(spec, str(bad)).works == spec.default, bad
+    assert check(spec, str(mine)) == str(mine.resolve())
+    assert list(mine.iterdir()) == []  # the trial file is gone
+    monkeypatch.setattr(folders, "writable", lambda _place: False)
+    assert "نكتب" in refused(spec, str(mine)).reason
+
+
 def test_every_setting_belongs_to_a_page_tab_and_says_who_may_change_it() -> None:
     assert {s.group for s in SPECS.values()} == set(GROUPS)
     assert sum(len(in_group(g)) for g in GROUPS) == len(SPECS)

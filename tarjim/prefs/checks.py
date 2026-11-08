@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from tarjim.languages import language
-from tarjim.prefs.colour import over_white, rgb, stands_out
+from tarjim.prefs.colour import BLACK, WHITE, over, rgb, stands_out
 from tarjim.prefs.table_look import LANDSCAPE_FONT, PORTRAIT_FONT
 from tarjim.rules import letter_width
 
@@ -24,16 +24,18 @@ class Rule:
 
 
 def letters_stand_out(values: Values, _target: str) -> bool:
-    """The words and every speaker's colour stand out from the box over a white picture, or
+    """The words and every speaker's colour stand out from the box over a white picture and
+    over a black one (2026-11-09: a light box at part opacity is grey on a dark frame), or
     from the letters' own edge when there is no box."""
     if values["look.style"] == "box":
-        behind = over_white(values["look.box_colour"], values["look.box_opacity"])
+        box, opacity = values["look.box_colour"], values["look.box_opacity"]
+        behind = [over(box, opacity, WHITE), over(box, opacity, BLACK)]
     else:
-        behind = rgb(values["look.outline_colour"])
+        behind = [rgb(values["look.outline_colour"])]
     shown = [values["look.text_colour"]]
     if values["look.speaker_colours"]:
         shown += str(values["look.speaker_palette"]).split(",")
-    return all(stands_out(c, behind) for c in shown)
+    return all(stands_out(c, b) for c in shown for b in behind)
 
 
 def widest_line(values: Values, target: str, frame: tuple[int, int]) -> int:
@@ -75,7 +77,8 @@ RULES: tuple[Rule, ...] = (
          "الفراغ بين السطور لازم ما يزيد عن ربع «أقل مدة يبقى فيها السطر»"),
     Rule(("look.style", "look.speaker_colours", "look.box_colour", "look.outline_colour",
           "look.speaker_palette", "look.box_opacity", "look.text_colour"), letters_stand_out,
-         "الكلام وألوان المتكلمين لازم تبين على الخلفية حتى فوق صورة بيضاء (تباين 4.5 على الأقل)"),
+         "الكلام وألوان المتكلمين لازم تبين على الخلفية فوق صورة بيضاء وفوق صورة سوداء"
+         " (تباين 4.5 على الأقل)"),
     Rule(("look.style", "look.box_padding", "look.outline_width", "look.side_margin",
           "look.size_wide", "text.line_chars"), line_fits,
          "السطر لازم يدخل في عرض الفيديو العرضي بهالحجم وهالمسافة من الجوانب"),

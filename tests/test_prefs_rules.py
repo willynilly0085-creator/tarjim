@@ -64,6 +64,19 @@ def test_letters_must_stand_out_from_the_box_over_a_white_picture() -> None:
     assert "look.speaker_palette" in refusal_of({"look.speaker_palette": "#FFE066,#777777"})
 
 
+def test_a_light_box_is_held_over_a_dark_picture_too() -> None:
+    """2026-11-09: a light box at part opacity is grey over a black frame, so mid or dark
+    letters that pass over white are refused; black letters on a full white box are taken."""
+    contrast = next(rule for rule in RULES if "look.box_opacity" in rule.keys)
+    for box, letters in (("#FFFFFF", "#6E6E6E"), ("#FFE066", "#3A3A3A")):
+        values = start(look__box_colour=box, look__box_opacity=60, look__text_colour=letters,
+                       look__speaker_colours=False)
+        assert contrast in broken(values, "ar"), (box, letters)
+    solid = start(look__box_colour="#FFFFFF", look__box_opacity=100,
+                  look__text_colour="#000000", look__speaker_colours=False)
+    assert contrast not in broken(solid, "ar")
+
+
 def test_outlined_letters_are_held_to_their_own_edge() -> None:
     assert refusal_of({"look.style": "outline", "look.box_opacity": 60}) == {}  # no box drawn
     back = changes(start(look__style="outline", look__box_opacity=60), {"look.style": "box"},

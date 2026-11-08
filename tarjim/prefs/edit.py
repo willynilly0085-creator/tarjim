@@ -5,8 +5,17 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from tarjim import config
+from tarjim.languages import LANGUAGES
 from tarjim.prefs.model import resolve
-from tarjim.prefs.presets import BUILT_IN, LONGEST_NAME, MOST_OWN, OUTSIDE, applied, put
+from tarjim.prefs.presets import (
+    BUILT_IN,
+    LONGEST_NAME,
+    MOST_OWN,
+    OUTSIDE,
+    applied,
+    languages_in,
+    put,
+)
 from tarjim.prefs.settle import changes
 from tarjim.prefs.spec import Refusal, Value, check
 from tarjim.prefs.store import for_saving, write
@@ -47,11 +56,27 @@ def stored(values: dict[str, Any], key: str, value: Value, language: str) -> Non
         values[key] = kept
 
 
+def elsewhere(values: dict[str, Any], clean: dict[str, Value], language: str) -> dict[str, str]:
+    """A shared setting must hold in every other language too (2026-11-09): a bigger font
+    that French's own longer line no longer fits is refused here, naming French, instead of
+    being saved and then quietly undone when a French job reads it."""
+    shared = {k: v for k, v in clean.items() if not SPECS[k].per_language}
+    refused: dict[str, str] = {}
+    for code in sorted((set(LANGUAGES) | languages_in(values)) - {language}):
+        left = {k: v for k, v in shared.items() if k not in refused}
+        broke = changes(resolve(values, {}, code).values, left, code)[1] if left else {}
+        name = LANGUAGES[code].native if code in LANGUAGES else code
+        refused |= {k: f"لما تترجم إلى {name}: {r.reason}" for k, r in broke.items()}
+    return refused
+
+
 def change(wanted: dict[str, Any], language: str = "ar") -> Outcome:
     """language: the target language a per-language setting is changed for."""
     with config.SAVING:
         kept = for_saving()
         clean, refused = parsed(wanted, language)
+        refused |= elsewhere(kept.values, clean, language)
+        clean = {k: v for k, v in clean.items() if k not in refused}
         before = resolve(kept.values, {}, language).values
         after, broke = changes(before, clean, language)
         refused |= {key: refusal.reason for key, refusal in broke.items()}

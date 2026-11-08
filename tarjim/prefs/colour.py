@@ -1,6 +1,7 @@
 """How well letters stand out from what is behind them (2026-11-09): the contrast ratio of
-WCAG 2, against the box as it is drawn, its colour laid over a white picture at its opacity.
-White is the worst picture for a dark box, so a pair that passes here passes on any frame."""
+WCAG 2, against the box as it is drawn, its colour laid at its opacity over a white picture
+and over a black one. A dark box is worst over white and a light box over black, so a pair
+that passes over both passes on any frame."""
 from tarjim.prefs.spec import colour_of
 
 LEAST = 4.5  # WCAG AA for text
@@ -28,10 +29,14 @@ def ratio(one: Rgb, other: Rgb) -> float:
     return (light + 0.05) / (dark + 0.05)
 
 
-def over_white(colour: str, opacity: float) -> Rgb:
-    """The colour drawn at opacity percent over white, as libass blends it."""
+WHITE, BLACK = 255.0, 0.0  # the two pictures a box is laid over
+
+
+def over(colour: str, opacity: float, picture: float) -> Rgb:
+    """The colour drawn at opacity percent over a grey picture (0 black, 255 white), as
+    libass blends it."""
     share = opacity / 100
-    red, green, blue = (share * c + (1 - share) * 255 for c in rgb(colour))
+    red, green, blue = (share * c + (1 - share) * picture for c in rgb(colour))
     return red, green, blue
 
 
