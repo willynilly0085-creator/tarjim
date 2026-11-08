@@ -12,7 +12,7 @@ from difflib import SequenceMatcher
 
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.merge import sane
-from tarjim.listen.vote import norm
+from tarjim.listen.vote import norm, ordered
 from tarjim.models import Word
 from tarjim.scripts import split_words
 
@@ -32,12 +32,18 @@ def support(run: list[Utterance], local: list[str]) -> float:
     return backed - UNBACKED * (len(mine) - backed)
 
 
+def cleaned(passes: list[list[Utterance]]) -> list[list[Utterance]]:
+    """Each pass without its broken lines (merge.sane), in the vote's own order so a tie falls
+    the same way whatever order the passes arrived in (2026-11-08)."""
+    return ordered([run for whole in passes if (run := sane(whole))])
+
+
 def fuller(voted: list[Utterance], passes: list[list[Utterance]]) -> list[Utterance]:
     """With no local words to judge by: the vote, unless it kept under half of what the middle
     pass heard. Passes that each heard a whole chant, spelled three ways, share few lines (a
     Somali chant on 2026-11-08: 47, 57 and 41 lines, a vote of 12), so the middle one stands:
     not the longest, which may have made lines up, nor the shortest, which left most out."""
-    runs = sorted([run for run in passes if run and sane(run)], key=lambda run: len(tokens(run)))
+    runs = sorted(cleaned(passes), key=lambda run: len(tokens(run)))
     if not runs:
         return voted
     middle = runs[(len(runs) - 1) // 2]
@@ -51,5 +57,5 @@ def best_heard(voted: list[Utterance], passes: list[list[Utterance]],
         return voted
     if not local:
         return fuller(voted, passes)
-    candidates = [voted, *[run for run in passes if run and sane(run)]]
+    candidates = [voted, *cleaned(passes)]
     return max(candidates, key=lambda run: support(run, local))  # the first wins a tie
