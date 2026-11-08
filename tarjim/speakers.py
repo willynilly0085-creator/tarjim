@@ -6,9 +6,10 @@ one who talks most is the main voice. Only a transcript saved before then has la
 piece ("c0.S1", "c1.S1"); those are still ranked within their piece, so the main voice of every
 piece keeps the main colour and voice when such a job is made again.
 
-A line the listener gave no speaker (a fill heard on this computer) is part of the turn it touches
-within TOUCHING, the way a word cut off by a pause is. Since 2026-11-08 it takes that turn's
-speaker; with no turn that close it stays without one, rather than being handed to anybody.
+A line the listener gave no speaker (a fill heard on this computer) was drawn in the main voice's
+colour, whoever said it. Since 2026-11-08 it takes the speaker of the nearer turn: within a few
+tenths of a second it is part of that turn, the way a word cut off by a pause is, and farther off
+the nearer voice is still a better guess than the main one, which it was only by chance.
 """
 import re
 from collections import Counter
@@ -19,7 +20,6 @@ from tarjim.models import Word
 
 PASS_TAG = re.compile(r"(?:^|(?<=\.))p\d+\.")
 GAP = 1.0  # seconds of silence that end a line even with the same speaker
-TOUCHING = 0.3  # seconds: a line without a speaker this close to a turn belongs to it
 
 Line = tuple[int, int]  # the first word and the one past the last
 
@@ -56,20 +56,22 @@ def span(words: list[Word], line: Line) -> tuple[float, float]:
     return words[line[0]].start, words[line[1] - 1].end
 
 
-def touching(words: list[Word], line: Line) -> str:
-    """The speaker of the nearer turn within TOUCHING of a line, or "" when none is."""
+def nearest(words: list[Word], line: Line) -> str:
+    """The speaker of the nearer word with a speaker on either side of a line, or "" when the
+    clip has none."""
     start, end = span(words, line)
-    before = [(start - words[line[0] - 1].end, words[line[0] - 1].speaker)] if line[0] else []
-    after = [(words[line[1]].start - end, words[line[1]].speaker)] if line[1] < len(words) else []
-    near = [(gap, name) for gap, name in before + after if name and gap < TOUCHING]
+    before = next(((start - w.end, w.speaker) for w in reversed(words[:line[0]]) if w.speaker),
+                  None)
+    after = next(((w.start - end, w.speaker) for w in words[line[1]:] if w.speaker), None)
+    near = [side for side in (before, after) if side]
     return min(near)[1] if near else ""
 
 
 def inherited(words: list[Word]) -> list[Word]:
-    """The words with each line that has no speaker given to the turn it touches."""
+    """The words with each line that has no speaker given to the nearer turn."""
     out = list(words)
     for first, last in lines(words):
-        name = "" if words[first].speaker else touching(words, (first, last))
+        name = "" if words[first].speaker else nearest(words, (first, last))
         if name:
             out[first:last] = [replace(w, speaker=name) for w in out[first:last]]
     return out

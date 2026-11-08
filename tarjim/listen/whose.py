@@ -15,10 +15,10 @@ each round leaves, until no line moves (ROUNDS at most), so the lines already in
 average back to one voice. Leaving the line out also took away the pull of its own label, so
 when the voices that come out are not clearly two people, no line is moved and the log says why:
 averages all over SAME alike, or lines on average not APART nearer their own speaker than another
-(one voice under two labels, singing, a voice changed by effects). Lines too short to know a voice
-by keep their label: a short reply's print is mostly noise, and the listener knew whose it was. A
-line the listener gave no speaker (a fill heard on this computer) is never judged by its print; it
-takes the turn it touches (speakers.inherited), after that turn's voice is put right.
+(one voice under two labels, singing, a voice changed by effects). A line too short to know a
+voice by is not judged by its print; it goes where its label's long lines went (listen/follow.py).
+A line the listener gave no speaker (a fill heard on this computer) is never judged by its print
+either; it takes the nearer turn (speakers.inherited), after that turn's voice is put right.
 """
 from dataclasses import dataclass, replace
 from itertools import combinations
@@ -27,6 +27,7 @@ from typing import Any, NamedTuple
 import numpy as np
 
 from tarjim.asr.voiceprint import RATE
+from tarjim.listen.follow import followed
 from tarjim.models import Word
 from tarjim.speakers import Line, inherited, lines, span, who
 
@@ -169,11 +170,12 @@ def checked(words: list[Word], wav: Any) -> list[Word]:
         print(f"speakers: no line given to another speaker by voice: {why}", flush=True)
         return words
     out = list(words)
-    moved = [line for line, name in labels.items() if name != heard[line]]
-    for first, last in moved:
-        out[first:last] = [replace(w, speaker=labels[first, last]) for w in out[first:last]]
+    moved = {line: name for line, name in labels.items() if name != heard[line]}
+    short = followed(words, heard, labels)
+    for (first, last), name in (moved | short).items():
+        out[first:last] = [replace(w, speaker=name) for w in out[first:last]]
     print(f"speakers: {len(labels)} lines checked by voice, {len(moved)} given to another "
-          "speaker", flush=True)
+          f"speaker, {len(short)} short lines with them", flush=True)
     return out
 
 
@@ -190,7 +192,8 @@ def voiced(words: list[Word], wav: Any) -> list[Word]:
         return words
 
 
-def by_voice(words: list[Word], wav: Any) -> list[Word]:
-    """The words checked by voice as far as can be done here, then each line without a speaker
-    given to the turn it touches (by then put right), so it is never the main voice's by chance."""
-    return inherited(voiced(words, wav))
+def by_voice(words: list[Word], wav: Any, rate: int = RATE) -> list[Word]:
+    """The words checked by voice as far as can be done here (sound at RATE only), then each line
+    without a speaker given to the nearer turn (by then put right), so it is never the main voice's
+    by chance, wherever the voice check could not run."""
+    return inherited(voiced(words, wav) if rate == RATE else words)

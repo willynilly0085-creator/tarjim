@@ -1,7 +1,7 @@
 """Since 2026-11-08 a line is judged against the speakers' voices without itself in them, again
 until no line moves, so a swap of labels from some point on is undone; voices too alike to be two
-people move nothing; and a line with no speaker takes the turn it touches, never the main voice by
-accident, while a short reply keeps its own label."""
+people move nothing; a line with no speaker takes the nearer turn, never the main voice by
+accident; and a short line goes where its label's long lines went, else keeps its own label."""
 from typing import Any
 
 import numpy as np
@@ -105,11 +105,22 @@ def test_a_short_line_without_a_speaker_takes_the_turn_it_touches(
     assert after[-1].speaker == "S2"
 
 
-def test_a_line_without_a_speaker_far_from_any_turn_stays_without_one(
+def test_a_line_without_a_speaker_far_from_every_turn_takes_the_nearer_one(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    # S1 talks most and has the main colour; left without a speaker, the fill 0.6 s after the
+    # guest would be drawn in it, though the guest is the nearer voice
+    monkeypatch.setattr(voiceprint, "fetched", lambda: False)
+    lone = [Word("hm", 9.6, 10.0, "")]
+    heard = [*said(0, "S1", 6), *said(7, "S2"), lone[0], *said(11.5, "S1", 6)]
+    assert whose.by_voice(heard, sound(18))[4].speaker == "S2"
+
+
+def test_a_line_without_a_speaker_inside_one_persons_talk_is_theirs(
         monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(voiceprint, "fetched", lambda: False)
-    lone = [Word("hm", 10.0, 10.4, "")]
-    assert whose.by_voice([*said(0, "S1"), *said(3, "S2"), *lone], sound(11))[-1].speaker == ""
+    lone = Word("so", 4.0, 4.4, "")  # a second from S2 on each side, S1 nowhere near
+    heard = [*said(1, "S2"), lone, *said(5.4, "S2"), *said(9, "S1", 6)]
+    assert whose.by_voice(heard, sound(16))[2].speaker == "S2"
 
 
 def test_a_line_without_a_speaker_follows_the_turn_after_its_voice_is_put_right(
@@ -123,9 +134,36 @@ def test_a_line_without_a_speaker_follows_the_turn_after_its_voice_is_put_right(
 
 def test_a_short_reply_keeps_its_own_label_and_is_not_printed(
         monkeypatch: pytest.MonkeyPatch) -> None:
-    # "Right" said by the guest straight after the host: too short to know a voice by, and
-    # the listener knew whose it was, so neither its print nor the host's turn takes it
+    # "Right" said by the host straight after the guest: too short to know a voice by, and
+    # the listener knew whose it was, so neither its print nor the guest's turn takes it
     heard = interview(monkeypatch, 2, swapped_from=99)
     reply = [Word("right", heard[-1].end + 0.1, heard[-1].end + 0.5, "S1")]
     after = whose.by_voice([*heard, *reply], sound(60))
     assert after[-1].speaker == "S1"
+
+
+def test_a_short_line_in_a_swapped_stretch_is_put_right_with_it(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    # the guest's "right" 0.1 s after the host's turn 12, labelled S1 like every guest line from
+    # turn 10 on: the guest lines on both sides of it go back to S2, so it goes with them; taking
+    # the host's touching turn would give the guest's word the host's colour
+    heard = interview(monkeypatch, 1, swapped_from=10)
+    reply = Word("right", 44.1, 44.4, "S1")
+    after = whose.checked([*heard[:26], reply, *heard[26:]], sound(60))
+    assert [w.speaker for w in after[:26:2]] == truth(heard)[:13]
+    assert after[26].speaker == "S2"
+
+
+def test_a_short_line_follows_its_label_only_where_both_sides_moved() -> None:
+    words = [*said(0, "S1"), *said(3, "S2"), Word("ok", 5.1, 5.4, "S1"), *said(7, "S1")]
+    heard = {(0, 2): "S1", (2, 4): "S2", (5, 7): "S1"}
+    assert whose.followed(words, heard, {**heard, (5, 7): "S2"}) == {}
+    assert whose.followed(words, heard, {**heard, (0, 2): "S2", (5, 7): "S2"}) == {(4, 5): "S2"}
+
+
+def test_a_line_without_a_speaker_takes_a_turn_even_where_no_voice_is_checked(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    # sound not at the voice model's rate is not checked by voice, but its fills still need a turn
+    monkeypatch.setattr(voiceprint, "fetched", lambda: True)
+    heard = [*said(0, "S1", 6), *said(7, "S2"), Word("yeah", 9.1, 9.4, "")]
+    assert whose.by_voice(heard, sound(10), 44100)[-1].speaker == "S2"

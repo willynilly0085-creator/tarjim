@@ -120,7 +120,6 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     """The transcript, and whether it covers all the speech, so it is worth keeping."""
     import soundfile
 
-    from tarjim.asr.voiceprint import RATE
     from tarjim.listen.check import regions_in
     from tarjim.listen.settle import Sound, settled
     from tarjim.listen.whose import by_voice
@@ -131,7 +130,7 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     local = heard.local_words
     opinion = second_opinion(audio, heard.language) if local is None else local
     done = settled(job, heard, Sound(wav, rate, regions_in(wav)), opinion)
-    words = by_voice(done.transcript.words, wav) if rate == RATE else done.transcript.words
+    words = by_voice(done.transcript.words, wav, rate)
     return replace(done.transcript, words=words), done.whole
 
 
