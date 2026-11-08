@@ -24,9 +24,17 @@ export function stageLabel(job) {
   return t(troubled(job) ? "stage_doneNotes" : `stage_${job.stage}`);
 }
 
+// An engine that stopped partway says why in the words a failed job uses (err_*), and what it
+// said, so a used-up quota reads as "come back tomorrow", not as a finished job.
+function words(note) {
+  const reason = note.reason ? t(`err_${note.reason}`) : "";
+  const text = t(`note_${note.kind}`, { n: note.count, at: times(note.at || []), share: note.share, reason });
+  return note.detail ? `${text}
+${t("errorDetail", { detail: note.detail })}` : text;
+}
+
 function item(note) {
-  const text = t(`note_${note.kind}`, { n: note.count, at: times(note.at || []), share: note.share });
-  return Object.assign(document.createElement("li"), { className: note.problem ? "" : "note-quiet", textContent: text });
+  return Object.assign(document.createElement("li"), { className: note.problem ? "" : "note-quiet", textContent: words(note) });
 }
 
 export function showNotes(row, job) {

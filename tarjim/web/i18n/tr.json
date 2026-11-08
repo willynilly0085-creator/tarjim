@@ -486,5 +486,7 @@
   "note_untranslated": "Çevirisi olmayan satırlar ({n}): {at}",
   "note_overlap": "Sonrakiyle çakışan satırlar ({n}): {at}",
   "note_readability": "Süresinden uzun, okunması zor olabilecek satırlar ({n}): {at}",
-  "note_timing": "Zamanlama sesten kaymış olabilir: kelimelerin yalnızca %{share} kadarı yerinde bulundu"
+  "note_timing": "Zamanlama sesten kaymış olabilir: kelimelerin yalnızca %{share} kadarı yerinde bulundu",
+  "note_sounds": "Yalnızca ses olan, Hmm ya da Ee gibi, altyazısız bırakılan satırlar ({n}): {at}",
+  "note_engine_stopped": "Çeviri motoru yarıda durdu, bu yüzden kalan satırlar aslıyla gösteriliyor. Nedeni: {reason}"
 }

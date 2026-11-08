@@ -486,5 +486,7 @@
   "note_untranslated": "번역이 없는 줄 ({n}): {at}",
   "note_overlap": "다음 줄과 겹치는 줄 ({n}): {at}",
   "note_readability": "표시 시간보다 길어 읽기 어려울 수 있는 줄 ({n}): {at}",
-  "note_timing": "타이밍이 목소리와 어긋났을 수 있습니다: 단어의 {share}%만 제자리에서 찾았습니다"
+  "note_timing": "타이밍이 목소리와 어긋났을 수 있습니다: 단어의 {share}%만 제자리에서 찾았습니다",
+  "note_sounds": "음, 어 같은 소리뿐이라 자막 없이 둔 줄 ({n}): {at}",
+  "note_engine_stopped": "번역 엔진이 중간에 멈춰서 남은 줄은 원문으로 보입니다. 이유: {reason}"
 }

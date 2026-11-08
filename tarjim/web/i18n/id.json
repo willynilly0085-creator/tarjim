@@ -486,5 +486,7 @@
   "note_untranslated": "Baris tanpa terjemahan ({n}): di {at}",
   "note_overlap": "Baris yang menimpa baris berikutnya ({n}): di {at}",
   "note_readability": "Baris lebih panjang dari waktunya, mungkin sulit dibaca ({n}): di {at}",
-  "note_timing": "Waktu mungkin tidak pas dengan suara: hanya {share}% kata ditemukan di tempatnya"
+  "note_timing": "Waktu mungkin tidak pas dengan suara: hanya {share}% kata ditemukan di tempatnya",
+  "note_sounds": "Hanya suara, seperti Mm atau Eh, dibiarkan tanpa subtitle ({n}): di {at}",
+  "note_engine_stopped": "Mesin terjemahan berhenti di tengah jalan, jadi baris sisanya ditampilkan aslinya. Alasannya: {reason}"
 }

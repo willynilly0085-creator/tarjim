@@ -5,6 +5,7 @@ from pathlib import Path
 from tarjim import media
 from tarjim.asr.base import Transcript
 from tarjim.asr.sanity import implausible
+from tarjim.findings import findings
 from tarjim.gemini_client import QuotaExhausted
 from tarjim.job import Job, checkpoint
 from tarjim.listen.kept import TRANSCRIPT, forget, load_heard
@@ -19,6 +20,7 @@ def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcrip
         forget(job.cache)
     cached = job.cache / TRANSCRIPT
     if cached.exists() and not implausible(Transcript.load(cached).words):
+        findings().recall(job.cache)  # its timing check is shown again (2026-11-08)
         return Transcript.load(cached)  # a broken timing kept by an older run is made again
     from tarjim.memory import free_for_listening
 
@@ -32,6 +34,7 @@ def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcrip
     if lasting:  # a backup's hearing, one that left speech out, or hearing nothing, is tried
         # afresh on the next run
         transcript.save(cached)
+        findings().remember(job.cache)
     return transcript
 
 
@@ -121,7 +124,6 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     import soundfile
 
     from tarjim.asr.voiceprint import RATE
-    from tarjim.findings import findings
     from tarjim.listen.check import regions_in
     from tarjim.listen.settle import Sound, settled
     from tarjim.listen.whose import by_voice
@@ -133,7 +135,7 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     opinion = second_opinion(audio, heard.language) if local is None else local
     done = settled(job, heard, Sound(wav, rate, regions_in(wav)), opinion)
     findings().heard(done.left, done.agreement)  # shown on the job (2026-11-08)
-    words =by_voice(done.transcript.words, wav) if rate == RATE else done.transcript.words
+    words = by_voice(done.transcript.words, wav) if rate == RATE else done.transcript.words
     return replace(done.transcript, words=words), done.whole
 
 

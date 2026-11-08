@@ -486,5 +486,7 @@
   "note_untranslated": "Líneas sin traducción ({n}): en {at}",
   "note_overlap": "Líneas que se solapan con la siguiente ({n}): en {at}",
   "note_readability": "Líneas más largas que su tiempo, pueden costar leerse ({n}): en {at}",
-  "note_timing": "La sincronía puede no seguir la voz: solo el {share}% de las palabras está donde se marcó"
+  "note_timing": "La sincronía puede no seguir la voz: solo el {share}% de las palabras está donde se marcó",
+  "note_sounds": "Solo sonidos, como Mm o Eh, dejados sin subtítulo ({n}): en {at}",
+  "note_engine_stopped": "El motor de traducción se detuvo a mitad, así que las líneas restantes se muestran en el original. Motivo: {reason}"
 }

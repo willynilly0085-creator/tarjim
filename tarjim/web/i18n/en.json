@@ -486,5 +486,7 @@
   "note_untranslated": "Lines without a translation ({n}): at {at}",
   "note_overlap": "Lines that overlap the next one ({n}): at {at}",
   "note_readability": "Lines longer than their time, may be hard to read ({n}): at {at}",
-  "note_timing": "The timing may be off the voice: only {share}% of the words were found where they are timed"
+  "note_timing": "The timing may be off the voice: only {share}% of the words were found where they are timed",
+  "note_sounds": "Sounds only, such as Mm or Uh, left without a subtitle ({n}): at {at}",
+  "note_engine_stopped": "The translation engine stopped partway, so the remaining lines are shown as spoken. Why: {reason}"
 }

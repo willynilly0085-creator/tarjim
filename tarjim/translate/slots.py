@@ -5,15 +5,29 @@ with a part missing, showed half a line in one speaker's colour, and a slot the 
 stayed empty, so the speech went without a subtitle. A slot that fails is cleared, so it is asked
 again and then given to the next engine (translate/rounds.py).
 """
+import unicodedata
+
 from tarjim.models import Cue, Word, join_words
 
 SEPARATOR = "||"
 NEIGHBOURS = 3  # lines each side shown, read only, beside a slot asked again
 NEAR_SECONDS = 30.0
-# A sound such as Mm, Uh, Hmm or Mm-hmm: one word of a few letters, mostly the same ones. The
-# prompt asks for an empty text there, so an empty answer for it is that, not a dropped line.
-SOUND_LETTERS = 5
-SOUND_KINDS = 3
+# The sounds the prompt asks to leave empty, written with each run of one letter once (Mmm is
+# Mm, Mm-hmm is mhm). Until 2026-11-08 any one word of up to 5 letters, 3 of them different, was
+# taken for a sound, which also took No, Yes, Hi, نعم, Да and most short lines of Chinese or
+# Japanese; an empty answer for those left speech with no subtitle and no note. Only these may be
+# left empty; any other line with letters answered empty is a failure and goes to the backup.
+# A word that is also a sound in some language (er is German for he) is left out.
+FILLERS = frozenset({
+    "m", "hm", "mhm", "uh", "um", "uhm", "uhuh", "ah", "eh", "ehm", "erm", "oh", "huh",
+    "euh", "ha", "haha", "hahaha",
+    "اه", "آه", "اوه", "م", "ه",  # Arabic and Urdu: آه, ممم, ههه (not ام, which can be أم)
+    "м", "хм", "э", "эм",  # Cyrillic
+    "हम्म", "उम्म",  # Devanagari
+    "嗯", "呃", "啊", "哦", "唔", "哈",  # Chinese
+    "えー", "あー", "うーん", "んー", "ん",  # Japanese
+    "음", "흠",  # Korean
+})
 
 
 def has_letters(text: str) -> bool:
@@ -21,9 +35,10 @@ def has_letters(text: str) -> bool:
 
 
 def only_a_sound(source: str) -> bool:
-    letters = [ch.casefold() for ch in source if ch.isalpha()]
-    one_word = len(source.split()) <= 1
-    return one_word and len(letters) <= SOUND_LETTERS and len(set(letters)) <= SOUND_KINDS
+    """A filler, in any script, however long it is drawn out; never decided by length."""
+    kept = [ch.casefold() for ch in source if ch.isalpha() or unicodedata.category(ch)[0] == "M"]
+    drawn = "".join(ch for n, ch in enumerate(kept) if not n or ch != kept[n - 1])
+    return drawn in FILLERS
 
 
 def speakers_of(cue: Cue) -> list[list[Word]]:

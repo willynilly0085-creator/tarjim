@@ -44,7 +44,9 @@ def cuts_for(job: Job) -> list[float]:
 
 def translate(job: Job, cues: list[Cue]) -> list[Cue]:
     """Every engine of the chain while a line is untranslated (translate/rounds.py). The job
-    fails only when no engine translated anything; otherwise what they did is kept."""
+    fails only when no engine translated anything; otherwise what they did is kept, and why an
+    engine stopped is kept on the job beside the lines left as said."""
+    from tarjim.findings import findings
     from tarjim.translate.glossary import current
     from tarjim.translate.prompt import Brief
     from tarjim.translate.rounds import Rounds
@@ -58,6 +60,8 @@ def translate(job: Job, cues: list[Cue]) -> list[Cue]:
     if failures and not rounds.translated():
         raise first_failure(failures)
     rounds.finish(job.rules)
+    if failures:
+        findings().stopped = first_failure(failures)
     return cues
 
 

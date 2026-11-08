@@ -486,5 +486,7 @@
   "note_untranslated": "Lignes sans traduction ({n}) : à {at}",
   "note_overlap": "Lignes qui chevauchent la suivante ({n}) : à {at}",
   "note_readability": "Lignes plus longues que leur durée, peut-être difficiles à lire ({n}) : à {at}",
-  "note_timing": "Le minutage peut s'écarter de la voix : seuls {share} % des mots sont là où ils sont placés"
+  "note_timing": "Le minutage peut s'écarter de la voix : seuls {share} % des mots sont là où ils sont placés",
+  "note_sounds": "Simples sons, comme Mm ou Euh, laissés sans sous-titre ({n}) : à {at}",
+  "note_engine_stopped": "Le moteur de traduction s'est arrêté en cours de route, les lignes restantes sont donc montrées en version originale. Raison : {reason}"
 }

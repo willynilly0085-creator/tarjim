@@ -486,5 +486,7 @@
   "note_untranslated": "Zeilen ohne Übersetzung ({n}): bei {at}",
   "note_overlap": "Zeilen, die die nächste überlappen ({n}): bei {at}",
   "note_readability": "Zeilen, länger als ihre Zeit, evtl. schwer zu lesen ({n}): bei {at}",
-  "note_timing": "Das Timing weicht vielleicht von der Stimme ab: nur {share}% der Wörter wurden dort gefunden, wo sie stehen"
+  "note_timing": "Das Timing weicht vielleicht von der Stimme ab: nur {share}% der Wörter wurden dort gefunden, wo sie stehen",
+  "note_sounds": "Nur Laute wie Mm oder Äh, ohne Untertitel gelassen ({n}): bei {at}",
+  "note_engine_stopped": "Die Übersetzungs-Engine hat mittendrin aufgehört, deshalb sind die übrigen Zeilen im Original gezeigt. Grund: {reason}"
 }
