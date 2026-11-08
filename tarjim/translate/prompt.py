@@ -125,7 +125,7 @@ def build_prompt(cues: list[Cue], brief: Brief) -> str:
 
 
 def format_item(number: int, cue: Cue, brief: Brief) -> str:
-    budget = brief.rules.char_budget(cue.duration)
+    budget = "+".join(str(n) for n in brief.rules.budgets(cue.duration, len(cue.parts)))
     start, end = cue.start - brief.offset, cue.end - brief.offset
     unit = "ث" if brief.arabic else "s"
     return f"{number}. [{start:.1f}-{end:.1f}{unit} | budget={budget}] {marked(cue)}"

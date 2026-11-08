@@ -8,6 +8,7 @@ speakers are ranked by how much they talk within each piece, which keeps the mai
 across pieces in an interview or a talk.
 """
 from tarjim.models import Cue
+from tarjim.render.stages import speaks_in_parts
 from tarjim.speakers import ranked, who
 
 # ASS colours are blue, green, red. Off-white F7F5F0, then yellow FFE066, cyan 8FE3F5, green A8E6A1.
@@ -24,10 +25,12 @@ def voices(cues: list[Cue]) -> Voices:
 
 
 def line_voices(cue: Cue, count: int, known: Voices) -> list[str]:
-    """The colour tag of each shown line: a dialogue line is its speaker's, else the cue's."""
+    """The colour tag of each shown line: a dialogue line is its speaker's, else the cue's.
+    Lines wrapped from one translation are one person's words and keep one colour, even when
+    their count matches the parts (2026-11-08)."""
     speakers = [who(part[0].speaker) for part in cue.parts if part] or [
         who(w.speaker) for w in cue.words[:1]]
-    if len(speakers) != count:
+    if len(speakers) != count or not speaks_in_parts(cue):
         speakers = (speakers[:1] or [""]) * count
     if not known:
         return [""] * count

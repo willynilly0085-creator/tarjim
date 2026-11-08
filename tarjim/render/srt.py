@@ -27,7 +27,7 @@ def plain(text: str) -> str:
 def stages(cue: Cue, rules: Rules) -> list[Block]:
     mark = RLM if rules.rtl else ""
     lines = [f"{mark}{line}{mark}" for line in display_lines(plain(cue.text), rules)]
-    moment = reveal_at(cue)
+    moment = reveal_at(cue, rules)
     if moment is None:
         return [(cue.start, cue.end, lines)]
     return [(cue.start, moment, lines[:-1]), (moment, cue.end, lines)]
