@@ -64,9 +64,10 @@ def test_lines_too_short_to_know_a_voice_by_keep_their_label(heard: list[Word]) 
     assert whose.checked([*heard, *short], sound(21))[-1].speaker == "S2"
 
 
-def test_speakers_of_different_pieces_are_never_mixed() -> None:
-    known = {"c0.S1": HOST, "c1.S1": GUEST}
-    assert whose.nearer(GUEST, "c0.S1", known) == "c0.S1"
+def test_every_speaker_of_the_clip_is_compared_and_one_with_no_other_line_stays() -> None:
+    # pieces share the listener's labels since 2026-10-31, so there is no piece to keep apart
+    assert whose.nearer(GUEST, "S1", {"S1": HOST, "S2": GUEST}) == "S2"
+    assert whose.nearer(GUEST, "S1", {"S2": GUEST}) == "S1"
 
 
 def test_a_model_that_cannot_be_fetched_is_tried_again_only_an_hour_later(

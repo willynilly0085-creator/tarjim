@@ -2,10 +2,9 @@
 
 Subtitlers have long given each extra speaker a colour of their own (white, yellow, cyan, green);
 tarjim does the same, softened so they sit calmly on the picture. The speaker who talks most keeps
-the usual off-white, so a video with one speaker looks as it always did. A listener names speakers
-per piece of a long video ("c0.S1", "c1.S1"), and the same name in two pieces may be two people:
-speakers are ranked by how much they talk within each piece, which keeps the main voice white
-across pieces in an interview or a talk.
+the usual off-white, so a video with one speaker looks as it always did. Every piece of a long
+video keeps the listener's own labels, so speakers are ranked by how much they talk in the whole
+clip (speakers.ranked), which keeps the main voice white from start to end of an interview.
 """
 from tarjim.models import Cue
 from tarjim.speakers import ranked, who

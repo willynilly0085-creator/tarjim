@@ -43,8 +43,9 @@ def pick(spans: list[Span]) -> list[Span]:
 
 
 def one_voice_each(words: list[Word], lines: list[Line]) -> tuple[list[Word], list[Line]]:
-    """Listener labels become voices: "voice1" for the speaker who talks most in each piece of
-    the video, so one person is not handed a new voice in every piece or voting pass."""
+    """Listener labels become voices: "voice1" for the speaker who talks most in the whole clip,
+    "voice2" for the next, and a voting pass's tag ("p2.S1") is the same person, so one person is
+    not handed a new voice by a pass that heard them."""
     ranks = ranked(words)
     names = {w.speaker: f"voice{ranks[who(w.speaker)] + 1}" for w in words if w.speaker}
     return ([replace(w, speaker=names.get(w.speaker, w.speaker)) for w in words],
