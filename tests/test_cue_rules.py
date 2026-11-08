@@ -147,3 +147,27 @@ def test_qa_names_a_line_too_short_to_read() -> None:
 
     issues = check([Cue(1.0, 1.2, [Word("Hi.", 1.0, 1.2)], text="هلا")])
     assert "too_short" in {i.kind for i in issues}
+
+
+def test_the_picture_is_probed_once_a_run(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-08: the run probed the picture for the line length and again to draw it."""
+    video = tmp_path / "clip.mp4"
+    video.write_bytes(b"x")
+    probed: list[Path] = []
+
+    def probe(path: Path) -> media.VideoInfo:
+        probed.append(path)
+        return media.VideoInfo(1080, 1920, 9.0)
+
+    heard = type("Heard", (), {"words": [Word("Hi.", 0.0, 0.5)]})()
+    monkeypatch.setattr(pipeline.media, "check_readable", lambda _v: None)
+    monkeypatch.setattr(pipeline.media, "probe", probe)
+    monkeypatch.setattr(pipeline, "transcript_for", lambda _j, _r: heard)
+    monkeypatch.setattr(pipeline, "cuts_for", lambda _j: [])
+    monkeypatch.setattr(pipeline, "translate", lambda _j, cues, _r=None: cues)
+    monkeypatch.setattr(pipeline, "placed", lambda _j, _c, canvas, _d: canvas)
+    monkeypatch.setattr(pipeline, "moved", lambda _j, _c, canvas, _m: canvas)
+    job = Job(video, burn=False, cache_dir=tmp_path / "work", out_dir=tmp_path)
+    pipeline.run(job)
+    assert probed == [video] and job.output(".ass").exists()

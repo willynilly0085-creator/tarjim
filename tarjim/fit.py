@@ -1,13 +1,13 @@
 """How long each subtitle stays on screen (2026-11-08).
 
-Two promises hold for every subtitle: it stays up at least rules.min_duration, and it ends
-rules.min_gap before the next one starts. Before, the end was cut to fit, so a line squeezed by
-the next one was shown for a microsecond and a line just before a shot change flashed, and the
-next line was pushed up to 0.9 s late to make room. When the two promises clash, this tries, in
-order: running on into the gap after it, starting up to LEAD_IN early (never across a shot
-change or into the line before), joining a neighbour (one speaker becomes one part, two become
-an exchange), running past the shot change, and only last, holding the line for
-rules.min_readable and starting the next one after it.
+Two promises hold for every subtitle: it stays up at least rules.shortest (min_duration and
+min_readable both), and it ends rules.min_gap before the next one starts. Before, the end was
+cut to fit, so a line squeezed by the next one was shown for a microsecond and a line just
+before a shot change flashed, and the next line was pushed up to 0.9 s late to make room. When
+the two promises clash, this tries, in order: running on into the gap after it, starting up to
+LEAD_IN early (never across a shot change or into the line before), joining a neighbour (one
+speaker becomes one part, two become an exchange), running past the shot change, and only
+last, holding the line for rules.shortest and starting the next one after it.
 """
 from dataclasses import dataclass
 
@@ -57,7 +57,7 @@ def fit(cue: Cue, floor: float, ceiling: float, frame: Frame) -> bool:
     rules = frame.rules
     for start in (cue.start, lead_in(cue.start, floor, ceiling, frame)):
         end = shown_until(cue, start, ceiling, rules)
-        if end - start >= rules.min_duration - TOLERANCE:
+        if end - start >= rules.shortest - TOLERANCE:
             cue.start, cue.end = start, end
             return True
     return False
@@ -65,18 +65,18 @@ def fit(cue: Cue, floor: float, ceiling: float, frame: Frame) -> bool:
 
 def lead_in(start: float, floor: float, ceiling: float, frame: Frame) -> float:
     earliest = max(start - LEAD_IN, min(floor, start), last_cut(frame.cuts, start))
-    return max(earliest, min(start, ceiling - frame.rules.min_duration))
+    return max(earliest, min(start, ceiling - frame.rules.shortest))
 
 
 def shown_until(cue: Cue, start: float, ceiling: float, rules: Rules) -> float:
-    wanted = max(spoken_end(cue) + rules.linger, start + rules.min_duration)
+    wanted = max(spoken_end(cue) + rules.linger, start + rules.shortest)
     return min(wanted, start + rules.max_duration, ceiling)
 
 
 def hold(cues: list[Cue], index: int, rules: Rules) -> None:
     """The last resort: the line stays long enough to read and the next one waits for it."""
     cue = cues[index]
-    cue.end = cue.start + max(rules.min_readable, rules.min_duration)
+    cue.end = cue.start + rules.shortest
     if index + 1 < len(cues):
         following = cues[index + 1]
         following.start = max(following.start, cue.end + rules.min_gap)

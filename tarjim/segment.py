@@ -15,7 +15,7 @@ MIN_SPLITTABLE = 2
 def build_cues(words: list[Word], cuts: list[float], rules: Rules = DEFAULT_RULES) -> list[Cue]:
     """Words in time order on one track, replies said over a turn as parts of its subtitle,
     then each subtitle's time on screen (2026-11-08)."""
-    main, replies = tracks(words)
+    main, replies = tracks(words, rules)
     blocks = split_blocks(main, cuts, rules)
     pieces = [piece for block in blocks for piece in split_long(block, rules)]
     return fit_timing(with_replies(merge_short(pieces, rules), replies, rules), rules, cuts)

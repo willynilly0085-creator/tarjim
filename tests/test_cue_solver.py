@@ -47,6 +47,21 @@ def test_a_third_voice_that_cannot_join_still_gets_time_to_read() -> None:
     assert fitted[1].duration >= RULES.min_duration - TOLERANCE
 
 
+def test_no_line_is_shown_for_less_than_the_time_to_read_it() -> None:
+    """2026-11-08: the solver held lines for min_duration (0.8 s), under min_readable (0.9 s)."""
+    fitted = fit_timing([cue("Hi.", 5.0, 5.2, "S1"), cue("a long turn after", 6.0, 9.0, "S2")],
+                        RULES)
+    assert fitted[0].duration >= RULES.min_readable - TOLERANCE
+    assert fitted[0].end + RULES.min_gap <= fitted[1].start + TOLERANCE
+
+
+def test_qa_names_a_line_shown_for_less_than_the_time_to_read_it() -> None:
+    from tarjim.qa import check as qa
+
+    shown = Cue(1.0, 1.85, [Word("Hi.", 1.0, 1.2)], text="هلا")
+    assert "too_short" in {issue.kind for issue in qa([shown], RULES)}
+
+
 def test_a_line_right_before_a_shot_change_stays_long_enough() -> None:
     fitted = fit_timing([cue("No.", 12.0, 12.2, "S1"),
                          cue("a long answer after the cut", 14.0, 19.0, "S2")], RULES, [12.3])
@@ -56,7 +71,9 @@ def test_a_line_right_before_a_shot_change_stays_long_enough() -> None:
 def test_a_squeezed_line_starts_a_little_early_instead_of_flashing() -> None:
     before = cue("Before.", 3.0, 4.0, "S2")
     hi = cue("Hi.", 5.0, 5.2, "S1")
-    after = cue("a long turn of somebody else", 5.75, 11.5, "S2")
+    # 5.85, not 5.75: since the floor became min_readable (0.9 s), a 0.2 s lead-in makes room
+    # only if the next line starts here
+    after = cue("a long turn of somebody else", 5.85, 11.5, "S2")
     fitted = fit_timing([before, hi, after], RULES)
     assert [c.source for c in fitted] == ["Before.", "Hi.", "a long turn of somebody else"]
     assert 4.8 - TOLERANCE <= fitted[1].start < 5.0
@@ -112,7 +129,7 @@ def stream(seed: int) -> tuple[list[Word], list[float]]:
 def check(cues: list[Cue], words: list[Word], rules: Rules) -> None:
     assert Counter(w for c in cues for w in c.words) == Counter(words)
     for one in cues:
-        assert one.end - one.start >= rules.min_duration - TOLERANCE, one
+        assert one.end - one.start >= max(rules.min_duration, rules.min_readable) - TOLERANCE, one
         assert 1 <= len(one.parts) <= MAX_SPEAKERS
         assert [w for part in one.parts for w in part] == one.words
     for first, second in pairwise(cues):

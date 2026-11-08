@@ -37,6 +37,11 @@ class Rules:
         return self.line_chars * self.max_lines
 
     @property
+    def shortest(self) -> float:
+        """The least time any subtitle is shown: both floors hold (2026-11-08)."""
+        return max(self.min_duration, self.min_readable)
+
+    @property
     def part_chars(self) -> int:
         """The source one part of an exchange may hold: each part is drawn on one line."""
         return self.max_source_chars // self.max_lines

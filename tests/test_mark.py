@@ -144,10 +144,10 @@ def outputs(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, job: Job) -> list[t
         burned.append((video, ass, target, placed))
         return target
 
-    monkeypatch.setattr(pipeline.media, "probe", lambda _v: media.VideoInfo(1280, 720, 9.0))
     monkeypatch.setattr(pipeline, "placed", lambda _j, _c, canvas, _d: canvas)
     monkeypatch.setattr(pipeline, "burn", fake_burn)
-    pipeline.write_outputs(job, CUES, [], pipeline.quiet)
+    made = pipeline.Made(CUES, [], media.VideoInfo(1280, 720, 9.0))
+    pipeline.write_outputs(job, made, pipeline.quiet)
     return burned
 
 

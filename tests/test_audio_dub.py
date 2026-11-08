@@ -13,10 +13,10 @@ CUES = [Cue(0.0, 1.0, [Word("Hi", 0.0, 0.5)], text="هلا")]
 
 def test_sound_alone_is_dubbed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     pictures: list[Path | None] = []
-    monkeypatch.setattr(pipeline.media, "probe", lambda _v: media.VideoInfo(0, 0, 9.0))
     monkeypatch.setattr(make, "dub_video", lambda _j, _c, _w, picture: pictures.append(picture))
     job = Job(tmp_path / "talk.mp3", dub="gemini", out_dir=tmp_path, cache_dir=tmp_path / "c")
-    pipeline.write_outputs(job, CUES, [], pipeline.quiet)
+    made = pipeline.Made(CUES, [], media.VideoInfo(0, 0, 9.0))
+    pipeline.write_outputs(job, made, pipeline.quiet)
     assert pictures == [None] and job.output(".srt").exists()
 
 

@@ -1,6 +1,7 @@
 import json
 from collections.abc import Callable
 from pathlib import Path
+from typing import NamedTuple
 
 from tarjim import media
 from tarjim.hearing import transcript_for
@@ -74,20 +75,29 @@ def save_review(job: Job, cues: list[Cue]) -> None:
     review.write_text(json.dumps(rows, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
-def write_outputs(job: Job, cues: list[Cue], words: list[Word], report: Report) -> None:
+class Made(NamedTuple):
+    """What the outputs are written from: the subtitles, the words heard (a dub is timed by
+    them) and the picture, probed once a run (2026-11-08)."""
+    cues: list[Cue]
+    words: list[Word]
+    info: media.VideoInfo
+
+
+def write_outputs(job: Job, made: Made, report: Report) -> None:
+    cues = made.cues
     job.output(".srt").write_text(render_srt(cues, job.rules), encoding="utf-8-sig")
-    picture = write_picture(job, cues, report)
+    picture = write_picture(job, cues, made.info, report)
     if job.dub:
         from tarjim.dub.make import dub_video
 
         report("dubbing")
-        dub_video(job, cues, words, picture)  # no picture: the sound alone is dubbed
+        dub_video(job, cues, made.words, picture)  # no picture: the sound alone is dubbed
 
 
-def write_picture(job: Job, cues: list[Cue], report: Report) -> Path | None:
+def write_picture(job: Job, cues: list[Cue], info: media.VideoInfo,
+                  report: Report) -> Path | None:
     """The subtitles drawn for the picture, burned when asked; what a dub is laid on, or None
     for a file with no picture."""
-    info = media.probe(job.video)
     if not info.has_picture:
         return None
     canvas = placed(job, cues, Canvas(info.width, info.height, job.font_name), info.duration)
@@ -115,19 +125,15 @@ def run(job: Job, report: Report = quiet) -> tuple[list[Cue], list[Issue]]:
     media.check_readable(job.video)
     report("hearing")
     words = transcript_for(job, report).words
+    info = media.probe(job.video)
     # the target language's rules, its lines shortened for the picture's shape: before
     # 2026-11-08 the cues were cut by the default rules whatever the language
-    rules = picture_rules(job)
+    rules = fitted(job.rules, info.width, info.height)
     cues = build_cues(words, cuts_for(job), rules)
     report("translating")
     cues = translate(job, cues, rules)
     save_review(job, cues)
     report("writing")
-    write_outputs(job, cues, words, report)
+    write_outputs(job, Made(cues, words, info), report)
     report("done")
     return cues, check(cues, rules)
-
-
-def picture_rules(job: Job) -> Rules:
-    info = media.probe(job.video)
-    return fitted(job.rules, info.width, info.height)

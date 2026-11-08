@@ -5,6 +5,7 @@ from tarjim.models import Cue, Word, join_words
 from tarjim.rules import Rules
 
 MAX_SPEAKERS = 2
+EDGE = 0.05
 
 
 @dataclass
@@ -112,8 +113,10 @@ def take_reply(cues: list[Cue], reply: list[Word], rules: Rules) -> list[Cue]:
 
 def split_at(host: Cue, reply: list[Word], rules: Rules) -> list[Cue]:
     """A reply with no room in its turn's subtitle (a third voice, or a part too long to share
-    the screen) starts a subtitle of its own, and the turn's words after it go with it."""
-    at = reply[0].start
+    the screen) starts a subtitle of its own, and the turn's words after it go with it. A word
+    of the turn begun while the reply is still said stays with the turn: before 2026-11-08 it
+    was torn from its sentence and shown after the reply."""
+    at = max(reply[0].start + EDGE, last_end(reply))
     before = [kept for part in host.parts if (kept := [w for w in part if w.start < at])]
     after = [rest for part in host.parts if (rest := [w for w in part if w.start >= at])]
     head = [list(reply)]
