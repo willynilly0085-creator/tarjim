@@ -112,7 +112,9 @@ def event_lines(cue: Cue, rules: Rules, paint: Paint | None = None) -> list[str]
     *first, last = lines
     before, after = paint.fade(cue.start, moment), paint.fade(moment, cue.end)
     waiting = "\\N".join([*first, f"{{{hide}}}" + last])
-    arriving = "\\N".join([*first, f"{{{hide}\\t(0,{after},{show})}}" + last])
+    # libass reads \t(0,0,...) as the whole event: with no fade the line shows at once (2026-11-09)
+    reveal = f"{{{hide}\\t(0,{after},{show})}}" if after else f"{{{show}}}"
+    arriving = "\\N".join([*first, reveal + last])
     return [event(cue.start, moment, fade(before, 0, paint.edge) + waiting, spot),
             event(moment, cue.end, fade(0, after, paint.edge) + arriving, spot)]
 

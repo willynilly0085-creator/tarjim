@@ -97,6 +97,13 @@ def test_a_fade_is_the_persons_and_never_more_than_a_quarter_of_its_line() -> No
     assert "\\fad(50,50)" in render_ass([Cue(0.0, 0.2, text="قصير")], Canvas(1920, 1080))
 
 
+def test_no_fade_shows_the_second_speaker_at_once() -> None:
+    # libass reads \t(0,0,...) as the whole event, so the reveal crawled over it (2026-11-09)
+    arriving = [e for e in drawn(prefs(fade_ms=0)) if "بالضبط" in e][-1]
+    assert "\\t(" not in arriving and "{\\1a&H00&\\3a&H00&}{\\c&HF0F5F7&}" in arriving
+    assert "\\t(0,90,\\1a&H00&\\3a&H00&)" in "\n".join(drawn(prefs()))
+
+
 def test_the_gap_over_the_pictures_text_follows_the_padding() -> None:
     assert size(Canvas(1920, 1080))[1] == round(0.3 * 63)
     assert size(canvas(prefs(box_padding=30)))[1] == round(0.38 * 63)
