@@ -1,0 +1,327 @@
+{
+ "words": [
+  {
+   "text": "alpha",
+   "start": 2.2,
+   "end": 2.5,
+   "speaker": "S1"
+  },
+  {
+   "text": "bravo",
+   "start": 2.6,
+   "end": 2.9,
+   "speaker": "S1"
+  },
+  {
+   "text": "charlie",
+   "start": 8.18,
+   "end": 8.6,
+   "speaker": "S2"
+  },
+  {
+   "text": "delta",
+   "start": 14.200000000000001,
+   "end": 14.5,
+   "speaker": "S1"
+  },
+  {
+   "text": "echo",
+   "start": 14.6,
+   "end": 14.84,
+   "speaker": "S1"
+  },
+  {
+   "text": "foxtrot",
+   "start": 22.2,
+   "end": 22.62,
+   "speaker": "S2"
+  },
+  {
+   "text": "golf",
+   "start": 22.72,
+   "end": 22.96,
+   "speaker": "S2"
+  },
+  {
+   "text": "hotel",
+   "start": 23.06,
+   "end": 23.36,
+   "speaker": "S2"
+  },
+  {
+   "text": "india",
+   "start": 30.2,
+   "end": 30.5,
+   "speaker": "S1"
+  },
+  {
+   "text": "&",
+   "start": 30.5,
+   "end": 30.76,
+   "speaker": "S1"
+  },
+  {
+   "text": "juliet",
+   "start": 30.76,
+   "end": 31.12,
+   "speaker": "S1"
+  }
+ ],
+ "cues": [
+  {
+   "start": 2.2,
+   "end": 3.3,
+   "words": [
+    {
+     "text": "alpha",
+     "start": 2.2,
+     "end": 2.5,
+     "speaker": "S1"
+    },
+    {
+     "text": "bravo",
+     "start": 2.6,
+     "end": 2.9,
+     "speaker": "S1"
+    }
+   ],
+   "text": "",
+   "parts": [
+    [
+     {
+      "text": "alpha",
+      "start": 2.2,
+      "end": 2.5,
+      "speaker": "S1"
+     },
+     {
+      "text": "bravo",
+      "start": 2.6,
+      "end": 2.9,
+      "speaker": "S1"
+     }
+    ]
+   ]
+  },
+  {
+   "start": 8.18,
+   "end": 9.08,
+   "words": [
+    {
+     "text": "charlie",
+     "start": 8.18,
+     "end": 8.6,
+     "speaker": "S2"
+    }
+   ],
+   "text": "",
+   "parts": [
+    [
+     {
+      "text": "charlie",
+      "start": 8.18,
+      "end": 8.6,
+      "speaker": "S2"
+     }
+    ]
+   ]
+  },
+  {
+   "start": 14.200000000000001,
+   "end": 15.24,
+   "words": [
+    {
+     "text": "delta",
+     "start": 14.200000000000001,
+     "end": 14.5,
+     "speaker": "S1"
+    },
+    {
+     "text": "echo",
+     "start": 14.6,
+     "end": 14.84,
+     "speaker": "S1"
+    }
+   ],
+   "text": "",
+   "parts": [
+    [
+     {
+      "text": "delta",
+      "start": 14.200000000000001,
+      "end": 14.5,
+      "speaker": "S1"
+     },
+     {
+      "text": "echo",
+      "start": 14.6,
+      "end": 14.84,
+      "speaker": "S1"
+     }
+    ]
+   ]
+  },
+  {
+   "start": 22.2,
+   "end": 23.759999999999998,
+   "words": [
+    {
+     "text": "foxtrot",
+     "start": 22.2,
+     "end": 22.62,
+     "speaker": "S2"
+    },
+    {
+     "text": "golf",
+     "start": 22.72,
+     "end": 22.96,
+     "speaker": "S2"
+    },
+    {
+     "text": "hotel",
+     "start": 23.06,
+     "end": 23.36,
+     "speaker": "S2"
+    }
+   ],
+   "text": "",
+   "parts": [
+    [
+     {
+      "text": "foxtrot",
+      "start": 22.2,
+      "end": 22.62,
+      "speaker": "S2"
+     },
+     {
+      "text": "golf",
+      "start": 22.72,
+      "end": 22.96,
+      "speaker": "S2"
+     },
+     {
+      "text": "hotel",
+      "start": 23.06,
+      "end": 23.36,
+      "speaker": "S2"
+     }
+    ]
+   ]
+  },
+  {
+   "start": 30.2,
+   "end": 31.52,
+   "words": [
+    {
+     "text": "india",
+     "start": 30.2,
+     "end": 30.5,
+     "speaker": "S1"
+    },
+    {
+     "text": "&",
+     "start": 30.5,
+     "end": 30.76,
+     "speaker": "S1"
+    },
+    {
+     "text": "juliet",
+     "start": 30.76,
+     "end": 31.12,
+     "speaker": "S1"
+    }
+   ],
+   "text": "",
+   "parts": [
+    [
+     {
+      "text": "india",
+      "start": 30.2,
+      "end": 30.5,
+      "speaker": "S1"
+     },
+     {
+      "text": "&",
+      "start": 30.5,
+      "end": 30.76,
+      "speaker": "S1"
+     },
+     {
+      "text": "juliet",
+      "start": 30.76,
+      "end": 31.12,
+      "speaker": "S1"
+     }
+    ]
+   ]
+  }
+ ],
+ "again": [
+  {
+   "text": "alpha",
+   "start": 2.2,
+   "end": 2.5,
+   "speaker": "S1"
+  },
+  {
+   "text": "bravo",
+   "start": 2.6,
+   "end": 2.9,
+   "speaker": "S1"
+  },
+  {
+   "text": "charlie",
+   "start": 8.18,
+   "end": 8.6,
+   "speaker": "S2"
+  },
+  {
+   "text": "delta",
+   "start": 14.200000000000001,
+   "end": 14.5,
+   "speaker": "S1"
+  },
+  {
+   "text": "echo",
+   "start": 14.6,
+   "end": 14.84,
+   "speaker": "S1"
+  },
+  {
+   "text": "foxtrot",
+   "start": 22.2,
+   "end": 22.62,
+   "speaker": "S2"
+  },
+  {
+   "text": "golf",
+   "start": 22.72,
+   "end": 22.96,
+   "speaker": "S2"
+  },
+  {
+   "text": "hotel",
+   "start": 23.06,
+   "end": 23.36,
+   "speaker": "S2"
+  },
+  {
+   "text": "india",
+   "start": 30.2,
+   "end": 30.5,
+   "speaker": "S1"
+  },
+  {
+   "text": "&",
+   "start": 30.5,
+   "end": 30.76,
+   "speaker": "S1"
+  },
+  {
+   "text": "juliet",
+   "start": 30.76,
+   "end": 31.12,
+   "speaker": "S1"
+  }
+ ]
+}

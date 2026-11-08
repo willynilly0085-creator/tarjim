@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from functools import lru_cache
 from itertools import islice
 from typing import Any
@@ -9,7 +8,17 @@ from tarjim.asr.ctc import FRAME, Emitter, Span, token_spans
 from tarjim.asr.groups import chunks, densest, quietest, tell_evened, windows
 from tarjim.asr.letters import Piece
 from tarjim.asr.numbers import said
-from tarjim.asr.qwen import core
+from tarjim.asr.spread import (
+    GAP_FALLBACK,
+    WORD_BASE,
+    WORD_PER_LETTER,
+    Slot,
+    fill_gaps,
+    longest,
+    proportional,
+    runs,
+    share,
+)
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
 from tarjim.scripts import split_words
@@ -18,20 +27,10 @@ OVERLAP = 1.0  # starting this far inside an earlier utterance: said over it, no
 SHORT_REPLY = 4  # words: "Really?", "Oh my gosh", not a turn of its own
 PAD = 2.0
 SPECIAL_IDS = 4
-GAP_FALLBACK = 0.2
-WORD_BASE = 0.3
-WORD_PER_LETTER = 0.1
-
-
-@dataclass
-class Slot:
-    text: str
-    speaker: str
-    owner: int
-    start: float = 0.0
-    end: float = 0.0
-    timed: bool = False
-    said: str = ""  # what the aligner listens for: a number spelled out, "" for none
+# moved to asr/spread.py on 2026-11-08 and still offered here: fuse, piles, anchor and tests
+# take them from this module
+__all__ = ["GAP_FALLBACK", "WORD_BASE", "WORD_PER_LETTER", "Slot", "fill_gaps", "longest",
+           "proportional", "runs", "share"]
 
 
 def short(utterance: Utterance) -> bool:
@@ -48,60 +47,6 @@ def overlapping(utterances: list[Utterance]) -> list[bool]:
         if not flags[-1]:
             reach = max(reach, utterance.end)
     return flags
-
-
-def proportional(utterance: Utterance) -> list[Word]:
-    tokens = split_words(utterance.text)
-    weights = [max(1, len(core(token))) for token in tokens]
-    step = (utterance.end - utterance.start) / max(1, sum(weights))
-    words, cursor = [], utterance.start
-    for token, weight in zip(tokens, weights, strict=True):
-        words.append(Word(token, cursor, cursor + weight * step, utterance.speaker))
-        cursor += weight * step
-    return words
-
-
-def longest(text: str) -> float:
-    return WORD_BASE + WORD_PER_LETTER * len(core(text))
-
-
-def runs(slots: list[Slot]) -> list[tuple[int, int]]:
-    """Where each stretch of words the aligner could not place begins and ends."""
-    found: list[tuple[int, int]] = []
-    for index, slot in enumerate(slots):
-        if slot.timed:
-            continue
-        if found and found[-1][1] == index:
-            found[-1] = (found[-1][0], index + 1)
-        else:
-            found.append((index, index + 1))
-    return found
-
-
-def share(run: list[Slot], start: float, end: float) -> None:
-    """The run's words take the time between their neighbours, each by its length."""
-    weights = [longest(slot.text) for slot in run]
-    step, cursor = (end - start) / sum(weights), start
-    for slot, weight in zip(run, weights, strict=True):
-        slot.start, cursor = cursor, cursor + weight * step
-        slot.end = cursor
-    run[-1].end = end
-
-
-def fill_gaps(slots: list[Slot]) -> None:
-    """Words the aligner could not place share the gap between the words around them, so a
-    countdown "2, 1, 0" is not one word on screen for seconds and two crushed after it."""
-    for first, past in runs(slots):
-        count = past - first
-        before = slots[first - 1].end if first else None
-        after = slots[past].start if past < len(slots) else None
-        if before is None:
-            end = after if after is not None else GAP_FALLBACK * count
-            start = max(0.0, end - GAP_FALLBACK * count)
-        else:
-            start = before
-            end = max(start, after) if after is not None else start + GAP_FALLBACK * count
-        share(slots[first:past], start, end)
 
 
 @lru_cache(maxsize=1)

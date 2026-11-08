@@ -8,11 +8,15 @@ from tarjim.findings import findings
 from tarjim.gemini_client import QuotaExhausted
 from tarjim.job import Job, checkpoint
 from tarjim.listen.asked import TRIES
+from tarjim.listen.heard_align import listen_and_align
 from tarjim.listen.kept import forget, keep_heard, keep_transcript, load_heard, reusable
 from tarjim.listen.merge import Heard
 from tarjim.models import Word
 
 Regions = list[tuple[float, float]]
+# moved to listen/heard_align.py on 2026-11-08 and still offered here; the names tests and the
+# bench put other code in place of (cloud_listener, second_opinion, qwen_transcript) stay here
+__all__ = ["listen_and_align"]
 
 
 def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcript:
@@ -127,28 +131,6 @@ def speech_regions_of(audio: Path) -> Regions:
 
     wav, _ = soundfile.read(str(audio), dtype="float32")
     return regions_in(wav)
-
-
-def listen_and_align(job: Job, audio: Path, heard: Heard,
-                     report: Callable[[str], None]) -> tuple[Transcript, bool]:
-    """The transcript, and whether it covers all the speech, so it is worth keeping."""
-    import soundfile
-
-    from tarjim.listen.check import regions_in
-    from tarjim.listen.settle import Sound, settled
-    from tarjim.listen.whose import by_voice
-
-    report("timing")
-    wav, rate = soundfile.read(str(audio), dtype="float32")
-    # first: its times correct a cloud listener's drift; the local listener is its own
-    local = heard.local_words
-    opinion = second_opinion(audio, heard.language) if local is None else local
-    done = settled(job, heard, Sound(wav, rate, regions_in(wav)), opinion)
-    # shown on the job, the stretches given up too (2026-11-08)
-    findings().heard(tuple((g.start, g.end) for g in done.left if not g.given_up),
-                     done.agreement, tuple((g.start, g.end) for g in done.left if g.given_up))
-    words = by_voice(done.transcript.words, wav, rate)
-    return replace(done.transcript, words=words), done.whole and not heard.backup
 
 
 def second_opinion(audio: Path, language: str = "") -> list[Word]:

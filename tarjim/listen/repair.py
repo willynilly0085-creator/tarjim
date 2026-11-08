@@ -9,7 +9,16 @@ from dataclasses import dataclass, field, replace
 
 from tarjim.job import checkpoint
 from tarjim.listen.asked import TRIES, Spent
-from tarjim.listen.coverage import Gap, Hearing, gaps, open_gaps
+from tarjim.listen.coverage import (
+    NOT_ASKED,
+    NOT_REPAIRED,
+    Gap,
+    Hearing,
+    described,
+    gaps,
+    open_gaps,
+    still_left,
+)
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.merge import Fill
 from tarjim.listen.vote import norm
@@ -23,8 +32,8 @@ LINE_PAUSE = 0.7  # local words become lines at pauses this long
 LINE_WORDS = 12
 TURN_GAP = 0.3  # seconds: a line this close to a turn goes on with it
 MAIN = "S1"  # the speaker of a line with no turn heard anywhere
-NOT_REPAIRED = "not repaired"
-NOT_ASKED = "not asked again"
+# moved to listen/coverage.py on 2026-11-08 and still offered here
+__all__ = ["NOT_ASKED", "NOT_REPAIRED", "described", "still_left"]
 
 Relisten = Callable[[float, float], list[Utterance]]  # asked about a gap, in clip times
 
@@ -98,11 +107,6 @@ def voiced(fills: list[Utterance], lines: list[Utterance]) -> list[Utterance]:
     return out
 
 
-def described(gap: Gap) -> str:
-    said = f"{len(gap.words)} local words" if gap.words else "no words"
-    return f"gap {gap.start:.1f}-{gap.end:.1f} s ({gap.speech:.1f} s of speech, {said})"
-
-
 class Mender:
     label = ""  # what the log calls the check: "" for lines, "words " after alignment
 
@@ -174,13 +178,6 @@ class Mender:
             fills.extend(Fill(line, (gap.start, gap.end)) for line in fresh)
             left.extend(still_left(gap, outcome))
         return Mended(sorted(lines, key=lambda u: u.start), [f.line for f in fills], left, fills)
-
-
-def still_left(gap: Gap, outcome: str) -> list[Gap]:
-    """The stretch, when nothing filled it: to be asked again, or given up but still listed."""
-    if outcome == NOT_REPAIRED:
-        return [gap]
-    return [replace(gap, given_up=True)] if NOT_ASKED in outcome else []
 
 
 def mend(hearing: Hearing, relisten: Relisten | None, name: str) -> Mended:

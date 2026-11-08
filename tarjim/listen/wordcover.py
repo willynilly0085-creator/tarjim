@@ -12,10 +12,10 @@ words, not by line spans; then the local words fill.
 from dataclasses import dataclass, replace
 
 from tarjim.asr.piles import Span, piles, spread
-from tarjim.listen.coverage import EDGE, Gap, Hearing, gaps, speech_of
+from tarjim.listen.coverage import EDGE, Gap, Hearing, described, gaps, speech_of
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.novel import Again, WordMender
-from tarjim.listen.repair import OVERLAP, described
+from tarjim.listen.repair import OVERLAP
 from tarjim.listen.timing import Timer
 from tarjim.models import Word
 

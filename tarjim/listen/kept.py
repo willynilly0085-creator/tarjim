@@ -36,6 +36,8 @@ DERIVE = "derive"
 ROOT = Path(__file__).resolve().parent.parent
 # with every tarjim module these import at the top (listen/derive.py)
 DERIVED_FROM = ("listen", "asr", "segment.py", "dialogue.py", "model_pins.py", "hearing.py")
+# the settings that choose how a hearing is derived; each later mode setting joins them
+MODES = ("aligner_mode",)
 
 Row = dict[str, Any]
 # the record of stretches asked again lived here before 2026-11-08 (now listen/asked.py)
@@ -98,11 +100,15 @@ def code_key() -> str:
 
 
 def derive_key() -> str:
-    """The code and the listening settings that change what is derived from a hearing."""
+    """The code and the listening settings that change what is derived from a hearing. Since
+    2026-11-08 the mode settings are in it too: a clip timed in one aligner mode would otherwise
+    be served as timed in the other (config is not followed into the code key, listen/derive)."""
+    from tarjim.config import setting
     from tarjim.listen.chunks import chunk_seconds
     from tarjim.listen.coverage import gap_seconds
 
-    chosen = f"{code_key()}|chunk={chunk_seconds()}|gap={gap_seconds()}"
+    modes = "".join(f"|{name}={setting(name)}" for name in MODES)
+    chosen = f"{code_key()}|chunk={chunk_seconds()}|gap={gap_seconds()}{modes}"
     return hashlib.sha256(chosen.encode()).hexdigest()[:16]
 
 

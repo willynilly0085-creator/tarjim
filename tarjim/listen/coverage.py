@@ -6,7 +6,7 @@ computer heard it. The check runs after the times were corrected against the loc
 (asr/anchor.py), so a listener's late times are not taken for missing speech. Speech is what the
 voice detector found, together with the words this computer heard (either may be missing).
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
@@ -14,6 +14,10 @@ from tarjim.models import Word
 GAP_SECONDS = 2.0  # this much speech with no line is speech left out, not a breath
 EDGE = 0.5  # a line's times are rough by about this much
 JOIN = 1.0  # speech pieces this close belong to one stretch
+# what listen/repair.py says of a stretch nothing filled (moved here with `described` and
+# `still_left` on 2026-11-08, to make room in repair.py; it still offers them)
+NOT_REPAIRED = "not repaired"
+NOT_ASKED = "not asked again"
 
 Span = tuple[float, float]
 
@@ -99,3 +103,15 @@ def gaps(hearing: Hearing, least: float | None = None) -> list[Gap]:
         if speech >= shortest:
             found.append(Gap(start, end, speech, inside))
     return found
+
+
+def described(gap: Gap) -> str:
+    said = f"{len(gap.words)} local words" if gap.words else "no words"
+    return f"gap {gap.start:.1f}-{gap.end:.1f} s ({gap.speech:.1f} s of speech, {said})"
+
+
+def still_left(gap: Gap, outcome: str) -> list[Gap]:
+    """The stretch, when nothing filled it: to be asked again, or given up but still listed."""
+    if outcome == NOT_REPAIRED:
+        return [gap]
+    return [replace(gap, given_up=True)] if NOT_ASKED in outcome else []
