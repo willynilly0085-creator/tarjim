@@ -2,17 +2,20 @@
 listen/repair.py), once, before any timing; then, in each timing, speech no timed word reaches
 (listen/wordcover.py). Every stretch asked about again goes through one record per job
 (listen/kept.py), so the lines check, the words check and both timings in listen/settle.py never
-pay twice for the same stretch. The hearing is kept once the timing is chosen, even when speech
-is left without words: only those stretches are asked about again on the next run."""
+pay twice for the same stretch. The hearing is kept even when speech is left without words: only
+those stretches are asked about again on the next run. Since 2026-11-08 it is kept right after
+the lines' check, before either timing, and again with the fills of the timing chosen: a crash
+or a closed app during a long timing threw away a whole-clip hearing that had been paid for."""
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
 from tarjim import media
 from tarjim.job import Job
-from tarjim.listen.coverage import Gap, Hearing
+from tarjim.listen.asked import TRIES, Asked
+from tarjim.listen.coverage import Gap, Hearing, open_gaps
 from tarjim.listen.gemini_listen import Utterance
-from tarjim.listen.kept import TRIES, Asked, keep_heard
+from tarjim.listen.kept import keep_heard
 from tarjim.listen.merge import Heard
 from tarjim.listen.novel import Again
 from tarjim.listen.repair import Mended, Relisten, mend
@@ -44,14 +47,18 @@ def rechecked(repair: Repair, hearing: Hearing, timer: Timer) -> Checked:
 
 
 def keep(job: Job, heard: Heard, asked: Asked, left: list[Gap]) -> None:
-    """The hearing of the timing chosen, with what was asked again. Until 2026-11-08 one stretch
-    left without words meant the hearing was not kept and every run paid to listen again."""
+    """The hearing, with what was asked again. Until 2026-11-08 one stretch left without words
+    meant the hearing was not kept and every run paid to listen again. A backup engine's hearing
+    is never kept: the chosen engine is tried again on the next run (2026-11-08: one busy answer
+    from it kept the backup's hearing until the person asked to listen again)."""
+    if heard.backup:
+        return
     keep_heard(job.cache, heard)
     asked.save()
-    if left:
-        print(f"coverage: {len(left)} stretch(es) of speech still have no words; the hearing is "
-              f"kept and only they are asked about again on the next run ({TRIES} times at "
-              "most)", flush=True)
+    if open_gaps(left):
+        print(f"coverage: {len(open_gaps(left))} stretch(es) of speech still have no words; the "
+              f"hearing is kept and only they are asked about again on the next run ({TRIES} "
+              "times at most)", flush=True)
 
 
 def relistener(provider: str, video: Path, asked: Asked) -> Relisten | None:

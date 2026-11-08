@@ -9,9 +9,13 @@ clip whose subtitles drift from the voice can be told from one that does not.
 
 Since 2026-11-08 the speech left out is filled once, before either timing, and both timings work
 on the same repaired lines: before, each timing filled it again, asking Gemini again about the
-same stretches, and kept the hearing it made, so the kept hearing could be the losing one's. The
-hearing is kept only once the timing is chosen, and a timing whose words are found too seldom
-where they are placed is not kept to be replayed on every later run.
+same stretches, and kept the hearing it made, so the kept hearing could be the losing one's.
+
+Since 2026-11-08 the hearing is kept as soon as the lines are mended, before either timing, and
+again with the fills of the timing chosen. The transcript is worth keeping whenever no speech is
+left to ask about again, whatever share of its words is found where they are timed: that share is
+kept beside it (findings.py) so the job still warns, where before such a clip was timed again in
+full on every run with the same result.
 """
 from collections.abc import Callable
 from dataclasses import dataclass, field, replace
@@ -20,9 +24,9 @@ from typing import TYPE_CHECKING, Any
 from tarjim.asr.base import Transcript
 from tarjim.asr.sanity import implausible
 from tarjim.job import Job
-from tarjim.listen.coverage import Gap, Hearing
+from tarjim.listen.coverage import Gap, Hearing, open_gaps
 from tarjim.listen.gemini_listen import Utterance
-from tarjim.listen.merge import Heard
+from tarjim.listen.merge import Fill, Heard
 from tarjim.models import Word
 
 # The share of words found where they are timed that needs no second try. Measured on the
@@ -45,29 +49,43 @@ class Sound:
 @dataclass(frozen=True)
 class Timed:
     transcript: Transcript
-    whole: bool  # it covers all the speech and follows the voice, so it is worth keeping
+    whole: bool  # no speech is left to ask about again, so it is worth keeping
     agreement: float | None
     added: list[Utterance] = field(default_factory=list)  # what the words' check filled
-    left: list[Gap] = field(default_factory=list)  # speech still without words, shown on the job
+    # speech still without words, shown on the job, with the stretches given up
+    left: list[Gap] = field(default_factory=list)
     passes: int = 0  # how often the clip's letters were heard so far in this run
 
 
-def worth_keeping(left: list[Gap], agreement: float | None) -> bool:
-    """No speech left out, and the words found where they are placed when that can be told: a
-    timing found 10% where it was placed was kept and replayed on every run (2026-11-08)."""
-    return not left and (agreement is None or agreement >= IN_SYNC)
+def worth_keeping(left: list[Gap]) -> bool:
+    """No speech left to ask about again. Changed 2026-11-08: a timing whose words were found
+    seldom where they are placed was not kept either, and every later run timed it again."""
+    return not open_gaps(left)
 
 
-def placed(heard: Heard, opinion: list[Word],
-           duration: float) -> tuple[list[Utterance], list[Utterance]]:
+def by_time(lines: list[Utterance]) -> list[Utterance]:
+    return sorted(lines, key=lambda u: u.start)
+
+
+@dataclass(frozen=True)
+class Placed:
+    own: list[Utterance]  # at the listener's own times
+    moved: list[Utterance]  # at the times the audio backs
+    fills: list[Fill]  # the kept fills still needed
+
+
+def placed(heard: Heard, opinion: list[Word], duration: float) -> Placed:
     """The hearing the audio backs most, with what filled the stretches it left out on an earlier
-    run: at the listener's own times, and at the times the audio backs."""
+    run, while the lines chosen now still leave them out (listen/fills.py)."""
     from tarjim.asr.anchor import anchor
+    from tarjim.listen.fills import still_needed
     from tarjim.listen.recover import best_heard
 
     chosen = best_heard(heard.utterances, heard.passes, opinion)
-    return (sorted([*chosen, *heard.added], key=lambda u: u.start),
-            sorted([*anchor(chosen, opinion, duration), *heard.added], key=lambda u: u.start))
+    moved = anchor(chosen, opinion, duration)
+    fills = still_needed(heard.added, moved)
+    extra = [fill.line for fill in fills]
+    return Placed(by_time([*chosen, *extra]), by_time([*moved, *extra]), fills)
 
 
 def trusted(words: list[Word], opinion: list[Word]) -> list[Word]:
@@ -89,7 +107,7 @@ def timed(repair: "Repair", hearing: Hearing, sound: Sound) -> Timed:
     text = " ".join(u.text for u in checked.utterances)
     agreement = timer.agreement(words)
     return Timed(Transcript(language=repair.language, text=text, words=words),
-                 worth_keeping(checked.left, agreement), agreement, checked.added, checked.left,
+                 worth_keeping(checked.left), agreement, checked.added, checked.left,
                  timer.passes())
 
 
@@ -115,18 +133,21 @@ def told(kept: Timed, last: Timed) -> Timed:
 
 
 def settled(job: Job, heard: Heard, sound: Sound, opinion: list[Word]) -> Timed:
-    """Speech left out filled once, the lines timed with the second opinion and, when that is off
-    the voice, without it; the hearing kept with the fills of the timing chosen."""
+    """Speech left out filled once and the hearing kept, the lines timed with the second opinion
+    and, when that is off the voice, without it; the hearing kept with the fills of the timing
+    chosen."""
+    from tarjim.listen.asked import Asked
     from tarjim.listen.check import keep, repaired
-    from tarjim.listen.kept import Asked
 
-    own, moved = placed(heard, opinion, len(sound.wav) / sound.rate)
+    found = placed(heard, opinion, len(sound.wav) / sound.rate)
     asked = Asked.load(job.cache)
-    repair = repaired(job, heard, Hearing(moved, opinion, sound.speech), asked)
+    repair = repaired(job, heard, Hearing(found.moved, opinion, sound.speech), asked)
+    fills = [*found.fills, *repair.mended.fills]
+    keep(job, replace(heard, added=fills), asked, [])  # before any timing (2026-11-08)
     first = timed(repair, Hearing(repair.mended.utterances, opinion, sound.speech), sound)
-    lines = sorted([*own, *repair.mended.added], key=lambda u: u.start)
+    lines = by_time([*found.own, *repair.mended.added])
     chosen = better(first, lambda: timed(repair, Hearing(lines, [], sound.speech), sound),
                     bool(opinion))
-    fills = [*heard.added, *repair.mended.added, *chosen.added]
-    keep(job, replace(heard, added=fills), asked, chosen.left)
+    words = [Fill(line) for line in chosen.added]  # judged by their words on a later run
+    keep(job, replace(heard, added=[*fills, *words]), asked, chosen.left)
     return chosen

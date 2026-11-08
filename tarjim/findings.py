@@ -33,9 +33,13 @@ class Findings:
     sounds: list[int] = field(default_factory=list)  # lines left empty as only a sound (Mm, Uh)
     over_budget: list[int] = field(default_factory=list)  # longer than their time allows
     stopped: Exception | None = None  # why an engine stopped, when lines were left as said
+    # speech no listener heard and that is not asked about again (2026-11-08: it was not listed,
+    # and a transcript kept with it showed plain success on every later run)
+    given_up: list[Span] = field(default_factory=list)
 
-    def heard(self, left: tuple[Span, ...], agreement: float | None) -> None:
-        self.left, self.agreement = list(left), agreement
+    def heard(self, left: tuple[Span, ...], agreement: float | None,
+              given_up: tuple[Span, ...] = ()) -> None:
+        self.left, self.agreement, self.given_up = list(left), agreement, list(given_up)
 
     def notes(self, cues: list[Cue], issues: list[Issue]) -> list[Note]:
         """What the page lists under the finished job; a problem says the job is done with
@@ -48,7 +52,8 @@ class Findings:
 
         sounds = set(self.sounds)  # left empty on purpose; the check counts them untranslated
         readable = [*self.over_budget, *(i.number for i in issues if i.kind in READABILITY)]
-        rows = [note("speech_left", [start for start, _end in self.left]),
+        left = sorted(start for start, _end in [*self.left, *self.given_up])
+        rows = [note("speech_left", left),
                 note("in_source", at(self.in_source)), *self.stop(),
                 note("untranslated", at([n for n in kind("untranslated") if n not in sounds])),
                 note("overlap", at(kind("overlap"))),
@@ -68,14 +73,18 @@ class Findings:
                  "reason": classify(self.stopped), "detail": evidence(str(self.stopped))}]
 
     def remember(self, cache: Path) -> None:
-        """Kept with the transcript, so a re-run from it still shows the timing check."""
-        (cache / TIMING).write_text(json.dumps({"agreement": self.agreement}), encoding="utf-8")
+        """Kept with the transcript, so a re-run from it still shows the timing check and the
+        speech given up."""
+        kept = {"agreement": self.agreement, "given_up": self.given_up}
+        (cache / TIMING).write_text(json.dumps(kept), encoding="utf-8")
 
     def recall(self, cache: Path) -> None:
         """The check of a kept transcript; one kept before 2026-11-08 has none: unchecked."""
         kept = cache / TIMING
         if kept.exists():
-            self.agreement = json.loads(kept.read_text(encoding="utf-8")).get("agreement")
+            data = json.loads(kept.read_text(encoding="utf-8"))
+            self.agreement = data.get("agreement")
+            self.given_up = [(float(a), float(b)) for a, b in data.get("given_up") or []]
 
     def timing(self) -> list[Note]:
         if self.agreement is None or self.agreement >= IN_SYNC:

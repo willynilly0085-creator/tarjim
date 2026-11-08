@@ -24,6 +24,14 @@ class Gap:
     end: float
     speech: float  # seconds of speech inside
     words: list[Word]  # what this computer heard inside
+    # no listener heard it and it is not asked about again: still listed on the job, but it does
+    # not stop the transcript being kept (2026-11-08: it was dropped, and the job looked whole)
+    given_up: bool = False
+
+
+def open_gaps(left: list[Gap]) -> list[Gap]:
+    """The stretches that are still asked about on the next run."""
+    return [gap for gap in left if not gap.given_up]
 
 
 @dataclass(frozen=True)

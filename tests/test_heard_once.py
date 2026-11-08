@@ -8,6 +8,7 @@ import pytest
 from test_coverage_flow import LOCAL, SPOKEN, Engine, everything, said, setup
 
 from tarjim import config, hearing
+from tarjim.findings import FINDINGS, Findings
 from tarjim.listen import check, timing
 from tarjim.listen.coverage import Gap, Hearing
 from tarjim.listen.gemini_listen import Utterance
@@ -89,19 +90,32 @@ def test_both_timings_share_one_repair_and_the_winner_is_kept(
     events = off_the_voice(monkeypatch, 0.9)
     transcript = hearing.transcript_for(job, lambda _stage: None)
     assert "on the sound alone, 90% found" in capsys.readouterr().out
-    assert engine.asked == 1 and events == ["timed", "timed", "kept"]
+    # changed 2026-11-08: the hearing is also kept before the first timing, so a crash during
+    # a long timing does not throw away a hearing that was paid for (tests/test_kept_early.py)
+    assert engine.asked == 1 and events == ["kept", "timed", "timed", "kept"]
     assert said(transcript) == everything()
     kept = json.loads((job.cache / "heard.json").read_text(encoding="utf-8"))
     assert len(kept["added"]) == 13 and (job.cache / "transcript.json").exists()
 
 
-def test_a_timing_found_seldom_where_it_is_placed_is_not_kept(
+def test_a_timing_found_seldom_where_it_is_placed_is_kept_with_its_share(
         tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Changed 2026-11-08: such a timing was not kept, and every later run timed the whole clip
+    again on this computer with the same result. It is kept with the share found, so a run from
+    it still warns that the subtitles may not follow the voice, and nothing is timed again."""
     job = setup(monkeypatch, tmp_path, Engine(list(SPOKEN)))
-    off_the_voice(monkeypatch, 0.05)
-    hearing.transcript_for(job, lambda _stage: None)
-    assert (job.cache / "heard.json").exists()
-    assert not (job.cache / "transcript.json").exists()
+    events = off_the_voice(monkeypatch, 0.05)
+    found = [Findings(), Findings()]
+    for record in found:  # each run is a job of its own, with its own record
+        token = FINDINGS.set(record)
+        try:
+            hearing.transcript_for(job, lambda _stage: None)
+        finally:
+            FINDINGS.reset(token)
+        assert (job.cache / "heard.json").exists() and (job.cache / "transcript.json").exists()
+    assert [record.agreement for record in found] == [0.1, 0.1]
+    assert [n["kind"] for n in found[1].notes([], [])] == ["timing"]
+    assert events.count("timed") == 2  # the second run timed nothing
 
 
 def test_a_missing_local_listener_is_said_once_with_why(

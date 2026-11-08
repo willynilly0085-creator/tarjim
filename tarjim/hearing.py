@@ -4,11 +4,11 @@ from pathlib import Path
 
 from tarjim import media
 from tarjim.asr.base import Transcript
-from tarjim.asr.sanity import implausible
 from tarjim.findings import findings
 from tarjim.gemini_client import QuotaExhausted
 from tarjim.job import Job, checkpoint
-from tarjim.listen.kept import HEARD, forget, keep_transcript, kept_transcript, load_heard
+from tarjim.listen.asked import TRIES
+from tarjim.listen.kept import forget, keep_heard, keep_transcript, load_heard, reusable
 from tarjim.listen.merge import Heard
 from tarjim.models import Word
 
@@ -31,25 +31,12 @@ def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcrip
         transcript, lasting = hear(job, audio, report)
     finally:
         audio.unlink(missing_ok=True)
-    if lasting:  # a backup's hearing, one that left speech out, or hearing nothing, is tried
-        # afresh on the next run
+    if lasting:  # a backup's hearing, one that left speech to ask about again, or hearing
+        # nothing, is tried afresh on the next run; one off the voice is kept with its share
+        # found, so the job still warns (2026-11-08)
         keep_transcript(job.cache, transcript)
         findings().remember(job.cache)
     return transcript
-
-
-def reusable(cache: Path) -> Transcript | None:
-    """The kept transcript, when the code and settings running now derived it and a person could
-    speak its timing. Since 2026-11-08 another key means it is derived again from the kept
-    hearing, on this computer: a timing kept by older code was replayed on every run."""
-    found = kept_transcript(cache)
-    if found is None or implausible(found[0].words):
-        return None  # a broken timing kept by an older run is made again
-    if not found[1] and (cache / HEARD).exists():
-        print("timing: the kept transcript was made by other code or settings; it is made "
-              "again from the kept hearing, with no new listening", flush=True)
-        return None
-    return found[0]
 
 
 def hear(job: Job, audio: Path, report: Callable[[str], None]) -> tuple[Transcript, bool]:
@@ -68,18 +55,28 @@ def hear(job: Job, audio: Path, report: Callable[[str], None]) -> tuple[Transcri
 
 
 def heard_for(job: Job, audio: Path) -> Heard:
-    """What was heard before, or a new hearing; kept only once its coverage is checked."""
-    return load_heard(job.cache) or listen_video(job.video, audio)
+    """What was heard before, or a new hearing; kept once the lines are checked. A cloud hearing
+    with no speech in it is kept too and heard again at most TRIES times across runs, or until
+    the person asks to listen again (2026-11-08: it was paid for in full on every run)."""
+    kept = load_heard(job.cache)
+    if kept is not None and (kept.utterances or kept.empty >= TRIES):
+        return kept
+    heard = listen_video(job.video, audio)
+    if not heard.utterances and heard.local_words is None and not heard.backup:
+        keep_heard(job.cache, replace(heard, empty=(kept.empty if kept else 0) + 1))
+    return heard
 
 
 def listen_video(video: Path, audio: Path) -> Heard:
+    """The chosen engine's hearing, or a backup's, marked so it is used but never kept."""
     from tarjim.engines.choice import chain
 
     failures: list[Exception] = []
-    for provider in chain("listen"):
+    for rank, provider in enumerate(chain("listen")):
         checkpoint()  # a backup engine is never started for a job that was cancelled
         try:
-            return replace(listen_with(provider, video, audio), provider=provider)
+            heard = listen_with(provider, video, audio)
+            return replace(heard, provider=provider, backup=rank > 0)
         except (RuntimeError, OSError) as error:
             failures.append(error)
     raise failures[-1] if failures else RuntimeError("no listening engine")
@@ -147,10 +144,11 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     local = heard.local_words
     opinion = second_opinion(audio, heard.language) if local is None else local
     done = settled(job, heard, Sound(wav, rate, regions_in(wav)), opinion)
-    # shown on the job (2026-11-08)
-    findings().heard(tuple((g.start, g.end) for g in done.left), done.agreement)
+    # shown on the job, the stretches given up too (2026-11-08)
+    findings().heard(tuple((g.start, g.end) for g in done.left if not g.given_up),
+                     done.agreement, tuple((g.start, g.end) for g in done.left if g.given_up))
     words = by_voice(done.transcript.words, wav, rate)
-    return replace(done.transcript, words=words), done.whole
+    return replace(done.transcript, words=words), done.whole and not heard.backup
 
 
 def second_opinion(audio: Path, language: str = "") -> list[Word]:
@@ -169,12 +167,15 @@ def second_opinion(audio: Path, language: str = "") -> list[Word]:
 
 
 def local_transcript(audio: Path, failure: RuntimeError | None = None) -> Transcript:
-    """What is left when the chosen listener heard nothing or failed. Without the local
-    listener, the person sees the chosen listener's own error; a video in which it heard no
-    speech (music alone) gets no subtitles."""
+    """What is left when the chosen listener heard nothing or failed. When the local listener
+    cannot run, the person sees the chosen listener's own error; a video in which it heard no
+    speech (music alone) gets no subtitles. Since 2026-11-08 a computer too weak to run it (out
+    of memory) is that case too, where before the job failed with the memory error."""
     try:
         return qwen_transcript(audio)
-    except (OSError, ImportError) as error:
+    except (RuntimeError, ValueError, MemoryError, OSError, ImportError) as error:
+        print(f"listening: the listener on this computer could not stand in "
+              f"({type(error).__name__}: {str(error)[:200]})", flush=True)
         if failure is not None:
             raise failure from error
         return Transcript(language="", text="")

@@ -1,15 +1,17 @@
 """Each stretch of speech the transcript left out is heard again by the same engine, alone; when
 that brings nothing, the words this computer heard there fill it. What cannot be filled is said in
 the log. Since 2026-11-08 the hearing is kept all the same and only that stretch is asked about
-again on the next run, at most TRIES times in all (listen/kept.py); after that it is left as it
-is, and the log says no listener heard it."""
+again on the next run, at most TRIES times in all (listen/asked.py); after that it is left as it
+is, and the log says no listener heard it. Since 2026-11-08 such a stretch is still listed (given
+up), so the job page shows it, where before it was dropped and the job looked whole."""
 from collections.abc import Callable
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 
 from tarjim.job import checkpoint
-from tarjim.listen.coverage import Gap, Hearing, gaps
+from tarjim.listen.asked import TRIES, Spent
+from tarjim.listen.coverage import Gap, Hearing, gaps, open_gaps
 from tarjim.listen.gemini_listen import Utterance
-from tarjim.listen.kept import TRIES, Spent
+from tarjim.listen.merge import Fill
 from tarjim.listen.vote import norm
 from tarjim.models import Word
 from tarjim.scripts import split_words
@@ -22,6 +24,7 @@ LINE_WORDS = 12
 TURN_GAP = 0.3  # seconds: a line this close to a turn goes on with it
 MAIN = "S1"  # the speaker of a line with no turn heard anywhere
 NOT_REPAIRED = "not repaired"
+NOT_ASKED = "not asked again"
 
 Relisten = Callable[[float, float], list[Utterance]]  # asked about a gap, in clip times
 
@@ -30,11 +33,12 @@ Relisten = Callable[[float, float], list[Utterance]]  # asked about a gap, in cl
 class Mended:
     utterances: list[Utterance]
     added: list[Utterance]
-    left: list[Gap]
+    left: list[Gap]  # with the stretches given up, which do not count against `whole`
+    fills: list[Fill] = field(default_factory=list)  # what was added, with the stretch it filled
 
     @property
     def whole(self) -> bool:
-        return not self.left
+        return not open_gaps(self.left)
 
 
 def tokens(text: str) -> set[str]:
@@ -147,7 +151,7 @@ class Mender:
         if not asking:
             heard = ("the local words here repeat a line timed elsewhere" if gap.words
                      else "heard by no listener")
-            return f"{heard}; not asked again ({TRIES} times at most), left as it is"
+            return f"{heard}; {NOT_ASKED} ({TRIES} times at most), left as it is"
         return NOT_REPAIRED
 
     def fill(self, gap: Gap, lines: list[Utterance]) -> tuple[list[Utterance], str]:
@@ -161,14 +165,22 @@ class Mender:
         return [], self.unfilled(gap, heard is not None)
 
     def mend(self, found: list[Gap] | None = None) -> Mended:
-        lines, added, left = list(self.hearing.utterances), [], []
+        lines, left = list(self.hearing.utterances), []
+        fills: list[Fill] = []
         for gap in gaps(self.hearing) if found is None else found:
             fresh, outcome = self.fill(gap, lines)
             print(f"coverage: {self.label}{described(gap)} -> {outcome}", flush=True)
             lines.extend(fresh)
-            added.extend(fresh)
-            left.extend([gap] if outcome == NOT_REPAIRED else [])
-        return Mended(sorted(lines, key=lambda u: u.start), added, left)
+            fills.extend(Fill(line, (gap.start, gap.end)) for line in fresh)
+            left.extend(still_left(gap, outcome))
+        return Mended(sorted(lines, key=lambda u: u.start), [f.line for f in fills], left, fills)
+
+
+def still_left(gap: Gap, outcome: str) -> list[Gap]:
+    """The stretch, when nothing filled it: to be asked again, or given up but still listed."""
+    if outcome == NOT_REPAIRED:
+        return [gap]
+    return [replace(gap, given_up=True)] if NOT_ASKED in outcome else []
 
 
 def mend(hearing: Hearing, relisten: Relisten | None, name: str) -> Mended:

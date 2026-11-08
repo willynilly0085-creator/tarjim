@@ -85,7 +85,55 @@ def test_the_code_key_does_not_depend_on_line_ends(
 
 
 def test_the_key_covers_the_code_that_derives_a_transcript() -> None:
-    names = {p.relative_to(kept.ROOT).as_posix() for name in kept.DERIVED_FROM
-             for p in kept.sources(kept.ROOT / name)}
-    assert {"listen/settle.py", "asr/align.py", "segment.py", "dialogue.py",
-            "model_pins.py"} <= names
+    """Changed 2026-11-08: the key covered only the files named, so a fix to who a line is given
+    to (speakers.py), how words are split (scripts.py), the words themselves (models.py) or the
+    local words' language (translate/glossary.py) never reached a clip done before it."""
+    names = {p.relative_to(kept.ROOT).as_posix() for p in kept.key_files()}
+    assert {"listen/settle.py", "asr/align.py", "segment.py", "dialogue.py", "model_pins.py",
+            "speakers.py", "scripts.py", "models.py", "translate/glossary.py"} <= names
+    assert "server/app.py" not in names  # what the page runs derives nothing
+
+
+def key_of(root: Path, files: dict[str, str], monkeypatch: pytest.MonkeyPatch) -> str:
+    for name, text in files.items():
+        (root / name).parent.mkdir(parents=True, exist_ok=True)
+        (root / name).write_text(text, encoding="utf-8")
+    monkeypatch.setattr(kept, "ROOT", root)
+    monkeypatch.setattr(kept, "DERIVED_FROM", ("listen",))
+    return kept.code_key.__wrapped__()
+
+
+def test_the_key_follows_what_the_code_imports_at_the_top(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    tree = {"listen/a.py": "from tarjim.helper import split\n\n\ndef f():\n"
+                           "    from tarjim.engine import ask\n",
+            "helper.py": "from tarjim import deeper\n", "deeper.py": "x = 1\n",
+            "engine.py": "y = 1\n"}
+    first = key_of(tmp_path / "one", tree, monkeypatch)
+    assert key_of(tmp_path / "two", {**tree, "deeper.py": "x = 2\n"}, monkeypatch) != first
+    assert key_of(tmp_path / "three", {**tree, "engine.py": "y = 2\n"}, monkeypatch) == first
+
+
+NOT_DERIVING = {"__init__.py", "config.py", "vault.py", "gemini_client.py", "google_ai.py",
+                "engines/catalog.py", "tool_catalog.py", "findings.py", "qa.py"}
+
+
+def test_the_key_leaves_out_what_changes_every_release_and_derives_nothing() -> None:
+    """2026-11-08: `from tarjim import media` took in tarjim/__init__.py, whose version changes
+    with every release, and hearing.py's imports took in the settings, the key vault and the
+    engines; every release then timed every kept clip again on this computer."""
+    names = {p.relative_to(kept.ROOT).as_posix() for p in kept.key_files()}
+    assert not names & NOT_DERIVING
+
+
+def test_a_new_version_alone_keeps_the_key(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    tree = {"__init__.py": '__version__ = "1.0.69"\n',
+            "listen/a.py": "from tarjim import helper\nfrom tarjim.config import setting\n",
+            "helper.py": "x = 1\n", "config.py": "setting = 1\n"}
+    first = key_of(tmp_path / "one", tree, monkeypatch)
+    assert key_of(tmp_path / "two", {**tree, "__init__.py": '__version__ = "1.0.70"\n'},
+                  monkeypatch) == first
+    assert key_of(tmp_path / "three", {**tree, "config.py": "setting = 2\n"},
+                  monkeypatch) == first
+    assert key_of(tmp_path / "four", {**tree, "helper.py": "x = 2\n"}, monkeypatch) != first

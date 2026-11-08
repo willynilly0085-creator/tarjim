@@ -123,7 +123,8 @@ def test_a_sentence_left_out_inside_a_stretched_line_is_heard_again(
     starts = [w.start for w in transcript.words]
     assert starts == sorted(starts)
     kept = json.loads((job.cache / "heard.json").read_text(encoding="utf-8"))
-    assert [u["text"] for u in kept["added"]] == [SPOKEN[12].text]
+    # since 2026-11-08 a fill is kept with the stretch it filled (listen/merge.Fill)
+    assert [u["line"]["text"] for u in kept["added"]] == [SPOKEN[12].text]
 
 
 def test_when_hearing_again_fails_the_local_words_fill_it(
