@@ -1,6 +1,8 @@
 """When the chosen listener fails or hears nothing: the person sees the listener's own error when
-nothing can stand in for it, a video with no speech finishes with no subtitles, a backup's or an
-empty hearing is not kept for the next run, and the local listener is not run twice."""
+nothing can stand in for it, a video with no speech finishes with no subtitles, a backup's hearing
+is not kept for the next run (an empty one is kept with a count since 2026-11-08), and the local
+listener is not run twice."""
+import json
 from pathlib import Path
 from typing import Any
 
@@ -62,7 +64,9 @@ def test_a_video_with_no_speech_finishes_with_no_subtitles(
     answering(monkeypatch, Heard("", [], [[]]))
     monkeypatch.setattr(hearing, "qwen_transcript", not_installed)
     assert hearing.transcript_for(job, lambda _stage: None).words == []
-    assert not (job.cache / "heard.json").exists()
+    # changed 2026-11-08: the empty hearing is kept with a count, so it is not paid for in full
+    # on every run (tests/test_kept_listener.py); the transcript is still not kept
+    assert json.loads((job.cache / "heard.json").read_text(encoding="utf-8"))["empty"] == 1
     assert not (job.cache / "transcript.json").exists()
 
 

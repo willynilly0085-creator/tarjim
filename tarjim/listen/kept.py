@@ -1,42 +1,61 @@
 """The hearing kept beside a clip's other work, so a re-run does not pay to listen again, with the
-stretches asked about again and the transcript made from it. "Listen again" forgets them all.
+stretches asked about again (listen/asked.py) and the transcript made from it. "Listen again"
+forgets them all.
 
 Since 2026-11-08 a hearing that left speech out is kept too: before, one stretch nothing could fill
 made every later run pay to listen to the whole clip again, and a computer without the local
 listener listened again forever. Now only the stretches left out are asked about again, each at
 most TRIES times across runs (listen/repair.py). The transcript carries a key made from the code
-and the settings it was derived with; another key means it is derived again from the kept hearing,
-with no new listening, so a fix reaches a clip done before it.
+(listen/derive.py) and the settings it was derived with; another key means it is derived again
+from the kept hearing, with no new listening, so a fix reaches a clip done before it.
+
+Since 2026-11-08 a long clip's hearing keeps each piece with its own passes, so it is voted again
+piece by piece as it was heard (listen/chunks.joined); one kept before that is used as it was
+voted. Each fill keeps the stretch it filled (listen/fills.py judges it again on every run).
 """
 import functools
 import hashlib
 import json
-from collections.abc import Callable, Sequence
-from dataclasses import asdict, dataclass, field, replace
+from dataclasses import asdict
 from pathlib import Path
+from typing import Any
 
 from tarjim.asr.base import Transcript
+from tarjim.asr.sanity import implausible
+from tarjim.listen.asked import ASKED, TRIES, Asked, Spent
+from tarjim.listen.chunks import joined
+from tarjim.listen.derive import with_imports
 from tarjim.listen.gemini_listen import Utterance
-from tarjim.listen.merge import Heard, agreed
+from tarjim.listen.merge import Fill, Heard, Piece
 from tarjim.models import Word
 
 HEARD = "heard.json"
-ASKED = "asked.json"
 TRANSCRIPT = "transcript.json"
 MADE_FROM_IT = "cues.*.json"
 DERIVE = "derive"
-TRIES = 2  # times a stretch is answered when asked about again, across runs
-SAME = 0.5  # share of the shorter of two stretches they share: the same stretch
-PAD = 0.75  # seconds of sound either side of a stretch, so its first and last words are whole
 ROOT = Path(__file__).resolve().parent.parent
+# with every tarjim module these import at the top (listen/derive.py)
 DERIVED_FROM = ("listen", "asr", "segment.py", "dialogue.py", "model_pins.py", "hearing.py")
 
-Span = tuple[float, float]
-Relisten = Callable[[float, float], list[Utterance]]  # what is said in a stretch, in clip times
+Row = dict[str, Any]
+# the record of stretches asked again lived here before 2026-11-08 (now listen/asked.py)
+__all__ = ["ASKED", "TRIES", "Asked", "Spent"]
 
 
-class Spent(Exception):
-    """The stretch was asked about TRIES times already: it is not asked again."""
+def lines_of(rows: list[Row] | None) -> list[Utterance]:
+    return [Utterance(**row) for row in rows or []]
+
+
+def fill_of(row: Row) -> Fill:
+    """A kept fill; one kept before 2026-11-08 is a bare line, with no stretch."""
+    if "line" not in row:
+        return Fill(Utterance(**row))
+    gap = row.get("gap")
+    return Fill(Utterance(**row["line"]), None if gap is None else (float(gap[0]), float(gap[1])))
+
+
+def piece_of(row: Row) -> Piece:
+    return Piece(float(row["start"]), float(row["end"]), [lines_of(run) for run in row["passes"]])
 
 
 def load_heard(cache: Path) -> Heard | None:
@@ -44,13 +63,14 @@ def load_heard(cache: Path) -> Heard | None:
     if not kept.exists():
         return None
     data = json.loads(kept.read_text(encoding="utf-8"))
+    pieces = [piece_of(row) for row in data.get("pieces") or []]
+    voted, passes = joined(pieces) if pieces else (
+        lines_of(data["utterances"]), [lines_of(run) for run in data.get("passes") or []])
     words = data.get("local_words")
-    passes = [[Utterance(**u) for u in run] for run in data.get("passes") or []]
-    voted = agreed(passes) if passes else [Utterance(**u) for u in data["utterances"]]
     return Heard(data["language"], voted, passes,
                  None if words is None else [Word(**w) for w in words],
-                 str(data.get("provider") or ""),
-                 [Utterance(**u) for u in data.get("added") or []])
+                 str(data.get("provider") or ""), [fill_of(row) for row in data.get("added") or []],
+                 pieces, empty=int(data.get("empty") or 0))
 
 
 def keep_heard(cache: Path, heard: Heard) -> None:
@@ -58,104 +78,20 @@ def keep_heard(cache: Path, heard: Heard) -> None:
                                encoding="utf-8")
 
 
-def same(span: Sequence[float], start: float, end: float) -> bool:
-    shared = min(span[1], end) - max(span[0], start)
-    return shared >= SAME * min(span[1] - span[0], end - start)
-
-
-def inside(line: Utterance, start: float, end: float) -> Utterance:
-    return replace(line, start=max(line.start, start), end=min(line.end, end))
-
-
-def heard_span(start: float, end: float) -> Span:
-    """The sound asked about for a stretch: the stretch and PAD either side."""
-    return max(0.0, start - PAD), end + PAD
-
-
-@dataclass
-class Asked:
-    """Each stretch asked about again. Within a job, what was heard: a stretch inside sound heard
-    already is answered from it, never paid for again (2026-11-08: the second timing asked Gemini
-    about the same gaps again, up to six requests a gap). Across runs, how often it was answered:
-    a request that failed is no try, or two busy hours gave the speech up for good (2026-11-08)."""
-    path: Path
-    tries: list[list[float]]  # [start, end, times answered]
-    answers: list[tuple[Span, list[Utterance]]] = field(default_factory=list)
-    counted: list[Span] = field(default_factory=list)  # counted in this job
-
-    @classmethod
-    def load(cls, cache: Path) -> "Asked":
-        try:
-            data = json.loads((cache / ASKED).read_text(encoding="utf-8"))
-            tries = [[float(a), float(b), int(n)] for a, b, n in data["asked"]]
-        except (OSError, ValueError, KeyError, TypeError):
-            tries = []
-        return cls(cache / ASKED, tries)
-
-    def save(self) -> None:
-        self.path.write_text(json.dumps({"asked": self.tries}), encoding="utf-8")
-
-    def known(self, start: float, end: float) -> list[Utterance] | None:
-        """The lines of sound heard already that holds the whole stretch, within the sound this
-        stretch asks about. Until 2026-11-08 the sound asked for was compared, so a gap moved by a
-        tenth of a second, as between the two timings, was paid for again."""
-        low, high = heard_span(start, end)
-        for (first, last), lines in self.answers:
-            if first <= start and end <= last:
-                return [inside(u, low, high) for u in lines if low <= (u.start + u.end) / 2 <= high]
-        return None
-
-    def entry(self, span: Span) -> list[float] | None:
-        return next((t for t in self.tries if same(t, *span)), None)
-
-    def this_job(self, span: Span) -> bool:
-        return any(same(c, *span) for c in self.counted)
-
-    def allow(self, span: Span) -> None:
-        entry = self.entry(span)
-        if entry is not None and entry[2] >= TRIES and not self.this_job(span):
-            raise Spent(f"{span[0]:.1f}-{span[1]:.1f} s was answered {TRIES} times")
-
-    def count(self, span: Span) -> None:
-        """One try for an answered stretch, once a job: more sound beside a stretch asked in this
-        job is the same stretch, not another try."""
-        if self.this_job(span):
-            return
-        self.counted.append(span)
-        entry = self.entry(span)
-        if entry is None:
-            self.tries.append([*span, 1])
-        else:
-            entry[2] += 1
-
-    def asking(self, relisten: Relisten) -> Relisten:
-        """`relisten` asked about a stretch's sound (heard_span), through this record."""
-        def once(start: float, end: float) -> list[Utterance]:
-            known = self.known(start, end)
-            if known is not None:
-                return known
-            span = heard_span(start, end)
-            self.allow(span)
-            lines: list[Utterance] = []
-            try:  # a failed request is answered with nothing for the rest of the job
-                lines = relisten(*span)
-                self.count(span)
-            finally:
-                self.answers.append((span, lines))
-            return lines
-
-        return once
-
-
 def sources(path: Path) -> list[Path]:
     return sorted(path.rglob("*.py")) if path.is_dir() else [path]
+
+
+def key_files() -> list[Path]:
+    """The files named and every tarjim module they import at the top (2026-11-08)."""
+    return with_imports([p for name in DERIVED_FROM for p in sources(ROOT / name)], ROOT)
 
 
 @functools.cache
 def code_key() -> str:
     """The code the transcript is derived with, the same on every system (line ends aside)."""
     digest = hashlib.sha256()
-    for path in sorted(p for name in DERIVED_FROM for p in sources(ROOT / name)):
+    for path in key_files():
         digest.update(path.relative_to(ROOT).as_posix().encode())
         digest.update(path.read_bytes().replace(b"\r\n", b"\n"))
     return digest.hexdigest()
@@ -185,6 +121,20 @@ def kept_transcript(cache: Path) -> tuple[Transcript, bool] | None:
         return Transcript(words=words, **data), current
     except (OSError, ValueError, KeyError, TypeError):
         return None
+
+
+def reusable(cache: Path) -> Transcript | None:
+    """The kept transcript, when the code and settings running now derived it and a person could
+    speak its timing. Since 2026-11-08 another key means it is derived again from the kept
+    hearing, on this computer: a timing kept by older code was replayed on every run."""
+    found = kept_transcript(cache)
+    if found is None or implausible(found[0].words):
+        return None  # a broken timing kept by an older run is made again
+    if not found[1] and (cache / HEARD).exists():
+        print("timing: the kept transcript was made by other code or settings; it is made "
+              "again from the kept hearing, with no new listening", flush=True)
+        return None
+    return found[0]
 
 
 def forget(cache: Path) -> None:

@@ -11,7 +11,7 @@ from itertools import pairwise
 
 from tarjim.job import checkpoint
 from tarjim.listen.gemini_listen import Utterance
-from tarjim.listen.merge import Heard
+from tarjim.listen.merge import Heard, Piece, agreed
 
 CHUNK_SECONDS = 75.0
 SEARCH_SHARE = 0.2  # a cut is looked for this share of a piece either side of its target
@@ -75,12 +75,22 @@ def listen_one(span: Span, listen_span: ListenSpan) -> Heard:
 
 def listen_in_chunks(duration: float, regions: list[Span], listen_span: ListenSpan,
                      target: float | None = None) -> Heard:
-    pieces = [(span, listen_one(span, listen_span))
-              for span in spans(duration, regions, target)]
-    utterances = [u for span, heard in pieces for u in shift(heard.utterances, span)]
-    rounds = max(len(heard.passes) for _, heard in pieces)
-    passes = [[u for span, heard in pieces if k < len(heard.passes)
-               for u in shift(heard.passes[k], span)] for k in range(rounds)]
+    heard = [(span, listen_one(span, listen_span)) for span in spans(duration, regions, target)]
+    pieces = [Piece(start, end, one.passes) for (start, end), one in heard]
     if len(pieces) > 1:
         print(f"listening: {len(pieces)} pieces, cut in pauses", flush=True)
-    return Heard(pieces[0][1].language, utterances, passes)
+    utterances, passes = joined(pieces)
+    return Heard(heard[0][1].language, utterances, passes, pieces=pieces)
+
+
+def joined(pieces: list[Piece]) -> tuple[list[Utterance], list[list[Utterance]]]:
+    """The clip's lines, each piece's passes voted on their own (merge.agreed), and its passes,
+    pass k being every piece's k-th pass. The same for a fresh hearing and a kept one, so a kept
+    hearing is voted again exactly as it was heard (2026-11-08: the joined passes were voted,
+    and one broken line in one piece cost a reply in another). A listener heard once (OpenAI)
+    votes to its own pass, less any line no one could speak, as a kept one already did."""
+    utterances = [u for p in pieces for u in shift(agreed(p.passes), p.span)]
+    rounds = max(len(p.passes) for p in pieces)
+    passes = [[u for p in pieces if k < len(p.passes) for u in shift(p.passes[k], p.span)]
+              for k in range(rounds)]
+    return utterances, passes

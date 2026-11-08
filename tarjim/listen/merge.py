@@ -13,6 +13,29 @@ PASSES = 3
 CLOSE = 0.9
 
 Listen = Callable[[], tuple[str, list[Utterance]]]
+Span = tuple[float, float]
+
+
+@dataclass(frozen=True)
+class Piece:
+    """A piece of the clip heard on its own, with its passes at the piece's own times: a kept
+    hearing is voted again piece by piece, the way it was heard (2026-11-08: the passes were
+    voted again joined, so one broken line in one piece cost a reply in another)."""
+    start: float
+    end: float
+    passes: list[list[Utterance]]
+
+    @property
+    def span(self) -> Span:
+        return self.start, self.end
+
+
+@dataclass(frozen=True)
+class Fill:
+    """A line that filled speech the hearing left out, and the stretch it filled; no stretch for
+    the words' check's fills and those kept before 2026-11-08, which are judged by their words."""
+    line: Utterance
+    gap: Span | None = None
 
 
 @dataclass(frozen=True)
@@ -23,7 +46,10 @@ class Heard:
     # the words the local listener heard, when it was the listener: its own second opinion
     local_words: list[Word] | None = None
     provider: str = ""  # the engine that heard it: a stretch it left out is asked of it again
-    added: list[Utterance] = field(default_factory=list)  # what filled those stretches
+    added: list[Fill] = field(default_factory=list)  # what filled those stretches
+    pieces: list[Piece] = field(default_factory=list)  # how a cloud listener heard it
+    backup: bool = False  # heard by an engine after the chosen one: used, never kept
+    empty: int = 0  # times the clip was heard with no speech in it, across runs
 
 
 def listen_many(listen: Listen, passes: int = PASSES) -> Heard:
@@ -56,9 +82,11 @@ def sane(run: list[Utterance]) -> list[Utterance]:
 def agreed(runs: list[list[Utterance]]) -> list[Utterance]:
     """The vote over the lines a person could have spoken: a pass that put the whole speech in
     one 129-second line once became the vote's base and broke every time (asr/sanity.py). The
-    agreement needed follows the passes that heard anything (vote.majority)."""
-    cleaned = [sane(run) for run in runs]
-    kept = ordered(cleaned if any(cleaned) else runs)
+    agreement needed follows the passes that heard anything (vote.majority). A pass left with
+    nothing is left out of the vote and of `settled` (2026-11-08: it counted as a pass that
+    heard nothing, so the fullest pass no longer stood and the hearing could come out empty)."""
+    cleaned = [run for whole in runs if (run := sane(whole))]
+    kept = ordered(cleaned or runs)
     return settled(vote(kept), kept)
 
 
