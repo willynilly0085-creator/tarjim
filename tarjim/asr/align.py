@@ -5,8 +5,9 @@ from typing import Any
 
 import numpy as np
 
-from tarjim.asr.ctc import FRAME, Emitter, Piece, Span, token_spans
+from tarjim.asr.ctc import FRAME, Emitter, Span, token_spans
 from tarjim.asr.groups import chunks, densest, quietest, tell_evened, windows
+from tarjim.asr.letters import Piece
 from tarjim.asr.numbers import said
 from tarjim.asr.qwen import core
 from tarjim.listen.gemini_listen import Utterance

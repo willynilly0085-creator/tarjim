@@ -36,6 +36,7 @@ class Timed:
     transcript: Transcript
     whole: bool  # it covers all the speech, so it is worth keeping
     agreement: float | None
+    passes: int = 0  # how often the clip's letters were heard so far in this run
 
 
 def placed(heard: Heard, opinion: list[Word], duration: float) -> list[Utterance]:
@@ -67,7 +68,7 @@ def timed(job: Job, heard: Heard, sound: Sound, opinion: list[Word]) -> Timed:
     words = trusted(checked.words, opinion)
     text = " ".join(u.text for u in checked.utterances)
     transcript = Transcript(language=heard.language, text=text, words=words)
-    return Timed(transcript, not checked.left, timer.agreement(words))
+    return Timed(transcript, not checked.left, timer.agreement(words), timer.passes())
 
 
 def share(agreement: float | None) -> str:
@@ -79,7 +80,14 @@ def settled(job: Job, heard: Heard, sound: Sound, opinion: list[Word]) -> Timed:
     first = timed(job, heard, sound, opinion)
     print(f"timing check: {share(first.agreement)} where they are timed", flush=True)
     if not opinion or first.agreement is None or first.agreement >= IN_SYNC:
-        return first
+        return told(first, first)
     alone = timed(job, heard, sound, [])
     print(f"timing check: on the sound alone, {share(alone.agreement)}", flush=True)
-    return alone if (alone.agreement or 0.0) > first.agreement else first
+    return told(alone if (alone.agreement or 0.0) > first.agreement else first, alone)
+
+
+def told(kept: Timed, last: Timed) -> Timed:
+    """How often the whole clip's letters were heard in this run, said once at its end: once is
+    right, more means a slice or a check heard the sound again (2026-11-08)."""
+    print(f"timing: the aligner heard the clip's letters {last.passes} time(s)", flush=True)
+    return kept

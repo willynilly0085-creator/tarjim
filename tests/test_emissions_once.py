@@ -9,7 +9,8 @@ import pytest
 
 from tarjim.asr import align, vad
 from tarjim.asr.align import AlignEngine
-from tarjim.asr.ctc import FRAME, Letters, piece
+from tarjim.asr.ctc import FRAME
+from tarjim.asr.letters import Letters, piece
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.timing import Timer
 
@@ -65,8 +66,7 @@ def hearing(monkeypatch: pytest.MonkeyPatch) -> Hearing:
     return heard
 
 
-def test_a_stretch_and_the_check_read_the_letters_heard_once(
-        hearing: Hearing, capsys: pytest.CaptureFixture[str]) -> None:
+def test_a_stretch_and_the_check_read_the_letters_heard_once(hearing: Hearing) -> None:
     lines = [Utterance(2.5, 4.5, "S1", "alpha"), Utterance(24.5, 26.5, "S1", "bravo")]
     timer = Timer(clip(), RATE, "English", [])
     whole = timer.whole(lines)
@@ -74,9 +74,7 @@ def test_a_stretch_and_the_check_read_the_letters_heard_once(
     assert abs(again[0].start - 25.0) < 0.1 and abs(again[0].end - 25.3) < 0.1
     assert timer.agreement(whole) == 1.0
     assert Timer(timer.wav, RATE, "English", []).agreement(again) == 1.0
-    assert hearing.passes == [SECONDS]
-    told = [line for line in capsys.readouterr().out.splitlines() if "clip's letters" in line]
-    assert told == ["timing: the aligner heard the clip's letters 1 time(s)"] * 2
+    assert hearing.passes == [SECONDS] and timer.passes() == 1
 
 
 def test_a_stretch_starts_on_a_frame_of_the_whole_clip() -> None:
@@ -100,3 +98,33 @@ def test_only_the_last_clip_is_kept() -> None:
     letters(second)
     letters(first)
     assert heard.passes == [SECONDS, 10.0, SECONDS]
+    assert letters.count(first) == 3 and letters.count(second) == 2  # every pass since it came
+    assert letters.count(clip()) == 0
+
+
+def timings(passes: list[int]) -> Any:
+    from tarjim.asr.base import Transcript
+    from tarjim.listen import settle
+
+    asked: list[int] = []
+
+    def timed(_job: Any, _heard: Any, _sound: Any, _opinion: Any) -> settle.Timed:
+        asked.append(1)
+        count = passes[len(asked) - 1]
+        return settle.Timed(Transcript("Somali", "x"), True, 0.1 * len(asked), count)
+
+    return timed
+
+
+def test_the_passes_are_told_once_a_run_even_when_it_is_timed_twice(
+        monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    """On 2026-11-08 the count was told after every timing, twice when a run timed again."""
+    from tarjim.listen import settle
+    from tarjim.listen.merge import Heard
+    from tarjim.models import Word
+
+    monkeypatch.setattr(settle, "timed", timings([1, 2]))
+    settle.settled(None, Heard("Somali", [], []), settle.Sound(None, 1, []),  # type: ignore[arg-type]
+                   [Word("hi", 0.0, 0.3)])
+    told = [line for line in capsys.readouterr().out.splitlines() if "clip's letters" in line]
+    assert told == ["timing: the aligner heard the clip's letters 2 time(s)"]

@@ -1,14 +1,14 @@
 """Word times for lines: the forced aligner, then the local listener's times where the aligner put a
 line's words outside it (asr/fuse.py). Lines added after the first alignment are aligned in their
 own stretch of sound, whose letters are read from those the aligner heard in the whole clip once
-(asr/ctc.Piece), so the clip is never heard again in full or in part (2026-11-08). Lines far apart
-are aligned each in its own stretch, since one search over both pulled the words of a line at
-130 s to 198 s and 232 s, toward the other line at 234 s (2026-11-08)."""
+(asr/letters.Piece), so the clip is never heard again in full or in part (2026-11-08). Lines far
+apart are aligned each in its own stretch, since one search over both pulled the words of a line
+at 130 s to 198 s and 232 s, toward the other line at 234 s (2026-11-08)."""
 from dataclasses import dataclass, replace
 from typing import Any
 
-from tarjim.asr.ctc import piece
 from tarjim.asr.fuse import fuse
+from tarjim.asr.letters import piece
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
 
@@ -60,6 +60,15 @@ class Timer:
         with heavy():
             score = scorer(shared_aligner(), self.wav)
             return share_found(score, words) if score and words else None
+
+    def passes(self) -> int:
+        """How often the aligner heard this clip's letters (asr/letters.Letters); 0 when it cannot
+        be told. The aligner is already made: the check above made it."""
+        from tarjim.asr.align import shared_aligner
+        from tarjim.asr.letters import Letters
+
+        letters = getattr(getattr(shared_aligner(), "emitter", None), "emissions", None)
+        return letters.count(self.wav) if isinstance(letters, Letters) else 0
 
     def aligned(self, sound: Any, utterances: list[Utterance]) -> list[Word]:
         from tarjim.asr.align import shared_aligner

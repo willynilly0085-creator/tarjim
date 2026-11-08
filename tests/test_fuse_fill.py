@@ -11,7 +11,7 @@ from tarjim.models import Word
 
 def test_a_run_of_unheard_words_shares_the_gap_by_length() -> None:
     texts = ["three", "two", "personally,", "zero"]
-    spans = fill(texts, [(1.0, 1.2), None, None, (3.0, 3.2)])
+    spans = fill(texts, [(1.0, 1.2), None, None, (3.0, 3.2)], (0.0, 9.0))
     middle = spans[1:3]
     assert middle[0][0] == 1.2 and middle[-1][1] == 3.0
     assert all(end > start for start, end in middle)
@@ -21,7 +21,7 @@ def test_a_run_of_unheard_words_shares_the_gap_by_length() -> None:
 
 
 def test_unheard_words_at_either_end_are_not_zero_long() -> None:
-    spans = fill(["a", "b", "c", "d"], [None, (2.0, 2.3), (2.4, 2.6), None])
+    spans = fill(["a", "b", "c", "d"], [None, (2.0, 2.3), (2.4, 2.6), None], (0.0, 9.0))
     assert spans[0][1] == 2.0 and spans[0][1] > spans[0][0]
     assert spans[-1][0] == 2.6 and spans[-1][1] > spans[-1][0]
 

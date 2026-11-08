@@ -13,7 +13,7 @@ from typing import Any
 
 import numpy as np
 
-from tarjim.asr.ctc import FRAME, Letters, token_spans
+from tarjim.asr.ctc import FRAME, token_spans
 from tarjim.models import Word
 
 SLACK = 0.5  # seconds of sound either side of a run's own time
@@ -55,9 +55,7 @@ def scorer(engine: Any, wav: Any) -> Score | None:
     emitter = getattr(engine, "emitter", None)
     if emitter is None:
         return None
-    logp = emitter.emissions(wav)  # the whole clip's letters, heard once (asr/ctc.Letters)
-    if isinstance(emitter.emissions, Letters):
-        emitter.emissions.tell(wav)
+    logp = emitter.emissions(wav)  # the whole clip's letters, heard once (asr/letters.Letters)
     return lambda run: run_score(logp, run, engine.tokens)
 
 

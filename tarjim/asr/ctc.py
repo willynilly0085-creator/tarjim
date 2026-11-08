@@ -1,6 +1,3 @@
-import math
-from collections.abc import Callable
-from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
@@ -84,73 +81,6 @@ def span_of(logp: np.ndarray, frames: list[int], token: int) -> Span:
     return frames[0] * FRAME, (frames[-1] + 1) * FRAME, score
 
 
-Key = tuple[int, int, bytes]
-
-
-def fingerprint(wav: Any) -> Key:
-    """The same sound: the same array, length and samples taken across it."""
-    samples = np.asarray(wav, dtype=np.float32)
-    return id(wav), len(samples), samples[:: max(1, len(samples) // 64)].tobytes()
-
-
-@dataclass(frozen=True)
-class Piece:
-    """A stretch of a longer sound that knows where it sits in it, so its letters are read from
-    the whole sound's, heard once, and the stretch is never heard again (2026-11-08)."""
-    clip: Any
-    rate: int
-    first: int  # the whole sound's frame it starts on
-    past: int  # the frame it ends before
-
-    @property
-    def start(self) -> float:
-        return self.first * FRAME
-
-    def sound(self) -> Any:
-        hop = self.rate * FRAME
-        return self.clip[round(self.first * hop):round(self.past * hop)]
-
-    def __len__(self) -> int:
-        return len(self.sound())
-
-    def __getitem__(self, key: Any) -> Any:
-        return self.sound()[key]
-
-    def __array__(self, dtype: Any = None, copy: bool | None = None) -> np.ndarray:
-        return np.asarray(self.sound(), dtype=dtype)
-
-
-def piece(clip: Any, rate: int, low: float, high: float) -> Piece:
-    """The sound from low to high seconds, widened to whole frames of the clip."""
-    return Piece(clip, rate, int(max(0.0, low) / FRAME + EPSILON),
-                 math.ceil(high / FRAME - EPSILON))
-
-
-class Letters:
-    """The letters heard in one whole sound, kept for that sound alone, so a weak computer holds
-    one clip's (about 45 MB for two hours) and a slice or a check never hears it again."""
-
-    def __init__(self, hear: Callable[[Any], np.ndarray]) -> None:
-        self.hear = hear
-        self.last: tuple[Key, np.ndarray] | None = None
-        self.passes: tuple[Key | None, int] = (None, 0)
-
-    def __call__(self, wav: Any) -> np.ndarray:
-        if isinstance(wav, Piece):
-            return self(wav.clip)[wav.first:wav.past]
-        key = fingerprint(wav)
-        if self.last is None or self.last[0] != key:
-            self.last = None  # the clip before is let go before the next is heard
-            self.last = (key, self.hear(wav))
-            self.passes = (key, self.passes[1] + 1 if self.passes[0] == key else 1)
-        return self.last[1]
-
-    def tell(self, wav: Any) -> None:
-        """How often the whole clip was heard, said once its lines are timed: once is right."""
-        count = self.passes[1] if self.passes[0] == fingerprint(wav) else 0
-        print(f"timing: the aligner heard the clip's letters {count} time(s)", flush=True)
-
-
 class Emitter:
     MODEL = "MahmoudAshraf/mms-300m-1130-forced-aligner"
     WINDOW = 30.0
@@ -161,6 +91,7 @@ class Emitter:
         import torch
         from transformers import AutoModelForCTC, AutoTokenizer
 
+        from tarjim.asr.letters import Letters
         from tarjim.device import best_device, precision
         from tarjim.model_pins import folder
 

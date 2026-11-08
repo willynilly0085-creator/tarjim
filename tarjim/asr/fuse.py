@@ -1,7 +1,7 @@
 import bisect
 from difflib import SequenceMatcher
 
-from tarjim.asr.align import Slot, fill_gaps, longest, overlapping
+from tarjim.asr.align import Slot, fill_gaps, longest, overlapping, share
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.vote import norm
 from tarjim.models import Word
@@ -34,25 +34,44 @@ def matched(group: list[Word], nearby: list[Word]) -> dict[int, Word]:
     return {a + k: nearby[b + k] for a, b, size in blocks for k in range(size)}
 
 
-def retime(group: list[Word], utterance: Utterance, heard: list[Word]) -> list[Word] | None:
+def retime(group: list[Word], utterance: Utterance, heard: list[Word],
+           limits: Limits) -> list[Word] | None:
     nearby = [w for w in heard
               if utterance.start - SEARCH <= w.start <= utterance.end + SEARCH]
     pairs = matched(group, nearby)
     if 2 * len(pairs) < len(group) or not inside(pairs[min(pairs)].start, utterance):
         return None
     times = [(pairs[i].start, pairs[i].end) if i in pairs else None for i in range(len(group))]
-    spans = fill([w.text for w in group], times)
+    own = max(limits[0], utterance.start), min(limits[1], utterance.end)
+    spans = fill([w.text for w in group], times, own)
     return [Word(w.text, *span, w.speaker) for w, span in zip(group, spans, strict=True)]
 
 
-def fill(texts: list[str], times: list[tuple[float, float] | None]) -> list[tuple[float, float]]:
+def fill(texts: list[str], times: list[tuple[float, float] | None],
+         room: Limits) -> list[tuple[float, float]]:
     """Words the local listener did not hear share the time between the words around them, each
     by its length, as the aligner's own do (asr/align.fill_gaps). Before 2026-11-08 the second
     and later of a run all sat on one instant, zero long."""
     slots = [Slot(text, "", 0, *(span or (0.0, 0.0)), timed=span is not None)
              for text, span in zip(texts, times, strict=True)]
     fill_gaps(slots)
+    kept_in(slots, room)
     return [(slot.start, slot.end) for slot in slots]
+
+
+def kept_in(slots: list[Slot], room: Limits) -> None:
+    """Unheard words before the first heard one or after the last share only the room the line
+    has: its own time and the turns around it. A fixed length past the heard words crossed a
+    close neighbour, the retime was refused and the line stayed seconds off (2026-11-08); with
+    no room left they sit on the heard word's edge, as they did before."""
+    heard = [index for index, slot in enumerate(slots) if slot.timed]
+    first, last = heard[0], heard[-1]
+    if first:
+        after = slots[first].start
+        share(slots[:first], min(after, max(room[0], slots[0].start)), after)
+    if last < len(slots) - 1:
+        before = slots[last].end
+        share(slots[last + 1:], before, max(before, min(room[1], slots[-1].end)))
 
 
 def fits(group: list[Word], floor: float, ceiling: float) -> bool:
@@ -75,7 +94,7 @@ def room(index: int, groups: list[list[Word]], over: list[bool], floor: float) -
 
 def retimed(group: list[Word], utterance: Utterance, heard: list[Word],
             limits: Limits) -> list[Word]:
-    better = retime(group, utterance, heard)
+    better = retime(group, utterance, heard, limits)
     return capped(better) if better and fits(better, *limits) else group
 
 
