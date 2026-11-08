@@ -133,5 +133,5 @@ def settled(job: Job, heard: Heard, sound: Sound, opinion: list[Word]) -> Timed:
                     bool(opinion))
     words = [Fill(line) for line in chosen.added]  # judged by their words on a later run
     keep(job, replace(heard, added=[*fills, *words]), asked, chosen.left)
-    paid(asked)
+    paid(asked, chosen.left)
     return chosen

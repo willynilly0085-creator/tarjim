@@ -159,3 +159,23 @@ def test_asks_made_because_the_transcript_is_derived_again_say_so(
     assert engine.asked == 1 and "paid ask 1 of 9" in log
     assert "because the kept transcript is derived again" in log
 
+
+
+def test_the_note_lists_only_refused_speech_the_chosen_timing_left_open(tmp_path: Path) -> None:
+    """Both timings ask through one budget (listen/settle.py): a stretch only the timing not
+    chosen asked about, and was refused, is not left open by the chosen one, so the note must
+    not tell the person to translate again for it (2026-11-08)."""
+    from tarjim.listen.check import paid
+
+    asked = Asked.load(tmp_path, Budget(0, 0.0, 3))
+    for start, end in [(20.0, 23.0), (50.0, 53.0), (80.0, 83.0)]:
+        with pytest.raises(Refused):
+            asked.asking(Counting())(start, end)
+    left = [Gap(20.0, 23.0, 3.0, []), Gap(80.5, 83.0, 2.5, [], given_up=True)]
+    record = Findings()
+    token = FINDINGS.set(record)
+    try:
+        paid(asked, left)
+    finally:
+        FINDINGS.reset(token)
+    assert record.refused == [(20.0, 23.0)]  # the open gap, at its own times

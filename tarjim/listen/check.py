@@ -13,7 +13,7 @@ from typing import Any
 from tarjim import media
 from tarjim.findings import findings
 from tarjim.job import Job
-from tarjim.listen.asked import TRIES, Asked
+from tarjim.listen.asked import TRIES, Asked, same
 from tarjim.listen.coverage import Gap, Hearing, open_gaps
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.kept import keep_heard
@@ -62,11 +62,13 @@ def keep(job: Job, heard: Heard, asked: Asked, left: list[Gap]) -> None:
               "times at most)", flush=True)
 
 
-def paid(asked: Asked) -> None:
-    """What the job paid to ask again, said once; the stretches its budget refused are listed on
-    the job page (2026-11-08). They are open too, so the next run asks them."""
+def paid(asked: Asked, left: list[Gap]) -> None:
+    """What the job paid to ask again, said once; the speech its budget refused is listed on the
+    job page (2026-11-08), at the times of the stretches the chosen timing left open: both timings
+    ask through one budget, and a stretch refused to the other one is not open in this one."""
     spent = asked.budget
-    findings().refused = sorted(set(spent.refused))
+    findings().refused = [(gap.start, gap.end) for gap in open_gaps(left)
+                          if any(same(span, gap.start, gap.end) for span in spent.refused)]
     if spent.made or spent.refused:
         print(spent.said(), flush=True)
 
