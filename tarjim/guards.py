@@ -10,6 +10,8 @@ line, and are kept on the job's findings.
 """
 import threading
 from collections import Counter
+from collections.abc import Iterator
+from contextlib import contextmanager
 from contextvars import ContextVar
 
 # Every guard, so each shows in the counts with 0 when it never fired.
@@ -49,6 +51,7 @@ NAMES = (
 
 COUNTS: ContextVar[Counter[str] | None] = ContextVar("guards", default=None)
 COUNTING = threading.Lock()  # a job's listening passes run in threads of their own
+QUIET: ContextVar[bool] = ContextVar("guards_quiet", default=False)
 
 
 def reset() -> None:
@@ -64,8 +67,22 @@ def current() -> Counter[str]:
     return found
 
 
+@contextmanager
+def quiet() -> Iterator[None]:
+    """Nothing counts inside: work done again by a later step that counts it. Each decision
+    counts once, at the step whose result the job keeps (2026-11-08: one broken line counted
+    three times on a fresh hearing and twice on a kept one, so the two never matched)."""
+    token = QUIET.set(True)
+    try:
+        yield
+    finally:
+        QUIET.reset(token)
+
+
 def fired(name: str, times: int = 1) -> None:
     """The guard `name` fired `times` times."""
+    if QUIET.get():
+        return
     found = current()
     with COUNTING:
         found[name] += max(times, 0)

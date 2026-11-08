@@ -70,9 +70,11 @@ def shift(utterances: list[Utterance], span: Span, tag: str = "") -> list[Uttera
 
 
 def listen_one(span: Span, listen_span: ListenSpan) -> Heard:
-    """Each chunk is a step of its own: the person's pause or cancel takes effect before it."""
+    """Each chunk is a step of its own: the person's pause or cancel takes effect before it. Its
+    passes are voted again in `joined`, which counts the vote (guards.quiet, 2026-11-08)."""
     checkpoint()
-    return listen_span(*span)
+    with guards.quiet():
+        return listen_span(*span)
 
 
 def listen_in_chunks(duration: float, regions: list[Span], listen_span: ListenSpan,

@@ -35,8 +35,10 @@ def support(run: list[Utterance], local: list[str]) -> float:
 
 def cleaned(passes: list[list[Utterance]]) -> list[list[Utterance]]:
     """Each pass without its broken lines (merge.sane), in the vote's own order so a tie falls
-    the same way whatever order the passes arrived in (2026-11-08)."""
-    return ordered([run for whole in passes if (run := sane(whole))])
+    the same way whatever order the passes arrived in (2026-11-08). Not counted: `joined` already
+    counted these lines when it voted each piece (guards.quiet, 2026-11-08)."""
+    with guards.quiet():
+        return ordered([run for whole in passes if (run := sane(whole))])
 
 
 def fuller(voted: list[Utterance], passes: list[list[Utterance]]) -> list[Utterance]:

@@ -144,3 +144,39 @@ def test_the_second_timing_and_the_trusted_words_are_counted() -> None:
     spoken = [Word(f"w{k}", k * 0.4, k * 0.4 + 0.3) for k in range(40)]
     assert trusted(squeezed, spoken) == spoken
     assert count("settle.trusted") == 1 and count("sanity.implausible") == 1
+
+
+def test_quiet_counts_nothing_and_counting_resumes_after() -> None:
+    with guards.quiet():
+        guards.fired("vote.extras", 3)
+        assert not guards.when("merge.fullest", False) and guards.when("merge.fullest", True)
+    guards.fired("vote.extras")
+    assert (count("vote.extras"), count("merge.fullest")) == (1, 0)
+
+
+def test_one_broken_line_counts_once_fresh_and_kept_alike(tmp_path: Path) -> None:
+    """Each decision counts once: a piece's passes voted in listen_many are voted again in
+    chunks.joined, and recover.cleaned cleans the passes joined already cleaned (2026-11-08:
+    one broken line counted three times fresh and twice kept)."""
+    from tarjim.listen.chunks import listen_in_chunks
+    from tarjim.listen.kept import keep_heard, load_heard
+    from tarjim.listen.merge import listen_many
+    from tarjim.listen.recover import best_heard
+
+    good = [U(10.0, 60.0, "S1", " ".join(["talk"] * 300))]
+    runs = iter([[*good, U(61.0, 61.1, "S1", " ".join(["word"] * 20))], good, good])
+    lock = threading.Lock()
+
+    def listen() -> tuple[str, list[Utterance]]:
+        with lock:
+            return "English", list(next(runs))
+
+    heard = listen_in_chunks(70.0, [], lambda _s, _e: listen_many(listen), 75.0)
+    best_heard(heard.utterances, heard.passes, [])
+    fresh = count("merge.sane_line"), count("vote.extras")
+    keep_heard(tmp_path, heard)
+    guards.reset()
+    kept = load_heard(tmp_path)
+    assert kept is not None
+    best_heard(kept.utterances, kept.passes, [])
+    assert fresh == (count("merge.sane_line"), count("vote.extras")) and fresh[0] == 1
