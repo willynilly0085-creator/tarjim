@@ -20,6 +20,7 @@ import tempfile
 from pathlib import Path
 
 from tarjim.media import picture, run, source, tool, video_kbps
+from tarjim.prefs.active import active
 from tarjim.render.encoders import for_quality
 from tarjim.render.mark import LOGO, Mark, overlay, with_mark
 from tarjim.render.sharp import Enlarged, drawn_size, enlarged, grown, scale_filter
@@ -27,6 +28,9 @@ from tarjim.whole import whole
 
 PLAIN = "subtitles.ass"
 HEADROOM = 1.15
+# The person's output.quality (2026-11-09): a higher quality aims lower (encoders.AIMS) and
+# may spend more than the source did, or the aim is held back by the ceiling.
+HEADROOMS = {"normal": HEADROOM, "high": 1.6}
 WEIGHTS = {"av1": 2.0, "vp9": 1.6, "hevc": 1.6}
 # Left as it is, a 10-bit or 4:2:2 source gives an H.264 that phones and browsers refuse.
 PLAYABLE = ",format=yuv420p"
@@ -49,10 +53,13 @@ def drawing(mark: Mark | None, by: Enlarged | None = None) -> list[str]:
             + overlay(grown(mark, by), "subtitled") + PLAYABLE]
 
 
-def enlargement(folder: Path) -> Enlarged | None:
-    """How much to enlarge the picture, from the size the subtitle file was laid out for."""
+def enlargement(folder: Path, frame: str = "1080") -> Enlarged | None:
+    """How much to enlarge the picture, from the size the subtitle file was laid out for, up
+    to the frame the person chose (output.enlarge)."""
     drawn = folder / PLAIN
-    return enlarged(drawn_size(drawn.read_text(encoding="utf-8"))) if drawn.is_file() else None
+    if not drawn.is_file():
+        return None
+    return enlarged(drawn_size(drawn.read_text(encoding="utf-8")), frame)
 
 
 def sound_codecs(video: Path) -> list[str]:
@@ -85,18 +92,21 @@ def ceiling_kbps(video: Path) -> int:
 
 
 def encode(video: Path, target: Path, folder: Path, mark: Mark | None) -> Path:
-    by = enlargement(folder)
+    chosen = active().output  # the job's own (2026-11-09)
+    by = enlargement(folder, chosen.enlarge)
     base = [tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "error", *source(video),
             *drawing(mark, by), *sound(sound_codecs(video)), "-movflags", "+faststart"]
-    rate = round(ceiling_kbps(video) * (by.factor if by else 1.0))
+    more = HEADROOMS.get(chosen.quality, HEADROOM) / HEADROOM
+    rate = round(ceiling_kbps(video) * more * (by.factor if by else 1.0))
     with whole(target) as part:
-        first_that_works(base, rate, part, folder)
+        first_that_works(base, (rate, chosen.quality), part, folder)
     return target
 
 
-def first_that_works(base: list[str], rate: int, part: Path, folder: Path) -> None:
+def first_that_works(base: list[str], aim: tuple[int, str], part: Path, folder: Path) -> None:
+    rate, quality = aim
     errors, limit = [], ceiling(rate)
-    for encoder in for_quality(rate):
+    for encoder in for_quality(rate, quality):
         result = run([*base, *encoder, *limit, str(part)], cwd=folder)
         if result.returncode == 0 and part.exists() and part.stat().st_size > 0:
             return

@@ -14,7 +14,8 @@ const state = { file: null, poll: 0, wired: false, recalled: false, languages: n
 const LINKED = { eleven: "voiceEleven", elevenclone: "voiceElevenClone", speech: "voiceSpeech" };
 const KEYED = { gemini: "gemini", fish: "fish", fishvoice: "fish" };
 const SEND = { "bad url": "sendBadLink", file: "sendFileBroken", big: "sendTooBig",
-  dub_language: "sendDubLanguage", dub_key: "sendDubKey", list: "err_list", mode: "actionFailed" };
+  dub_language: "sendDubLanguage", dub_key: "sendDubKey", list: "err_list", mode: "actionFailed",
+  dialect: "actionFailed", tweaks: "sendTweaks" };
 
 const linkReady = () => /^https?:\/\//i.test($("link").value.trim()) && !qualityBlocked();
 const ready = () => Boolean(state.file) || linkReady();

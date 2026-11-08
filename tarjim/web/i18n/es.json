@@ -474,6 +474,7 @@
   "sendDubKey": "Esta voz necesita su clave. Añádela en Ajustes o elige otra voz.",
   "pageExpired": "Esta página está desactualizada. Recárgala y vuelve a intentarlo.",
   "actionFailed": "No funcionó. Vuelve a intentarlo.",
+  "sendTweaks": "One of this video's own changes can't be used. Open the settings to see why.",
   "actionGone": "El archivo ya no está donde tarjim lo guardó. Puede que se haya movido o borrado.",
   "actionStale": "Este trabajo cambió antes de que llegara tu petición. Mira en qué punto está ahora.",
   "actionOpen": "Este equipo no pudo abrir el archivo. Muéstralo en su carpeta.",

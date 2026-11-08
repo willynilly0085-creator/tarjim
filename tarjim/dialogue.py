@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from tarjim.models import Cue, Word, join_words
 from tarjim.rules import Rules
 
-MAX_SPEAKERS = 2
+MAX_SPEAKERS = 2  # the default of rules.max_speakers, a setting since 2026-11-09
 EDGE = 0.05
 
 
@@ -71,7 +71,7 @@ def room_for(cue: Cue, piece: Piece, rules: Rules) -> bool:
     if not piece.new_speaker:
         return not cue.is_dialogue or fits_one_line(cue.parts[-1] + piece.words, rules)
     parts = [*cue.parts, piece.words]
-    return len(parts) <= MAX_SPEAKERS and all(fits_one_line(part, rules) for part in parts)
+    return len(parts) <= rules.max_speakers and all(fits_one_line(part, rules) for part in parts)
 
 
 def fits_one_line(words: list[Word], rules: Rules) -> bool:
@@ -108,7 +108,7 @@ def take_reply(cues: list[Cue], reply: list[Word], rules: Rules) -> list[Cue]:
         return [*cues, cue_of([Reply(reply)])]
     host = cues[index]
     parts = in_time(host.parts, Reply(reply))
-    if len(parts) <= MAX_SPEAKERS and all(fits_one_line(part, rules) for part in parts):
+    if len(parts) <= rules.max_speakers and all(fits_one_line(part, rules) for part in parts):
         cues[index] = cue_of(parts)
         return cues
     if reply[0].start < host.start:  # said before the turn: nothing of it to cut away

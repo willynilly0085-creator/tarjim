@@ -61,11 +61,16 @@ def heard_nothing(hearing: Hearing, gap: Gap) -> bool:
 
 
 def gap_seconds() -> float:
-    """The person's setting `coverage_gap_seconds`."""
-    from tarjim.config import setting
+    """The job's listen.gap_seconds (2026-11-09); TARJIM_COVERAGE_GAP_SECONDS still sets it."""
+    import os
 
+    from tarjim.prefs.active import active
+
+    raw = os.environ.get("TARJIM_COVERAGE_GAP_SECONDS", "")
+    if not raw:
+        return float(active().listen.gap_seconds)
     try:
-        return max(float(setting("coverage_gap_seconds") or GAP_SECONDS), 0.1)
+        return max(float(raw), 0.1)
     except ValueError:
         return GAP_SECONDS
 

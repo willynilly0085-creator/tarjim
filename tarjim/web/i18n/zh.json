@@ -474,6 +474,7 @@
   "sendDubKey": "这个语音需要它的密钥。请在设置中添加，或选择其他语音。",
   "pageExpired": "此页面已过期。请刷新后重试。",
   "actionFailed": "没有成功，请重试。",
+  "sendTweaks": "One of this video's own changes can't be used. Open the settings to see why.",
   "actionGone": "文件已不在 tarjim 保存的位置，可能已被移动或删除。",
   "actionStale": "在你的请求送达前，这个任务已经变化。请查看它现在的进度。",
   "actionOpen": "这台电脑无法打开该文件。请改为在文件夹中显示。",

@@ -4,7 +4,7 @@ import unicodedata
 from tarjim.rules import DEFAULT_RULES, Rules
 
 SEPARATOR = "||"
-DASH = "- "
+DASH = "- "  # the default of rules.dash, the person's choice since 2026-11-09
 LEADING_DASH = re.compile(r"^\s*[-–—]\s*")
 CLAUSE_END = ("،", ",", ".", "؟", "?", "!", "؛", ":", "。", "，", "、", "！", "？", "：")
 CLAUSE_BONUS = 12
@@ -44,12 +44,12 @@ def text_parts(text: str) -> list[str]:
 def display_lines(text: str, rules: Rules = DEFAULT_RULES) -> list[str]:
     if SEPARATOR not in text:
         return balance_lines(text, rules)
-    return [DASH + part for part in text_parts(text)]
+    return [rules.dash + part for part in text_parts(text)]
 
 
 def balance_lines(text: str, rules: Rules = DEFAULT_RULES) -> list[str]:
     text = " ".join(text.split())
-    if len(text) <= rules.line_chars:
+    if len(text) <= rules.line_chars or rules.max_lines == 1:  # one line asked (2026-11-09)
         return [text]
     joiner = " " if rules.spaced else ""
     units = text.split(" ") if rules.spaced else clusters(text)

@@ -15,6 +15,7 @@ from tarjim.phone.meter import shown
 from tarjim.phone.progress import Follower
 from tarjim.phone.telegram import Bot, TelegramError, note
 from tarjim.phone.words import say
+from tarjim.server.orders import stamped
 
 # Why an order cannot be made, in the page's own words (web/workspace.js).
 REFUSED = {"dub_language": "sendDubLanguage", "dub_key": "sendDubKey"}
@@ -68,7 +69,7 @@ class Starting:
             source = self.fetched(bot, item, message)
         except (TelegramError, OSError):
             return bot.edit(chat, message, say("phone_fetch_failed"))
-        task = self.follower.jobs.submit(order_for(source, item, mode, dialect))
+        task = self.follower.jobs.submit(stamped(order_for(source, item, mode, dialect)))
         self.follower.adopt(bot, chat, message, task)
         return None
 

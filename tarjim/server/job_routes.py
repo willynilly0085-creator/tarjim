@@ -19,6 +19,8 @@ def refusal(order: Order) -> str:
         return "mode"
     if order.dialect not in DIALECTS:  # the prompt looked it up mid-job (2026-11-09)
         return "dialect"
+    if order.tweaks and tweak_refused(order):
+        return "tweaks"
     if order.mode not in DUBBING:
         return ""
     from tarjim.dub.make import DubUnavailable, choose
@@ -28,6 +30,15 @@ def refusal(order: Order) -> str:
     except DubUnavailable as error:
         return "dub_key" if "API key" in str(error) else "dub_language"
     return ""
+
+
+def tweak_refused(order: Order) -> bool:
+    """One of the order's own changes is not a setting, is not for one video, or breaks a
+    rule: refused before the job starts (2026-11-09)."""
+    from tarjim.prefs.job import vetted
+    from tarjim.prefs.store import load
+
+    return bool(vetted(load().values, order.tweaks, order.target))
 
 
 class JobRoutes:

@@ -474,6 +474,7 @@
   "sendDubKey": "Suara ini memerlukan kuncinya. Tambahkan di Pengaturan atau pilih suara lain.",
   "pageExpired": "Halaman ini sudah usang. Muat ulang lalu coba lagi.",
   "actionFailed": "Itu tidak berhasil. Coba lagi.",
+  "sendTweaks": "One of this video's own changes can't be used. Open the settings to see why.",
   "actionGone": "File tidak lagi berada di tempat tarjim menyimpannya. Mungkin sudah dipindah atau dihapus.",
   "actionStale": "Pekerjaan ini berubah sebelum permintaanmu sampai. Lihat posisinya sekarang.",
   "actionOpen": "Komputer ini tidak bisa membuka file. Tampilkan di foldernya saja.",

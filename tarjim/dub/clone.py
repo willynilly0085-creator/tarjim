@@ -18,7 +18,7 @@ REPO = "openbmb/VoxCPM2"
 PACKAGE = "voxcpm==2.0.3"
 LANGUAGES = {"ar", "en", "zh", "da", "nl", "fi", "fr", "de", "el", "he", "hi", "id", "it", "ja",
              "ko", "ms", "no", "pl", "pt", "ru", "es", "sw", "sv", "tl", "th", "tr", "vi"}
-STEPS = 10
+STEPS = 10  # the default of dub.clone_steps (2026-11-09): more is closer and slower
 GUIDANCE = 2.0
 LIMIT = 220
 ATTEMPTS = 2
@@ -76,8 +76,11 @@ class CloneVoices:
 
     def once(self, line: Line) -> np.ndarray:
         reference = self.references.get(line.speaker) or next(iter(self.references.values()))
+        from tarjim.prefs.active import active
+
+        steps = active().dub.clone_steps
         parts = [self.model.generate(text=part, reference_wav_path=reference, cfg_value=GUIDANCE,
-                                     inference_timesteps=STEPS)
+                                     inference_timesteps=steps)
                  for part in split_for_tts(line.text)]
         wav = np.concatenate([np.asarray(p, dtype=np.float32) for p in parts])
         return trim(resample(wav, self.rate))

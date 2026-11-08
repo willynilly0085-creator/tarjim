@@ -37,11 +37,12 @@ class Rounds:
     def run(self) -> list[Exception]:
         """The failures met on the way; what an engine filled before failing stays, so a used-up
         quota on the backup never takes back what the first engine did."""
-        from tarjim.engines.choice import chain
+        from tarjim.engines.choice import tried
+        from tarjim.prefs.active import active
 
         failures: list[Exception] = []
         wanted = [cue for cue in self.cues if not cue.text.strip()]  # a backup never redoes good
-        for turn, provider in enumerate(chain("translate")):
+        for turn, provider in enumerate(tried("translate", active().translate.local_backup)):
             if not wanted:
                 break
             checkpoint()  # a backup engine is never started for a job that was cancelled

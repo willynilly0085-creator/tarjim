@@ -93,10 +93,14 @@ def test_text_already_in_the_marks_corner_sends_it_to_the_other_edge() -> None:
 
 
 def test_the_setting_turns_the_mark_off(monkeypatch: pytest.MonkeyPatch) -> None:
+    # the old name still works from the environment, through the settings (2026-11-09)
+    from tarjim.prefs.active import plain
+
     monkeypatch.setenv("TARJIM_VIDEO_MARK", "no")
-    assert mark.mark_for(Canvas(1920, 1080)) is None
+    assert mark.mark_for(Canvas(1920, 1080, look=plain().look)) is None
     monkeypatch.setenv("TARJIM_VIDEO_MARK", "yes")
-    assert mark.mark_for(Canvas(1920, 1080)) == mark.place_mark(Canvas(1920, 1080))
+    assert mark.mark_for(Canvas(1920, 1080, look=plain().look)) == mark.place_mark(
+        Canvas(1920, 1080))
 
 
 def burn_command(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,

@@ -19,7 +19,7 @@ from tarjim.server.guard import (
 from tarjim.server.job_routes import JobRoutes, refusal
 from tarjim.server.jobs import Board, Order, Task
 from tarjim.server.listener import OnlyListener
-from tarjim.server.orders import body_size, copy_limited, first, json_body, order_from
+from tarjim.server.orders import body_size, copy_limited, first, json_body, order_from, stamped
 from tarjim.server.pages import PageRoutes
 from tarjim.server.pairing import Pairing
 from tarjim.server.quality_routes import QualityRoutes
@@ -132,7 +132,7 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoute
         refused = refusal(order)
         if refused:
             return self.reply(400, {"error": refused})
-        self.reply(200, self.board.submit(order).view())
+        self.reply(200, self.board.submit(stamped(order)).view())
 
     def upload(self, query: Query) -> None:
         name = safe_name(first(query, "name"))

@@ -1,3 +1,4 @@
+import contextlib
 import threading
 import time
 import uuid
@@ -5,6 +6,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from queue import Empty, Queue
+from typing import Any
 
 from tarjim.children import Family, watch
 from tarjim.server import reasons
@@ -13,9 +15,7 @@ DUBBING = {"dub-gemini": "gemini", "dub-clone": "clone", "dub-studio": "studio",
            "dub-fishvoice": "fish:saved", "dub-eleven": "eleven", "dub-elevenclone": "eleven:clone",
            "dub-speech": "speech"}
 MODES = ("srt", "burn", *DUBBING)
-KEEP = 50
-PAUSE_TICK = 0.5
-IDLE_SECONDS = 300.0
+KEEP, PAUSE_TICK, IDLE_SECONDS = 50, 0.5, 300.0
 ENDED = ("done", "failed", "cancelled")
 CONTROLS = {"pause": "paused", "resume": "run", "cancel": "cancelled"}
 
@@ -35,6 +35,10 @@ class Order:
     name: str = ""
     quality: str = ""  # a link's picked quality (tarjim/qualities.py); empty: 1080p or below
     relisten: bool = False  # the kept hearing is forgotten and the clip listened to again
+    tweaks: dict[str, Any] = field(default_factory=dict)  # settings for this one video only
+    # The settings when it was ordered (prefs/job.snapshot, 2026-11-09): a retry, a restart and
+    # a queued job run what the person saw; empty (an older jobs.json) reads them when it runs.
+    prefs: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -63,10 +67,8 @@ class Task:
     def take_back(self) -> None:
         """What this run made and a cancel removes: pieces, results, work."""
         for step in list(self.undo):
-            try:
+            with contextlib.suppress(OSError):
                 step()
-            except OSError:
-                continue
 
     @property
     def finished(self) -> bool:
@@ -82,10 +84,9 @@ class Task:
         from tarjim.server.evidence import evidence
 
         detail = evidence(self.error)
-        return {"id": self.id, "stage": self.stage, "error": detail,
+        return {"id": self.id, "stage": self.stage, "error": detail, "detail": detail,
                 "error_code": self.error_code, "finished": self.finished,
-                "failed_at": self.failed_at, "detail": detail,
-                "paused": self.control == "paused",
+                "failed_at": self.failed_at, "paused": self.control == "paused",
                 "link": self.order.source.startswith(("http://", "https://")),
                 "target": self.order.target, "mode": self.order.mode,
                 "title": self.order.name or (self.video.stem if self.video else self.order.source),
@@ -105,8 +106,7 @@ class Board:
                  idle_after: float = IDLE_SECONDS) -> None:
         self.tasks: dict[str, Task] = {}
         self.queue: Queue[Task] = Queue()
-        self.work = work
-        self.idle, self.idle_after, self.busy_since_idle = idle, idle_after, False
+        self.work, self.idle, self.idle_after, self.busy_since_idle = work, idle, idle_after, False
         self.lock = threading.Lock()
         self.saved: Callable[[], None] = lambda: None  # job_record.keep writes the list down
         self.closing = False  # set just before the engine closes for an update or restart
@@ -116,8 +116,7 @@ class Board:
     def submit(self, order: Order) -> Task:
         task = Task(order)
         with self.lock:
-            twin = self.running_twin(order)
-            if twin is not None:
+            if (twin := self.running_twin(order)) is not None:
                 return twin
             self.tasks[task.id] = task
             for old in sorted(self.tasks.values(), key=lambda t: t.created)[:-KEEP]:
@@ -129,9 +128,9 @@ class Board:
         return task
 
     def running_twin(self, order: Order) -> Task | None:
-        same = (order.source, order.target, order.mode, order.dialect)
+        same = (order.source, order.target, order.mode, order.dialect, order.tweaks)
         return next((t for t in self.tasks.values() if not t.finished and same == (
-            t.order.source, t.order.target, t.order.mode, t.order.dialect)), None)
+            t.order.source, t.order.target, t.order.mode, t.order.dialect, t.order.tweaks)), None)
 
     def retry(self, task_id: str) -> Task | None:
         old = self.get(task_id)

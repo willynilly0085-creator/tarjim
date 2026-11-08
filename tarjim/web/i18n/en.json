@@ -474,6 +474,7 @@
   "sendDubKey": "This voice needs its key. Add it in Settings or pick another voice.",
   "pageExpired": "This page is out of date. Reload it and try again.",
   "actionFailed": "That didn't work. Try again.",
+  "sendTweaks": "One of this video's own changes can't be used. Open the settings to see why.",
   "actionGone": "The file isn't where tarjim saved it anymore. It may have been moved or deleted.",
   "actionStale": "This job changed before your request arrived. Check where it is now.",
   "actionOpen": "This computer couldn't open the file. Show it in its folder instead.",

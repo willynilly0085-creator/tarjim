@@ -28,14 +28,14 @@ def opacity(alpha: str) -> float:
 def test_the_look_is_what_the_subtitle_file_drew() -> None:
     look = resolve({}, {}, "ar").look
     assert (look.style == "box") == ass.Canvas(1920, 1080).boxed
-    assert (LANDSCAPE_FONT, PORTRAIT_FONT) == (ass.LANDSCAPE_FONT, ass.PORTRAIT_FONT)
+    assert (LANDSCAPE_FONT, PORTRAIT_FONT) == (0.058, 0.066)
     assert f"&H00{bgr(look.text_colour)}" == voices.MAIN
     assert ass.BOX_COLOUR[4:] == bgr(look.box_colour)
     assert round(opacity(ass.BOX_COLOUR[2:4])) == look.box_opacity
     assert f"&H00{bgr(look.outline_colour)}" == ass.OUTLINE_COLOUR
     assert round(opacity(ass.SHADOW_COLOUR[2:4])) == look.shadow
     assert f"\\blur{look.soft_edge}" == ass.SOFT_EDGE
-    assert look.fade_ms == ass.FADE_MS and look.box_padding == ass.BOX_PADDING * 100
+    assert look.fade_ms == ass.FADE_MS and look.box_padding == 22
     others = tuple(f"&H{bgr(c)}&" for c in look.palette)
     assert others == voices.OTHERS and look.dialogue_dash == DASH
 

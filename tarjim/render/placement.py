@@ -17,20 +17,22 @@ from pathlib import Path
 from tarjim.job import Job
 from tarjim.models import Cue
 from tarjim.render import frames
-from tarjim.render.ass import Canvas
+from tarjim.render.canvas import DEFAULT_LOOK, Canvas
 from tarjim.render.text_bands import Band, text_bands
 
 LINE = 1.3
 LINES = 2
-GAP = 0.3
+GAP = 0.3  # at least: past the box's padding since 2026-11-09 (Canvas.gap)
 MIDDLE = 0.5
+# The defaults of look.top_margin_wide and look.top_margin_tall (Canvas.top_margin).
 TOP_SAFE = {False: 0.05, True: 0.12}
 KEPT = "placement.json"
+LOOKING = ("auto", "steady")  # the places that move off the picture's text (look.position)
 
 
 def size(canvas: Canvas) -> tuple[int, int]:
     """How tall two lines of subtitle are, and the gap kept between them and other text."""
-    return round(LINES * LINE * canvas.font_size), round(GAP * canvas.font_size)
+    return round(LINES * LINE * canvas.font_size), round(canvas.gap * canvas.font_size)
 
 
 def meets(band: Band, canvas: Canvas, upper: int, lower: int) -> bool:
@@ -51,11 +53,19 @@ def clear_bottom(bands: list[Band], canvas: Canvas) -> int:
 
 def clear_top(bands: list[Band], canvas: Canvas) -> int:
     block, gap = size(canvas)
-    margin = round(canvas.height * TOP_SAFE[canvas.portrait])
+    margin = canvas.top_margin
     for band in sorted(bands):
         if meets(band, canvas, margin, margin + block):
             margin = round(band[1] * canvas.height + gap)
     return margin
+
+
+def chosen_place(bands: list[Band], canvas: Canvas) -> Canvas:
+    """The person's place (2026-11-09): moved off the picture's text, always at the bottom,
+    or always at the top at its own distance from the edge."""
+    if canvas.look.position == "top":
+        return replace(canvas, margin=canvas.top_margin, top=True)
+    return place(bands, canvas) if canvas.look.position in LOOKING else canvas
 
 
 def place(bands: list[Band], canvas: Canvas) -> Canvas:
@@ -78,12 +88,20 @@ def kept(record: Path, canvas: Canvas) -> Canvas | None:
     if not record.is_file():
         return None
     data = json.loads(record.read_text(encoding="utf-8"))
+    if data.get("layout", made_before(canvas)) != canvas.layout:
+        return None  # decided for another size, margin or place: looked at again (2026-11-09)
     margin, top = data["margin"], data["top"]
     if not isinstance(margin, int) or not 0 <= margin < canvas.height:
         return None
     usual = margin == canvas.margin_v and not top
     chosen = canvas if usual else replace(canvas, margin=margin, top=bool(top))
     return replace(chosen, bands=tuple((float(t), float(b)) for t, b in data["bands"]))
+
+
+def made_before(canvas: Canvas) -> str:
+    """What a decision kept before 2026-11-09, which says nothing of its layout, was made for:
+    the default look."""
+    return replace(canvas, look=DEFAULT_LOOK).layout
 
 
 def placed(job: Job, cues: list[Cue], canvas: Canvas, duration: float) -> Canvas:
@@ -95,11 +113,11 @@ def placed(job: Job, cues: list[Cue], canvas: Canvas, duration: float) -> Canvas
             return reused
         began = time.perf_counter()
         bands = look(job.video, cues, duration)
-        chosen = replace(place(bands, canvas), bands=tuple(bands))
+        chosen = replace(chosen_place(bands, canvas), bands=tuple(bands))
         record.write_text(json.dumps({
             "bands": [[round(t, 4), round(b, 4)] for t, b in bands], "top": chosen.top,
-            "margin": chosen.margin_v, "seconds": round(time.perf_counter() - began, 2)}),
-            encoding="utf-8")
+            "margin": chosen.margin_v, "seconds": round(time.perf_counter() - began, 2),
+            "layout": canvas.layout}), encoding="utf-8")
     except Exception:
         return canvas
     return chosen

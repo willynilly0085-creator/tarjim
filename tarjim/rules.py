@@ -1,7 +1,11 @@
 import unicodedata
 from dataclasses import dataclass, replace
+from typing import TYPE_CHECKING
 
 from tarjim.languages import Language
+
+if TYPE_CHECKING:  # the settings import this module's letter widths
+    from tarjim.prefs.model import Prefs
 
 DASH_WIDTH = 2  # the "- " that opens each line of an exchange
 # How wide a letter is drawn, in parts of the font size, kept on the wide side so two lines
@@ -31,6 +35,13 @@ class Rules:
     rtl: bool = True
     spaced: bool = True
     char_em: float = NARROW_EM
+    # Since 2026-11-09 from the person's settings (tarjim/prefs): how many people one subtitle
+    # may hold (an exchange is two), the mark before each of their lines, and how much faster
+    # than the reading speed a line may go before the report warns.
+    max_speakers: int = 2
+    dash: str = "- "
+    warn_at: float = 1.25
+    staged: bool = True  # an exchange's second line shows when its speaker starts
 
     @property
     def max_chars(self) -> int:
@@ -69,6 +80,27 @@ def letter_width(target: Language) -> float:
     return WIDE_EM if letters and 2 * wide >= len(letters) else NARROW_EM
 
 
-def rules_for(target: Language) -> Rules:
-    return replace(DEFAULT_RULES, line_chars=target.line_chars, reading_cps=target.reading_cps,
-                   rtl=target.rtl, spaced=target.spaced, char_em=letter_width(target))
+def rules_for(target: Language, prefs: "Prefs | None" = None) -> Rules:
+    shaped = replace(DEFAULT_RULES, line_chars=target.line_chars,
+                     reading_cps=target.reading_cps, rtl=target.rtl, spaced=target.spaced,
+                     char_em=letter_width(target))
+    return shaped if prefs is None else chosen(shaped, prefs)
+
+
+def chosen(rules: Rules, prefs: "Prefs") -> Rules:
+    """The language's rules with the person's settings (2026-11-09). A cue holds as much
+    speech as its lines hold letters (the review of 2026-11-09): a shorter line, or one line
+    instead of two, makes shorter cues, not more squeezed ones."""
+    text, timing = prefs.text, prefs.timing
+    lines = 1 if text.one_line else rules.max_lines
+    source = rules.max_source_chars * text.line_chars * lines // (
+        rules.line_chars * rules.max_lines)
+    return replace(rules, line_chars=text.line_chars, reading_cps=text.reading_cps,
+                   max_lines=lines, max_source_chars=max(1, source),
+                   min_duration=timing.min_duration, max_duration=timing.max_duration,
+                   linger=timing.linger, min_gap=timing.min_gap, long_pause=timing.long_pause,
+                   join_gap=timing.join_gap, min_readable=timing.min_readable,
+                   cut_snap=timing.cut_snap, cut_dialogue_span=timing.cut_dialogue_span,
+                   max_speakers=2 if timing.dialogue_cues and lines > 1 else 1,
+                   dash=prefs.look.dialogue_dash, warn_at=text.reading_warning,
+                   staged=prefs.look.staged_reveal)

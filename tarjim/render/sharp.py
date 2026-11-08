@@ -10,11 +10,13 @@ to five times the rows. The picture gains no detail and loses none; the rate it 
 with its size (burn.encode), and tarjim's logo, laid on in pixels, grows with it.
 """
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from tarjim.render.mark import Mark
 
 WIDEST, TALLEST = 1920, 1080  # one 1080p frame, either way round
+# What the person may enlarge to (output.enlarge, 2026-11-09): its frame, or nothing.
+FRAMES = {"1080": (WIDEST, TALLEST), "720": (1280, 720), "off": (0, 0)}
 LEAST = 1.1  # enlarging by less than this sharpens nothing worth the bigger file
 PLAY_RES = re.compile(r"^PlayRes([XY]):\s*(\d+)", re.MULTILINE)
 
@@ -36,12 +38,14 @@ def drawn_size(ass: str) -> tuple[int, int]:
     return int(found.get("X", 0)), int(found.get("Y", 0))
 
 
-def enlarged(size: tuple[int, int]) -> Enlarged | None:
-    """The size to draw at, or None when the picture is already large enough."""
+def enlarged(size: tuple[int, int], frame: str = "1080") -> Enlarged | None:
+    """The size to draw at, or None when the picture is already large enough or the person
+    keeps every picture at its own size."""
     width, height = size
-    if width <= 0 or height <= 0:
+    wide, tall = FRAMES.get(frame, (WIDEST, TALLEST))
+    if width <= 0 or height <= 0 or not wide:
         return None
-    box = (WIDEST, TALLEST) if width >= height else (TALLEST, WIDEST)
+    box = (wide, tall) if width >= height else (tall, wide)
     factor = min(box[0] / width, box[1] / height)
     if factor < LEAST:
         return None
@@ -52,8 +56,8 @@ def grown(mark: Mark, by: Enlarged | None) -> Mark:
     """The logo's place and size on the enlarged picture."""
     if by is None:
         return mark
-    return Mark(round(mark.x * by.factor), round(mark.y * by.factor),
-                round(mark.logo * by.factor))
+    return replace(mark, x=round(mark.x * by.factor), y=round(mark.y * by.factor),
+                   logo=round(mark.logo * by.factor))
 
 
 def scale_filter(by: Enlarged | None) -> str:

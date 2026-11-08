@@ -9,7 +9,7 @@ next run asks it (listen/repair.py), so only what is left over waits a run."""
 from dataclasses import dataclass, field
 from math import ceil
 
-from tarjim.listen.merge import PASSES
+from tarjim.prefs.active import active
 
 REQUESTS = 9  # requests a job may always make
 BASE = 3  # requests a job makes besides one a minute of the clip
@@ -66,7 +66,7 @@ class Budget:
 def budget_for(provider: str, seconds: float, rederive: bool = False) -> Budget:
     """At least REQUESTS requests and AUDIO seconds of sound; one more request a minute of the
     clip and a tenth of its length on longer clips; half the requests on a subscription."""
-    passes = 1 if provider == SINGLE else PASSES
+    passes = 1 if provider == SINGLE else active().listen.passes  # the job's (2026-11-09)
     requests = max(REQUESTS, BASE + ceil(seconds / 60))
     if provider == SUBSCRIPTION:
         requests = ceil(requests / 2)

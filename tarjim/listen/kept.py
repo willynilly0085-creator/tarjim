@@ -27,7 +27,7 @@ from tarjim.listen.asked import ASKED, TRIES, Asked, Spent
 from tarjim.listen.chunks import joined
 from tarjim.listen.derive import with_imports
 from tarjim.listen.gemini_listen import Utterance
-from tarjim.listen.merge import Fill, Heard, Piece
+from tarjim.listen.merge import ONE_PASS, PASSES, Fill, Heard, Piece
 from tarjim.models import Word
 
 HEARD = "heard.json"
@@ -37,8 +37,10 @@ DERIVE = "derive"
 ROOT = Path(__file__).resolve().parent.parent
 # with every tarjim module these import at the top (listen/derive.py)
 DERIVED_FROM = ("listen", "asr", "segment.py", "dialogue.py", "model_pins.py", "hearing.py")
-# the settings that choose how a hearing is derived; each later mode setting joins them
-MODES = ("aligner_mode",)
+# the settings that choose how a hearing is derived; each later mode setting joins them. Since
+# 2026-11-09 the person's own listening settings too (tarjim/prefs), each named in the key only
+# when it is not its default, so a transcript kept before them is still the one derived now.
+MODES = ("aligner_mode", "listen.passes", "listen.second_opinion", "listen.voice_check")
 
 Row = dict[str, Any]
 # the record of stretches asked again lived here before 2026-11-08 (now listen/asked.py)
@@ -70,11 +72,13 @@ def load_heard(cache: Path) -> Heard | None:
     guards.when("kept.revoted", bool(pieces))  # voted again piece by piece below
     voted, passes = joined(pieces) if pieces else (
         lines_of(data["utterances"]), [lines_of(run) for run in data.get("passes") or []])
-    words = data.get("local_words")
+    words, provider = data.get("local_words"), str(data.get("provider") or "")
+    # kept before 2026-11-09 with no count: asked as many as every hearing was then
+    asked = data.get("asked") or (1 if provider in ONE_PASS else PASSES)
     return Heard(data["language"], voted, passes,
                  None if words is None else [Word(**w) for w in words],
-                 str(data.get("provider") or ""), [fill_of(row) for row in data.get("added") or []],
-                 pieces, empty=int(data.get("empty") or 0))
+                 provider, [fill_of(row) for row in data.get("added") or []],
+                 pieces, empty=int(data.get("empty") or 0), asked=int(asked))
 
 
 def keep_heard(cache: Path, heard: Heard) -> None:
@@ -105,13 +109,24 @@ def derive_key() -> str:
     """The code and the listening settings that change what is derived from a hearing. Since
     2026-11-08 the mode settings are in it too: a clip timed in one aligner mode would otherwise
     be served as timed in the other (config is not followed into the code key, listen/derive)."""
-    from tarjim.config import setting
     from tarjim.listen.chunks import chunk_seconds
     from tarjim.listen.coverage import gap_seconds
 
-    modes = "".join(f"|{name}={setting(name)}" for name in MODES)
+    modes = "".join(mode(name) for name in MODES)
     chosen = f"{code_key()}|chunk={chunk_seconds()}|gap={gap_seconds()}{modes}"
     return hashlib.sha256(chosen.encode()).hexdigest()[:16]
+
+
+def mode(name: str) -> str:
+    """One setting as the key holds it: a setup setting always, a person's one when changed."""
+    from tarjim.config import setting
+    from tarjim.prefs.active import active
+    from tarjim.prefs.table import SPECS
+
+    if name not in SPECS:
+        return f"|{name}={setting(name)}"
+    value = active().values[name]
+    return "" if value == SPECS[name].default else f"|{name}={value}"
 
 
 def keep_transcript(cache: Path, transcript: Transcript) -> None:

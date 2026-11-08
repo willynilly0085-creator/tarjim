@@ -52,11 +52,18 @@ def cast(references: dict[str, Path]) -> dict[str, str]:
     return voices
 
 
-def style_for(language: str, dialect: str) -> str:
+# The person's dub.gemini_tone (2026-11-09), each a fixed instruction; natural is the one the
+# voices were always given.
+TONES = {"natural": "natural and expressive, like a professional voice actor dubbing a video",
+         "calm": "calm and gentle, like a soft-spoken narrator dubbing a video",
+         "lively": "lively and energetic, like an enthusiastic presenter dubbing a video",
+         "news": "clear and steady, like a television news anchor reading the news"}
+
+
+def style_for(language: str, dialect: str, tone: str = "natural") -> str:
     accent = ACCENTS.get(dialect, "") if language == "ar" else ""
-    tone = ("natural and expressive, like a professional voice actor dubbing a video; "
-            "a short pause after each line")
-    return f"{tone}; {accent}" if accent else tone
+    said = f"{TONES.get(tone, TONES['natural'])}; a short pause after each line"
+    return f"{said}; {accent}" if accent else said
 
 
 def batches(lines: list[Line]) -> list[list[int]]:
@@ -80,7 +87,9 @@ class GeminiVoices:
         self.client: Any = genai.Client(api_key=api_key(SPOKEN), http_options=options)
         self.voices = cast(references) or {"": LOW_VOICES[0]}
         self.language = language
-        self.style = style_for(language, dialect)
+        from tarjim.prefs.active import active
+
+        self.style = style_for(language, dialect, active().dub.gemini_tone)
 
     def request(self, model: str, text: str, voice: str) -> np.ndarray:
         content = {"type": "text", "text": text,

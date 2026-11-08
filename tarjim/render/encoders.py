@@ -7,14 +7,18 @@ in that build on every computer. An encoder the computer lacks fails at once and
 tried.
 """
 FALLBACK_KBPS = 4000
+# The quality aimed at, by the person's output.quality (2026-11-09): the card encoders' CQ and
+# x264's CRF; lower is clearer and larger.
+AIMS = {"normal": ("21", "19"), "high": ("18", "16")}
 
 
-def for_quality(kbps: int) -> list[list[str]]:
+def for_quality(kbps: int, quality: str = "normal") -> list[list[str]]:
     """Burning subtitles: aim at a quality; the last two have no quality mode, so a rate."""
-    return [["-c:v", "h264_nvenc", "-preset", "p5", "-rc", "vbr", "-cq", "21", "-b:v", "0"],
-            ["-c:v", "h264_qsv", "-global_quality", "21"],
-            ["-c:v", "h264_amf", "-rc", "qvbr", "-qvbr_quality_level", "21"],
-            ["-c:v", "libx264", "-crf", "19", "-preset", "medium"],
+    card, crf = AIMS.get(quality, AIMS["normal"])
+    return [["-c:v", "h264_nvenc", "-preset", "p5", "-rc", "vbr", "-cq", card, "-b:v", "0"],
+            ["-c:v", "h264_qsv", "-global_quality", card],
+            ["-c:v", "h264_amf", "-rc", "qvbr", "-qvbr_quality_level", card],
+            ["-c:v", "libx264", "-crf", crf, "-preset", "medium"],
             *for_rate(kbps or FALLBACK_KBPS)[-2:]]
 
 

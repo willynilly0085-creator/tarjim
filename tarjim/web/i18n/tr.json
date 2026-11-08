@@ -474,6 +474,7 @@
   "sendDubKey": "Bu ses kendi anahtarını istiyor. Ayarlar'dan ekle ya da başka bir ses seç.",
   "pageExpired": "Bu sayfa eskidi. Yenile ve tekrar dene.",
   "actionFailed": "Olmadı. Tekrar dene.",
+  "sendTweaks": "One of this video's own changes can't be used. Open the settings to see why.",
   "actionGone": "Dosya artık tarjim'in kaydettiği yerde değil. Taşınmış ya da silinmiş olabilir.",
   "actionStale": "İsteğin ulaşmadan bu iş değişti. Şu an ne durumda olduğuna bak.",
   "actionOpen": "Bu bilgisayar dosyayı açamadı. Bunun yerine klasöründe göster.",

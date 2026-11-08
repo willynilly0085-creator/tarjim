@@ -6,11 +6,18 @@ the usual off-white, so a video with one speaker looks as it always did. Every p
 video keeps the listener's own labels, so speakers are ranked by how much they talk in the whole
 clip (speakers.ranked), which keeps the main voice white from start to end of an interview.
 """
+from typing import TYPE_CHECKING
+
 from tarjim.models import Cue
+from tarjim.render.paint import tag_colour
 from tarjim.render.stages import speaks_in_parts
 from tarjim.speakers import ranked, who
 
-# ASS colours are blue, green, red. Off-white F7F5F0, then yellow FFE066, cyan 8FE3F5, green A8E6A1.
+if TYPE_CHECKING:
+    from tarjim.prefs.model import Look
+
+# ASS colours are blue, green, red. Off-white F7F5F0, then yellow FFE066, cyan 8FE3F5, green A8E6A1:
+# the defaults of the person's look.text_colour and look.speaker_palette since 2026-11-09.
 MAIN = "&H00F0F5F7"
 OTHERS = ("&H66E0FF&", "&HF5E38F&", "&HA1E6A8&")
 BACK_TO_MAIN = "&HF0F5F7&"  # a colour holds to the end of the subtitle, so main lines say theirs
@@ -18,12 +25,17 @@ BACK_TO_MAIN = "&HF0F5F7&"  # a colour holds to the end of the subtitle, so main
 Voices = dict[str, str]
 
 
-def voices(cues: list[Cue]) -> Voices:
+def voices(cues: list[Cue], look: "Look | None" = None) -> Voices:
+    """Each speaker but the main one and their colour; none when the person turned colours
+    off (2026-11-09)."""
+    if look is not None and not look.speaker_colours:
+        return {}
+    others = OTHERS if look is None else tuple(tag_colour(c) for c in look.palette)
     ranks = ranked(w for cue in cues for w in cue.words)
-    return {name: OTHERS[(rank - 1) % len(OTHERS)] for name, rank in ranks.items() if rank}
+    return {name: others[(rank - 1) % len(others)] for name, rank in ranks.items() if rank}
 
 
-def line_voices(cue: Cue, count: int, known: Voices) -> list[str]:
+def line_voices(cue: Cue, count: int, known: Voices, main: str = BACK_TO_MAIN) -> list[str]:
     """The colour tag of each shown line: a dialogue line is its speaker's, else the cue's.
     Lines wrapped from one translation are one person's words and keep one colour, even when
     their count matches the parts (2026-11-08)."""
@@ -33,4 +45,4 @@ def line_voices(cue: Cue, count: int, known: Voices) -> list[str]:
         speakers = (speakers[:1] or [""]) * count
     if not known:
         return [""] * count
-    return [f"{{\\c{known.get(s, BACK_TO_MAIN)}}}" for s in speakers]
+    return [f"{{\\c{known.get(s, main)}}}" for s in speakers]

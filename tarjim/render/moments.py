@@ -30,9 +30,9 @@ from pathlib import Path
 from tarjim.job import Job, checkpoint
 from tarjim.models import Cue
 from tarjim.render import frames, timeline
-from tarjim.render.ass import Canvas, Move
+from tarjim.render.canvas import Canvas, Move
 from tarjim.render.mark import Mark
-from tarjim.render.placement import MIDDLE, meets, place, size
+from tarjim.render.placement import MIDDLE, made_before, meets, place, size
 from tarjim.render.text_bands import Band, frame_bands
 from tarjim.render.timeline import Seen
 
@@ -123,16 +123,20 @@ def level(moves: list[Move]) -> tuple[Move, ...]:
                  for run in runs for start, end, _margin, top in run)
 
 
-def kept(record: Path) -> Seen | None:
+def kept(record: Path, canvas: Canvas) -> Seen | None:
+    """What was seen, when it was looked for with this layout: the exact looks a line needs
+    follow where the subtitle is drawn (2026-11-09)."""
     if not record.is_file():
         return None
     data = json.loads(record.read_text(encoding="utf-8"))
+    if data.get("layout", made_before(canvas)) != canvas.layout:
+        return None
     return {float(at): [(float(t), float(b)) for t, b in bands] for at, bands in data["seen"]}
 
 
-def keep(record: Path, seen: Seen) -> None:
+def keep(record: Path, seen: Seen, canvas: Canvas) -> None:
     rows = [[at, [[round(t, 4), round(b, 4)] for t, b in seen[at]]] for at in sorted(seen)]
-    record.write_text(json.dumps({"seen": rows}), encoding="utf-8")
+    record.write_text(json.dumps({"seen": rows, "layout": canvas.layout}), encoding="utf-8")
 
 
 def looked(video: Path, moments: list[float]) -> Seen:
@@ -141,7 +145,7 @@ def looked(video: Path, moments: list[float]) -> Seen:
 
 
 def observed(job: Job, cues: list[Cue], canvas: Canvas) -> Seen:
-    seen = kept(job.cache / KEPT)
+    seen = kept(job.cache / KEPT, canvas)
     if seen is None:
         seen = timeline.scan(job.video, (canvas.width, canvas.height), cues[-1].end)
     return seen | looked(job.video, wanted(seen, cues, canvas))
@@ -152,6 +156,8 @@ def moved(job: Job, cues: list[Cue], canvas: Canvas, mark: Mark | None) -> Canva
     spoken = [cue for cue in cues if cue.text.strip()]
     if canvas.top or canvas.margin is not None or not spoken:
         return canvas  # a video with steady text of its own (a news bar) keeps its one place
+    if canvas.look.position != "auto":
+        return canvas  # the person keeps every line in the video's one place (2026-11-09)
     try:
         seen = observed(job, spoken, canvas)
     except Exception:  # anything that goes wrong while looking moves no line
@@ -159,7 +165,7 @@ def moved(job: Job, cues: list[Cue], canvas: Canvas, mark: Mark | None) -> Canva
     checkpoint()  # a cancel while looking: the job stops, and what was half seen is not kept
     try:
         if seen:
-            keep(job.cache / KEPT, seen)
+            keep(job.cache / KEPT, seen, canvas)
         return replace(canvas, moves=decide(seen, spoken, canvas, mark))
     except Exception:
         return canvas

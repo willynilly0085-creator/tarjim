@@ -7,9 +7,14 @@ from pathlib import Path
 from typing import TypeVar
 
 from tarjim.languages import Language, language
+from tarjim.prefs.active import plain
+from tarjim.prefs.model import Prefs
 from tarjim.rules import Rules, rules_for
 
 CHECKPOINT: ContextVar[Callable[[], None]] = ContextVar("checkpoint", default=lambda: None)
+# The dialect a file name leaves unsaid: another one is named in it (2026-11-09), so a Saudi
+# and a plain Arabic translation of one video never write over each other.
+USUAL_DIALECT = "saudi"
 
 
 PROGRESS: ContextVar[Callable[[int, int], None]] = ContextVar(
@@ -57,18 +62,25 @@ class Job:
     out_dir: Path | None = None
     cache_dir: Path | None = None
     relisten: bool = False  # forget the kept hearing: listen to the clip again
+    # The person's settings as they were when the order was made (2026-11-09); none: the
+    # defaults, with the old names from the environment.
+    prefs: Prefs | None = None
 
     @property
     def language(self) -> Language:
         return language(self.target)
 
     @property
+    def settings(self) -> Prefs:
+        return self.prefs or plain(self.target)
+
+    @property
     def rules(self) -> Rules:
-        return rules_for(self.language)
+        return rules_for(self.language, self.settings)
 
     @property
     def font_name(self) -> str:
-        return self.font or self.language.font
+        return self.font or self.settings.look.font or self.language.font
 
     @property
     def cache(self) -> Path:
@@ -90,4 +102,6 @@ class Job:
 
     def output(self, suffix: str) -> Path:
         folder = self.out_dir or self.video.parent
-        return folder / f"{self.video.stem}.{self.target}{suffix}"
+        dialect = f".{self.dialect}" if self.target == "ar" and self.dialect != USUAL_DIALECT \
+            else ""
+        return folder / f"{self.video.stem}.{self.target}{dialect}{suffix}"

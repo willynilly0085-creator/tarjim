@@ -35,6 +35,6 @@ def cue_issues(number: int, cue: Cue, rules: Rules) -> list[Issue]:
     if len(lines) > rules.max_lines:
         issues.append(Issue(number, "too_many_lines", str(len(lines))))
     cps = len(cue.text) / max(cue.duration, TOLERANCE)
-    if cue.text and cps > rules.reading_cps * 1.25:
+    if cue.text and cps > rules.reading_cps * rules.warn_at:
         issues.append(Issue(number, "reading_speed", f"{cps:.0f} cps"))
     return issues

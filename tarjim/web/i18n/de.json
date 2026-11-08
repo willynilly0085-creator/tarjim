@@ -474,6 +474,7 @@
   "sendDubKey": "Diese Stimme braucht ihren Schlüssel. Füge ihn in den Einstellungen hinzu oder wähle eine andere Stimme.",
   "pageExpired": "Diese Seite ist veraltet. Lade sie neu und versuche es noch einmal.",
   "actionFailed": "Das hat nicht geklappt. Versuche es noch einmal.",
+  "sendTweaks": "One of this video's own changes can't be used. Open the settings to see why.",
   "actionGone": "Die Datei ist nicht mehr dort, wo tarjim sie gespeichert hat. Vielleicht wurde sie verschoben oder gelöscht.",
   "actionStale": "Dieser Auftrag hat sich geändert, bevor deine Anfrage ankam. Sieh nach, wo er jetzt steht.",
   "actionOpen": "Dieser Computer konnte die Datei nicht öffnen. Zeige sie stattdessen im Ordner.",

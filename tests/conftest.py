@@ -55,6 +55,18 @@ def no_browser_registration(monkeypatch: pytest.MonkeyPatch,
     monkeypatch.setattr(native_setup, "KNOWN", set())
 
 
+@pytest.fixture(autouse=True)
+def no_saved_prefs(monkeypatch: pytest.MonkeyPatch,
+                   tmp_path_factory: pytest.TempPathFactory) -> None:
+    """No test reads the person's own preferences.json, nor config.json to move it over: an
+    order made in a test takes the defaults (2026-11-09)."""
+    from tarjim.prefs import store
+
+    kept = tmp_path_factory.mktemp("prefs") / store.FILE
+    kept.write_text('{"version": 1, "values": {}}', encoding="utf-8")
+    monkeypatch.setattr(store, "path", lambda: kept)
+
+
 @pytest.fixture
 def prefs_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """A home of its own for the saved settings (tarjim/prefs, 2026-11-09): never the person's
@@ -62,6 +74,7 @@ def prefs_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     from tarjim.prefs import store
 
     home = tmp_path / "home"
+    monkeypatch.setattr(store, "path", lambda: home / store.FILE)
     monkeypatch.setenv("TARJIM_HOME", str(home))
     monkeypatch.setattr(config, "HOME", home)
     monkeypatch.setattr(config, "CONFIG", home / "config.json")

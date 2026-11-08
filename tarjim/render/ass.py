@@ -2,9 +2,11 @@ from dataclasses import dataclass, field
 
 from tarjim.lines import display_lines
 from tarjim.models import Cue
+from tarjim.render.canvas import Canvas, Move
+from tarjim.render.paint import alpha_at, ass_colour, tag_colour
 from tarjim.render.stages import reveal_at
 from tarjim.render.timecode import ass_time
-from tarjim.render.voices import MAIN, Voices, line_voices, voices
+from tarjim.render.voices import BACK_TO_MAIN, Voices, line_voices, voices
 from tarjim.rules import DEFAULT_RULES, Rules
 
 RLM = chr(0x200F)
@@ -12,25 +14,25 @@ RLM = chr(0x200F)
 # Latin word ("افتح YouTube ثم") came out in scrambled order.
 RIGHT_TO_LEFT = -1
 LOOKALIKE_BACKSLASH = "⧵"  # a "\" in the text would start an ASS command such as \N
-FADE_MS = 90
+FADE_MS = 90  # the default of look.fade_ms; a line fades a quarter of its time at most
+FADE_SHARE = 4
 EVERYTHING = ("\\alpha&HFF&", "\\alpha&H00&")
 LETTERS_ONLY = ("\\1a&HFF&\\3a&HFF&", "\\1a&H00&\\3a&H00&")
-PORTRAIT_FONT = 0.066
-LANDSCAPE_FONT = 0.058
 OUTLINED, BOXED = 1, 4
+# The defaults of the person's colours (tarjim/prefs/table_look.py) as tarjim drew them: a warm
+# near-black box at about 70% cover, so the picture still shows through and its own text does
+# not (the owner, 2026-11-08: whatever sits under the subtitle must never spoil it); outlined
+# letters with a 45% black shadow.
 SHADOW_COLOUR = "&H8C000000"
 OUTLINE_COLOUR = "&H00141414"
-# Warm near-black at about 70% cover: the picture still shows through, its own text does not
-# (the owner, 2026-11-08: whatever sits under the subtitle must never spoil it).
 BOX_COLOUR = "&H50131415"
-BOX_PADDING = 0.22
+BOX_OPACITY, BOX_ALPHA = 69, 0x50
+SHADOW_OPACITY, SHADOW_ALPHA = 45, 0x8C
 BOTTOM_CENTRE, TOP_CENTRE = 2, 8
 SOFT_EDGE = "\\blur0.8"  # a slightly soft outline reads as a studio's, not a hard sticker
 TOP_LINE = "{\\an8}"
-# One line drawn somewhere other than the video's place (render/moments.py): its start and end,
-# then its distance from the bottom edge, or from the top edge when the flag is set.
-Move = tuple[float, float, int, bool]
 Spot = tuple[int, bool]
+__all__ = ["Canvas", "Move"]  # where the rest of tarjim looks for them
 
 HEADER = """[Script Info]
 ScriptType: v4.00+
@@ -43,7 +45,7 @@ ScaledBorderAndShadow: yes
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, \
 BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, \
 BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,{font},{size},{main},{main},{edge},{back},-1,0,0,0,\
+Style: Default,{font},{size},{main},{main},{edge},{back},{bold},0,0,0,\
 100,100,0,0,{border},{outline},{shadow},{align},{mh},{mh},{mv},{charset}
 
 [Events]
@@ -51,91 +53,68 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
 
 
-@dataclass(frozen=True)
-class Canvas:
-    width: int
-    height: int
-    font: str = "Dubai"
-    # Every line sits on its own see-through box; False draws the older outlined letters.
-    boxed: bool = True
-    # Where the picture's own text leaves room (render/placement.py): a distance from the bottom
-    # edge, or from the top edge when top is set. None is the usual place.
-    margin: int | None = None
-    top: bool = False
-    # The picture's own text bands (render/text_bands.py), for tarjim's mark (render/mark.py).
-    # They say what the picture holds, not where the subtitle goes, so equality leaves them out.
-    bands: tuple[tuple[float, float], ...] = field(default=(), compare=False)
-    moves: tuple[Move, ...] = ()
-
-    @property
-    def portrait(self) -> bool:
-        return self.height > self.width
-
-    @property
-    def font_size(self) -> int:
-        ratio = PORTRAIT_FONT if self.portrait else LANDSCAPE_FONT
-        return round(min(self.width, self.height) * ratio)
-
-    @property
-    def margin_v(self) -> int:
-        if self.margin is not None:
-            return self.margin
-        return round(self.height * (0.14 if self.portrait else 0.07))
-
-    @property
-    def margin_h(self) -> int:
-        return round(self.width * 0.06)
-
-    @property
-    def outline(self) -> int:
-        return 1 if self.boxed else max(2, round(self.font_size * 0.08))
-
-    @property
-    def shadow(self) -> int:
-        if self.boxed:
-            return max(4, round(self.font_size * BOX_PADDING))
-        return max(1, self.outline // 2)
+def colours(canvas: Canvas) -> dict[str, object]:
+    """The style's letters, edge and back, from the person's colours (2026-11-09)."""
+    look = canvas.look
+    box = ass_colour(look.box_colour, alpha_at(look.box_opacity, BOX_OPACITY, BOX_ALPHA))
+    shadow = ass_colour("#000000", alpha_at(look.shadow, SHADOW_OPACITY, SHADOW_ALPHA))
+    return {"main": ass_colour(look.text_colour), "bold": -1 if look.bold else 0,
+            "edge": box if canvas.boxed else ass_colour(look.outline_colour),
+            "back": box if canvas.boxed else shadow}
 
 
 def render_ass(cues: list[Cue], canvas: Canvas, rules: Rules = DEFAULT_RULES) -> str:
     header = HEADER.format(
         w=canvas.width, h=canvas.height, font=canvas.font, size=canvas.font_size,
         outline=canvas.outline, shadow=canvas.shadow, border=BOXED if canvas.boxed else OUTLINED,
-        edge=BOX_COLOUR if canvas.boxed else OUTLINE_COLOUR,
-        back=BOX_COLOUR if canvas.boxed else SHADOW_COLOUR,
         align=TOP_CENTRE if canvas.top else BOTTOM_CENTRE, mh=canvas.margin_h,
-        mv=canvas.margin_v, charset=RIGHT_TO_LEFT if rules.rtl else 1, main=MAIN,
+        mv=canvas.margin_v, charset=RIGHT_TO_LEFT if rules.rtl else 1, **colours(canvas),
     )
-    look = Look(LETTERS_ONLY if canvas.boxed else EVERYTHING, voices(cues),
-                "" if canvas.boxed else SOFT_EDGE, {(s, e): (m, t) for s, e, m, t in canvas.moves})
-    events = [line for cue in cues if cue.text.strip() for line in event_lines(cue, rules, look)]
+    paint = paint_for(cues, canvas)
+    events = [line for cue in cues if cue.text.strip() for line in event_lines(cue, rules, paint)]
     return header + "\n".join(events) + "\n"
 
 
 @dataclass(frozen=True)
-class Look:
+class Paint:
+    """What every line of one subtitle file is drawn with."""
     alphas: tuple[str, str] = EVERYTHING
     voices: Voices = field(default_factory=dict)
     edge: str = ""
     spots: dict[tuple[float, float], Spot] = field(default_factory=dict)
+    fade_ms: int = FADE_MS
+    main: str = BACK_TO_MAIN
+
+    def fade(self, start: float, end: float) -> int:
+        """A line cut short by a scene change fades a quarter of its time at most (2026-11-09)."""
+        return max(0, min(self.fade_ms, int((end - start) * 1000 / FADE_SHARE)))
 
 
-def event_lines(cue: Cue, rules: Rules, look: Look | None = None) -> list[str]:
-    look = look or Look()
+def paint_for(cues: list[Cue], canvas: Canvas) -> Paint:
+    look = canvas.look
+    edge = "" if canvas.boxed else f"\\blur{look.soft_edge:g}"
+    return Paint(LETTERS_ONLY if canvas.boxed else EVERYTHING, voices(cues, look), edge,
+                 {(s, e): (m, t) for s, e, m, t in canvas.moves}, look.fade_ms,
+                 tag_colour(look.text_colour))
+
+
+def event_lines(cue: Cue, rules: Rules, paint: Paint | None = None) -> list[str]:
+    paint = paint or Paint()
     mark = RLM if rules.rtl else ""
     shown = display_lines(cue.text, rules)
-    lines = [f"{colour}{mark}{clean(line)}{mark}"
-             for colour, line in zip(line_voices(cue, len(shown), look.voices), shown, strict=True)]
-    moment, spot = reveal_at(cue, rules), look.spots.get((cue.start, cue.end))
+    lines = [f"{colour}{mark}{clean(line)}{mark}" for colour, line in zip(
+        line_voices(cue, len(shown), paint.voices, paint.main), shown, strict=True)]
+    moment, spot = reveal_at(cue, rules), paint.spots.get((cue.start, cue.end))
     if moment is None:
-        return [event(cue.start, cue.end, fade(FADE_MS, FADE_MS, look.edge) + "\\N".join(lines),
-                      spot)]
-    hide, show = look.alphas
+        both = paint.fade(cue.start, cue.end)
+        return [event(cue.start, cue.end, fade(both, both, paint.edge) + "\\N".join(lines), spot)]
+    hide, show = paint.alphas
     *first, last = lines
+    before, after = paint.fade(cue.start, moment), paint.fade(moment, cue.end)
     waiting = "\\N".join([*first, f"{{{hide}}}" + last])
-    arriving = "\\N".join([*first, f"{{{hide}\\t(0,{FADE_MS},{show})}}" + last])
-    return [event(cue.start, moment, fade(FADE_MS, 0, look.edge) + waiting, spot),
-            event(moment, cue.end, fade(0, FADE_MS, look.edge) + arriving, spot)]
+    arriving = "\\N".join([*first, f"{{{hide}\\t(0,{after},{show})}}" + last])
+    return [event(cue.start, moment, fade(before, 0, paint.edge) + waiting, spot),
+            event(moment, cue.end, fade(0, after, paint.edge) + arriving, spot)]
 
 
 def event(start: float, end: float, body: str, spot: Spot | None = None) -> str:

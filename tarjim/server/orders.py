@@ -1,4 +1,5 @@
 import json
+from dataclasses import replace
 from typing import Any
 
 from tarjim.qualities import AUDIO, clean
@@ -16,9 +17,21 @@ def order_from(source: str, data: dict[str, Any], name: str = "") -> Order:
     mode = str(data.get("mode") or "burn")
     quality = clean(data.get("quality"))
     sound_only = quality == AUDIO and mode != "srt"  # burning and dubbing need the picture
+    tweaks = data.get("tweaks")
     return Order(source, str(data.get("target") or "ar"), mode,
                  str(data.get("dialect") or "saudi"), name, "" if sound_only else quality,
-                 data.get("relisten") is True)
+                 data.get("relisten") is True, dict(tweaks) if isinstance(tweaks, dict) else {})
+
+
+def stamped(order: Order) -> Order:
+    """The order with the settings it runs with, taken now, as the person sees them, with its
+    own changes (2026-11-09); one already stamped keeps its own."""
+    if order.prefs:
+        return order
+    from tarjim.prefs.job import snapshot
+    from tarjim.prefs.store import current
+
+    return replace(order, prefs=snapshot(current(order.target, order.tweaks)))
 
 
 def body_size(headers: Any) -> int:

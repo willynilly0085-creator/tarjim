@@ -6,6 +6,7 @@ from tarjim.config import prepare_environment
 from tarjim.fetch import resolve
 from tarjim.job import Job
 from tarjim.pipeline import run
+from tarjim.prefs.store import current
 from tarjim.translate.prompt import DIALECTS
 
 DOWNLOADS = Path.home() / "Downloads" / "tarjim"
@@ -32,8 +33,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parse(sys.argv[1:] if argv is None else argv)
     for source in args.sources:
         video = resolve(source, args.downloads)
+        # the saved settings, as the page's jobs run them; a flag here still wins (2026-11-09)
         job = Job(video=video, target=args.to, dialect=args.dialect, burn=not args.no_burn,
-                  font=args.font, relisten=args.listen_again)
+                  font=args.font, relisten=args.listen_again, prefs=current(args.to))
         cues, issues = run(job, report=lambda stage: print(f"  .. {stage}", flush=True))
         print(f"{video.name}: {len(cues)} subtitles, {len(issues)} issues")
         for issue in issues:

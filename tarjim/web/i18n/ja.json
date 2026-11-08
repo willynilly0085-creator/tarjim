@@ -474,6 +474,7 @@
   "sendDubKey": "この音声にはキーが必要です。設定で追加するか、別の音声を選んでください。",
   "pageExpired": "このページは古くなっています。再読み込みしてもう一度お試しください。",
   "actionFailed": "うまくいきませんでした。もう一度お試しください。",
+  "sendTweaks": "One of this video's own changes can't be used. Open the settings to see why.",
   "actionGone": "tarjim が保存した場所にファイルがありません。移動または削除された可能性があります。",
   "actionStale": "依頼が届く前にこのジョブの状態が変わりました。現在の状態を確認してください。",
   "actionOpen": "このコンピューターではファイルを開けませんでした。代わりにフォルダーで表示してください。",
