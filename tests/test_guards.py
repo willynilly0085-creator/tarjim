@@ -146,6 +146,16 @@ def test_the_second_timing_and_the_trusted_words_are_counted() -> None:
     assert count("settle.trusted") == 1 and count("sanity.implausible") == 1
 
 
+def test_a_few_confirmed_words_never_stand_in_for_the_whole_clip() -> None:
+    """2026-11-08: the local words are only the runs the sound confirmed; 8 of them must not
+    replace 40 squeezed words, or most of the speech would go without a subtitle."""
+    from tarjim.listen.settle import trusted
+
+    squeezed = [Word(f"w{k}", 65.6 + k * 0.01, 65.605 + k * 0.01) for k in range(40)]
+    few = [Word(f"w{k}", k * 0.4, k * 0.4 + 0.3) for k in range(8)]
+    assert trusted(squeezed, few) == squeezed
+
+
 def test_quiet_counts_nothing_and_counting_resumes_after() -> None:
     with guards.quiet():
         guards.fired("vote.extras", 3)

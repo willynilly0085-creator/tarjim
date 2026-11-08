@@ -36,6 +36,10 @@ from tarjim.models import Word
 # debates where two people talk at once (each one's letters are hard to find under the other's),
 # 0.00 on the Somali chant whose timing had gone wrong.
 IN_SYNC = 0.5
+# Of the aligned words, how many the local words must hold to stand in for them: since
+# 2026-11-08 they are only the runs the sound confirmed, and a few kept runs standing in for a
+# whole clip would leave most of its speech with no subtitle.
+STANDS_IN = 0.8
 # moved to listen/placed.py on 2026-11-08 and still offered here
 __all__ = ["Placed", "by_time", "placed"]
 
@@ -70,7 +74,8 @@ def worth_keeping(left: list[Gap]) -> bool:
 
 
 def trusted(words: list[Word], opinion: list[Word]) -> list[Word]:
-    if implausible(words) and opinion and not implausible(opinion):
+    enough = len(opinion) >= STANDS_IN * len(words)
+    if implausible(words) and enough and not implausible(opinion):
         guards.fired("settle.trusted")
         print(f"timing: {len(words)} words timed faster than speech; using the words this "
               "computer heard", flush=True)
