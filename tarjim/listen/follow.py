@@ -8,11 +8,18 @@ its label's nearest long lines were given, on both sides of it (or on the one si
 the start or end of the clip). Where they did not all move the same way it keeps its label. It
 never simply takes the turn it touches: a short reply is most often the other person's, and the
 listener heard whose it was.
+
+A speaker another listening pass heard but the vote could not link to the base pass's ("S2~p3",
+listen/vote.relabel) is one of the base's speakers too. Since 2026-11-08 its lines go, together,
+to the base speaker whose average voice is nearest to theirs: judged alone, a label with one line
+had no average to leave it out of, so it was never moved and stayed a third speaker.
 """
 from bisect import bisect
 
+import numpy as np
+
 from tarjim.models import Word
-from tarjim.speakers import Line, lines, who
+from tarjim.speakers import Line, lines, unlinked, who
 
 Labels = dict[Line, str]
 
@@ -34,3 +41,14 @@ def followed(words: list[Word], heard: Labels, labels: Labels) -> Labels:
         if line not in heard and len(names) == 1 and own not in names:
             found[line] = names.pop()
     return found
+
+
+def adopted(voices: dict[str, np.ndarray]) -> dict[str, str]:
+    """Each unlinked label among the speakers' average voices as the base speaker whose voice is
+    nearest to its own; none when the clip has no base speaker's voice to go by."""
+    base = {name: voice / np.linalg.norm(voice) for name, voice in voices.items()
+            if not unlinked(name) and np.linalg.norm(voice) > 0}
+    if not base:
+        return {}
+    return {name: max(base, key=lambda known: float(base[known] @ voice))
+            for name, voice in voices.items() if unlinked(name)}

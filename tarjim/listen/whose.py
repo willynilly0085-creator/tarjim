@@ -27,9 +27,9 @@ from typing import Any, NamedTuple
 import numpy as np
 
 from tarjim.asr.voiceprint import RATE
-from tarjim.listen.follow import followed
+from tarjim.listen.follow import adopted, followed
 from tarjim.models import Word
-from tarjim.speakers import Line, inherited, lines, span, who
+from tarjim.speakers import Line, inherited, lines, linked_by_time, span, who
 
 SHORTEST = 0.8  # seconds: a shorter line says too little to know the voice by
 STEADY = 1.5  # seconds: lines this long make up a speaker's average print
@@ -164,7 +164,8 @@ def checked(words: list[Word], wav: Any) -> list[Word]:
     heard = {line: who(words[line[0]].speaker) for line in prints.voices}
     if len(averages(prints, heard)) < FEWEST:
         return words
-    labels = refined(prints, heard)
+    names = adopted(averages(prints, heard))  # 2026-11-08: unlinked "S2~p3" by voice first
+    labels = refined(prints, {line: names.get(name, name) for line, name in heard.items()})
     why = unreliable(prints, labels)
     if why:
         print(f"speakers: no line given to another speaker by voice: {why}", flush=True)
@@ -193,7 +194,7 @@ def voiced(words: list[Word], wav: Any) -> list[Word]:
 
 
 def by_voice(words: list[Word], wav: Any, rate: int = RATE) -> list[Word]:
-    """The words checked by voice as far as can be done here (sound at RATE only), then each line
-    without a speaker given to the nearer turn (by then put right), so it is never the main voice's
-    by chance, wherever the voice check could not run."""
-    return inherited(voiced(words, wav) if rate == RATE else words)
+    """The words checked by voice as far as can be done here (sound at RATE only), each line the
+    vote could not link given a base speaker by time where the check did not (2026-11-08), then
+    each line without a speaker given to the nearer turn (by then put right)."""
+    return inherited(linked_by_time(voiced(words, wav) if rate == RATE else words))
