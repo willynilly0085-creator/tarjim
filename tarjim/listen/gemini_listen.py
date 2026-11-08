@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 from tarjim.gemini_client import GeminiClient
@@ -31,10 +31,17 @@ class Hearer(Protocol):
 
 @dataclass(frozen=True)
 class Utterance:
+    """A line heard. Since 2026-11-08 it carries where it came from, outside equality so a copy
+    is still a copy: the piece of the clip it was heard in, the request that heard it ("k0.v" the
+    vote of piece 0, "k0.p1" its pass 1, "local", "words") and how far its time is trusted (1
+    as heard, 0.5 read back from an mm:ss misread, 0 put at its piece's edge)."""
     start: float
     end: float
     speaker: str
     text: str
+    piece: tuple[float, float] | None = field(default=None, compare=False)
+    request: str = field(default="", compare=False)
+    prior: float = field(default=1.0, compare=False)
 
 
 def listen(audio: bytes, client: Hearer | None = None) -> tuple[str, list[Utterance]]:

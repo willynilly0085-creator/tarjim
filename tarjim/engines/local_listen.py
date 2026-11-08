@@ -15,8 +15,9 @@ def utterances_from(words: list[Word]) -> list[Utterance]:
             last.append(word)
         else:
             groups.append([word])
-    return [Utterance(g[0].start, max(g[-1].end, g[0].start + 0.01), "", join_words(g))
-            for g in groups]
+    whole = (0.0, max(w.end for w in words)) if words else None  # all the sound it heard
+    return [Utterance(g[0].start, max(g[-1].end, g[0].start + 0.01), "", join_words(g),
+                      piece=whole, request="local") for g in groups]
 
 
 def listen_file(audio: Path) -> tuple[str, list[Utterance], list[Word]]:

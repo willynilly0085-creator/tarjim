@@ -81,12 +81,13 @@ def relistener(provider: str, video: Path, asked: Asked) -> Relisten | None:
     if provider in ("", "local"):
         return None
     from tarjim.hearing import cloud_listener
-    from tarjim.listen.chunks import shift
+    from tarjim.listen.chunks import placeable, shift
 
     once = cloud_listener(provider)
 
     def again(start: float, end: float) -> list[Utterance]:
-        return shift(once(media.audio_bytes(video, start, end)).utterances, (start, end))
+        heard = once(media.audio_bytes(video, start, end)).utterances
+        return placeable(shift(heard, (start, end)))  # as the hearing's lines (2026-11-08)
 
     return asked.asking(again)
 

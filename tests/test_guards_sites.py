@@ -78,8 +78,9 @@ def test_lines_far_apart_and_lines_past_their_piece_are_counted() -> None:
     apart([U(0.0, 1.0, "S1", "a"), U(60.0, 61.0, "S1", "b")])
     apart([U(0.0, 1.0, "S1", "a"), U(2.0, 3.0, "S1", "b")])
     assert count("timing.apart") == 1
-    shift([U(1.0, 2.0, "S1", "in"), U(80.0, 81.0, "S1", "past")], (0.0, 75.0))
-    assert count("shift.dropped") == 1
+    shift([U(1.0, 2.0, "S1", "in"), U(80.0, 81.0, "S1", "past"), U(82.0, 83.0, "S1", "in")],
+          (0.0, 75.0))
+    assert count("shift.clamped") == 1 and count("shift.hallucinated") == 1
 
 
 def test_speech_known_only_from_the_local_words_is_counted() -> None:

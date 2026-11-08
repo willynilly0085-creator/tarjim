@@ -2,6 +2,10 @@ from dataclasses import dataclass, field
 
 from tarjim.scripts import joined
 
+# how a word got its time (2026-11-08): the aligner heard its letters; a listener heard it;
+# spread over its line by its length; placed between the words around it; not said
+SOURCES = ("aligned", "heard", "estimated", "unplaced", "unknown")
+
 
 @dataclass(frozen=True)
 class Word:
@@ -9,6 +13,9 @@ class Word:
     start: float
     end: float
     speaker: str = ""
+    # outside equality, so two words alike in text and time are still one (2026-11-08)
+    score: float | None = field(default=None, compare=False)  # the aligner's, for its letters
+    source: str = field(default="unknown", compare=False)  # one of SOURCES
 
 
 DIALOGUE_SEPARATOR = " || "

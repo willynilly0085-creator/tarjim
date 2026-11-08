@@ -5,7 +5,7 @@ alone, a Japanese, Chinese or Thai line was one ballot cell that only a letter-p
 back, so those languages were voted away (2026-11-08)."""
 import re
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from difflib import SequenceMatcher
 from statistics import median
 
@@ -108,7 +108,7 @@ def relabel(u: Utterance, links: dict[str, str], number: int) -> Utterance:
     which speakers.who reads as plain "S2": pass 3's S2 silently became the base's S2."""
     if not u.speaker:
         return u
-    return Utterance(u.start, u.end, links.get(u.speaker) or f"{u.speaker}~p{number}", u.text)
+    return replace(u, speaker=links.get(u.speaker) or f"{u.speaker}~p{number}")
 
 
 def elect(ballot: Ballot, agree: int) -> Utterance | None:
@@ -117,7 +117,7 @@ def elect(ballot: Ballot, agree: int) -> Utterance | None:
         return None
     u = ballot.utterance
     start, end = median([u.start, *ballot.starts]), median([u.end, *ballot.ends])
-    return Utterance(start, max(start, end), u.speaker, u.text)
+    return replace(u, start=start, end=max(start, end))  # with its piece and request
 
 
 def similar(a: Utterance, b: Utterance) -> bool:

@@ -16,6 +16,7 @@ start of a stretched line is right; a drifted line's first words drift with it. 
 brought back to where its last words were heard, so the stretch no longer hides the speech after
 it from the coverage check.
 """
+from dataclasses import replace
 from difflib import SequenceMatcher
 from statistics import median
 
@@ -81,7 +82,7 @@ def moved(utterance: Utterance, delta: float, duration: float, ends: float | Non
     if (start, end) == (utterance.start, utterance.end):
         return utterance
     guards.fired("anchor.moved")
-    return Utterance(start, end, utterance.speaker, utterance.text)
+    return replace(utterance, start=start, end=end)  # with its piece and request (2026-11-08)
 
 
 def anchor(utterances: list[Utterance], heard: list[Word], duration: float) -> list[Utterance]:

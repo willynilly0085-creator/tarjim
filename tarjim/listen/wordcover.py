@@ -44,7 +44,7 @@ def filled(gap: Gap, windows: list[Span]) -> bool:
 
 def word_gaps(hearing: Hearing, words: list[Word], tried: list[Span],
               windows: list[Span]) -> list[Gap]:
-    lines = [Utterance(w.start, w.end, w.speaker, w.text) for w in words]
+    lines = [Utterance(w.start, w.end, w.speaker, w.text, request="words") for w in words]
     found = gaps(replace(hearing, utterances=lines))
     return [g for g in found
             if not any(touches(t, g) for t in tried) and not filled(g, windows)]
@@ -65,13 +65,15 @@ def room(words: list[Word], run: tuple[int, int], gap: Gap) -> Span:
 
 
 def realigned(pile: list[Word], span: Span, timer: Timer) -> list[Word] | None:
-    line = Utterance(span[0], span[1], pile[0].speaker, " ".join(w.text for w in pile))
+    line = Utterance(span[0], span[1], pile[0].speaker, " ".join(w.text for w in pile),
+                     request="words")
     again = timer.part([line])
     fits = all(span[0] - EDGE <= w.start and w.end <= span[1] + EDGE for w in again)
     if len(again) != len(pile) or piles(again) or not fits:
         return None
     guards.fired("wordcover.realigned")
-    return [replace(w, start=a.start, end=a.end) for w, a in zip(pile, again, strict=True)]
+    return [replace(w, start=a.start, end=a.end, score=a.score, source=a.source)
+            for w, a in zip(pile, again, strict=True)]
 
 
 def unpiled(words: list[Word], found: list[Gap], speech: list[Span],

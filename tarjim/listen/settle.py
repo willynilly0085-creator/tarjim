@@ -25,6 +25,7 @@ from tarjim import guards
 from tarjim.asr.base import Transcript
 from tarjim.asr.sanity import implausible
 from tarjim.job import Job
+from tarjim.listen.chunks import CLAMPED, placeable
 from tarjim.listen.coverage import Gap, Hearing, open_gaps
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.merge import Fill, Heard
@@ -121,6 +122,12 @@ def told(kept: Timed, last: Timed) -> Timed:
     return kept
 
 
+def timeable(found: Placed) -> Placed:
+    """The lines placed less those whose time is not known (chunks.placeable, 2026-11-08)."""
+    moved = placeable(found.moved)
+    return replace(found, own=[u for u in found.own if u.prior > CLAMPED], moved=moved)
+
+
 def settled(job: Job, heard: Heard, sound: Sound, opinion: list[Word]) -> Timed:
     """Speech left out filled once and the hearing kept, the lines timed with the second opinion
     and, when that is off the voice, without it; the hearing kept with the fills of the timing
@@ -131,7 +138,7 @@ def settled(job: Job, heard: Heard, sound: Sound, opinion: list[Word]) -> Timed:
     from tarjim.listen.kept import rederiving
 
     seconds = len(sound.wav) / sound.rate
-    found = placed(heard, opinion, seconds)
+    found = timeable(placed(heard, opinion, seconds))
     # one budget for every stretch asked again in this job (2026-11-08)
     asked = Asked.load(job.cache, budget.budget_for(heard.provider, seconds,
                                                     rederiving(job.cache)))

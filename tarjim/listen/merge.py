@@ -25,6 +25,7 @@ class Piece:
     start: float
     end: float
     passes: list[list[Utterance]]
+    language: str = ""  # as its listener named it; the clip's is the first piece's (2026-11-08)
 
     @property
     def span(self) -> Span:

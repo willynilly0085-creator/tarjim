@@ -83,6 +83,7 @@ def spread(pile: list[Word], span: Span, speech: list[Span]) -> list[Word]:
     words, cursor = [], 0.0
     for word, weight in zip(pile, weights, strict=True):
         end = cursor + weight * step
-        words.append(replace(word, start=at(pieces, cursor), end=at(pieces, end)))
+        words.append(replace(word, start=at(pieces, cursor), end=at(pieces, end),
+                             source="estimated"))
         cursor = end
     return words

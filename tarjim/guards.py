@@ -47,7 +47,10 @@ NAMES = (
     "novel.said_before",  # a line heard again after alignment that was said nearby
     "novel.timed_over",  # ...whose time timed words already fill
     "novel.echoes",  # ...that echoes timed words close by
-    "shift.dropped",  # a line past its piece's end, dropped
+    "shift.slipped",  # a line past its piece's end read back from an mm:ss misread
+    "shift.clamped",  # ...kept at the piece's edge, said nowhere else in the piece
+    "shift.hallucinated",  # ...dropped, a copy of a line the piece has
+    "shift.held",  # ...and held back from the timing, its time unknown
     "kept.implausible",  # a kept transcript whose timing no one could speak
     "kept.rederived",  # a kept transcript made by other code, derived again
     "kept.revoted",  # a kept hearing voted again piece by piece
