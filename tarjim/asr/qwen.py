@@ -94,6 +94,6 @@ def attach_punctuation(text: str, items: list[Any]) -> list[Word]:
         if not size or cursor >= len(timeline):
             continue
         span = timeline[cursor:cursor + size]
-        words.append(Word(token, span[0][0], span[-1][1]))
+        words.append(Word(token, span[0][0], span[-1][1], source="heard"))
         cursor += size
     return words

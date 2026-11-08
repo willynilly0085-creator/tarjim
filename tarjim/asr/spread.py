@@ -23,6 +23,7 @@ class Slot:
     end: float = 0.0
     timed: bool = False
     said: str = ""  # what the aligner listens for: a number spelled out, "" for none
+    score: float | None = None  # the mean score of its letters, when the aligner heard them
 
 
 def proportional(utterance: Utterance) -> list[Word]:
@@ -31,7 +32,8 @@ def proportional(utterance: Utterance) -> list[Word]:
     step = (utterance.end - utterance.start) / max(1, sum(weights))
     words, cursor = [], utterance.start
     for token, weight in zip(tokens, weights, strict=True):
-        words.append(Word(token, cursor, cursor + weight * step, utterance.speaker))
+        words.append(Word(token, cursor, cursor + weight * step, utterance.speaker,
+                          source="estimated"))
         cursor += weight * step
     return words
 

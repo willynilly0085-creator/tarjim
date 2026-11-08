@@ -45,20 +45,27 @@ Row = dict[str, Any]
 __all__ = ["ASKED", "TRIES", "Asked", "Spent"]
 
 
+def line_of(row: Row) -> Utterance:
+    """A kept line; its piece is kept as a list, and one kept before 2026-11-08 has none."""
+    piece = row.get("piece")
+    return Utterance(**{**row, "piece": None if piece is None else (piece[0], piece[1])})
+
+
 def lines_of(rows: list[Row] | None) -> list[Utterance]:
-    return [Utterance(**row) for row in rows or []]
+    return [line_of(row) for row in rows or []]
 
 
 def fill_of(row: Row) -> Fill:
     """A kept fill; one kept before 2026-11-08 is a bare line, with no stretch."""
     if "line" not in row:
-        return Fill(Utterance(**row))
+        return Fill(line_of(row))
     gap = row.get("gap")
-    return Fill(Utterance(**row["line"]), None if gap is None else (float(gap[0]), float(gap[1])))
+    return Fill(line_of(row["line"]), None if gap is None else (float(gap[0]), float(gap[1])))
 
 
 def piece_of(row: Row) -> Piece:
-    return Piece(float(row["start"]), float(row["end"]), [lines_of(run) for run in row["passes"]])
+    return Piece(float(row["start"]), float(row["end"]), [lines_of(run) for run in row["passes"]],
+                 str(row.get("language") or ""))  # each piece's own since 2026-11-08
 
 
 def load_heard(cache: Path) -> Heard | None:

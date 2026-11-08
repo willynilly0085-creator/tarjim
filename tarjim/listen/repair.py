@@ -1,15 +1,14 @@
 """Each stretch of speech the transcript left out is heard again by the same engine, alone; when
 that brings nothing, the words this computer heard there fill it. What cannot be filled is said in
 the log. Since 2026-11-08 the hearing is kept all the same and only that stretch is asked about
-again on the next run, at most TRIES times in all (listen/asked.py); after that it is left as it
-is, and the log says no listener heard it. Since 2026-11-08 such a stretch is still listed (given
-up), so the job page shows it, where before it was dropped and the job looked whole."""
+again on the next run, at most TRIES times in all (listen/asked.py); after that the log says no
+listener heard it, and it is still listed (given up) so the job page shows it (2026-11-08)."""
 from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 
 from tarjim import guards
 from tarjim.job import checkpoint
-from tarjim.listen.asked import TRIES, Spent
+from tarjim.listen.asked import TRIES, Spent, heard_span
 from tarjim.listen.budget import Refused
 from tarjim.listen.coverage import (
     NOT_ASKED,
@@ -84,8 +83,8 @@ def from_words(words: list[Word]) -> list[Utterance]:
             groups[-1].append(word)
         else:
             groups.append([word])
-    return [Utterance(g[0].start, g[-1].end, g[0].speaker, " ".join(w.text for w in g))
-            for g in groups]
+    return [Utterance(g[0].start, g[-1].end, g[0].speaker, " ".join(w.text for w in g),
+                      request="local") for g in groups]
 
 
 def apart(line: Utterance, turn: Utterance) -> float:
@@ -150,8 +149,9 @@ class Mender:
     def from_local(self, gap: Gap, lines: list[Utterance]) -> list[Utterance]:
         """The local words as lines, less those a line close by already says: a cloud line
         timed a little off leaves a gap its own words fill, and the sentence was shown twice
-        ("I apologize, Jim, if things got heated", 2026-11-08)."""
-        return voiced([u for u in from_words(gap.words) if not repeats(u, lines)], lines)
+        ("I apologize, Jim, if things got heated", 2026-11-08); each has the sound asked."""
+        heard = [replace(u, piece=heard_span(gap.start, gap.end)) for u in from_words(gap.words)]
+        return voiced([u for u in heard if not repeats(u, lines)], lines)
 
     def in_transcript(self, _gap: Gap) -> str | None:
         """Whether the local words left out here are said where the transcript is timed. Lines

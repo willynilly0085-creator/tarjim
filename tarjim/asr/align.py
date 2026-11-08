@@ -100,7 +100,8 @@ class AlignEngine:
             slot.said = sound
         if self.time_slots(logp[low:high], slots, group, low):
             fill_gaps(slots)
-            return [Word(s.text, s.start, s.end, s.speaker) for s in slots]
+            return [Word(s.text, s.start, s.end, s.speaker, score=s.score,
+                         source="aligned" if s.timed else "unplaced") for s in slots]
         if len(group) > 1 and any(self.tokens(s.said) for s in slots):
             cut = quietest(group, self.speech)
             return self.align_group(logp, group[:cut]) + self.align_group(logp, group[cut:])
@@ -122,4 +123,5 @@ class AlignEngine:
             start, slot.end = densest(word, self.speech)
             slot.start = max(start, slot.end - longest(slot.text))
             slot.timed = True
+            slot.score = sum(score for *_, score in word) / len(word)  # 2026-11-08
         return True

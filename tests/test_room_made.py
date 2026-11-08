@@ -107,6 +107,14 @@ def setup(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Job:
     return Job(tmp_path / "clip.mp4", cache_dir=tmp_path / "cache")
 
 
+def timing(found: Any) -> Any:
+    """What a clip gets, less each word's source and score (2026-11-08), which say how it got
+    its time and change none of it."""
+    if isinstance(found, dict):
+        return {k: timing(v) for k, v in found.items() if k not in ("score", "source")}
+    return [timing(v) for v in found] if isinstance(found, list) else found
+
+
 def made(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> str:
     """The words and subtitles of a first run, and the words derived again from the kept
     hearing once the kept transcript is gone."""
@@ -118,7 +126,7 @@ def made(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> str:
     found = {"words": [asdict(w) for w in first.words],
              "cues": [asdict(c) for c in build_cues(first.words, [])],
              "again": [asdict(w) for w in again.words]}
-    return json.dumps(found, ensure_ascii=False, indent=1) + "\n"
+    return json.dumps(timing(found), ensure_ascii=False, indent=1) + "\n"
 
 
 def test_the_hearing_path_gives_the_same_words_and_subtitles(

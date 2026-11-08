@@ -1,4 +1,5 @@
 import bisect
+from dataclasses import replace
 from difflib import SequenceMatcher
 
 from tarjim import guards
@@ -45,7 +46,8 @@ def retime(group: list[Word], utterance: Utterance, heard: list[Word],
     times = [(pairs[i].start, pairs[i].end) if i in pairs else None for i in range(len(group))]
     own = max(limits[0], utterance.start), min(limits[1], utterance.end)
     spans = fill([w.text for w in group], times, own)
-    return [Word(w.text, *span, w.speaker) for w, span in zip(group, spans, strict=True)]
+    return [Word(w.text, *span, w.speaker, source="unplaced" if time is None else "heard")
+            for w, span, time in zip(group, spans, times, strict=True)]
 
 
 def fill(texts: list[str], times: list[tuple[float, float] | None],
@@ -80,7 +82,7 @@ def fits(group: list[Word], floor: float, ceiling: float) -> bool:
 
 
 def capped(group: list[Word]) -> list[Word]:
-    return [Word(w.text, max(w.start, w.end - longest(w.text)), w.end, w.speaker) for w in group]
+    return [replace(w, start=max(w.start, w.end - longest(w.text))) for w in group]
 
 
 def room(index: int, groups: list[list[Word]], over: list[bool], floor: float) -> Limits:
