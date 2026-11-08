@@ -72,26 +72,32 @@ def save(name: str, value: str) -> None:
 
 
 def write_settings(data: dict[str, str]) -> None:
+    write_json(CONFIG, data)
+
+
+def write_json(path: Path, data: object) -> None:
+    """The whole file or none of it, readable by its owner only: config.json, and since
+    2026-11-09 preferences.json (tarjim/prefs/store.py). Callers hold SAVING."""
     private_home()
-    # Beside the settings file itself: a swap across two drives is refused (EXDEV).
-    CONFIG.parent.mkdir(parents=True, exist_ok=True)
-    handle, temporary = tempfile.mkstemp(dir=CONFIG.parent, prefix=".config-")
+    # Beside the file itself: a swap across two drives is refused (EXDEV).
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handle, temporary = tempfile.mkstemp(dir=path.parent, prefix=f".{path.stem}-")
     try:
         os.chmod(temporary, OWNER_FILE)
         with os.fdopen(handle, "w", encoding="utf-8") as out:
             out.write(json.dumps(data, ensure_ascii=False, indent=1))
-        put_in_place(temporary)
+        put_in_place(temporary, path)
     except BaseException:
         with contextlib.suppress(OSError):
             os.unlink(temporary)
         raise
 
 
-def put_in_place(temporary: str) -> None:
+def put_in_place(temporary: str, path: Path) -> None:
     """On Windows the swap fails while another thread is reading the file; that passes."""
     for attempt in range(TRIES):
         try:
-            os.replace(temporary, CONFIG)
+            os.replace(temporary, path)
             return
         except PermissionError:
             if attempt == TRIES - 1:

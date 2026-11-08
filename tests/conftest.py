@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -52,3 +53,19 @@ def no_browser_registration(monkeypatch: pytest.MonkeyPatch,
     monkeypatch.setattr(native_setup, "save", saved.__setitem__)
     monkeypatch.setattr(native_setup, "point_browsers", lambda _path: None)
     monkeypatch.setattr(native_setup, "KNOWN", set())
+
+
+@pytest.fixture
+def prefs_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """A home of its own for the saved settings (tarjim/prefs, 2026-11-09): never the person's
+    ~/.tarjim, and none of the old names in the environment."""
+    from tarjim.prefs import store
+
+    home = tmp_path / "home"
+    monkeypatch.setenv("TARJIM_HOME", str(home))
+    monkeypatch.setattr(config, "HOME", home)
+    monkeypatch.setattr(config, "CONFIG", home / "config.json")
+    for name in store.MIGRATED.values():
+        monkeypatch.delenv(f"TARJIM_{name.upper()}", raising=False)
+    monkeypatch.setattr(store, "SAID", set())
+    return home

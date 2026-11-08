@@ -13,8 +13,12 @@ Query = dict[str, list[str]]
 
 def refusal(order: Order) -> str:
     """Why an order cannot be made, found when it is sent and not at the end of the work."""
+    from tarjim.translate.prompt import DIALECTS
+
     if order.mode not in MODES:
         return "mode"
+    if order.dialect not in DIALECTS:  # the prompt looked it up mid-job (2026-11-09)
+        return "dialect"
     if order.mode not in DUBBING:
         return ""
     from tarjim.dub.make import DubUnavailable, choose
