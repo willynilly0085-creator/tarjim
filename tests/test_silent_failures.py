@@ -83,8 +83,12 @@ def test_a_burned_video_spends_little_more_than_its_source() -> None:
 
 @pytest.mark.parametrize("answer", [None, [], [{"id": 9, "text": "x"}]])
 def test_a_reply_that_translates_nothing_is_a_failure(answer: Any) -> None:
-    with pytest.raises(RuntimeError, match="empty"):
-        Translator(Answers(answer, answer)).translate(cues(), silence, brief())  # type: ignore[arg-type]
+    # Since 2026-11-08 a batch that fails twice is recorded on the translator rather than raised,
+    # so the batches after it are still asked (translate/gemini.py Translator.batch).
+    translator = Translator(Answers(answer, answer))  # type: ignore[arg-type]
+    done = translator.translate(cues(), silence, brief())
+    assert [c.text for c in done] == ["", ""]
+    assert len(translator.failures) == 1 and "empty" in str(translator.failures[0])
 
 
 def test_line_numbers_written_as_text_are_still_understood() -> None:

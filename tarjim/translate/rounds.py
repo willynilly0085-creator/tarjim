@@ -11,16 +11,24 @@ from tarjim.findings import findings
 from tarjim.job import checkpoint
 from tarjim.models import Cue
 from tarjim.rules import Rules
-from tarjim.translate.clean import budgets_for, over_budget
+from tarjim.translate.clean import over_budget
 from tarjim.translate.gemini import BAD_REPLY, AudioSlice, Translator
 from tarjim.translate.prompt import Brief
 from tarjim.translate.slots import as_said, has_letters
+
+# An engine that cannot be made (a key removed, a local server gone, a library missing) hands
+# over to the backup like one that failed.
+UNBUILT = (*BAD_REPLY, OSError, ImportError)
 
 
 class Rounds:
     def __init__(self, cues: list[Cue], audio: AudioSlice, brief: Brief) -> None:
         self.cues, self.audio, self.brief = cues, audio, brief
         self.sounds: set[int] = set()  # lines (by id) an engine answered empty as only a sound
+        # the parts each line was asked in (prompt.format_item), before one_speaker merges the
+        # parts of an exchange answered as one sentence
+        self.parts = [len(cue.parts) for cue in cues]
+        self.stopped: list[Exception] = []  # what the last engine that ran failed on
 
     def pending(self) -> list[Cue]:
         return [cue for cue in self.cues if not cue.text.strip() and has_letters(cue.source)
@@ -29,7 +37,7 @@ class Rounds:
     def run(self) -> list[Exception]:
         """The failures met on the way; what an engine filled before failing stays, so a used-up
         quota on the backup never takes back what the first engine did."""
-        from tarjim.engines.choice import asker, chain
+        from tarjim.engines.choice import chain
 
         failures: list[Exception] = []
         wanted = [cue for cue in self.cues if not cue.text.strip()]  # a backup never redoes good
@@ -37,14 +45,29 @@ class Rounds:
             if not wanted:
                 break
             checkpoint()  # a backup engine is never started for a job that was cancelled
-            translator = Translator(asker(provider), self.cues if turn else None)
-            try:
-                translator.translate(wanted, self.audio, self.brief)
-            except BAD_REPLY as error:
-                failures.append(error)
-            self.sounds |= translator.sounds
+            failures += self.turn(provider, wanted, self.cues if turn else None)
             wanted = self.pending()
         return failures
+
+    def turn(self, provider: str, wanted: list[Cue], whole: list[Cue] | None) -> list[Exception]:
+        """One engine's failures. Since 2026-11-08 an engine is made inside the try: a missing
+        key no longer fails the job before the backup is tried, and a backup that cannot be made
+        no longer throws away what the first engine translated. Only an engine that ran is the
+        one the stop note speaks of (stopped)."""
+        from tarjim.engines.choice import asker
+
+        try:
+            translator = Translator(asker(provider), whole)
+        except UNBUILT as error:
+            print(f"translation: {provider} could not be started: {error}", flush=True)
+            return [error]
+        try:
+            translator.translate(wanted, self.audio, self.brief)
+        except BAD_REPLY as error:
+            translator.failures.append(error)
+        self.sounds |= translator.sounds
+        self.stopped = translator.failures
+        return translator.failures
 
     def translated(self) -> bool:
         return any(cue.text.strip() for cue in self.cues)
@@ -65,4 +88,6 @@ class Rounds:
         shown = set(found.in_source)
         texts = {n: cue.text for n, cue in enumerate(self.cues, start=1)
                  if cue.text.strip() and n not in shown}
-        found.over_budget = over_budget(texts, budgets_for([c.duration for c in self.cues], rules))
+        budgets = [rules.budgets(cue.duration, parts) for cue, parts in zip(self.cues, self.parts,
+                                                                               strict=True)]
+        found.over_budget = over_budget(texts, budgets)

@@ -1,7 +1,5 @@
 import re
 
-from tarjim.rules import DEFAULT_RULES, Rules
-
 MARKS = ("A", "B", "C", "D")
 MARK = re.compile(r"^\s*[\[(]\s*([A-D])\s*[\])]\s*[-–—]?\s*")
 
@@ -37,12 +35,19 @@ def line_number(value: object) -> int:
     return int(number) if number.is_integer() else 0
 
 
-def over_budget(results: dict[int, str], budgets: list[int]) -> list[int]:
-    return [n for n, text in results.items() if len(text) > budgets[n - 1]]
+def over_budget(results: dict[int, str], budgets: list[list[int]]) -> list[int]:
+    return [n for n, text in results.items() if too_long(text, budgets[n - 1])]
 
 
-def budgets_for(durations: list[float], rules: Rules = DEFAULT_RULES) -> list[int]:
-    return [rules.char_budget(d) for d in durations]
+def too_long(text: str, budgets: list[int]) -> bool:
+    """Measured the way the prompt asked (prompt.format_item): an exchange part by part against
+    its own budget, the " || " between them not counted, and one sentence for it against the sum.
+    Until 2026-11-08 the whole text was measured against the whole cue's budget, so an exchange
+    that kept each part's budget was listed as too long."""
+    parts = [part.strip() for part in text.split("||")]
+    if len(parts) != len(budgets):
+        return len(" ".join(part for part in parts if part)) > sum(budgets)
+    return any(len(part) > most for part, most in zip(parts, budgets, strict=True))
 
 
 def in_order(text: str) -> str:
