@@ -25,6 +25,17 @@ def test_a_pass_with_made_up_lines_does_not_win() -> None:
     assert best_heard(real, [invented, real], said(INTRO, 30.0)) == real
 
 
-def test_without_the_local_words_the_vote_stands() -> None:
+def test_without_the_local_words_a_vote_that_kept_most_of_it_stands() -> None:
+    voted = [Utterance(0.0, 9.0, "S1", SPEECH)]
+    passes = [[Utterance(0.0, 9.0, "S1", SPEECH + " yes")], voted, voted]
+    assert best_heard(voted, passes, []) == voted
+
+
+def test_without_the_local_words_passes_spelled_apart_keep_the_middle_one() -> None:
+    # a Somali chant on 2026-11-08: each pass heard it whole, spelled its own way, and the vote
+    # kept 12 of 47 lines; the middle pass stands, not the longest nor the shortest
     voted = [Utterance(0.0, 2.0, "S1", "hello there")]
-    assert best_heard(voted, [[Utterance(0.0, 9.0, "S1", SPEECH)]], []) == voted
+    short, middle = SPEECH.split()[:8], SPEECH.split()[:12]
+    passes = [[Utterance(0.0, 9.0, "S1", SPEECH)], [Utterance(0.0, 6.0, "S1", " ".join(short))],
+              [Utterance(0.0, 7.0, "S1", " ".join(middle))]]
+    assert best_heard(voted, passes, []) == passes[2]

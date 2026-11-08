@@ -264,6 +264,7 @@ are **not licensed for commercial use**:
 | Tool | License | Commercial use |
 |---|---|---|
 | Timing aligner `MahmoudAshraf/mms-300m-1130-forced-aligner` (required) | CC-BY-NC-4.0 | No |
+| Speaker check `Wespeaker/wespeaker-voxceleb-resnet34-LM` (required, comes with timing) | CC-BY-4.0 | Yes |
 | Voice clone VoxCPM2 (optional) | Apache-2.0 | Yes |
 | Local translation `aya-expanse:8b` (optional) | CC-BY-NC-4.0 | No |
 | Local listening Qwen3-ASR-1.7B and Qwen3-ForcedAligner | Apache-2.0 | Yes |

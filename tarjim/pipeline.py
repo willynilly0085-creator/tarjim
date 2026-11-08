@@ -88,8 +88,7 @@ def write_picture(job: Job, cues: list[Cue], report: Report) -> Path | None:
     info = media.probe(job.video)
     if not info.has_picture:
         return None
-    canvas = placed(job, cues, Canvas(info.width, info.height, job.font_name,
-                                      media.bright_bottom(job.video)), info.duration)
+    canvas = placed(job, cues, Canvas(info.width, info.height, job.font_name), info.duration)
     mark = mark_for(canvas)
     canvas = moved(job, cues, canvas, mark)
     subtitles = render_ass(cues, canvas, job.rules)

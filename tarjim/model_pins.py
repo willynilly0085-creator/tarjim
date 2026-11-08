@@ -42,6 +42,11 @@ PINS = {
                                          (*SETTINGS_AND_WEIGHTS, "merges.txt")),
     "MahmoudAshraf/mms-300m-1130-forced-aligner": Pin("49402e9577b1158620820667c218cd494cc44486",
                                                       SETTINGS_AND_WEIGHTS),
+    # Whose voice each line is (tarjim/asr/voiceprint.py): one ONNX file, run by onnxruntime.
+    "Wespeaker/wespeaker-voxceleb-resnet34-LM": Pin(
+        "f0c48c298fd835726c27956a5d617bad7115627e", ("*.onnx",), (
+            ("voxceleb_resnet34_LM.onnx",
+             "7bb2f06e9df17cdf1ef14ee8a15ab08ed28e8d0ef5054ee135741560df2ec068"),)),
     "openbmb/VoxCPM2": Pin("32279effe8c19989596f05d353d1447f51d9e915",
                            (*SETTINGS_AND_WEIGHTS, "audiovae.pth")),
     "adefossez/HTDemucs": Pin("cbc8a9b1a87023b7fd74e7b3412e6321c0eab003",

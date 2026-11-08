@@ -33,6 +33,20 @@ def test_small_differences_are_left_to_the_aligner() -> None:
     assert anchor(on_time, heard_at(said, 8.6), 60.0) == on_time
 
 
+def test_a_line_stretched_to_its_pieces_end_keeps_its_place() -> None:
+    # 2026-11-08: a line said in 133-147 s came back as 131-164 s; moving it by the median of
+    # its words put it ahead of the turn said before it
+    said = ("your statements are also shockingly ahistorical in another respect which is if you "
+            "look at the history of immigration it has actually ebbed and flowed")
+    turn = Utterance(123.7, 132.6, "S2", "you're bringing a press one for English philosophy")
+    stretched = Utterance(131.4, 164.4, "S1", said)
+    heard = [*heard_at(turn.text, 127.0), *heard_at(said, 133.2, 0.5)]
+    moved = anchor([turn, stretched], heard, 410.0)
+    assert moved[1].start == stretched.start and moved[0].start < moved[1].start
+    last = heard[-1].end
+    assert last < moved[1].end <= last + 1.0  # its end where its words end, not at 164 s
+
+
 def test_nothing_heard_locally_changes_nothing() -> None:
     lines = [Utterance(1.0, 2.0, "S1", "Hello there my friend")]
     assert anchor(lines, [], 60.0) == lines

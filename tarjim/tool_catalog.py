@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 
 VOICE_REPO = "openbmb/VoxCPM2"
+VOICEPRINT_REPO = "Wespeaker/wespeaker-voxceleb-resnet34-LM"  # whose voice each line is
 
 
 @dataclass(frozen=True)
@@ -30,7 +31,8 @@ AYA = License("CC-BY-NC-4.0", "https://ollama.com/library/aya-expanse", commerci
 LGPL = License("LGPL-2.1", "https://ffmpeg.org/legal.html", commercial=True)
 TOOLS = [
     Tool("ffmpeg", ("BtbN/FFmpeg-Builds",), 0.08, True, "ffmpeg", LGPL),
-    Tool("timing", ("MahmoudAshraf/mms-300m-1130-forced-aligner",), 1.2, True, "hub", MMS),
+    Tool("timing", ("MahmoudAshraf/mms-300m-1130-forced-aligner", VOICEPRINT_REPO), 1.23, True,
+         "hub", MMS),
     Tool("accuracy", ("Qwen/Qwen3-ASR-1.7B-hf", "Qwen/Qwen3-ForcedAligner-0.6B-hf"), 5.9, False,
          "hub", QWEN),
     Tool("dubbing", (VOICE_REPO,), 4.7, False, "voice", APACHE),

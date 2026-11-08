@@ -7,7 +7,6 @@ from tarjim.asr.base import Transcript
 from tarjim.asr.sanity import implausible
 from tarjim.gemini_client import QuotaExhausted
 from tarjim.job import Job, checkpoint
-from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.kept import TRANSCRIPT, forget, load_heard
 from tarjim.listen.merge import Heard
 from tarjim.models import Word
@@ -121,46 +120,30 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     """The transcript, and whether it covers all the speech, so it is worth keeping."""
     import soundfile
 
-    from tarjim.listen.check import covered, regions_in
-    from tarjim.listen.coverage import Hearing
-    from tarjim.listen.timing import Timer
+    from tarjim.asr.voiceprint import RATE
+    from tarjim.listen.check import regions_in
+    from tarjim.listen.settle import Sound, settled
+    from tarjim.listen.whose import by_voice
 
     report("timing")
     wav, rate = soundfile.read(str(audio), dtype="float32")
     # first: its times correct a cloud listener's drift; the local listener is its own
     local = heard.local_words
-    opinion = second_opinion(audio) if local is None else local
-    utterances = placed(heard, opinion, len(wav) / rate)
-    timer = Timer(wav, rate, heard.language, opinion)
-    checked = covered(job, heard, Hearing(utterances, opinion, regions_in(wav)), timer)
-    words = trusted(checked.words, opinion)
-    text = " ".join(u.text for u in checked.utterances)
-    return Transcript(language=heard.language, text=text, words=words), not checked.left
+    opinion = second_opinion(audio, heard.language) if local is None else local
+    done = settled(job, heard, Sound(wav, rate, regions_in(wav)), opinion)
+    words = by_voice(done.transcript.words, wav) if rate == RATE else done.transcript.words
+    return replace(done.transcript, words=words), done.whole
 
 
-def placed(heard: Heard, opinion: list[Word], duration: float) -> list[Utterance]:
-    """The hearing the audio backs most, at the times the audio backs, with what filled the
-    stretches it left out on an earlier run."""
-    from tarjim.asr.anchor import anchor
-    from tarjim.listen.recover import best_heard
+def second_opinion(audio: Path, language: str = "") -> list[Word]:
+    """The words this computer heard, when they are in the language the clip was heard in."""
+    from tarjim.listen.opinion import agreeing
 
-    chosen = best_heard(heard.utterances, heard.passes, opinion)
-    return sorted([*anchor(chosen, opinion, duration), *heard.added], key=lambda u: u.start)
-
-
-def trusted(words: list[Word], opinion: list[Word]) -> list[Word]:
-    if implausible(words) and opinion and not implausible(opinion):
-        print(f"timing: {len(words)} words timed faster than speech; using the words this "
-              "computer heard", flush=True)
-        return opinion
-    return words
-
-
-def second_opinion(audio: Path) -> list[Word]:
     try:
-        return qwen_transcript(audio).words
+        heard = qwen_transcript(audio)
     except (RuntimeError, ValueError, MemoryError, OSError, ImportError):
         return []
+    return agreeing(heard.words, heard.language, language)
 
 
 def local_transcript(audio: Path, failure: RuntimeError | None = None) -> Transcript:

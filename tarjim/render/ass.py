@@ -20,7 +20,9 @@ LANDSCAPE_FONT = 0.058
 OUTLINED, BOXED = 1, 4
 SHADOW_COLOUR = "&H8C000000"
 OUTLINE_COLOUR = "&H00141414"
-BOX_COLOUR = "&H3A141414"
+# Warm near-black at about 70% cover: the picture still shows through, its own text does not
+# (the owner, 2026-11-08: whatever sits under the subtitle must never spoil it).
+BOX_COLOUR = "&H50131415"
 BOX_PADDING = 0.22
 BOTTOM_CENTRE, TOP_CENTRE = 2, 8
 SOFT_EDGE = "\\blur0.8"  # a slightly soft outline reads as a studio's, not a hard sticker
@@ -54,7 +56,8 @@ class Canvas:
     width: int
     height: int
     font: str = "Dubai"
-    bright: bool = False
+    # Every line sits on its own see-through box; False draws the older outlined letters.
+    boxed: bool = True
     # Where the picture's own text leaves room (render/placement.py): a distance from the bottom
     # edge, or from the top edge when top is set. None is the usual place.
     margin: int | None = None
@@ -85,11 +88,11 @@ class Canvas:
 
     @property
     def outline(self) -> int:
-        return 1 if self.bright else max(2, round(self.font_size * 0.08))
+        return 1 if self.boxed else max(2, round(self.font_size * 0.08))
 
     @property
     def shadow(self) -> int:
-        if self.bright:
+        if self.boxed:
             return max(4, round(self.font_size * BOX_PADDING))
         return max(1, self.outline // 2)
 
@@ -97,14 +100,14 @@ class Canvas:
 def render_ass(cues: list[Cue], canvas: Canvas, rules: Rules = DEFAULT_RULES) -> str:
     header = HEADER.format(
         w=canvas.width, h=canvas.height, font=canvas.font, size=canvas.font_size,
-        outline=canvas.outline, shadow=canvas.shadow, border=BOXED if canvas.bright else OUTLINED,
-        edge=BOX_COLOUR if canvas.bright else OUTLINE_COLOUR,
-        back=BOX_COLOUR if canvas.bright else SHADOW_COLOUR,
+        outline=canvas.outline, shadow=canvas.shadow, border=BOXED if canvas.boxed else OUTLINED,
+        edge=BOX_COLOUR if canvas.boxed else OUTLINE_COLOUR,
+        back=BOX_COLOUR if canvas.boxed else SHADOW_COLOUR,
         align=TOP_CENTRE if canvas.top else BOTTOM_CENTRE, mh=canvas.margin_h,
         mv=canvas.margin_v, charset=RIGHT_TO_LEFT if rules.rtl else 1, main=MAIN,
     )
-    look = Look(LETTERS_ONLY if canvas.bright else EVERYTHING, voices(cues),
-                "" if canvas.bright else SOFT_EDGE, {(s, e): (m, t) for s, e, m, t in canvas.moves})
+    look = Look(LETTERS_ONLY if canvas.boxed else EVERYTHING, voices(cues),
+                "" if canvas.boxed else SOFT_EDGE, {(s, e): (m, t) for s, e, m, t in canvas.moves})
     events = [line for cue in cues if cue.text.strip() for line in event_lines(cue, rules, look)]
     return header + "\n".join(events) + "\n"
 

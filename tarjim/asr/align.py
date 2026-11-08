@@ -34,7 +34,6 @@ class Slot:
     said: str = ""  # what the aligner listens for: a number spelled out, "" for none
 
 
-
 def short(utterance: Utterance) -> bool:
     return len(split_words(utterance.text)) <= SHORT_REPLY
 
@@ -149,7 +148,9 @@ class AlignEngine:
 
         self.language = language
         logp = self.emitter.emissions(wav)
-        self.speech = speech_mask(speech_regions(wav), len(logp))
+        # a heard line is speech too: the detector takes a chant for silence (2026-11-08)
+        heard = [(u.start, u.end) for u in utterances]
+        self.speech = speech_mask([*speech_regions(wav), *heard], len(logp))
         logp = mute_silence(logp, self.speech)
         over = overlapping(utterances)
         turns = [u for u, said_over in zip(utterances, over, strict=True) if not said_over]

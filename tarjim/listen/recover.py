@@ -18,6 +18,7 @@ from tarjim.scripts import split_words
 
 RUN = 2  # backed words come in runs: one common word ("the") backs nothing
 UNBACKED = 0.5
+KEPT = 0.5  # a vote holding less of the middle pass's words than this lost speech
 
 
 def tokens(run: list[Utterance]) -> list[str]:
@@ -31,10 +32,24 @@ def support(run: list[Utterance], local: list[str]) -> float:
     return backed - UNBACKED * (len(mine) - backed)
 
 
+def fuller(voted: list[Utterance], passes: list[list[Utterance]]) -> list[Utterance]:
+    """With no local words to judge by: the vote, unless it kept under half of what the middle
+    pass heard. Passes that each heard a whole chant, spelled three ways, share few lines (a
+    Somali chant on 2026-11-08: 47, 57 and 41 lines, a vote of 12), so the middle one stands:
+    not the longest, which may have made lines up, nor the shortest, which left most out."""
+    runs = sorted([run for run in passes if run and sane(run)], key=lambda run: len(tokens(run)))
+    if not runs:
+        return voted
+    middle = runs[(len(runs) - 1) // 2]
+    return middle if len(tokens(voted)) < KEPT * len(tokens(middle)) else voted
+
+
 def best_heard(voted: list[Utterance], passes: list[list[Utterance]],
                heard: list[Word]) -> list[Utterance]:
     local = [norm(w.text) for w in heard if norm(w.text)]
-    if not local or not passes:
+    if not passes:
         return voted
+    if not local:
+        return fuller(voted, passes)
     candidates = [voted, *[run for run in passes if run and sane(run)]]
     return max(candidates, key=lambda run: support(run, local))  # the first wins a tie

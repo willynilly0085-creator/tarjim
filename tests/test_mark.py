@@ -76,7 +76,7 @@ def test_a_subtitle_at_the_top_of_a_portrait_video_never_meets_the_mark() -> Non
 
 
 @pytest.mark.parametrize("canvas", [
-    Canvas(1920, 1080), Canvas(1280, 720, bright=True), Canvas(1080, 1080), Canvas(1440, 1080),
+    Canvas(1920, 1080), Canvas(1280, 720, boxed=False), Canvas(1080, 1080), Canvas(1440, 1080),
     Canvas(640, 360), Canvas(1920, 1080, margin=54, top=True), Canvas(1080, 1920),
     Canvas(608, 1080, margin=300), Canvas(1440, 2560, margin=40, top=True)])
 def test_the_mark_never_sits_on_the_subtitle(canvas: Canvas) -> None:
@@ -145,7 +145,6 @@ def outputs(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, job: Job) -> list[t
         return target
 
     monkeypatch.setattr(pipeline.media, "probe", lambda _v: media.VideoInfo(1280, 720, 9.0))
-    monkeypatch.setattr(pipeline.media, "bright_bottom", lambda _v: False)
     monkeypatch.setattr(pipeline, "placed", lambda _j, _c, canvas, _d: canvas)
     monkeypatch.setattr(pipeline, "burn", fake_burn)
     pipeline.write_outputs(job, CUES, [], pipeline.quiet)

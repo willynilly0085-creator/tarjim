@@ -85,8 +85,11 @@ class Mender:
     def novel(self, line: Utterance, lines: list[Utterance]) -> bool:
         return not overlaps(line, lines) and not repeats(line, lines)
 
-    def from_local(self, gap: Gap, _lines: list[Utterance]) -> list[Utterance]:
-        return from_words(gap.words)
+    def from_local(self, gap: Gap, lines: list[Utterance]) -> list[Utterance]:
+        """The local words as lines, less those a line close by already says: a cloud line
+        timed a little off leaves a gap its own words fill, and the sentence was shown twice
+        ("I apologize, Jim, if things got heated", 2026-11-08)."""
+        return [line for line in from_words(gap.words) if not repeats(line, lines)]
 
     def fill(self, gap: Gap, lines: list[Utterance]) -> tuple[list[Utterance], str]:
         again = [u for u in self.heard_again(gap) if self.novel(u, lines)]
