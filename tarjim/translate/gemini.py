@@ -25,6 +25,9 @@ PAD = 1.0
 BAD_REPLY = (RuntimeError, ValueError, LookupError, TypeError)
 # Asking again would only wait as long once more, or meet the same used-up quota.
 FINAL = (TimedOut, QuotaExhausted)
+# An engine that failed this many batches in a row (its server gone, its key refused) is asked
+# no more, so the backup gets the rest (2026-11-08).
+IN_A_ROW = 2
 
 AudioSlice = Callable[[float, float], bytes]
 
@@ -59,6 +62,7 @@ class Translator:
         self.whole = whole
         self.sounds: set[int] = set()  # the lines (by id) answered empty as only a sound
         self.failures: list[Exception] = []  # the batches that failed twice, and why
+        self.row = 0  # the batches that failed one after another, up to the last one asked
 
     def translate(self, cues: list[Cue], audio: AudioSlice, brief: Brief) -> list[Cue]:
         most = int(getattr(self.client, "most_cues", 0) or 0)
@@ -70,13 +74,16 @@ class Translator:
             if self.whole is not None:
                 told = replace(told, context=context_for(self.whole, batch))
             self.batch(batch, sound, told)
+            if self.row >= IN_A_ROW:
+                print(f"translation: {self.row} batches failed in a row; next engine", flush=True)
+                break
         return cues
 
     def batch(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
         """A batch that failed twice is noted and its lines go to the backup; the batches after
         it are still asked. Until 2026-11-08 one busy answer abandoned every later batch, so a
-        single engine showed most of a long video in its source language. Only a used-up quota
-        or a timed-out engine (FINAL) stops the engine."""
+        single engine showed most of a long video in its source language. A used-up quota or a
+        timed-out engine (FINAL) stops the engine, and so do IN_A_ROW failed batches."""
         try:
             self.fill_twice(cues, sound, brief)
         except FINAL:
@@ -84,15 +91,20 @@ class Translator:
         except BAD_REPLY as error:
             print(f"translation: a batch of {len(cues)} lines failed: {error}", flush=True)
             self.failures.append(error)
+            self.row += 1
+        else:
+            self.row = 0
 
     def fill_twice(self, cues: list[Cue], sound: bytes | None, brief: Brief) -> None:
         """The lines that came back wrong are asked once more, alone, beside their neighbours
-        (read only) and with the same sound; if that fails, the first answer stays."""
+        (read only) and with the same sound; if that fails, the first answer stays. Since
+        2026-11-08 one_speaker also runs when the engine stops while unsliding."""
         self.fill_again(cues, sound, brief)
-        self.unslide(cues, sound, brief)
-        strict = has_speakers(cues)
-        retry = [cue for cue in cues if needs_retry(cue, strict) and id(cue) not in self.sounds]
         try:
+            self.unslide(cues, sound, brief)
+            strict = has_speakers(cues)
+            retry = [cue for cue in cues
+                     if needs_retry(cue, strict) and id(cue) not in self.sounds]
             if retry:
                 self.once_more(retry, sound, replace(brief, context=context_for(self.whole or cues,
                                                                                 retry)))

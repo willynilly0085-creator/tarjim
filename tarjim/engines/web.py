@@ -66,6 +66,10 @@ def post(provider: str, url: str, headers: dict[str, str], **payload: Any) -> An
     seconds = payload.pop("timeout", TIMEOUT)
     try:
         response = requests.post(url, headers=headers, timeout=seconds, **payload)
+    except requests.Timeout as error:
+        # Since 2026-11-08 a request that ran out of time is final (TimedOut): as a plain error
+        # each batch of a long clip waited twice, hours on a local model on the processor.
+        raise TimedOut(provider, 0, str(error)) from error
     except requests.RequestException as error:
         raise EngineError(provider, 0, str(error)) from error
     if response.status_code != OK:
