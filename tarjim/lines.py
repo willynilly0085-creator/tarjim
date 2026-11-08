@@ -1,4 +1,5 @@
 import re
+import unicodedata
 
 from tarjim.rules import DEFAULT_RULES, Rules
 
@@ -14,6 +15,10 @@ INSIDE_A_WORD = {("kanji", "kanji"): 30, ("kanji", "hiragana"): 20,
                  ("katakana", "katakana"): 30, ("hiragana", "hiragana"): 6}
 SCRIPTS = (("hiragana", 0x3040, 0x309F), ("katakana", 0x30A0, 0x30FF),
            ("kanji", 0x4E00, 0x9FFF), ("kanji", 0x3400, 0x4DBF))
+MARKS = {"Mn", "Mc", "Me"}
+JOINER = "\u200d"  # zero width joiner: the letters on both sides are drawn as one
+SPACING_MARKS = set("\u0e33\u0eb3")  # Thai and Lao SARA AM: drawn on the letter before
+LEADING_VOWELS = set("\u0e40\u0e41\u0e42\u0e43\u0e44\u0ec0\u0ec1\u0ec2\u0ec3\u0ec4")
 
 
 def script_of(char: str) -> str:
@@ -47,7 +52,7 @@ def balance_lines(text: str, rules: Rules = DEFAULT_RULES) -> list[str]:
     if len(text) <= rules.line_chars:
         return [text]
     joiner = " " if rules.spaced else ""
-    units = text.split(" ") if rules.spaced else list(text)
+    units = text.split(" ") if rules.spaced else clusters(text)
     if len(units) < MIN_UNITS:  # one word longer than a line (a link, a handle) stays whole
         return [text]
 
@@ -60,3 +65,23 @@ def balance_lines(text: str, rules: Rules = DEFAULT_RULES) -> list[str]:
 
     best = min(range(1, len(units)), key=cost)
     return [joiner.join(units[:best]).strip(), joiner.join(units[best:]).strip()]
+
+
+def clusters(text: str) -> list[str]:
+    """The letters of an unspaced script as they are drawn: a vowel or tone mark stays on its
+    letter and a Thai or Lao leading vowel on the letter after it. Before 2026-11-08 a Thai
+    line could start with a mark torn from the letter that carries it."""
+    found: list[str] = []
+    for char in text:
+        if found and bound(found[-1], char):
+            found[-1] += char
+        else:
+            found.append(char)
+    return found
+
+
+def bound(before: str, char: str) -> bool:
+    """Whether char belongs to the cluster before it."""
+    if unicodedata.category(char) in MARKS or char in SPACING_MARKS or char == JOINER:
+        return True
+    return before[-1] in LEADING_VOWELS or before[-1] == JOINER
