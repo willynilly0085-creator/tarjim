@@ -9,6 +9,7 @@ from pathlib import Path
 from tarjim.listen.chunks import joined, listen_in_chunks
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.kept import keep_heard, keep_transcript, kept_transcript, load_heard
+from tarjim.listen.lead import LINK_LEAD
 from tarjim.listen.merge import Heard, Piece
 from tarjim.listen.vote import vote
 from tarjim.models import SOURCES, Word
@@ -87,8 +88,9 @@ def test_a_transcript_keeps_its_words_sources(tmp_path: Path) -> None:
 
 
 def heard_in(start: float, _end: float) -> Heard:
-    run = [Utterance(2.0, 4.0, "S1", f"said at {start:.0f} seconds"),
-           Utterance(5.0, 7.0, "S2", "and an answer to it")]
+    lead = LINK_LEAD if start else 0.0  # heard before the piece itself (2026-11-09)
+    run = [Utterance(lead + 2.0, lead + 4.0, "S1", f"said at {start + lead:.0f} seconds"),
+           Utterance(lead + 5.0, lead + 7.0, "S2", "and an answer to it")]
     return Heard("French" if start else "English", run, [run, run, run])
 
 

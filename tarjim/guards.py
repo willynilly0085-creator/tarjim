@@ -55,6 +55,11 @@ NAMES = (
     "kept.implausible",  # a kept transcript whose timing no one could speak
     "kept.rederived",  # a kept transcript made by other code, derived again
     "kept.revoted",  # a kept hearing voted again piece by piece
+    "lead.over_cut",  # a line heard over a piece's cut, dropped: the piece before has it (11-09)
+    "speaker.linked_piece",  # a piece's label linked to the clip's name its lead heard (11-09)
+    "speaker.eliminated",  # ...the one label left given the one name left
+    "speaker.unlinked_piece",  # ...one with nothing to link it, keeping its own name
+    "speaker.apart_piece",  # ...one whose own name another label took, left for the voice check
 )
 
 COUNTS: ContextVar[Counter[str] | None] = ContextVar("guards", default=None)

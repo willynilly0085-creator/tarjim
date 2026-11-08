@@ -26,6 +26,10 @@ class Piece:
     end: float
     passes: list[list[Utterance]]
     language: str = ""  # as its listener named it; the clip's is the first piece's (2026-11-08)
+    # 2026-11-09: the seconds of the piece before it that its request heard too, and each pass's
+    # lines there at the request's own times: they only tell who is who (listen/links.py)
+    lead_s: float = 0.0
+    lead: list[list[Utterance]] = field(default_factory=list)
 
     @property
     def span(self) -> Span:

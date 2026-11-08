@@ -2,9 +2,10 @@
 
 A cloud listener given minutes of sound in one request drifts and leaves speech out: on
 2026-10-31 all three passes over a 250-second clip stopped at 178 s and stretched their times to
-fill the rest. Short pieces keep every listener close to the sound. A piece's speakers keep the
-listener's labels: a tag per piece made one person a new speaker every 75 seconds, and a dub gives
-each speaker a voice of their own.
+fill the rest. Short pieces keep every listener close to the sound. A tag per piece made one person
+a new speaker every 75 seconds, and a dub gives each speaker a voice of their own; since 2026-11-09
+each request also hears the end of the piece before it (listen/lead.py), and the labels of
+neighbouring pieces are linked from what both heard there (listen/links.py).
 """
 from collections.abc import Callable
 from dataclasses import replace
@@ -13,6 +14,8 @@ from itertools import pairwise
 from tarjim import guards
 from tarjim.job import checkpoint
 from tarjim.listen.gemini_listen import Utterance
+from tarjim.listen.lead import lead_of, pieces_of
+from tarjim.listen.links import named
 from tarjim.listen.merge import Heard, Piece, agreed
 from tarjim.listen.vote import SIMILAR, norm
 from tarjim.scripts import split_words
@@ -160,8 +163,14 @@ def listen_one(span: Span, listen_span: ListenSpan) -> Heard:
 
 def listen_in_chunks(duration: float, regions: list[Span], listen_span: ListenSpan,
                      target: float | None = None) -> Heard:
-    heard = [(span, listen_one(span, listen_span)) for span in spans(duration, regions, target)]
-    pieces = [Piece(start, end, one.passes, one.language) for (start, end), one in heard]
+    """Each piece heard on its own; one after the first from a little before it (2026-11-09)."""
+    cut = spans(duration, regions, target)
+    size = chunk_seconds() if target is None else target
+    heard = []
+    for k, (start, end) in enumerate(cut):
+        lead_s = lead_of(cut, k, regions, size)
+        heard.append((lead_s, listen_one((start - lead_s, end), listen_span)))
+    pieces = pieces_of(cut, heard)
     if len(pieces) > 1:
         print(f"listening: {len(pieces)} pieces, cut in pauses", flush=True)
     utterances, passes = joined(pieces)
@@ -175,9 +184,11 @@ def joined(pieces: list[Piece]) -> tuple[list[Utterance], list[list[Utterance]]]
     The same for a fresh hearing and a kept one, so a kept hearing is voted again exactly as it
     was heard (2026-11-08: the joined passes were voted, and one broken line in one piece cost a
     reply in another). A listener heard once (OpenAI) votes to its own pass, less any line no one
-    could speak, as a kept one already did."""
+    could speak, as a kept one already did. Each piece's speakers are named as the clip's
+    (listen/links.named, 2026-11-09); its passes keep their request's own names."""
+    voted = named(pieces, [agreed(p.passes) for p in pieces])
     utterances = [u for k, p in enumerate(pieces)
-                  for u in shift(agreed(p.passes), p.span, request=f"k{k}.v")]
+                  for u in shift(voted[k], p.span, request=f"k{k}.v")]
     rounds = max(len(p.passes) for p in pieces)
     passes = [[u for k, p in enumerate(pieces) if n < len(p.passes)
                for u in shift(p.passes[n], p.span, request=f"k{k}.p{n}")] for n in range(rounds)]

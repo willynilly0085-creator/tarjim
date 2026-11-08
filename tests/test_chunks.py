@@ -6,6 +6,7 @@ import pytest
 from tarjim.listen import chunks
 from tarjim.listen.chunks import chunk_seconds, is_long, listen_in_chunks, spans
 from tarjim.listen.gemini_listen import Utterance
+from tarjim.listen.lead import LINK_LEAD
 from tarjim.listen.merge import Heard
 
 
@@ -53,7 +54,9 @@ def test_the_size_is_a_setting_and_zero_hears_the_clip_in_one_request(
 
 def test_pieces_are_moved_to_video_time_and_keep_the_listener_speakers() -> None:
     def listen_span(start: float, _end: float) -> Heard:
-        line = [Utterance(2.0, 3.0, "S1", f"from {start:.0f}")]
+        # each request after the first hears LINK_LEAD seconds before its piece (2026-11-09)
+        piece = start + LINK_LEAD if start else 0.0
+        line = [Utterance(piece - start + 2.0, piece - start + 3.0, "S1", f"from {piece:.0f}")]
         return Heard("English", line, [line, line, line])
 
     heard = listen_in_chunks(700.0, [(0.0, 700.0)], listen_span, target=300.0)
