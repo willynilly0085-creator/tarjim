@@ -1,4 +1,3 @@
-from bisect import bisect_right
 from dataclasses import dataclass, field
 
 from tarjim.models import Cue, Word, join_words
@@ -66,9 +65,11 @@ def should_join(cue: Cue, piece: Piece, rules: Rules) -> bool:
 
 def room_for(cue: Cue, piece: Piece, rules: Rules) -> bool:
     """A new speaker becomes a part of the exchange, and each part is drawn on one line: a part
-    longer than a line would wrap onto a third (2026-11-08)."""
+    longer than a line would wrap onto a third (2026-11-08). The same speaker's words go on the
+    exchange's last part, which must still fit its line: before 2026-11-08 they were never
+    measured, and a long answer wrapped onto a third line."""
     if not piece.new_speaker:
-        return True
+        return not cue.is_dialogue or fits_one_line(cue.parts[-1] + piece.words, rules)
     parts = [*cue.parts, piece.words]
     return len(parts) <= MAX_SPEAKERS and all(fits_one_line(part, rules) for part in parts)
 
@@ -98,17 +99,52 @@ def with_replies(cues: list[Cue], replies: list[list[Word]], rules: Rules) -> li
 
 
 def take_reply(cues: list[Cue], reply: list[Word], rules: Rules) -> list[Cue]:
-    if not cues:
-        return [new_cue(Piece(list(reply)))]
-    index = max(0, bisect_right([cue.start for cue in cues], reply[0].start) - 1)
+    """The host is the subtitle whose time holds the reply's start, else the one its time
+    overlaps most; with neither, the reply is a subtitle of its own. Before 2026-11-08 the host
+    was the last subtitle begun before the reply, even one that had ended: it was stretched over
+    the silence and the reply was shown seconds before it was said."""
+    index = host_of(cues, reply)
+    if index is None:
+        return [*cues, cue_of([Reply(reply)])]
     host = cues[index]
-    parts = [*host.parts, reply]
+    parts = in_time(host.parts, Reply(reply))
     if len(parts) <= MAX_SPEAKERS and all(fits_one_line(part, rules) for part in parts):
-        host.parts.append(list(reply))
-        host.words.extend(reply)
-        host.end = max(host.end, last_end(reply))
+        cues[index] = cue_of(parts)
         return cues
+    if reply[0].start < host.start:  # said before the turn: nothing of it to cut away
+        return [*cues, cue_of([Reply(reply)])]
     return [*cues[:index], *split_at(host, reply, rules), *cues[index + 1:]]
+
+
+def host_of(cues: list[Cue], reply: list[Word]) -> int | None:
+    said = reply[0].start
+    holding = [k for k, cue in enumerate(cues) if cue.words and cue.start <= said < last_end(
+        cue.words)]
+    if holding:
+        return holding[-1]
+    shared = {k: overlap(cue, reply) for k, cue in enumerate(cues) if cue.words}
+    best = max(shared, key=lambda k: shared[k], default=None)
+    return best if best is not None and shared[best] > 0 else None
+
+
+def overlap(cue: Cue, reply: list[Word]) -> float:
+    return min(last_end(cue.words), last_end(reply)) - max(cue.start, reply[0].start)
+
+
+def in_time(parts: list[list[Word]], reply: list[Word]) -> list[list[Word]]:
+    """A reply said before the turn begins comes first, as it is heard."""
+    at = sum(1 for part in parts if part and part[0].start <= reply[0].start)
+    return [*parts[:at], reply, *parts[at:]]
+
+
+class Reply(list[Word]):
+    """A part made of a reply said over a turn: its own line, never joined to the first words
+    of the subtitle next to it (fit.joined_parts, 2026-11-08)."""
+
+
+def like(part: list[Word], words: list[Word]) -> list[Word]:
+    """The words as a part of the same kind: a reply part stays a reply part."""
+    return Reply(words) if isinstance(part, Reply) else list(words)
 
 
 def split_at(host: Cue, reply: list[Word], rules: Rules) -> list[Cue]:
@@ -117,10 +153,13 @@ def split_at(host: Cue, reply: list[Word], rules: Rules) -> list[Cue]:
     of the turn begun while the reply is still said stays with the turn: before 2026-11-08 it
     was torn from its sentence and shown after the reply."""
     at = max(reply[0].start + EDGE, last_end(reply))
-    before = [kept for part in host.parts if (kept := [w for w in part if w.start < at])]
-    after = [rest for part in host.parts if (rest := [w for w in part if w.start >= at])]
-    head = [list(reply)]
-    if after and fits_one_line(after[0], rules):
+    before = [like(part, kept) for part in host.parts if (kept := [w for w in part
+                                                                     if w.start < at])]
+    after = [like(part, rest) for part in host.parts if (rest := [w for w in part
+                                                                   if w.start >= at])]
+    head: list[list[Word]] = [Reply(reply)]
+    # an exchange only when both parts fit their lines (2026-11-08: a long reply wrapped)
+    if after and fits_one_line(after[0], rules) and fits_one_line(reply, rules):
         head.append(after.pop(0))
     return [cue_of(parts) for parts in (before, head, after) if parts]
 

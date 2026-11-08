@@ -78,15 +78,19 @@ def save_review(job: Job, cues: list[Cue]) -> None:
 
 class Made(NamedTuple):
     """What the outputs are written from: the subtitles, the words heard (a dub is timed by
-    them) and the picture, probed once a run (2026-11-08)."""
+    them) and the picture, probed once a run, with the rules fitted to it (2026-11-08)."""
     cues: list[Cue]
     words: list[Word]
     info: media.VideoInfo
+    rules: Rules | None = None
 
 
 def write_outputs(job: Job, made: Made, report: Report) -> None:
     cues = made.cues
-    job.output(".srt").write_text(render_srt(cues, job.rules), encoding="utf-8-sig")
+    # the rules fitted to the picture, as the .ass, the translation and the check use: before
+    # 2026-11-08 the .srt was wrapped by the unfitted ones and broke its lines differently
+    rules = made.rules or fitted(job.rules, made.info.width, made.info.height)
+    job.output(".srt").write_text(render_srt(cues, rules), encoding="utf-8-sig")
     picture = write_picture(job, cues, made.info, report)
     if job.dub:
         from tarjim.dub.make import dub_video
@@ -135,6 +139,6 @@ def run(job: Job, report: Report = quiet) -> tuple[list[Cue], list[Issue]]:
     cues = translate(job, cues, rules)
     save_review(job, cues)
     report("writing")
-    write_outputs(job, Made(cues, words, info), report)
+    write_outputs(job, Made(cues, words, info, rules), report)
     report("done")
     return cues, check(cues, rules)
