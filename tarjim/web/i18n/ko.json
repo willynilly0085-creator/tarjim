@@ -488,5 +488,6 @@
   "note_readability": "표시 시간보다 길어 읽기 어려울 수 있는 줄 ({n}): {at}",
   "note_timing": "타이밍이 목소리와 어긋났을 수 있습니다: 단어의 {share}%만 제자리에서 찾았습니다",
   "note_sounds": "음, 어 같은 소리뿐이라 자막 없이 둔 줄 ({n}): {at}",
-  "note_engine_stopped": "번역 엔진이 중간에 멈춰서 남은 줄은 원문으로 보입니다. 이유: {reason}"
+  "note_engine_stopped": "번역 엔진이 중간에 멈춰서 남은 줄은 원문으로 보입니다. 이유: {reason}",
+  "note_budget_used": "유료 요청을 줄이려고 다시 듣지 않은 말소리 ({n}): {at}. 다시 번역하면 다시 듣습니다"
 }

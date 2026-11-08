@@ -6,6 +6,8 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
+from tarjim.gemini_client import QuotaExhausted
+from tarjim.listen.budget import Budget, Refused
 from tarjim.listen.gemini_listen import Utterance
 
 ASKED = "asked.json"
@@ -40,20 +42,25 @@ class Asked:
     """Each stretch asked about again. Within a job, what was heard: a stretch inside sound heard
     already is answered from it, never paid for again (2026-11-08: the second timing asked Gemini
     about the same gaps again, up to six requests a gap). Across runs, how often it was answered:
-    a request that failed is no try, or two busy hours gave the speech up for good (2026-11-08)."""
+    a request that failed is no try, or two busy hours gave the speech up for good (2026-11-08).
+    Since 2026-11-08 a job asks within its budget (listen/budget.py) and asks nothing more once
+    the quota is used up; a refused stretch is no try either."""
     path: Path
     tries: list[list[float]]  # [start, end, times answered]
     answers: list[tuple[Span, list[Utterance]]] = field(default_factory=list)
     counted: list[Span] = field(default_factory=list)  # counted in this job
+    budget: Budget = field(default_factory=Budget)
+    exhausted: bool = False  # the engine's quota is used up: nothing more is asked in this job
+    failed: list[Span] = field(default_factory=list)  # requests that failed in this job
 
     @classmethod
-    def load(cls, cache: Path) -> "Asked":
+    def load(cls, cache: Path, budget: Budget | None = None) -> "Asked":
         try:
             data = json.loads((cache / ASKED).read_text(encoding="utf-8"))
             tries = [[float(a), float(b), int(n)] for a, b, n in data["asked"]]
         except (OSError, ValueError, KeyError, TypeError):
             tries = []
-        return cls(cache / ASKED, tries)
+        return cls(cache / ASKED, tries, budget=budget or Budget())
 
     def save(self) -> None:
         self.path.write_text(json.dumps({"asked": self.tries}), encoding="utf-8")
@@ -79,6 +86,15 @@ class Asked:
         if entry is not None and entry[2] >= TRIES and not self.this_job(span):
             raise Spent(f"{span[0]:.1f}-{span[1]:.1f} s was answered {TRIES} times")
 
+    def stopped(self, start: float, end: float) -> None:
+        """No request after a used-up quota, nor for sound that failed already in this job: until
+        2026-11-08 the failure was taken for an answer that heard nothing, and with the local
+        listener on, the stretch was dropped from the job."""
+        if self.exhausted:
+            raise Refused("the engine's quota is used up; nothing more is asked in this job")
+        if any(first <= start and end <= last for first, last in self.failed):
+            raise Refused(f"{start:.1f}-{end:.1f} s failed already in this job")
+
     def count(self, span: Span) -> None:
         """One try for an answered stretch, once a job: more sound beside a stretch asked in this
         job is the same stretch, not another try."""
@@ -99,12 +115,19 @@ class Asked:
                 return known
             span = heard_span(start, end)
             self.allow(span)
-            lines: list[Utterance] = []
-            try:  # a failed request is answered with nothing for the rest of the job
-                lines = relisten(*span)
-                self.count(span)
-            finally:
-                self.answers.append((span, lines))
-            return lines
+            self.stopped(start, end)
+            self.budget.charge(span)
+            return self.answered(relisten, span)
 
         return once
+
+    def answered(self, relisten: Relisten, span: Span) -> list[Utterance]:
+        try:
+            lines = relisten(*span)
+        except Exception as error:  # not asked again in this job, and no try
+            self.exhausted = self.exhausted or isinstance(error, QuotaExhausted)
+            self.failed.append(span)
+            raise
+        self.count(span)
+        self.answers.append((span, lines))
+        return lines

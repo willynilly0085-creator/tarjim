@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from tarjim import media
+from tarjim.findings import findings
 from tarjim.job import Job
 from tarjim.listen.asked import TRIES, Asked
 from tarjim.listen.coverage import Gap, Hearing, open_gaps
@@ -59,6 +60,15 @@ def keep(job: Job, heard: Heard, asked: Asked, left: list[Gap]) -> None:
         print(f"coverage: {len(open_gaps(left))} stretch(es) of speech still have no words; the "
               f"hearing is kept and only they are asked about again on the next run ({TRIES} "
               "times at most)", flush=True)
+
+
+def paid(asked: Asked) -> None:
+    """What the job paid to ask again, said once; the stretches its budget refused are listed on
+    the job page (2026-11-08). They are open too, so the next run asks them."""
+    spent = asked.budget
+    findings().refused = sorted(set(spent.refused))
+    if spent.made or spent.refused:
+        print(spent.said(), flush=True)
 
 
 def relistener(provider: str, video: Path, asked: Asked) -> Relisten | None:

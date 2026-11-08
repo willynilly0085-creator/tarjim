@@ -143,6 +143,13 @@ def reusable(cache: Path) -> Transcript | None:
     return found[0]
 
 
+def rederiving(cache: Path) -> bool:
+    """The kept transcript is derived again from the kept hearing: what that asks again is paid
+    because the code or settings changed, and the log says so (2026-11-08)."""
+    found = kept_transcript(cache)
+    return found is not None and not found[1] and (cache / HEARD).exists()
+
+
 def forget(cache: Path) -> None:
     """What a "listen again" clears: the hearing, what was asked again, its transcript and the
     lines made from them."""

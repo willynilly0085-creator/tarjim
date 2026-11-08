@@ -488,5 +488,6 @@
   "note_readability": "比显示时间长、可能难以读完的行（{n}）：{at}",
   "note_timing": "时间轴可能与声音不符：只有 {share}% 的词在标注的位置被找到",
   "note_sounds": "只是“嗯”“呃”之类的声音，未加字幕的行（{n}）：{at}",
-  "note_engine_stopped": "翻译引擎中途停止，所以其余的行按原文显示。原因：{reason}"
+  "note_engine_stopped": "翻译引擎中途停止，所以其余的行按原文显示。原因：{reason}",
+  "note_budget_used": "为减少付费请求，这些语音没有重听（{n}）：{at}。再翻译一次即可重听"
 }

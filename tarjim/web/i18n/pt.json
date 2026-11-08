@@ -488,5 +488,6 @@
   "note_readability": "Linhas mais longas que o seu tempo, podem ser difíceis de ler ({n}): em {at}",
   "note_timing": "A sincronia pode estar fora da voz: só {share}% das palavras estão onde foram marcadas",
   "note_sounds": "Só sons, como Hum ou Éh, deixados sem legenda ({n}): em {at}",
-  "note_engine_stopped": "O motor de tradução parou no meio, por isso as linhas restantes aparecem no original. Motivo: {reason}"
+  "note_engine_stopped": "O motor de tradução parou no meio, por isso as linhas restantes aparecem no original. Motivo: {reason}",
+  "note_budget_used": "Fala não ouvida de novo, para limitar pedidos pagos ({n}): em {at}. Traduza o vídeo outra vez para conferi-la"
 }

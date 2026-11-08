@@ -36,6 +36,9 @@ class Findings:
     # speech no listener heard and that is not asked about again (2026-11-08: it was not listed,
     # and a transcript kept with it showed plain success on every later run)
     given_up: list[Span] = field(default_factory=list)
+    # stretches not asked about again because the job's budget was used (listen/budget.py,
+    # 2026-11-08); they are in `left` too, and asked on the next run
+    refused: list[Span] = field(default_factory=list)
 
     def heard(self, left: tuple[Span, ...], agreement: float | None,
               given_up: tuple[Span, ...] = ()) -> None:
@@ -58,7 +61,9 @@ class Findings:
                 note("untranslated", at([n for n in kind("untranslated") if n not in sounds])),
                 note("overlap", at(kind("overlap"))),
                 note("readability", at(readable), problem=False),
-                note("sounds", at(self.sounds), problem=False), *self.timing()]
+                note("sounds", at(self.sounds), problem=False),
+                note("budget_used", [start for start, _end in self.refused], problem=False),
+                *self.timing()]
         return [row for row in rows if row["count"]]
 
     def stop(self) -> list[Note]:

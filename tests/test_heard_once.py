@@ -10,6 +10,7 @@ from test_coverage_flow import LOCAL, SPOKEN, Engine, everything, said, setup
 from tarjim import config, hearing
 from tarjim.findings import FINDINGS, Findings
 from tarjim.listen import check, timing
+from tarjim.listen.budget import Refused
 from tarjim.listen.coverage import Gap, Hearing
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.kept import Asked, Spent
@@ -50,7 +51,9 @@ def test_a_failed_request_is_not_made_again_in_the_same_job(tmp_path: Path) -> N
     again = Asked.load(tmp_path).asking(failing)
     with pytest.raises(RuntimeError):
         again(9.0, 17.0)
-    assert again(10.0, 16.0) == [] and calls == [8.25]
+    with pytest.raises(Refused):  # unasked, not an answer that heard nothing (2026-11-08)
+        again(10.0, 16.0)
+    assert calls == [8.25]
 
 
 def test_a_stretch_is_asked_about_twice_across_runs_at_most(tmp_path: Path) -> None:

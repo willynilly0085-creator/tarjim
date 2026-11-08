@@ -114,11 +114,16 @@ def settled(job: Job, heard: Heard, sound: Sound, opinion: list[Word]) -> Timed:
     """Speech left out filled once and the hearing kept, the lines timed with the second opinion
     and, when that is off the voice, without it; the hearing kept with the fills of the timing
     chosen."""
+    from tarjim.listen import budget
     from tarjim.listen.asked import Asked
-    from tarjim.listen.check import keep, repaired
+    from tarjim.listen.check import keep, paid, repaired
+    from tarjim.listen.kept import rederiving
 
-    found = placed(heard, opinion, len(sound.wav) / sound.rate)
-    asked = Asked.load(job.cache)
+    seconds = len(sound.wav) / sound.rate
+    found = placed(heard, opinion, seconds)
+    # one budget for every stretch asked again in this job (2026-11-08)
+    asked = Asked.load(job.cache, budget.budget_for(heard.provider, seconds,
+                                                    rederiving(job.cache)))
     repair = repaired(job, heard, Hearing(found.moved, opinion, sound.speech), asked)
     fills = [*found.fills, *repair.mended.fills]
     keep(job, replace(heard, added=fills), asked, [])  # before any timing (2026-11-08)
@@ -128,4 +133,5 @@ def settled(job: Job, heard: Heard, sound: Sound, opinion: list[Word]) -> Timed:
                     bool(opinion))
     words = [Fill(line) for line in chosen.added]  # judged by their words on a later run
     keep(job, replace(heard, added=[*fills, *words]), asked, chosen.left)
+    paid(asked)
     return chosen

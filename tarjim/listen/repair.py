@@ -9,6 +9,7 @@ from dataclasses import dataclass, field, replace
 
 from tarjim.job import checkpoint
 from tarjim.listen.asked import TRIES, Spent
+from tarjim.listen.budget import Refused
 from tarjim.listen.coverage import (
     NOT_ASKED,
     NOT_REPAIRED,
@@ -36,6 +37,14 @@ MAIN = "S1"  # the speaker of a line with no turn heard anywhere
 __all__ = ["NOT_ASKED", "NOT_REPAIRED", "described", "still_left"]
 
 Relisten = Callable[[float, float], list[Utterance]]  # asked about a gap, in clip times
+
+
+class Unasked:
+    """No answer for a stretch in this job: the budget refused it, the request failed or the
+    quota is used up. The stretch stays open and is asked on the next run (2026-11-08)."""
+
+
+UNASKED = Unasked()
 
 
 @dataclass(frozen=True)
@@ -113,11 +122,11 @@ class Mender:
     def __init__(self, hearing: Hearing, relisten: Relisten | None, name: str) -> None:
         self.hearing, self.relisten, self.name = hearing, relisten, name or "the same engine"
 
-    def heard_again(self, gap: Gap) -> list[Utterance] | None:
+    def heard_again(self, gap: Gap) -> list[Utterance] | Unasked | None:
         """What the engine hears in the stretch now, with a little sound either side (the job's
         record adds it, listen/kept.py); None when no engine is asked about it any more: there is
-        none, or it answered TRIES times across runs. A failed request is [], so the stretch is
-        left for the next run to ask again."""
+        none, or it answered TRIES times across runs. A request refused or failed is UNASKED: until
+        2026-11-08 it was [], heard nothing, and with the local listener on it was dropped."""
         if self.relisten is None:
             return None
         checkpoint()  # a cancel stops before another request
@@ -125,10 +134,13 @@ class Mender:
             return self.relisten(gap.start, gap.end)
         except Spent:
             return None
+        except Refused as error:
+            print(f"coverage: not asked again with {self.name}: {error}", flush=True)
+            return UNASKED
         except (RuntimeError, OSError) as error:
             print(f"coverage: listening again with {self.name} failed: {str(error)[:200]}",
                   flush=True)
-            return []
+            return UNASKED
 
     def novel(self, line: Utterance, lines: list[Utterance]) -> bool:
         return not overlaps(line, lines) and not repeats(line, lines)
@@ -146,27 +158,30 @@ class Mender:
         words, wherever that line's words were timed."""
         return "the local words here are said by a line close by; checked once it is timed"
 
-    def unfilled(self, gap: Gap, asking: bool) -> str:
+    def unfilled(self, gap: Gap, heard: list[Utterance] | Unasked | None) -> str:
+        """NOT_REPAIRED keeps the stretch open: one not asked is, whatever the local words say."""
+        if isinstance(heard, Unasked):
+            return NOT_REPAIRED
         said = self.in_transcript(gap) if gap.words else None
         if said:
             return said
         if self.hearing.local and not gap.words:  # the listener on this computer ran here
             return "no listener heard words here; left as it is"
-        if not asking:
-            heard = ("the local words here repeat a line timed elsewhere" if gap.words
-                     else "heard by no listener")
-            return f"{heard}; {NOT_ASKED} ({TRIES} times at most), left as it is"
+        if heard is None:
+            why = ("the local words here repeat a line timed elsewhere" if gap.words
+                   else "heard by no listener")
+            return f"{why}; {NOT_ASKED} ({TRIES} times at most), left as it is"
         return NOT_REPAIRED
 
     def fill(self, gap: Gap, lines: list[Utterance]) -> tuple[list[Utterance], str]:
         heard = self.heard_again(gap)
-        again = [u for u in heard or [] if self.novel(u, lines)]
+        again = [u for u in heard if self.novel(u, lines)] if isinstance(heard, list) else []
         if again:
             return again, f"re-listened with {self.name}: {len(again)} lines"
         local = self.from_local(gap, lines)
         if local:
             return local, f"filled from local words: {len(gap.words)} words"
-        return [], self.unfilled(gap, heard is not None)
+        return [], self.unfilled(gap, heard)
 
     def mend(self, found: list[Gap] | None = None) -> Mended:
         lines, left = list(self.hearing.utterances), []

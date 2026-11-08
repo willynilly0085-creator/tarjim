@@ -30,7 +30,7 @@ from tarjim.ui_languages import FOLDER
 WEB = Path(__file__).resolve().parents[1] / "tarjim" / "web"
 EMOJI = re.compile("[\U0001F300-\U0001FAFF☀-➿]")
 KINDS = ("speech_left", "in_source", "untranslated", "overlap", "readability", "timing",
-         "sounds", "engine_stopped")
+         "sounds", "engine_stopped", "budget_used")
 
 
 @pytest.fixture

@@ -488,5 +488,6 @@
   "note_readability": "Lines longer than their time, may be hard to read ({n}): at {at}",
   "note_timing": "The timing may be off the voice: only {share}% of the words were found where they are timed",
   "note_sounds": "Sounds only, such as Mm or Uh, left without a subtitle ({n}): at {at}",
-  "note_engine_stopped": "The translation engine stopped partway, so the remaining lines are shown as spoken. Why: {reason}"
+  "note_engine_stopped": "The translation engine stopped partway, so the remaining lines are shown as spoken. Why: {reason}",
+  "note_budget_used": "Speech not checked again, to keep paid requests low ({n}): at {at}. Translate the video again to check it"
 }
