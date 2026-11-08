@@ -8,11 +8,25 @@ replaying the transcripts older code had made. An import inside a function is ho
 reaches the engines, the machine and the settings, none of which shapes what is derived from a
 kept hearing, so it is not followed: following it took in most of tarjim, and every release
 would have timed every clip done before it again on this computer.
+
+Since 2026-11-08 the package itself (tarjim/__init__.py, whose version changes with every release,
+reached through `from tarjim import media`) is not followed, nor the modules in NOT_FOLLOWED:
+the settings, the key vault, the cloud clients, the engines and the timing check shape nothing
+derived from a kept hearing, and they change often; following them timed every kept clip again
+after every release.
 """
 import ast
 from pathlib import Path
 
 PACKAGE = "tarjim"
+NOT_FOLLOWED = frozenset({"config", "vault", "gemini_client", "google_ai", "engines",
+                          "tool_catalog", "findings", "qa"})
+
+
+def followed(name: str) -> bool:
+    """A tarjim module below the package, outside NOT_FOLLOWED (2026-11-08)."""
+    parts = name.split(".")
+    return parts[0] == PACKAGE and len(parts) > 1 and parts[1] not in NOT_FOLLOWED
 
 
 def top_imports(path: Path) -> set[str]:
@@ -24,7 +38,7 @@ def top_imports(path: Path) -> set[str]:
             names |= {node.module, *(f"{node.module}.{alias.name}" for alias in node.names)}
         elif isinstance(node, ast.Import):
             names |= {alias.name for alias in node.names}
-    return {name for name in names if name.split(".")[0] == PACKAGE}
+    return {name for name in names if followed(name)}
 
 
 def module_file(name: str, root: Path) -> Path | None:
