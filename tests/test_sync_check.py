@@ -1,7 +1,6 @@
 """The words this computer heard are used only in the clip's language, and the timing is checked
 against the sound, timed again without them when too few words are found where they sit."""
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 import pytest
@@ -9,12 +8,10 @@ import pytest
 from tarjim.asr import agree
 from tarjim.asr.base import Transcript
 from tarjim.listen import settle
-from tarjim.listen.merge import Heard
 from tarjim.listen.opinion import agreeing
 from tarjim.models import Word
 
 SAID = [Word("Hello", 0.0, 0.4), Word("there", 0.4, 0.8)]
-HEARD = Heard("Somali", [], [])
 
 
 def test_words_in_another_language_than_the_one_heard_are_not_used() -> None:
@@ -52,37 +49,29 @@ def test_words_are_found_only_where_they_are_said() -> None:
     assert found(1.0, 1.4, "12") is None  # no letters to look for
 
 
-def timing(agreements: list[float | None]) -> tuple[list[list[Word]], Any]:
-    asked: list[list[Word]] = []
-
-    def timed(_job: Any, _heard: Any, _sound: Any, opinion: list[Word]) -> settle.Timed:
-        asked.append(opinion)
-        return settle.Timed(Transcript("Somali", "x"), True, agreements[len(asked) - 1])
-
-    return asked, timed
+def timed(agreement: float | None) -> settle.Timed:
+    return settle.Timed(Transcript("Somali", "x"), True, agreement)
 
 
-def test_a_timing_off_the_voice_is_made_again_on_the_sound_alone(
-        monkeypatch: pytest.MonkeyPatch) -> None:
-    asked, timed = timing([0.1, 0.9])
-    monkeypatch.setattr(settle, "timed", timed)
-    sound = settle.Sound(None, 16000, [])
-    done = settle.settled(None, HEARD, sound, SAID)  # type: ignore[arg-type]
-    assert asked == [SAID, []] and done.agreement == 0.9
+# Changed 2026-11-08: the speech left out is now filled once before either timing
+# (settle.settled), so the choice between the two timings is tested on its own here.
+def test_a_timing_off_the_voice_is_made_again_on_the_sound_alone() -> None:
+    asked: list[bool] = []
+    done = settle.better(timed(0.1), lambda: asked.append(True) or timed(0.9), True)
+    assert asked == [True] and done.agreement == 0.9
 
 
-@pytest.mark.parametrize(("agreements", "opinion", "times"), [
-    ([0.95], SAID, 1),  # in time: no second try
-    ([0.1], [], 1),  # no second opinion was used: nothing else to try
-    ([None], SAID, 1),  # cannot be told: kept
-    ([0.4, 0.3], SAID, 2),  # the second try is worse: the first stays
+@pytest.mark.parametrize(("agreements", "second", "times"), [
+    ([0.95], True, 0),  # in time: no second try
+    ([0.1], False, 0),  # no second opinion was used: nothing else to try
+    ([None], True, 0),  # cannot be told: kept
+    ([0.4, 0.3], True, 1),  # the second try is worse: the first stays
 ])
 def test_a_timing_is_tried_again_only_when_that_can_help(
-        monkeypatch: pytest.MonkeyPatch, agreements: list[float | None], opinion: list[Word],
-        times: int) -> None:
-    asked, timed = timing(agreements)
-    monkeypatch.setattr(settle, "timed", timed)
-    done = settle.settled(None, HEARD, settle.Sound(None, 1, []), opinion)  # type: ignore[arg-type]
+        agreements: list[float | None], second: bool, times: int) -> None:
+    asked: list[bool] = []
+    done = settle.better(timed(agreements[0]),
+                         lambda: asked.append(True) or timed(agreements[-1]), second)
     assert len(asked) == times and done.agreement == agreements[0]
 
 

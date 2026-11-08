@@ -8,9 +8,17 @@ from dataclasses import dataclass
 from difflib import SequenceMatcher
 from itertools import pairwise
 
-from tarjim.listen.coverage import Gap, Hearing, merged, outside
+from tarjim.listen.coverage import EDGE, Gap, Hearing, merged, outside
 from tarjim.listen.gemini_listen import Utterance
-from tarjim.listen.repair import NEAR, OVERLAP, REPEATED, Mender, Relisten, from_words
+from tarjim.listen.repair import (
+    NEAR,
+    OVERLAP,
+    REPEATED,
+    Mender,
+    Relisten,
+    from_words,
+    voiced,
+)
 from tarjim.listen.vote import norm
 from tarjim.models import Word
 from tarjim.scripts import split_words
@@ -82,4 +90,16 @@ class WordMender(Mender):
                     or echoes(line, self.words))
 
     def from_local(self, gap: Gap, lines: list[Utterance]) -> list[Utterance]:
-        return [u for u in from_words(gap.words) if not said_before(u, lines)]
+        return voiced([u for u in from_words(gap.words) if not said_before(u, lines)], lines)
+
+    def in_transcript(self, gap: Gap) -> str | None:
+        """The local words are in the transcript only when timed words inside the gap say them;
+        a line close by that says them but is timed elsewhere leaves the speech without words
+        (2026-11-08)."""
+        here = [t for w in self.words if gap.start - EDGE <= (w.start + w.end) / 2 <= gap.end + EDGE
+                for t in said(w.text)]
+        mine = [t for w in gap.words for t in said(w.text)]
+        found = sum(any(alike(word, other) for other in here) for word in mine)
+        if mine and found >= REPEATED * len(mine):
+            return "the local words here are already in the transcript; left as it is"
+        return None

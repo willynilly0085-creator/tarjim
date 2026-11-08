@@ -60,9 +60,13 @@ def test_speech_no_listener_heard_words_in_does_not_hold_the_hearing_back(
     assert "no listener heard words here" in capsys.readouterr().out
 
 
-def test_without_an_engine_to_ask_and_no_words_the_gap_is_left() -> None:
+def test_without_an_engine_to_ask_and_no_words_the_gap_is_said_and_let_go(
+        capsys: pytest.CaptureFixture[str]) -> None:
+    """Changed 2026-11-08: such a gap held the hearing back on every run, though no run could
+    ever fill it."""
     mended = mend(Hearing([LINE], [], [(40.0, 45.0)]), None, "")
-    assert not mended.whole and mended.left[0].start == 40.0
+    assert mended.whole and mended.added == []
+    assert "heard by no listener; not asked again" in capsys.readouterr().out
 
 
 def test_local_words_become_lines_at_pauses() -> None:

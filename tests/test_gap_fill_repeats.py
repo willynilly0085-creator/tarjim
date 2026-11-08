@@ -23,8 +23,10 @@ def test_local_words_a_line_close_by_already_says_are_not_added() -> None:
     line = Utterance(388.7, 390.9, "S1", SORRY)
     mender = Mender(Hearing([line], [], []), None, "gemini")
     again = Gap(388.8, 391.8, 3.0, said(SORRY.partition(" ")[2], 388.8))
+    # Changed 2026-11-08: lines have no word times yet, so whether the line's words are said in
+    # the gap is told after alignment (tests/test_heard_once.py), not taken for granted here.
     assert mender.fill(again, [line]) == (
-        [], "the local words here are already in the transcript; left as it is")
+        [], "the local words here are said by a line close by; checked once it is timed")
     new = Gap(395.0, 398.0, 3.0, said("thank you and I will hand it over to Sarah", 395.0))
     assert [u.text for u in mender.fill(new, [line])[0]] == [
         "thank you and I will hand it over to Sarah"]

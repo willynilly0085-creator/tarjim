@@ -102,29 +102,15 @@ def test_only_the_last_clip_is_kept() -> None:
     assert letters.count(clip()) == 0
 
 
-def timings(passes: list[int]) -> Any:
+def test_the_passes_are_told_once_a_run_even_when_it_is_timed_twice(
+        capsys: pytest.CaptureFixture[str]) -> None:
+    """On 2026-11-08 the count was told after every timing, twice when a run timed again."""
     from tarjim.asr.base import Transcript
     from tarjim.listen import settle
 
-    asked: list[int] = []
+    def made(agreement: float, passes: int) -> settle.Timed:
+        return settle.Timed(Transcript("Somali", "x"), True, agreement, passes=passes)
 
-    def timed(_job: Any, _heard: Any, _sound: Any, _opinion: Any) -> settle.Timed:
-        asked.append(1)
-        count = passes[len(asked) - 1]
-        return settle.Timed(Transcript("Somali", "x"), True, 0.1 * len(asked), count)
-
-    return timed
-
-
-def test_the_passes_are_told_once_a_run_even_when_it_is_timed_twice(
-        monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
-    """On 2026-11-08 the count was told after every timing, twice when a run timed again."""
-    from tarjim.listen import settle
-    from tarjim.listen.merge import Heard
-    from tarjim.models import Word
-
-    monkeypatch.setattr(settle, "timed", timings([1, 2]))
-    settle.settled(None, Heard("Somali", [], []), settle.Sound(None, 1, []),  # type: ignore[arg-type]
-                   [Word("hi", 0.0, 0.3)])
+    settle.better(made(0.1, 1), lambda: made(0.2, 2), second_opinion=True)
     told = [line for line in capsys.readouterr().out.splitlines() if "clip's letters" in line]
     assert told == ["timing: the aligner heard the clip's letters 2 time(s)"]
