@@ -1,12 +1,15 @@
 """Each stretch of speech the transcript left out is heard again by the same engine, alone; when
-that brings nothing, the words this computer heard there fill it. What cannot be filled is said
-in the log, and the hearing is not kept, so the next run listens again (hearing.py)."""
+that brings nothing, the words this computer heard there fill it. What cannot be filled is said in
+the log. Since 2026-11-08 the hearing is kept all the same and only that stretch is asked about
+again on the next run, at most TRIES times in all (listen/kept.py); after that it is left as it
+is, and the log says no listener heard it."""
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from tarjim.job import checkpoint
 from tarjim.listen.coverage import Gap, Hearing, gaps
 from tarjim.listen.gemini_listen import Utterance
+from tarjim.listen.kept import TRIES, Spent
 from tarjim.listen.vote import norm
 from tarjim.models import Word
 from tarjim.scripts import split_words
@@ -17,6 +20,9 @@ REPEATED = 0.6  # share of its words already said by a line close by: the same s
 NEAR = 3.0
 LINE_PAUSE = 0.7  # local words become lines at pauses this long
 LINE_WORDS = 12
+TURN_GAP = 0.3  # seconds: a line this close to a turn goes on with it
+MAIN = "S1"  # the speaker of a line with no turn heard anywhere
+NOT_REPAIRED = "not repaired"
 
 Relisten = Callable[[float, float], list[Utterance]]
 
@@ -60,6 +66,35 @@ def from_words(words: list[Word]) -> list[Utterance]:
             for g in groups]
 
 
+def apart(line: Utterance, turn: Utterance) -> float:
+    return max(turn.start - line.end, line.start - turn.end, 0.0)
+
+
+def adjacent(line: Utterance, turns: list[Utterance]) -> list[Utterance]:
+    before = [t for t in turns if t.end <= line.start]
+    after = [t for t in turns if t.start >= line.end]
+    return [*([max(before, key=lambda t: t.end)] if before else []),
+            *([min(after, key=lambda t: t.start)] if after else [])]
+
+
+def speaker_of(line: Utterance, turns: list[Utterance]) -> str:
+    """The speaker of the turn next to the line, when it is closer than TURN_GAP, else of the
+    nearest turn."""
+    speaking = [t for t in turns if t.speaker]
+    close = [t for t in adjacent(line, speaking) if apart(line, t) < TURN_GAP]
+    found = min(close or speaking, key=lambda t: apart(line, t), default=None)
+    return found.speaker if found else line.speaker or MAIN
+
+
+def voiced(fills: list[Utterance], lines: list[Utterance]) -> list[Utterance]:
+    """Lines made from the local words, which name no speaker, each with the speaker of the turn
+    it goes on with: before 2026-11-08 they had none and were shown in the main colour."""
+    out: list[Utterance] = []
+    for line in fills:
+        out.append(replace(line, speaker=line.speaker or speaker_of(line, [*lines, *out])))
+    return out
+
+
 def described(gap: Gap) -> str:
     said = f"{len(gap.words)} local words" if gap.words else "no words"
     return f"gap {gap.start:.1f}-{gap.end:.1f} s ({gap.speech:.1f} s of speech, {said})"
@@ -71,12 +106,16 @@ class Mender:
     def __init__(self, hearing: Hearing, relisten: Relisten | None, name: str) -> None:
         self.hearing, self.relisten, self.name = hearing, relisten, name or "the same engine"
 
-    def heard_again(self, gap: Gap) -> list[Utterance]:
+    def heard_again(self, gap: Gap) -> list[Utterance] | None:
+        """What the engine hears in the stretch now; None when no engine is asked about it any
+        more: there is none, or it was asked TRIES times across runs."""
         if self.relisten is None:
-            return []
+            return None
         checkpoint()  # a cancel stops before another request
         try:
             return self.relisten(max(0.0, gap.start - PAD), gap.end + PAD)
+        except Spent:
+            return None
         except (RuntimeError, OSError) as error:
             print(f"coverage: listening again with {self.name} failed: {str(error)[:200]}",
                   flush=True)
@@ -89,20 +128,36 @@ class Mender:
         """The local words as lines, less those a line close by already says: a cloud line
         timed a little off leaves a gap its own words fill, and the sentence was shown twice
         ("I apologize, Jim, if things got heated", 2026-11-08)."""
-        return [line for line in from_words(gap.words) if not repeats(line, lines)]
+        return voiced([u for u in from_words(gap.words) if not repeats(u, lines)], lines)
+
+    def in_transcript(self, _gap: Gap) -> str | None:
+        """Whether the local words left out here are said where the transcript is timed. Lines
+        have no word times yet, so the check after alignment tells (listen/wordcover.py): until
+        2026-11-08 a gap was called filled here, and kept, whenever a line close by said its
+        words, wherever that line's words were timed."""
+        return "the local words here are said by a line close by; checked once it is timed"
+
+    def unfilled(self, gap: Gap, asking: bool) -> str:
+        said = self.in_transcript(gap) if gap.words else None
+        if said:
+            return said
+        if self.hearing.local and not gap.words:  # the listener on this computer ran here
+            return "no listener heard words here; left as it is"
+        if not asking:
+            heard = ("the local words here repeat a line timed elsewhere" if gap.words
+                     else "heard by no listener")
+            return f"{heard}; not asked again ({TRIES} times at most), left as it is"
+        return NOT_REPAIRED
 
     def fill(self, gap: Gap, lines: list[Utterance]) -> tuple[list[Utterance], str]:
-        again = [u for u in self.heard_again(gap) if self.novel(u, lines)]
+        heard = self.heard_again(gap)
+        again = [u for u in heard or [] if self.novel(u, lines)]
         if again:
             return again, f"re-listened with {self.name}: {len(again)} lines"
         local = self.from_local(gap, lines)
         if local:
             return local, f"filled from local words: {len(gap.words)} words"
-        if gap.words:
-            return [], "the local words here are already in the transcript; left as it is"
-        if self.hearing.local:  # the listener on this computer ran and heard no words here
-            return [], "no listener heard words here; left as it is"
-        return [], "not repaired"
+        return [], self.unfilled(gap, heard is not None)
 
     def mend(self, found: list[Gap] | None = None) -> Mended:
         lines, added, left = list(self.hearing.utterances), [], []
@@ -111,7 +166,7 @@ class Mender:
             print(f"coverage: {self.label}{described(gap)} -> {outcome}", flush=True)
             lines.extend(fresh)
             added.extend(fresh)
-            left.extend([gap] if outcome == "not repaired" else [])
+            left.extend([gap] if outcome == NOT_REPAIRED else [])
         return Mended(sorted(lines, key=lambda u: u.start), added, left)
 
 

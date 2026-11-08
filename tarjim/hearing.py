@@ -7,7 +7,7 @@ from tarjim.asr.base import Transcript
 from tarjim.asr.sanity import implausible
 from tarjim.gemini_client import QuotaExhausted
 from tarjim.job import Job, checkpoint
-from tarjim.listen.kept import TRANSCRIPT, forget, load_heard
+from tarjim.listen.kept import HEARD, forget, keep_transcript, kept_transcript, load_heard
 from tarjim.listen.merge import Heard
 from tarjim.models import Word
 
@@ -17,9 +17,9 @@ Regions = list[tuple[float, float]]
 def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcript:
     if job.relisten:  # the person asked: nothing kept from an earlier hearing is used
         forget(job.cache)
-    cached = job.cache / TRANSCRIPT
-    if cached.exists() and not implausible(Transcript.load(cached).words):
-        return Transcript.load(cached)  # a broken timing kept by an older run is made again
+    kept = reusable(job.cache)
+    if kept is not None:
+        return kept
     from tarjim.memory import free_for_listening
 
     free_for_listening()
@@ -31,8 +31,22 @@ def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcrip
         audio.unlink(missing_ok=True)
     if lasting:  # a backup's hearing, one that left speech out, or hearing nothing, is tried
         # afresh on the next run
-        transcript.save(cached)
+        keep_transcript(job.cache, transcript)
     return transcript
+
+
+def reusable(cache: Path) -> Transcript | None:
+    """The kept transcript, when the code and settings running now derived it and a person could
+    speak its timing. Since 2026-11-08 another key means it is derived again from the kept
+    hearing, on this computer: a timing kept by older code was replayed on every run."""
+    found = kept_transcript(cache)
+    if found is None or implausible(found[0].words):
+        return None  # a broken timing kept by an older run is made again
+    if not found[1] and (cache / HEARD).exists():
+        print("timing: the kept transcript was made by other code or settings; it is made "
+              "again from the kept hearing, with no new listening", flush=True)
+        return None
+    return found[0]
 
 
 def hear(job: Job, audio: Path, report: Callable[[str], None]) -> tuple[Transcript, bool]:
@@ -141,7 +155,11 @@ def second_opinion(audio: Path, language: str = "") -> list[Word]:
 
     try:
         heard = qwen_transcript(audio)
-    except (RuntimeError, ValueError, MemoryError, OSError, ImportError):
+    except (RuntimeError, ValueError, MemoryError, OSError, ImportError) as error:
+        # said once, with why: before 2026-11-08 a computer that could not run it lost the
+        # second opinion with no trace in the log
+        print(f"timing: no words from the listener on this computer ({type(error).__name__}: "
+              f"{str(error)[:200]}); the lines are timed on the sound alone", flush=True)
         return []
     return agreeing(heard.words, heard.language, language)
 
