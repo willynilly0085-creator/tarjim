@@ -479,5 +479,12 @@
   "actionOpen": "このコンピューターではファイルを開けませんでした。代わりにフォルダーで表示してください。",
   "cancelSure": "中止しますか？ここまでの作業は削除されます",
   "cancelLabel": "このジョブを中止します。ここまでに作ったものは削除されます。",
-  "openSrt": "字幕を開く"
+  "openSrt": "字幕を開く",
+  "stage_doneNotes": "完了（注意点あり）",
+  "note_speech_left": "字幕のない発話（{n}）：{at}",
+  "note_in_source": "どのエンジンも翻訳できず原文のまま表示した行（{n}）：{at}",
+  "note_untranslated": "翻訳のない行（{n}）：{at}",
+  "note_overlap": "次の行と重なる行（{n}）：{at}",
+  "note_readability": "表示時間に対して長く、読みにくいかもしれない行（{n}）：{at}",
+  "note_timing": "タイミングが声からずれている可能性があります：正しい位置で見つかった単語は {share}% だけです"
 }

@@ -479,5 +479,12 @@
   "actionOpen": "이 컴퓨터에서 파일을 열 수 없었습니다. 대신 폴더에서 보세요.",
   "cancelSure": "취소할까요? 지금까지 한 작업이 삭제됩니다",
   "cancelLabel": "이 작업을 취소합니다. 지금까지 만든 것은 삭제됩니다.",
-  "openSrt": "자막 열기"
+  "openSrt": "자막 열기",
+  "stage_doneNotes": "완료, 참고 사항 있음",
+  "note_speech_left": "자막이 없는 말소리 ({n}): {at}",
+  "note_in_source": "어떤 엔진도 번역하지 못해 원문으로 보인 줄 ({n}): {at}",
+  "note_untranslated": "번역이 없는 줄 ({n}): {at}",
+  "note_overlap": "다음 줄과 겹치는 줄 ({n}): {at}",
+  "note_readability": "표시 시간보다 길어 읽기 어려울 수 있는 줄 ({n}): {at}",
+  "note_timing": "타이밍이 목소리와 어긋났을 수 있습니다: 단어의 {share}%만 제자리에서 찾았습니다"
 }

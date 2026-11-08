@@ -479,5 +479,12 @@
   "actionOpen": "Este computador não conseguiu abrir o arquivo. Mostre-o na pasta.",
   "cancelSure": "Cancelar? O que foi feito é apagado",
   "cancelLabel": "Cancelar este trabalho. O que ele fez até agora é apagado.",
-  "openSrt": "Abrir legendas"
+  "openSrt": "Abrir legendas",
+  "stage_doneNotes": "Pronto, com avisos",
+  "note_speech_left": "Fala sem legenda ({n}): em {at}",
+  "note_in_source": "Linhas que nenhum motor traduziu, mostradas no original ({n}): em {at}",
+  "note_untranslated": "Linhas sem tradução ({n}): em {at}",
+  "note_overlap": "Linhas que se sobrepõem à seguinte ({n}): em {at}",
+  "note_readability": "Linhas mais longas que o seu tempo, podem ser difíceis de ler ({n}): em {at}",
+  "note_timing": "A sincronia pode estar fora da voz: só {share}% das palavras estão onde foram marcadas"
 }

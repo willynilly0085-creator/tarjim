@@ -479,5 +479,12 @@
   "actionOpen": "Komputer ini tidak bisa membuka file. Tampilkan di foldernya saja.",
   "cancelSure": "Batalkan? Hasil sejauh ini dihapus",
   "cancelLabel": "Batalkan pekerjaan ini. Hasil yang sudah dibuat akan dihapus.",
-  "openSrt": "Buka subtitle"
+  "openSrt": "Buka subtitle",
+  "stage_doneNotes": "Selesai, dengan catatan",
+  "note_speech_left": "Ucapan tanpa subtitle ({n}): di {at}",
+  "note_in_source": "Baris yang tidak diterjemahkan mesin mana pun, ditampilkan aslinya ({n}): di {at}",
+  "note_untranslated": "Baris tanpa terjemahan ({n}): di {at}",
+  "note_overlap": "Baris yang menimpa baris berikutnya ({n}): di {at}",
+  "note_readability": "Baris lebih panjang dari waktunya, mungkin sulit dibaca ({n}): di {at}",
+  "note_timing": "Waktu mungkin tidak pas dengan suara: hanya {share}% kata ditemukan di tempatnya"
 }

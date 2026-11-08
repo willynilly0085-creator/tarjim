@@ -36,6 +36,7 @@ class Timed:
     transcript: Transcript
     whole: bool  # it covers all the speech, so it is worth keeping
     agreement: float | None
+    left: tuple[tuple[float, float], ...] = ()  # speech still without words, shown on the job
 
 
 def placed(heard: Heard, opinion: list[Word], duration: float) -> list[Utterance]:
@@ -67,7 +68,8 @@ def timed(job: Job, heard: Heard, sound: Sound, opinion: list[Word]) -> Timed:
     words = trusted(checked.words, opinion)
     text = " ".join(u.text for u in checked.utterances)
     transcript = Transcript(language=heard.language, text=text, words=words)
-    return Timed(transcript, not checked.left, timer.agreement(words))
+    left = tuple((gap.start, gap.end) for gap in checked.left)
+    return Timed(transcript, not left, timer.agreement(words), left)
 
 
 def share(agreement: float | None) -> str:

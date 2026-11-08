@@ -479,5 +479,12 @@
   "actionOpen": "This computer couldn't open the file. Show it in its folder instead.",
   "cancelSure": "Cancel? Work so far is deleted",
   "cancelLabel": "Cancel this job. What it has made so far is deleted.",
-  "openSrt": "Open subtitles"
+  "openSrt": "Open subtitles",
+  "stage_doneNotes": "Done, with notes",
+  "note_speech_left": "Speech with no subtitle ({n}): at {at}",
+  "note_in_source": "Lines no engine translated, shown as spoken ({n}): at {at}",
+  "note_untranslated": "Lines without a translation ({n}): at {at}",
+  "note_overlap": "Lines that overlap the next one ({n}): at {at}",
+  "note_readability": "Lines longer than their time, may be hard to read ({n}): at {at}",
+  "note_timing": "The timing may be off the voice: only {share}% of the words were found where they are timed"
 }

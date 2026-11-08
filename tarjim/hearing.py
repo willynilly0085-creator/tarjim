@@ -121,6 +121,7 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     import soundfile
 
     from tarjim.asr.voiceprint import RATE
+    from tarjim.findings import findings
     from tarjim.listen.check import regions_in
     from tarjim.listen.settle import Sound, settled
     from tarjim.listen.whose import by_voice
@@ -131,7 +132,8 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     local = heard.local_words
     opinion = second_opinion(audio, heard.language) if local is None else local
     done = settled(job, heard, Sound(wav, rate, regions_in(wav)), opinion)
-    words = by_voice(done.transcript.words, wav) if rate == RATE else done.transcript.words
+    findings().heard(done.left, done.agreement)  # shown on the job (2026-11-08)
+    words =by_voice(done.transcript.words, wav) if rate == RATE else done.transcript.words
     return replace(done.transcript, words=words), done.whole
 
 

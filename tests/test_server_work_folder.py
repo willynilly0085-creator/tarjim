@@ -14,11 +14,12 @@ from tarjim.server.jobs import Order, Task
 
 def hears(seen: list[bool]) -> Any:
     """What hearing leaves in the job's cache, and whether an earlier run's work was found."""
-    def run(job: Job, report: Any) -> None:
+    def run(job: Job, report: Any) -> tuple[list[Any], list[Any]]:
         job.claim_cache()
         seen.append((job.cache / "transcript.json").exists())
         (job.cache / "transcript.json").write_text("{}", encoding="utf-8")
         (job.cache / "audio.wav").write_bytes(b"RIFF")
+        return [], []  # the cues and the checks, as pipeline.run returns them
     return run
 
 

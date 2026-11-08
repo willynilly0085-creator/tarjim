@@ -479,5 +479,12 @@
   "actionOpen": "Dieser Computer konnte die Datei nicht öffnen. Zeige sie stattdessen im Ordner.",
   "cancelSure": "Abbrechen? Bisherige Arbeit wird gelöscht",
   "cancelLabel": "Diesen Auftrag abbrechen. Was bisher entstanden ist, wird gelöscht.",
-  "openSrt": "Untertitel öffnen"
+  "openSrt": "Untertitel öffnen",
+  "stage_doneNotes": "Fertig, mit Hinweisen",
+  "note_speech_left": "Sprache ohne Untertitel ({n}): bei {at}",
+  "note_in_source": "Zeilen, die keine Engine übersetzt hat, im Original gezeigt ({n}): bei {at}",
+  "note_untranslated": "Zeilen ohne Übersetzung ({n}): bei {at}",
+  "note_overlap": "Zeilen, die die nächste überlappen ({n}): bei {at}",
+  "note_readability": "Zeilen, länger als ihre Zeit, evtl. schwer zu lesen ({n}): bei {at}",
+  "note_timing": "Das Timing weicht vielleicht von der Stimme ab: nur {share}% der Wörter wurden dort gefunden, wo sie stehen"
 }
