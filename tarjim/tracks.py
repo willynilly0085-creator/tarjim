@@ -6,7 +6,8 @@ fill slots a reply in by its start, inside the host's sentence. Here the words a
 time order a whole run at a time (a run is what the listener gave in order: one speaker, time
 never going back), so two long turns said at once stay whole instead of alternating word by
 word. A short reply said over another turn is set aside, to become a part of the subtitle that
-holds its time (dialogue.with_replies). The repair is logged, never asserted: a job never
+holds its time (dialogue.with_replies), and so are the first words of a long labelled turn said
+over the end of another (over_end). The repair is logged, never asserted: a job never
 fails because a listener gave its words out of order.
 """
 import logging
@@ -14,6 +15,7 @@ from bisect import bisect_left
 from itertools import pairwise
 from typing import NamedTuple
 
+from tarjim.dialogue import fits_one_line
 from tarjim.models import Word
 from tarjim.rules import DEFAULT_RULES, Rules
 from tarjim.speakers import who
@@ -21,6 +23,7 @@ from tarjim.speakers import who
 # The same test as asr.align.overlapping, which this mirrors for words from every listener.
 SHORT_REPLY = 4  # words: "Really?", "Oh my gosh", not a turn of its own
 OVERLAP = 1.0  # starting this far inside an earlier turn: said over it, not after it
+SAID_OVER = 0.5  # seconds a long turn of another voice starts before the last one ends
 EDGE = 0.05
 
 Run = list[Word]
@@ -43,12 +46,37 @@ def tracks(words: list[Word], rules: Rules = DEFAULT_RULES) -> tuple[list[Word],
     reach = float("-inf")
     for index, run in enumerate(ordered):
         following = ordered[index + 1] if index + 1 < len(ordered) else None
-        if main and said_over(run, (main[-1], reach), following, rules):
-            replies.append(run)
-        else:
-            main.extend(run)
-            reach = max(reach, *(word.end for word in run))
+        over = taken(run, (main[-1], reach), following, rules) if main else 0
+        if over:
+            replies.append(run[:over])
+        main.extend(run[over:])
+        reach = max([reach, *(word.end for word in run[over:])])
     return main, replies
+
+
+def taken(run: Run, host: tuple[Word, float], following: Run | None, rules: Rules) -> int:
+    """How many of the run's first words are said over the turn before it."""
+    if said_over(run, host, following, rules):
+        return len(run)
+    return over_end(run, host, rules)
+
+
+def over_end(run: Run, host: tuple[Word, float], rules: Rules) -> int:
+    """A labelled turn of another voice begun well before the last one ends (2026-11-08): the
+    words said while that one is still said are a reply, a part of the subtitle that holds
+    their time, and the rest goes on the main track. Before, the turn's subtitle came up only
+    once the other one's had gone, or cut its last words. The whole turn is the reply when it
+    fits one line of an exchange; no reply at all when its words said over do not."""
+    last, reach = host
+    voice, replier = who(last.speaker), who(run[0].speaker)
+    if len(run) <= SHORT_REPLY or not (voice and replier) or voice == replier:
+        return 0
+    if run[0].start >= reach - SAID_OVER:
+        return 0
+    if fits_one_line(run, rules):
+        return len(run)
+    over = sum(1 for word in run if word.start < reach - EDGE)
+    return over if fits_one_line(run[:over], rules) else 0
 
 
 def in_order(words: list[Word], rules: Rules = DEFAULT_RULES) -> list[Run]:

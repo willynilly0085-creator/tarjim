@@ -1,12 +1,12 @@
 from functools import lru_cache
 from itertools import islice
-from typing import Any
+from typing import Any, NamedTuple
 
 import numpy as np
 
 from tarjim import guards
 from tarjim.asr.ctc import FRAME, Emitter, Span, token_spans
-from tarjim.asr.groups import chunks, densest, quietest, tell_evened, windows
+from tarjim.asr.groups import WINDOW_MARGIN, chunks, densest, quietest, tell_evened, windows
 from tarjim.asr.letters import Piece
 from tarjim.asr.numbers import said
 from tarjim.asr.spread import (
@@ -20,6 +20,7 @@ from tarjim.asr.spread import (
     runs,
     share,
 )
+from tarjim.asr.waited import TIGHT, waited
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
 from tarjim.scripts import split_words
@@ -32,6 +33,23 @@ SPECIAL_IDS = 4
 # take them from this module
 __all__ = ["GAP_FALLBACK", "WORD_BASE", "WORD_PER_LETTER", "Slot", "fill_gaps", "longest",
            "proportional", "runs", "share"]
+
+
+class Reach(NamedTuple):
+    """How far around its lines a group is searched: the sound cut out either side (pad), and
+    the margin a letter is found in without a penalty (groups.windows)."""
+    pad: float
+    margin: float
+
+
+WIDE = Reach(PAD, WINDOW_MARGIN)
+OWN = Reach(TIGHT, TIGHT)  # a turn searched again inside its own time (asr/waited.py)
+
+
+class Search(NamedTuple):
+    group: list[Utterance]
+    low: int  # the frame the searched sound starts at
+    margin: float
 
 
 def short(utterance: Utterance) -> bool:
@@ -80,6 +98,7 @@ class AlignEngine:
         words = [w for u, said_over in zip(utterances, over, strict=True)
                  for w in (self.align_group(logp, [u]) if said_over
                            else islice(timed, len(split_words(u.text))))]
+        self.unwaited(logp, utterances, over, words)
         tell_evened(self.evened, wav.start if isinstance(wav, Piece) else 0.0)
         return words
 
@@ -88,30 +107,46 @@ class AlignEngine:
         roman = self.roman.romanize_string(text).lower()
         return [vocab[ch] for ch in roman if vocab.get(ch, 0) >= SPECIAL_IDS]
 
-    def align_group(self, logp: np.ndarray, group: list[Utterance]) -> list[Word]:
+    def unwaited(self, logp: np.ndarray, utterances: list[Utterance], over: list[bool],
+                 words: list[Word]) -> None:
+        """A turn the one search made wait for the turn it was said over gets the times its own
+        search inside its own time gives, when they start earlier (asr/waited.py)."""
+        moved = 0
+        for index, first in waited(utterances, over, words):
+            evened = len(self.evened)
+            alone = self.align_group(logp, [utterances[index]], OWN)
+            if len(self.evened) == evened and alone[0].start < words[first].start:
+                words[first:first + len(alone)] = alone
+                moved += 1
+            del self.evened[evened:]  # not followed alone: the first search's times stay
+        guards.fired("align.unwaited", moved)
+
+    def align_group(
+            self, logp: np.ndarray, group: list[Utterance], reach: Reach = WIDE) -> list[Word]:
         """The group's words where their letters are heard. A group that cannot be followed
         whole is cut at its longest silence and each half tried on its own; only a line that
         still cannot be, or text with no letters at all, is spread evenly (2026-11-08)."""
-        low = max(0, int((group[0].start - PAD) / FRAME))
-        high = min(len(logp), int((max(u.end for u in group) + PAD) / FRAME))
+        low = max(0, int((group[0].start - reach.pad) / FRAME))
+        high = min(len(logp), int((max(u.end for u in group) + reach.pad) / FRAME))
         slots = [Slot(tok, u.speaker, i) for i, u in enumerate(group)
                  for tok in split_words(u.text)]
         for slot, sound in zip(slots, said([s.text for s in slots], self.language), strict=True):
             slot.said = sound
-        if self.time_slots(logp[low:high], slots, group, low):
+        if self.time_slots(logp[low:high], slots, Search(group, low, reach.margin)):
             fill_gaps(slots)
             return [Word(s.text, s.start, s.end, s.speaker, score=s.score,
                          source="aligned" if s.timed else "unplaced") for s in slots]
         if len(group) > 1 and any(self.tokens(s.said) for s in slots):
             cut = quietest(group, self.speech)
-            return self.align_group(logp, group[:cut]) + self.align_group(logp, group[cut:])
+            halves = group[:cut], group[cut:]
+            return [w for half in halves for w in self.align_group(logp, half, reach)]
         self.evened.extend(group)
         return [word for u in group for word in proportional(u)]
 
-    def time_slots(
-            self, logp: np.ndarray, slots: list[Slot], group: list[Utterance], low: int) -> bool:
+    def time_slots(self, logp: np.ndarray, slots: list[Slot], search: Search) -> bool:
         owners = [(k, t) for k, s in enumerate(slots) for t in self.tokens(s.said)]
-        bounds = windows([group[slots[k].owner] for k, _ in owners], low)
+        group, low = search.group, search.low
+        bounds = windows([group[slots[k].owner] for k, _ in owners], low, search.margin)
         spans = token_spans(logp, [t for _, t in owners], bounds)
         if spans is None:
             return False
