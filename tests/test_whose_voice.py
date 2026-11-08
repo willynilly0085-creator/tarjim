@@ -60,13 +60,22 @@ def test_one_speaker_or_no_model_leaves_the_words_alone(
 
 
 def test_lines_too_short_to_know_a_voice_by_keep_their_label(heard: list[Word]) -> None:
+    # S1's long lines on both sides stay S1, so the reply 0.2 s after the guest stays S1 too
+    short = Word("yes", 6.2, 6.5, "S1")
+    assert whose.checked([*heard[:4], short, *heard[4:]], sound(21))[4].speaker == "S1"
+
+
+def test_a_short_line_after_the_swap_goes_where_its_label_went(heard: list[Word]) -> None:
+    # since 2026-11-08: the labels are swapped from 12 s on, so an S2 there is the host's; it
+    # used to keep S2 and the guest's colour while the line before it was put right
     short = [Word("yes", 20.0, 20.5, "S2")]
-    assert whose.checked([*heard, *short], sound(21))[-1].speaker == "S2"
+    assert whose.checked([*heard, *short], sound(21))[-1].speaker == "S1"
 
 
-def test_speakers_of_different_pieces_are_never_mixed() -> None:
-    known = {"c0.S1": HOST, "c1.S1": GUEST}
-    assert whose.nearer(GUEST, "c0.S1", known) == "c0.S1"
+def test_every_speaker_of_the_clip_is_compared_and_one_with_no_other_line_stays() -> None:
+    # pieces share the listener's labels since 2026-10-31, so there is no piece to keep apart
+    assert whose.nearer(GUEST, "S1", {"S1": HOST, "S2": GUEST}) == "S2"
+    assert whose.nearer(GUEST, "S1", {"S2": GUEST}) == "S1"
 
 
 def test_a_model_that_cannot_be_fetched_is_tried_again_only_an_hour_later(

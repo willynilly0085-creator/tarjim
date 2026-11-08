@@ -38,7 +38,15 @@ def test_each_line_of_a_dialogue_takes_its_own_speaker_colour() -> None:
     assert YELLOW in top and YELLOW not in bottom and BACK_TO_MAIN in bottom
 
 
-def test_speakers_are_ranked_within_each_piece_of_a_long_video() -> None:
+def test_speakers_are_ranked_by_talk_in_the_whole_clip_and_a_pass_tag_is_the_same_person() -> None:
+    # pieces keep the listener's labels since 2026-10-31, so S2 is one person all the way through
+    cues = [said("a b c d e f", 0.0, "S1"), said("yes", 3.0, "S2"),
+            said("g h", 400.0, "S2"), said("ok", 403.0, "p2.S1")]
+    assert voices(cues) == {"S2": YELLOW}
+
+
+def test_old_labels_tagged_by_piece_are_ranked_within_each_piece() -> None:
+    # only a transcript saved before 2026-10-31 has these
     cues = [said("a b c d e f", 0.0, "c0.S1"), said("yes", 3.0, "c0.S2"),
             said("g h i j k l", 400.0, "c1.S2"), said("ok", 403.0, "c1.p2.S1")]
     assert voices(cues) == {"c0.S2": YELLOW, "c1.S1": YELLOW}
