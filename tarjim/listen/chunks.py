@@ -75,14 +75,24 @@ def undone(seconds: float) -> float | None:
     return MINUTE * minutes + rest if rest < MINUTE else None
 
 
-def unslipped(u: Utterance, length: float, placed: list[Utterance]) -> Utterance | None:
-    """The line at its mm:ss misread's time, when that falls inside the piece after the end of
-    the line before it: one that lands inside another line was not misread (2026-11-08)."""
+def unslipped(u: Utterance, length: float, room: Span) -> Utterance | None:
+    """The line at its mm:ss misread's time, when that falls inside the piece between the end of
+    the line before it and the start of the line after it: one that lands on another line was
+    not misread (2026-11-08: only the line before was checked, and a line said at 45 s read back
+    to 65 s, among the lines after it)."""
     start, end = undone(u.start), undone(u.end)
-    if start is None or not (placed[-1].end if placed else 0.0) <= start <= length:
+    if start is None or not room[0] <= start <= length:
         return None
     end = end if end is not None and end >= start else start + u.end - u.start
-    return replace(u, start=start, end=max(start, min(end, length + OVERRUN)), prior=SLIPPED)
+    end = max(start, min(end, length + OVERRUN))
+    return replace(u, start=start, end=end, prior=SLIPPED) if end <= room[1] else None
+
+
+def room(placed: list[Utterance], rest: list[Utterance], length: float) -> Span:
+    """Where a misread line may be read back to: after the line placed before it and before the
+    next line of the piece in the listener's order (a raw pass is not sorted, 2026-11-08)."""
+    later = next((u.start for u in rest if u.start < length + OVERRUN), length + OVERRUN)
+    return (placed[-1].end if placed else 0.0), later
 
 
 def novel(u: Utterance, lines: list[Utterance]) -> bool:
@@ -92,8 +102,8 @@ def novel(u: Utterance, lines: list[Utterance]) -> bool:
         len(mine & {norm(w) for w in split_words(o.text)}) >= SIMILAR * len(mine) for o in lines)
 
 
-def placed_line(u: Utterance, length: float, inside: list[Utterance],
-                placed: list[Utterance]) -> Utterance | None:
+def placed_line(u: Utterance, length: float, free: Span,
+                others: list[Utterance]) -> Utterance | None:
     """The line at the piece's own times, inside the piece and OVERRUN either side. A line put
     past it is read back from an mm:ss misread, else kept at the edge with no trust in its time
     when no line of the piece says it, else dropped as the listener's invention (2026-11-08:
@@ -102,10 +112,10 @@ def placed_line(u: Utterance, length: float, inside: list[Utterance],
     if u.start < high:
         start = max(u.start, -OVERRUN)
         return replace(u, start=start, end=max(start, min(u.end, high)))
-    fixed = unslipped(u, length, placed)
+    fixed = unslipped(u, length, free)
     if guards.when("shift.slipped", fixed is not None):
         return fixed
-    if not guards.when("shift.clamped", novel(u, [*inside, *placed])):
+    if not guards.when("shift.clamped", novel(u, others)):
         guards.fired("shift.hallucinated")
         return None
     start = high - SHORTEST
@@ -118,8 +128,9 @@ def shift(utterances: list[Utterance], span: Span, tag: str = "",
     length = span[1] - span[0]
     inside = [u for u in utterances if u.start < length + OVERRUN]
     placed: list[Utterance] = []
-    for u in utterances:
-        if (line := placed_line(u, length, inside, placed)) is not None:
+    for k, u in enumerate(utterances):
+        free = room(placed, utterances[k + 1:], length)
+        if (line := placed_line(u, length, free, [*inside, *placed])) is not None:
             placed.append(line)
     return [replace(u, start=u.start + span[0], end=u.end + span[0], speaker=f"{tag}{u.speaker}",
                     piece=span, request=request) for u in placed]

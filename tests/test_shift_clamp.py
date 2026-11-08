@@ -81,3 +81,25 @@ def test_a_misread_that_lands_inside_the_line_before_is_not_trusted() -> None:
     lines = [U(68.0, 69.8, "S1", "thank you for your patience"), U(109.0, 110.0, "S2", "no")]
     kept = shift(lines, PIECE)
     assert kept[1].prior == 0.0 and count("shift.slipped") == 0
+
+
+def test_a_misread_that_lands_past_the_line_after_is_not_trusted() -> None:
+    """A raw pass keeps its listener's order: a line at 45 s slipped by a minute reads back to
+    65 s, on top of the lines after it, and is not trusted there (2026-11-08)."""
+    lines = [U(40.0, 42.0, "S1", "we start with the onions"), U(43.0, 44.5, "S2", "how many"),
+             U(105.0, 107.0, "S1", "two large ones chopped fine"),
+             U(48.0, 50.0, "S2", "and then what"), U(52.0, 56.0, "S1", "then the garlic goes in"),
+             U(60.0, 64.0, "S1", "stir it until it smells good"),
+             U(66.0, 70.0, "S1", "about ten minutes or so")]
+    kept = shift(lines, PIECE, request="k0.p0")
+    moved = next(u for u in kept if u.text == "two large ones chopped fine")
+    assert moved.prior == 0.0 and count("shift.slipped") == 0
+    assert count("shift.clamped") == 1
+
+
+def test_a_misread_that_ends_before_the_line_after_is_read_back() -> None:
+    lines = [U(10.0, 12.0, "S1", "early words"), U(105.0, 107.0, "S2", "read back here"),
+             U(70.0, 72.0, "S1", "after it")]
+    kept = shift(lines, PIECE)
+    assert (kept[1].start, kept[1].end, kept[1].prior) == (165.0, 167.0, 0.5)
+    assert count("shift.slipped") == 1
