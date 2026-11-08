@@ -5,8 +5,9 @@ from dataclasses import dataclass, field
 
 from tarjim.gemini_client import QuotaExhausted
 from tarjim.listen.gemini_listen import Utterance
-from tarjim.listen.vote import AGREE, vote
+from tarjim.listen.vote import ordered, vote
 from tarjim.models import Word
+from tarjim.scripts import split_words
 
 PASSES = 3
 CLOSE = 0.9
@@ -40,21 +41,26 @@ def listen_many(listen: Listen, passes: int = PASSES) -> Heard:
     return Heard(results[0][0], agreed(runs), runs)
 
 
-def sane(run: list[Utterance]) -> bool:
+def sane(run: list[Utterance]) -> list[Utterance]:
+    """The lines of a pass a person could have spoken. Only the broken line is left out: until
+    2026-11-08 one such line cost the vote every other line of its pass, and with it the ending
+    only that pass and one other had heard."""
     from tarjim.asr.sanity import plausible_line
 
-    return all(plausible_line(u.start, u.end, u.text) for u in run)
+    return [u for u in run if plausible_line(u.start, u.end, u.text)]
 
 
 def agreed(runs: list[list[Utterance]]) -> list[Utterance]:
-    """The vote over the passes a person could have spoken: a pass that put the whole speech in
-    one 129-second line once became the vote's base and broke every time (asr/sanity.py)."""
-    kept = [run for run in runs if sane(run)] or runs
-    return settled(vote(kept, min(AGREE, len(kept))), kept)
+    """The vote over the lines a person could have spoken: a pass that put the whole speech in
+    one 129-second line once became the vote's base and broke every time (asr/sanity.py). The
+    agreement needed follows the passes that heard anything (vote.majority)."""
+    cleaned = [sane(run) for run in runs]
+    kept = ordered(cleaned if any(cleaned) else runs)
+    return settled(vote(kept), kept)
 
 
 def spoken(run: list[Utterance]) -> int:
-    return sum(len(u.text.split()) for u in run)
+    return sum(len(split_words(u.text)) for u in run)
 
 
 def settled(voted: list[Utterance], runs: list[list[Utterance]]) -> list[Utterance]:
