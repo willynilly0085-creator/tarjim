@@ -12,7 +12,6 @@ neighbouring turn (crowded.handed), and only last, holding the line for rules.sh
 starting the next one after it.
 """
 from tarjim.crowded import handed
-from tarjim.dialogue import Reply
 from tarjim.joins import TOLERANCE, Frame, joinable, joined, spoken_end
 from tarjim.models import Cue
 from tarjim.rules import Rules
@@ -20,7 +19,9 @@ from tarjim.rules import Rules
 LEAD_IN = 0.2
 # The most a subtitle comes up after its first word to leave the one before it time, since
 # 2026-11-08: before, a one-word reply held for rules.shortest pushed the answer after it 0.56 s
-# past its first word, and a turn said over the end of another cut that one's last words.
+# past its first word. Only a line too short to read waits for it (waited): bringing the next
+# line up late whenever two voices crossed moved what was not shown from one line's end to the
+# next one's start, and kept the two from the subtitle that showed them both.
 LATE_START = 0.2
 NEVER = float("inf")
 
@@ -38,7 +39,6 @@ def fit_timing(cues: list[Cue], rules: Rules, cuts: list[float] | None = None) -
 
 def settle(cues: list[Cue], index: int, frame: Frame) -> int:
     """Places one subtitle and says which to place next: the same one again after a join."""
-    make_way(cues, index)
     cue, gap = cues[index], frame.rules.min_gap
     floor = cues[index - 1].end + gap if index else 0.0
     ceiling = cues[index + 1].start - gap if index + 1 < len(cues) else NEVER
@@ -80,17 +80,6 @@ def lead_in(start: float, floor: float, ceiling: float, frame: Frame) -> float:
 def shown_until(cue: Cue, start: float, ceiling: float, rules: Rules) -> float:
     wanted = max(spoken_end(cue) + rules.linger, start + rules.shortest)
     return min(wanted, start + rules.max_duration, ceiling)
-
-
-def make_way(cues: list[Cue], index: int) -> None:
-    """When the next speech starts before this subtitle's words end, the next subtitle comes up
-    a little late, LATE_START at most, so this one's last words are still shown. A reply said
-    over a turn comes up when it is said: it is the reason the turn was cut."""
-    following = cues[index + 1] if index + 1 < len(cues) else None
-    if following and following.words and not (following.parts and isinstance(
-            following.parts[0], Reply)):
-        late = min(spoken_end(cues[index]), first_said(following) + LATE_START)
-        following.start = max(following.start, pushed_to(cues, index + 1, late))
 
 
 def waited(cues: list[Cue], index: int, frame: Frame, floor: float) -> bool:

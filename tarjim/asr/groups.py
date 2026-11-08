@@ -24,9 +24,10 @@ def chunks(utterances: list[Utterance]) -> list[list[Utterance]]:
     return groups
 
 
-def windows(utterances: list[Utterance], low: int) -> tuple[np.ndarray, np.ndarray]:
-    starts = np.array([(u.start - WINDOW_MARGIN) / FRAME - low for u in utterances])
-    ends = np.array([(u.end + WINDOW_MARGIN) / FRAME - low for u in utterances])
+def windows(utterances: list[Utterance], low: int,
+            margin: float = WINDOW_MARGIN) -> tuple[np.ndarray, np.ndarray]:
+    starts = np.array([(u.start - margin) / FRAME - low for u in utterances])
+    ends = np.array([(u.end + margin) / FRAME - low for u in utterances])
     return starts.astype(np.int64), ends.astype(np.int64)
 
 

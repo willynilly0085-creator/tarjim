@@ -109,22 +109,40 @@ SCHOOL = timed("They can use the school computers for that.",
 
 
 def test_a_long_turn_said_over_another_shows_both_while_they_are_said() -> None:
+    """Only the question's last word, said while the answer starts, gives way to the answer."""
     words = [*EXISTED, *STUDY, *SCHOOL]
     cues = build_cues(words, cuts=[])
     kept_promises(cues, words)
-    assert all(on_screen(cues, w) for w in words)
-    assert all(len(c.parts) <= 2 for c in cues)
+    assert [w for w in words if not on_screen(cues, w)] == STUDY[-1:]
+    assert holding(cues, STUDY[0]).is_dialogue and all(len(c.parts) <= 2 for c in cues)
+    assert holding(cues, SCHOOL[0]).start == SCHOOL[0].start
 
 
-def test_a_short_overlap_is_shared_by_a_late_start_not_a_cut() -> None:
-    """The answer starts 0.5 s before the question ends: it comes up 0.2 s late, so the
-    question's last word is still on screen, and neither sentence is cut."""
+def test_a_short_overlap_does_not_make_the_answer_come_up_late() -> None:
+    """The answer starts 0.5 s before the question ends. Bringing it up 0.2 s late only moved
+    0.2 s of what is not shown from the question's end to the answer's start (2026-11-08)."""
     words = [*STUDY, *SCHOOL]
     cues = build_cues(words, cuts=[])
     kept_promises(cues, words)
     assert [c.source for c in cues] == [" ".join(w.text for w in STUDY),
                                         " ".join(w.text for w in SCHOOL)]
-    assert cues[1].start == SCHOOL[0].start + LATE
+    assert cues[1].start == SCHOOL[0].start
+
+
+# unlabelled words where every one of them fits one subtitle: a late start for "Cannot" left
+# just enough room for "Wow. ... Yes." alone, and the join that showed every word was not made
+CROSSED = [Word("problems", 5.918, 6.401), Word("is", 6.547, 6.876), Word("they?", 6.877, 7.259),
+           Word("Wow.", 7.479, 7.967), Word("Other", 7.489, 7.845),
+           Word("other", 7.867, 8.199), Word("rare.", 8.241, 8.737), Word("Yes.", 8.251, 8.706),
+           Word("Cannot", 8.295, 8.482), Word("they", 8.612, 8.924),
+           Word("getting", 8.998, 9.307), Word("it", 9.319, 9.695), Word("is?", 9.798, 10.182)]
+
+
+def test_crossed_turns_that_fit_one_subtitle_are_joined_into_it() -> None:
+    cues = build_cues(list(CROSSED), cuts=[])
+    kept_promises(cues, CROSSED)
+    assert [c.source for c in cues] == ["problems is they?", " ".join(w.text for w in CROSSED[3:])]
+    assert all(on_screen(cues, w) for w in CROSSED)
 
 
 def test_unlabelled_turns_keep_their_old_order() -> None:

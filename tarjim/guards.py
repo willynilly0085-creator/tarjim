@@ -24,6 +24,7 @@ NAMES = (
     "fuse.retimed",  # a line's words re-timed by the local listener's times
     "align.evened",  # lines spread evenly over their time: the sound could not follow them
     "align.said_over",  # short replies said over a turn, aligned on their own
+    "align.unwaited",  # turns begun over another's end, timed again inside their own time
     "timing.apart",  # added lines aligned in more than one stretch of sound
     "coverage.local_only",  # speech known only from local words, outside the voice detector's
     "wordcover.unpiled",  # a pile of words by a gap re-timed
