@@ -1,0 +1,32 @@
+{
+ "about": "Thresholds for `bench.py accept PKG LABEL BASELINE` (see report.py). The default holds for every package: each cell no worse than the baseline's same cell on every metric below, within the baseline's band (results/BASELINE.band.json, else bench.TOLERANCE; cpu_s_per_min and peak_mb within bench.RELATIVE), plus the rules in \"always\". A package adds its own rules: {\"metric\", \"where\": {field: value or [values]}, one of at_most, at_least, at_most_plus, at_most_times, equals}.",
+ "default": {
+  "metrics": ["ok", "matched", "start_median", "start_p95", "over_0_5", "over_1_5",
+              "missing_count", "missing_seconds", "early_cues", "late_cues",
+              "duplicated_words", "rushed_cues", "tail_seconds", "speaker_accuracy",
+              "short_cues", "overlapping_cues", "slope", "extra_words", "on_silence",
+              "background_words", "flips", "letters_passes", "vad_runs", "oracle_calls",
+              "oracle_requests", "oracle_audio_s", "cpu_s_per_min", "peak_mb"],
+  "always": []
+ },
+ "packages": {
+  "B0": [],
+  "S0": [],
+  "R0": [],
+  "G0": [],
+  "O1": [],
+  "D1": [],
+  "M2": [],
+  "L2": [],
+  "C3": [],
+  "T3": [],
+  "V3": [],
+  "P4": [],
+  "K4": [],
+  "J6": [],
+  "R5": [],
+  "Q7": [],
+  "X8": [],
+  "X9": []
+ }
+}
