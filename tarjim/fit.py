@@ -95,6 +95,8 @@ def join_around(cues: list[Cue], index: int, frame: Frame) -> int | None:
 def joinable(first: Cue, second: Cue, frame: Frame) -> bool:
     if not (first.words and second.words) or first.text or second.text:
         return False
+    if replied_after(first, second):
+        return False
     rules, parts = frame.rules, joined_parts(first, second, frame)
     span = max(spoken_end(first), spoken_end(second)) - first.start
     if len(parts) > MAX_SPEAKERS or span > rules.max_duration + TOLERANCE:
@@ -104,6 +106,14 @@ def joinable(first: Cue, second: Cue, frame: Frame) -> bool:
     if len(parts) == 1:
         return len(join_words(parts[0])) <= rules.max_source_chars
     return all(fits_one_line(part, rules) for part in parts)
+
+
+def replied_after(first: Cue, second: Cue) -> bool:
+    """A reply said after the first subtitle ended is not joined back onto it: before
+    2026-11-08 the join stretched that subtitle over the silence, so the reply showed seconds
+    before it was said and was gone before it finished. It goes through lead_in or hold."""
+    head = second.parts[0] if second.parts else second.words
+    return isinstance(head, Reply) and head[0].start > spoken_end(first)
 
 
 def joined_parts(first: Cue, second: Cue, frame: Frame) -> Parts:

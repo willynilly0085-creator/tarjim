@@ -48,6 +48,17 @@ def test_a_reply_after_a_finished_sentence_goes_with_the_turn_it_is_said_over(
     assert holding(cues, "today.").end <= 2.3
 
 
+@pytest.mark.parametrize("rules", [DEFAULT_RULES, fitted(DEFAULT_RULES, 1080, 1920)])
+def test_a_reply_before_a_long_line_is_not_joined_back_over_the_silence(rules: Rules) -> None:
+    first = spread("I went to the market today.", 0.0, 2.0, "S1")
+    reply = spread("Really?", 2.3, 2.8, "S2")
+    then = spread("Then I saw my old teacher there at the big market", 2.5, 4.5, "S1")
+    cues = build_cues([*first, *reply, *then], cuts=[], rules=rules)
+    shown = holding(cues, "Really?")
+    assert shown.start >= 2.0 and "today." not in [w.text for w in shown.words]
+    assert holding(cues, "today.").end <= 2.3
+
+
 def test_a_reply_no_subtitle_holds_gets_its_own_and_stretches_none() -> None:
     first = spread("I went to the market today.", 0.0, 2.0, "S1")
     cue = Cue(0.0, first[-1].end, list(first), parts=[list(first)])
