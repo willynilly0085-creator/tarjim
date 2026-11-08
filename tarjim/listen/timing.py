@@ -10,6 +10,7 @@ from typing import Any
 from tarjim import guards
 from tarjim.asr.fuse import fuse
 from tarjim.asr.letters import piece
+from tarjim.asr.speechmap import SpeechMap
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
 
@@ -34,6 +35,8 @@ class Timer:
     rate: int
     language: str
     opinion: list[Word]  # the words this computer heard, possibly none
+    # the clip's speech map (asr/speechmap.py): a stretch reads its part of it (2026-11-09)
+    speech: SpeechMap | None = None
 
     def whole(self, utterances: list[Utterance]) -> list[Word]:
         return fuse(self.aligned(self.wav, utterances), utterances, self.opinion)
@@ -77,4 +80,4 @@ class Timer:
         from tarjim.memory import heavy
 
         with heavy():
-            return shared_aligner().align(sound, utterances, self.language)
+            return shared_aligner().align(sound, utterances, self.language, self.speech)

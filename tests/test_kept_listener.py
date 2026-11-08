@@ -38,7 +38,9 @@ def test_a_backup_engines_hearing_is_used_but_never_kept(
         words = hearing.transcript_for(job, lambda _stage: None).words
         assert [w.text for w in words] == ["Hello", "there."]
     assert calls == ["gemini", "local", "gemini", "local"]
-    assert not [p.name for p in job.cache.iterdir() if p.suffix == ".json"]
+    # the speech map is the sound's, whichever engine heard it (listen/clipmap.py, 2026-11-09)
+    kept = [p.name for p in job.cache.iterdir() if p.suffix == ".json"]
+    assert kept in ([], ["speech.json"])
 
 
 def raising(error: Exception) -> Any:

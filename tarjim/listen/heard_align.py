@@ -1,6 +1,7 @@
 """A cloud hearing's lines timed on the clip's sound, with the words this computer heard as the
-second opinion, then each word given to its speaker by voice. Moved out of hearing.py on 2026-11-08,
-unchanged, to make room there; hearing.py still offers it. The second opinion is reached through
+second opinion, then each word given to its speaker by voice. Moved out of hearing.py on 2026-11-08
+to make room there; hearing.py still offers it. Since 2026-11-09 every timing reads one map of
+the clip's speech (listen/clipmap.py). The second opinion is reached through
 the hearing module, as are the settle and check steps through theirs, so what tests and the bench
 put in place of them there is what runs."""
 from collections.abc import Callable
@@ -19,7 +20,8 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     import soundfile
 
     from tarjim import hearing
-    from tarjim.listen import check, settle
+    from tarjim.listen import settle
+    from tarjim.listen.clipmap import Clip, clip_map
     from tarjim.listen.opinion import doubted, sounded
     from tarjim.listen.whose import by_voice
 
@@ -30,7 +32,10 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     local = heard.local_words
     opinion = hearing.second_opinion(audio, heard.language) if local is None else local
     kept = sounded(opinion, wav)
-    sound = settle.Sound(wav, rate, check.regions_in(wav), doubted(opinion, kept))
+    # one map of the clip's speech for every timing, the detector run once (2026-11-09)
+    lines = [(u.start, u.end) for u in heard.utterances]
+    speech = clip_map(job.cache, Clip(audio, wav, rate), lines)
+    sound = settle.Sound(wav, rate, speech.speech(), doubted(opinion, kept), speech)
     done = settle.settled(job, heard, sound, kept)
     # shown on the job, the stretches given up too (2026-11-08)
     findings().heard(tuple((g.start, g.end) for g in done.left if not g.given_up),

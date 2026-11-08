@@ -9,6 +9,7 @@ from tarjim.asr.ctc import FRAME, Emitter, Span, token_spans
 from tarjim.asr.groups import WINDOW_MARGIN, chunks, densest, quietest, tell_evened, windows
 from tarjim.asr.letters import Piece
 from tarjim.asr.numbers import said
+from tarjim.asr.speechmap import SOFT, SpeechMap, build
 from tarjim.asr.spread import (
     GAP_FALLBACK,
     WORD_BASE,
@@ -20,6 +21,7 @@ from tarjim.asr.spread import (
     runs,
     share,
 )
+from tarjim.asr.vad import mute
 from tarjim.asr.waited import TIGHT, waited
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
@@ -68,6 +70,17 @@ def overlapping(utterances: list[Utterance]) -> list[bool]:
     return flags
 
 
+def mapped(wav: Any, logp: np.ndarray, speech: SpeechMap | None) -> SpeechMap:
+    """The sound's part of the clip's speech map; with none (a dub's lines, 2026-11-09), the
+    sound's own, the voice detector run on it."""
+    first = wav.first if isinstance(wav, Piece) else 0
+    if speech is not None:
+        return speech.view(first, first + len(logp))
+    from tarjim.asr.vad import speech_regions
+
+    return build(logp, len(logp), speech_regions(wav))
+
+
 @lru_cache(maxsize=1)
 def shared_aligner() -> "AlignEngine":
     return AlignEngine()
@@ -80,16 +93,19 @@ class AlignEngine:
         self.emitter = Emitter(device)
         self.roman = uroman.Uroman()
 
-    def align(self, wav: Any, utterances: list[Utterance], language: str) -> list[Word]:
-        from tarjim.asr.vad import mute_silence, speech_mask, speech_regions
-
+    def align(self, wav: Any, utterances: list[Utterance], language: str,
+              speech: SpeechMap | None = None) -> list[Word]:
         self.language = language
         self.evened: list[Utterance] = []  # lines spread evenly, told once at the end
         logp = self.emitter.emissions(wav)
-        # a heard line is speech too: the detector takes a chant for silence (2026-11-08)
-        heard = [(u.start, u.end) for u in utterances]
-        self.speech = speech_mask([*speech_regions(wav), *heard], len(logp))
-        logp = mute_silence(logp, self.speech)
+        # the heard lines over silence are soft, not speech: a line stretched over silence no
+        # longer makes it free, and a chant the detector misses is speech by its letters
+        # (asr/speechmap.py, 2026-11-09; before, every heard line was speech outright). A word
+        # is still not cut at a soft frame (groups.densest): on the bench, cutting there moved a
+        # word off its speech in two clips and helped none
+        view = mapped(wav, logp, speech).heard([(u.start, u.end) for u in utterances])
+        self.speech = view.tier >= SOFT
+        logp = mute(logp, view.penalty())
         over = overlapping(utterances)
         guards.fired("align.said_over", sum(over))  # here, not in overlapping: fuse asks it too
         turns = [u for u, said_over in zip(utterances, over, strict=True) if not said_over]

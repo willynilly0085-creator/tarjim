@@ -124,13 +124,11 @@ def cloud_listener(provider: str) -> Callable[[bytes], Heard]:
 
 
 def speech_regions_of(audio: Path) -> Regions:
-    """Where the pauses are, for cutting; with no voice detector the pieces are cut on time."""
-    import soundfile
+    """Where the pauses are, for cutting; with no voice detector the pieces are cut on time. Run
+    once per file: the timing reads the same (listen/clipmap.regions_of, 2026-11-09)."""
+    from tarjim.listen.clipmap import regions_of
 
-    from tarjim.listen.check import regions_in
-
-    wav, _ = soundfile.read(str(audio), dtype="float32")
-    return regions_in(wav)
+    return regions_of(audio)
 
 
 def second_opinion(audio: Path, language: str = "") -> list[Word]:

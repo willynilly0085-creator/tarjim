@@ -26,7 +26,8 @@ REGIONS = [(u.start, u.end) for u in SPOKEN]
 
 
 class Aligner:
-    def align(self, _wav: Any, utterances: list[Utterance], _language: str) -> list[Word]:
+    def align(self, _wav: Any, utterances: list[Utterance], _language: str,
+              _speech: Any = None) -> list[Word]:
         return [w for u in utterances for w in align.proportional(u)]
 
 
