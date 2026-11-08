@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from difflib import SequenceMatcher
 from itertools import pairwise
 
+from tarjim import guards
 from tarjim.listen.coverage import EDGE, Gap, Hearing, merged, outside
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.repair import (
@@ -86,8 +87,9 @@ class WordMender(Mender):
         self.words, self.spans = words, merged([(w.start, w.end) for w in words], 0.0)
 
     def novel(self, line: Utterance, lines: list[Utterance]) -> bool:
-        return not (said_before(line, lines) or timed_over(line, self.spans)
-                    or echoes(line, self.words))
+        return not (guards.when("novel.said_before", said_before(line, lines))
+                    or guards.when("novel.timed_over", timed_over(line, self.spans))
+                    or guards.when("novel.echoes", echoes(line, self.words)))
 
     def from_local(self, gap: Gap, lines: list[Utterance]) -> list[Utterance]:
         return voiced([u for u in from_words(gap.words) if not said_before(u, lines)], lines)

@@ -6,8 +6,10 @@ computer heard it. The check runs after the times were corrected against the loc
 (asr/anchor.py), so a listener's late times are not taken for missing speech. Speech is what the
 voice detector found, together with the words this computer heard (either may be missing).
 """
+from bisect import bisect_left, bisect_right
 from dataclasses import dataclass, replace
 
+from tarjim import guards
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
 
@@ -76,8 +78,18 @@ def outside(span: Span, covered: list[Span]) -> list[Span]:
     return [*pieces, (start, end)] if end > start else pieces
 
 
+def local_only(heard: list[Span], detected: list[Span]) -> int:
+    """Stretches only the local words call speech, longer than a line's times are rough: what
+    the local words add to the voice detector's speech (counted, tarjim/guards.py)."""
+    regions = merged(detected, 0.0)
+    lows, highs = [low for low, _ in regions], [high for _, high in regions]
+    return sum(b - a > EDGE for start, end in merged(heard, JOIN) for a, b in outside(
+        (start, end), regions[bisect_right(highs, start):bisect_left(lows, end)]))
+
+
 def speech_of(hearing: Hearing) -> list[Span]:
     heard = [(w.start, w.end) for w in hearing.local if w.end > w.start]
+    guards.fired("coverage.local_only", local_only(heard, hearing.regions))
     return merged([*hearing.regions, *heard], 0.0)
 
 

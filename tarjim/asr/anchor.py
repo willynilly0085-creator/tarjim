@@ -19,6 +19,7 @@ it from the coverage check.
 from difflib import SequenceMatcher
 from statistics import median
 
+from tarjim import guards
 from tarjim.asr.align import proportional
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.vote import norm
@@ -79,6 +80,7 @@ def moved(utterance: Utterance, delta: float, duration: float, ends: float | Non
     end = max(start, min(end, ends)) if ends is not None else end
     if (start, end) == (utterance.start, utterance.end):
         return utterance
+    guards.fired("anchor.moved")
     return Utterance(start, end, utterance.speaker, utterance.text)
 
 

@@ -8,6 +8,7 @@ People say at most about 6 words a second; a timing far past that is wrong, what
 """
 from collections.abc import Iterable
 
+from tarjim import guards
 from tarjim.models import Word
 from tarjim.scripts import UNSPACED, split_words
 
@@ -36,7 +37,7 @@ def implausible(words: list[Word]) -> bool:
     if len(words) < FEWEST:
         return False
     squeezed = sum(w.end - w.start < SHORTEST for w in words) / len(words)
-    return squeezed > SQUEEZED or rate(words) > FASTEST
+    return guards.when("sanity.implausible", squeezed > SQUEEZED or rate(words) > FASTEST)
 
 
 def plausible_line(start: float, end: float, text: str) -> bool:

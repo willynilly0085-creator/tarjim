@@ -10,7 +10,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
-from tarjim import media
+from tarjim import guards, media
 from tarjim.findings import findings
 from tarjim.job import Job
 from tarjim.listen.asked import TRIES, Asked, same
@@ -37,6 +37,7 @@ class Repair:
 def repaired(job: Job, heard: Heard, hearing: Hearing, asked: Asked) -> Repair:
     relisten = relistener(heard.provider, job.video, asked)
     mended = mend(hearing, relisten, heard.provider)
+    guards.fired("repair.fills", len(mended.fills))
     return Repair(heard.language, Again(relisten, heard.provider, mended.left), mended)
 
 

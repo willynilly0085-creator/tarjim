@@ -4,6 +4,7 @@ from typing import Any
 
 import numpy as np
 
+from tarjim import guards
 from tarjim.asr.ctc import FRAME, Emitter, Span, token_spans
 from tarjim.asr.groups import chunks, densest, quietest, tell_evened, windows
 from tarjim.asr.letters import Piece
@@ -72,6 +73,7 @@ class AlignEngine:
         self.speech = speech_mask([*speech_regions(wav), *heard], len(logp))
         logp = mute_silence(logp, self.speech)
         over = overlapping(utterances)
+        guards.fired("align.said_over", sum(over))  # here, not in overlapping: fuse asks it too
         turns = [u for u, said_over in zip(utterances, over, strict=True) if not said_over]
         timed = iter([w for group in chunks(turns) for w in self.align_group(logp, group)])
         # one search keeps words in order, so a reply said over a turn is searched on its own

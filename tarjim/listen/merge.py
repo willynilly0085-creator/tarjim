@@ -3,6 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from contextvars import copy_context
 from dataclasses import dataclass, field
 
+from tarjim import guards
 from tarjim.gemini_client import QuotaExhausted
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.vote import ordered, vote
@@ -76,7 +77,11 @@ def sane(run: list[Utterance]) -> list[Utterance]:
     from tarjim.asr.sanity import plausible_line
 
     lines = [u for u in run if plausible_line(u.start, u.end, u.text)]
-    return lines if spoken(lines) >= CLOSE * spoken(run) else []
+    if spoken(lines) >= CLOSE * spoken(run):
+        guards.fired("merge.sane_line", len(run) - len(lines))
+        return lines
+    guards.fired("merge.sane_pass")
+    return []
 
 
 def agreed(runs: list[list[Utterance]]) -> list[Utterance]:
@@ -101,4 +106,5 @@ def settled(voted: list[Utterance], runs: list[list[Utterance]]) -> list[Utteran
     stands; the words are timed afterwards on this computer either way."""
     counts = sorted(spoken(run) for run in runs)
     agreed = len(runs) > 1 and counts[0] >= CLOSE * counts[-1]
-    return max(runs, key=spoken) if agreed and spoken(voted) < CLOSE * counts[-1] else voted
+    fullest = guards.when("merge.fullest", agreed and spoken(voted) < CLOSE * counts[-1])
+    return max(runs, key=spoken) if fullest else voted

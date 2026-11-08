@@ -9,6 +9,7 @@ a word that has less time to itself than its letters take at any pace is squeeze
 """
 from dataclasses import replace
 
+from tarjim import guards
 from tarjim.asr.align import longest
 from tarjim.asr.qwen import core
 from tarjim.models import Word
@@ -74,6 +75,7 @@ def at(pieces: list[Span], offset: float) -> float:
 def spread(pile: list[Word], span: Span, speech: list[Span]) -> list[Word]:
     """The piled words share the speech inside the span, each by its length, in order; with no
     speech known there, the whole span."""
+    guards.fired("piles.spread")
     pieces = [(max(a, span[0]), min(b, span[1])) for a, b in speech]
     pieces = [p for p in pieces if p[1] > p[0]] or [span]
     weights = [longest(w.text) for w in pile]

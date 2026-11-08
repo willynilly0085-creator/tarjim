@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from difflib import SequenceMatcher
 from statistics import median
 
+from tarjim import guards
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.scripts import split_words
 
@@ -137,8 +138,9 @@ def repeat(u: Utterance, index: int, kept: Elected, found: Run) -> bool:
     phrase said twice can pair with its far copy in the base, leaving its near copy over, which
     came back as a second subtitle. A pass that backed the kept line with another of its lines
     heard the phrase twice, so its leftover is the second time it was said (a chant, a refrain)."""
-    return any(similar(u, f) and index not in heard for f, heard in kept) or any(
+    copy = any(similar(u, f) and index not in heard for f, heard in kept) or any(
         similar(u, f) for f in found)
+    return guards.when("vote.extra_dropped", copy)
 
 
 def extras(leftovers: list[Run], agree: int, kept: Elected) -> Run:
@@ -163,4 +165,5 @@ def vote(runs: list[Run], agree: int | None = None) -> Run:
                           if k not in used])
     kept = [(e, b.passes) for b in ballots if (e := elect(b, needed)) is not None]
     found = extras(leftovers, needed, kept)
+    guards.fired("vote.extras", len(found))
     return sorted([u for u, _ in kept] + found, key=lambda u: u.start)

@@ -21,6 +21,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from typing import TYPE_CHECKING, Any
 
+from tarjim import guards
 from tarjim.asr.base import Transcript
 from tarjim.asr.sanity import implausible
 from tarjim.job import Job
@@ -68,6 +69,7 @@ def worth_keeping(left: list[Gap]) -> bool:
 
 def trusted(words: list[Word], opinion: list[Word]) -> list[Word]:
     if implausible(words) and opinion and not implausible(opinion):
+        guards.fired("settle.trusted")
         print(f"timing: {len(words)} words timed faster than speech; using the words this "
               "computer heard", flush=True)
         return opinion
@@ -99,8 +101,10 @@ def better(first: Timed, alone: Callable[[], Timed], second_opinion: bool) -> Ti
     if not second_opinion or first.agreement is None or first.agreement >= IN_SYNC:
         return told(first, first)
     other = alone()
+    guards.fired("settle.second_timing")
     print(f"timing check: on the sound alone, {share(other.agreement)}", flush=True)
-    return told(other if (other.agreement or 0.0) > first.agreement else first, other)
+    won = guards.when("settle.alone_won", (other.agreement or 0.0) > first.agreement)
+    return told(other if won else first, other)
 
 
 def told(kept: Timed, last: Timed) -> Timed:

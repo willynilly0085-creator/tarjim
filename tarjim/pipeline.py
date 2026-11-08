@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import NamedTuple
 
 from tarjim import media
+from tarjim.findings import findings
 from tarjim.hearing import transcript_for
 from tarjim.job import Job
 from tarjim.models import Cue, Word
@@ -49,7 +50,6 @@ def translate(job: Job, cues: list[Cue], rules: Rules | None = None) -> list[Cue
     """Every engine of the chain while a line is untranslated (translate/rounds.py). The job
     fails only when no engine translated anything; otherwise what they did is kept, and why an
     engine stopped is kept on the job beside the lines left as said."""
-    from tarjim.findings import findings
     from tarjim.translate.glossary import current
     from tarjim.translate.prompt import Brief
     from tarjim.translate.rounds import Rounds
@@ -133,6 +133,7 @@ def run(job: Job, report: Report = quiet) -> tuple[list[Cue], list[Issue]]:
     media.check_readable(job.video)
     report("hearing")
     words = transcript_for(job, report).words
+    findings().guarded()  # once per job, when every guard has had its say (2026-11-08)
     info = media.probe(job.video)
     # the target language's rules, its lines shortened for the picture's shape: before
     # 2026-11-08 the cues were cut by the default rules whatever the language

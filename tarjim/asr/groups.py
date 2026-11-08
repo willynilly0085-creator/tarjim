@@ -5,6 +5,7 @@ from itertools import pairwise
 
 import numpy as np
 
+from tarjim import guards
 from tarjim.asr.ctc import FRAME, Span
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.scripts import split_words
@@ -53,6 +54,7 @@ def quietest(group: list[Utterance], speech: np.ndarray) -> int:
 
 def tell_evened(lines: list[Utterance], offset: float) -> None:
     """Words spread evenly over their line are not timed by the sound: said once, in the log."""
+    guards.fired("align.evened", len(lines))
     if lines:
         count = sum(len(split_words(u.text)) for u in lines)
         print(f"aligner: {count} words in {len(lines)} lines at {offset + lines[0].start:.1f}-"

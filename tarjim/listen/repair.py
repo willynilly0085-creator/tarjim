@@ -7,6 +7,7 @@ up), so the job page shows it, where before it was dropped and the job looked wh
 from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 
+from tarjim import guards
 from tarjim.job import checkpoint
 from tarjim.listen.asked import TRIES, Spent
 from tarjim.listen.budget import Refused
@@ -33,8 +34,7 @@ LINE_PAUSE = 0.7  # local words become lines at pauses this long
 LINE_WORDS = 12
 TURN_GAP = 0.3  # seconds: a line this close to a turn goes on with it
 MAIN = "S1"  # the speaker of a line with no turn heard anywhere
-# moved to listen/coverage.py on 2026-11-08 and still offered here
-__all__ = ["NOT_ASKED", "NOT_REPAIRED", "described", "still_left"]
+__all__ = ["NOT_ASKED", "NOT_REPAIRED", "described", "still_left"]  # in coverage.py, 2026-11-08
 
 Relisten = Callable[[float, float], list[Utterance]]  # asked about a gap, in clip times
 
@@ -143,7 +143,8 @@ class Mender:
             return UNASKED
 
     def novel(self, line: Utterance, lines: list[Utterance]) -> bool:
-        return not overlaps(line, lines) and not repeats(line, lines)
+        return not (guards.when("repair.overlaps", overlaps(line, lines))
+                    or guards.when("repair.repeats", repeats(line, lines)))
 
     def from_local(self, gap: Gap, lines: list[Utterance]) -> list[Utterance]:
         """The local words as lines, less those a line close by already says: a cloud line

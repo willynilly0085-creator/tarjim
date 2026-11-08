@@ -11,6 +11,7 @@ words, not by line spans; then the local words fill.
 """
 from dataclasses import dataclass, replace
 
+from tarjim import guards
 from tarjim.asr.piles import Span, piles, spread
 from tarjim.listen.coverage import EDGE, Gap, Hearing, described, gaps, speech_of
 from tarjim.listen.gemini_listen import Utterance
@@ -69,6 +70,7 @@ def realigned(pile: list[Word], span: Span, timer: Timer) -> list[Word] | None:
     fits = all(span[0] - EDGE <= w.start and w.end <= span[1] + EDGE for w in again)
     if len(again) != len(pile) or piles(again) or not fits:
         return None
+    guards.fired("wordcover.realigned")
     return [replace(w, start=a.start, end=a.end) for w, a in zip(pile, again, strict=True)]
 
 
@@ -84,6 +86,7 @@ def unpiled(words: list[Word], found: list[Gap], speech: list[Span],
         pile = words[first:past]
         words[first:past] = realigned(pile, span, timer) or spread(pile, span, speech)
         windows.append(span)
+        guards.fired("wordcover.unpiled")
         print(f"coverage: words {described(gap)} -> timing collapsed: re-timed {len(pile)} "
               f"words into {span[0]:.1f}-{span[1]:.1f} s", flush=True)
     return words, windows
@@ -105,5 +108,6 @@ def recheck(hearing: Hearing, words: list[Word], timer: Timer, again: Again) -> 
     missing = word_gaps(hearing, words, tried, windows)
     mended = WordMender(hearing, again, words).mend(missing)
     if mended.added:
+        guards.fired("wordcover.fills", len(mended.added))
         words = joined(words, sorted(mended.added, key=lambda u: u.start), timer)
     return Checked(mended.utterances, words, mended.added, mended.left)

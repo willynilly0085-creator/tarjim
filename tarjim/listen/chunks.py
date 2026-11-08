@@ -9,6 +9,7 @@ each speaker a voice of their own.
 from collections.abc import Callable
 from itertools import pairwise
 
+from tarjim import guards
 from tarjim.job import checkpoint
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.merge import Heard, Piece, agreed
@@ -62,9 +63,10 @@ def spans(duration: float, regions: list[Span], target: float | None = None) -> 
 
 def shift(utterances: list[Utterance], span: Span, tag: str = "") -> list[Utterance]:
     start, end = span
+    inside = [u for u in utterances if u.start + start < end + OVERRUN]
+    guards.fired("shift.dropped", len(utterances) - len(inside))
     return [Utterance(u.start + start, min(u.end + start, end + OVERRUN), f"{tag}{u.speaker}",
-                      u.text)
-            for u in utterances if u.start + start < end + OVERRUN]
+                      u.text) for u in inside]
 
 
 def listen_one(span: Span, listen_span: ListenSpan) -> Heard:

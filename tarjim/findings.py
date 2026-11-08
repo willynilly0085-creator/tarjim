@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from tarjim import guards
 from tarjim.models import Cue
 from tarjim.qa import Issue
 
@@ -39,6 +40,9 @@ class Findings:
     # stretches not asked about again because the job's budget was used (listen/budget.py,
     # 2026-11-08); they are in `left` too, and asked on the next run
     refused: list[Span] = field(default_factory=list)
+    # how often each layer that makes up for another fired in this job (tarjim/guards.py,
+    # 2026-11-08): evidence for the bench, never shown on the page
+    guards: dict[str, int] = field(default_factory=dict)
 
     def heard(self, left: tuple[Span, ...], agreement: float | None,
               given_up: tuple[Span, ...] = ()) -> None:
@@ -91,6 +95,11 @@ class Findings:
             self.agreement = data.get("agreement")
             self.given_up = [(float(a), float(b)) for a, b in data.get("given_up") or []]
 
+    def guarded(self) -> None:
+        """The guards' counts kept here and said once in the log, in one line."""
+        self.guards = guards.counts()
+        print(guards.said(self.guards), flush=True)
+
     def timing(self) -> list[Note]:
         if self.agreement is None or self.agreement >= IN_SYNC:
             return []
@@ -107,7 +116,8 @@ FINDINGS: ContextVar[Findings | None] = ContextVar("findings", default=None)
 
 
 def collecting() -> Findings:
-    """A fresh record for the job this thread runs."""
+    """A fresh record for the job this thread runs, and counts of nothing (tarjim/guards.py)."""
+    guards.reset()
     found = Findings()
     FINDINGS.set(found)
     return found

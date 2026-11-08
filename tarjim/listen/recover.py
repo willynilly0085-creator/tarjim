@@ -10,6 +10,7 @@ stays on a tie.
 """
 from difflib import SequenceMatcher
 
+from tarjim import guards
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.merge import sane
 from tarjim.listen.vote import norm, ordered
@@ -47,7 +48,8 @@ def fuller(voted: list[Utterance], passes: list[list[Utterance]]) -> list[Uttera
     if not runs:
         return voted
     middle = runs[(len(runs) - 1) // 2]
-    return middle if len(tokens(voted)) < KEPT * len(tokens(middle)) else voted
+    lost = guards.when("recover.fuller", len(tokens(voted)) < KEPT * len(tokens(middle)))
+    return middle if lost else voted
 
 
 def best_heard(voted: list[Utterance], passes: list[list[Utterance]],
@@ -58,4 +60,6 @@ def best_heard(voted: list[Utterance], passes: list[list[Utterance]],
     if not local:
         return fuller(voted, passes)
     candidates = [voted, *cleaned(passes)]
-    return max(candidates, key=lambda run: support(run, local))  # the first wins a tie
+    chosen = max(candidates, key=lambda run: support(run, local))  # the first wins a tie
+    guards.when("recover.not_vote", chosen is not voted)
+    return chosen

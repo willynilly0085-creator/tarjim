@@ -20,6 +20,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
+from tarjim import guards
 from tarjim.asr.base import Transcript
 from tarjim.asr.sanity import implausible
 from tarjim.listen.asked import ASKED, TRIES, Asked, Spent
@@ -66,6 +67,7 @@ def load_heard(cache: Path) -> Heard | None:
         return None
     data = json.loads(kept.read_text(encoding="utf-8"))
     pieces = [piece_of(row) for row in data.get("pieces") or []]
+    guards.when("kept.revoted", bool(pieces))  # voted again piece by piece below
     voted, passes = joined(pieces) if pieces else (
         lines_of(data["utterances"]), [lines_of(run) for run in data.get("passes") or []])
     words = data.get("local_words")
@@ -134,9 +136,10 @@ def reusable(cache: Path) -> Transcript | None:
     speak its timing. Since 2026-11-08 another key means it is derived again from the kept
     hearing, on this computer: a timing kept by older code was replayed on every run."""
     found = kept_transcript(cache)
-    if found is None or implausible(found[0].words):
+    if found is None or guards.when("kept.implausible", implausible(found[0].words)):
         return None  # a broken timing kept by an older run is made again
     if not found[1] and (cache / HEARD).exists():
+        guards.fired("kept.rederived")
         print("timing: the kept transcript was made by other code or settings; it is made "
               "again from the kept hearing, with no new listening", flush=True)
         return None

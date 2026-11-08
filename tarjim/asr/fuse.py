@@ -1,6 +1,7 @@
 import bisect
 from difflib import SequenceMatcher
 
+from tarjim import guards
 from tarjim.asr.align import Slot, fill_gaps, longest, overlapping, share
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.vote import norm
@@ -95,7 +96,10 @@ def room(index: int, groups: list[list[Word]], over: list[bool], floor: float) -
 def retimed(group: list[Word], utterance: Utterance, heard: list[Word],
             limits: Limits) -> list[Word]:
     better = retime(group, utterance, heard, limits)
-    return capped(better) if better and fits(better, *limits) else group
+    if not (better and fits(better, *limits)):
+        return group
+    guards.fired("fuse.retimed")
+    return capped(better)
 
 
 def fuse(words: list[Word], utterances: list[Utterance], heard: list[Word]) -> list[Word]:

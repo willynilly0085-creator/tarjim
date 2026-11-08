@@ -7,6 +7,7 @@ at 130 s to 198 s and 232 s, toward the other line at 234 s (2026-11-08)."""
 from dataclasses import dataclass, replace
 from typing import Any
 
+from tarjim import guards
 from tarjim.asr.fuse import fuse
 from tarjim.asr.letters import piece
 from tarjim.listen.gemini_listen import Utterance
@@ -23,6 +24,7 @@ def apart(utterances: list[Utterance]) -> list[list[Utterance]]:
             groups[-1].append(line)
         else:
             groups.append([line])
+    guards.when("timing.apart", len(groups) > 1)
     return groups
 
 
