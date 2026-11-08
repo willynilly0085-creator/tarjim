@@ -16,6 +16,10 @@ from contextvars import ContextVar
 
 # Every guard, so each shows in the counts with 0 when it never fired.
 NAMES = (
+    "opinion.no_length",  # local words with no length one says them in, left out (2026-11-08)
+    "opinion.not_found",  # ...not heard where they are timed
+    "opinion.stretch",  # ...in a stretch whose local words were mostly not heard where timed
+    "opinion.unused",  # ...all of them: hardly any was heard where timed
     "anchor.moved",  # a line moved to where the local listener heard its words
     "fuse.retimed",  # a line's words re-timed by the local listener's times
     "align.evened",  # lines spread evenly over their time: the sound could not follow them

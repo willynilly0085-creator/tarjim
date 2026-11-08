@@ -3,7 +3,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import NamedTuple
 
-from tarjim import media
+from tarjim import guards, media
 from tarjim.findings import findings
 from tarjim.hearing import transcript_for
 from tarjim.job import Job
@@ -129,6 +129,7 @@ def picture_for(job: Job, canvas: Canvas, mark: Mark | None) -> Path:
 
 
 def run(job: Job, report: Report = quiet) -> tuple[list[Cue], list[Issue]]:
+    guards.reset()  # each job counts from nothing, the command line's too (2026-11-08)
     job.claim_cache()
     media.check_readable(job.video)
     report("hearing")

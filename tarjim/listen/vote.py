@@ -137,10 +137,12 @@ def repeat(u: Utterance, index: int, kept: Elected, found: Run) -> bool:
     """A copy of a line already kept, checked against the kept lines as well (2026-11-08): a
     phrase said twice can pair with its far copy in the base, leaving its near copy over, which
     came back as a second subtitle. A pass that backed the kept line with another of its lines
-    heard the phrase twice, so its leftover is the second time it was said (a chant, a refrain)."""
-    copy = any(similar(u, f) and index not in heard for f, heard in kept) or any(
-        similar(u, f) for f in found)
-    return guards.when("vote.extra_dropped", copy)
+    heard the phrase twice, so its leftover is the second time it was said (a chant, a refrain).
+    Only a copy of a kept line is counted (2026-11-08): another pass's copy of an extra is the
+    same extra heard twice, which is how extras are found, not a guard firing."""
+    copy = guards.when("vote.extra_dropped",
+                       any(similar(u, f) and index not in heard for f, heard in kept))
+    return copy or any(similar(u, f) for f in found)
 
 
 def extras(leftovers: list[Run], agree: int, kept: Elected) -> Run:
