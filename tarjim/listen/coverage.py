@@ -5,24 +5,38 @@ a 250-second clip stopped at 178 s, while the sound held speech to 240 s and the
 computer heard it. The check runs after the times were corrected against the local words
 (asr/anchor.py), so a listener's late times are not taken for missing speech. Speech is what the
 voice detector found, together with the words this computer heard (either may be missing).
+
+Since 2026-11-09 speech is the clip's speech map (asr/speechmap.py) when one is given, so a stretch
+is judged the same with or without the local listener; one only the local words call speech is
+given up (listed, never asked about) when the sound holds no speech there.
 """
 from bisect import bisect_left, bisect_right
 from dataclasses import dataclass, field, replace
 
+import numpy as np
+
 from tarjim import guards
+from tarjim.asr.ctc import FRAME
+from tarjim.asr.speechmap import SPEECH, SpeechMap
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
 
 GAP_SECONDS = 2.0  # this much speech with no line is speech left out, not a breath
 EDGE = 0.5  # a line's times are rough by about this much
 JOIN = 1.0  # speech pieces this close belong to one stretch
-# what listen/repair.py says of a stretch nothing filled (moved here with `described` and
-# `still_left` on 2026-11-08, to make room in repair.py; it still offers them)
+# what listen/repair.py says of a stretch nothing filled (here since 2026-11-08; it offers them)
 NOT_REPAIRED = "not repaired"
 NOT_ASKED = "not asked again"
 # seconds around a stretch where local words left out as unconfirmed say the local listener heard
 # speech there after all, timed elsewhere: Qwen drifted up to 11 s on the Arabic bench (2026-11-08)
 DOUBT = 15.0
+# Of a stretch only the local words call speech, the share of its frames the map must call speech
+# (asr/speechmap.SPEECH) for it to be speech by the sound (2026-11-09); the share is logged
+NO_SPEECH = 0.3
+NO_SOUND = "the sound holds no speech"
+SOUNDED = "the sound holds speech"
+UNCHECKED = "only local words call it speech: not checked against the sound (no letters heard)"
+UNSPOKEN = f"no speech here by the sound; {NOT_ASKED}, left as it is"
 
 Span = tuple[float, float]
 
@@ -36,6 +50,12 @@ class Gap:
     # no listener heard it and it is not asked about again: still listed on the job, but it does
     # not stop the transcript being kept (2026-11-08: it was dropped, and the job looked whole)
     given_up: bool = False
+    # what the speech map says of a stretch only the local words call speech (2026-11-09)
+    sound: str = ""
+
+    @property
+    def unspoken(self) -> bool:
+        return self.sound.startswith(NO_SOUND)
 
 
 def open_gaps(left: list[Gap]) -> list[Gap]:
@@ -50,13 +70,17 @@ class Hearing:
     regions: list[Span]  # the voice detector's speech; none when it could not run
     # where the local words the sound did not confirm were timed (listen/opinion.doubted)
     doubted: list[Span] = field(default_factory=list)
+    # the clip's speech map (listen/clipmap.py, 2026-11-09); None: the detector and local words
+    map: SpeechMap | None = None
 
 
 def heard_nothing(hearing: Hearing, gap: Gap) -> bool:
     """The local listener ran and heard no words in the stretch. Since 2026-11-08 a stretch near
     local words left out as unconfirmed is not one: they were heard, timed off, so it stays open
-    as with the local listener off, where before A1's review it was closed as heard by no one."""
-    return bool(hearing.local) and not gap.words and not any(
+    as with the local listener off, where before A1's review it was closed as heard by no one.
+    With the speech map no stretch is one (2026-11-09): every stretch with no local words is the
+    map's own speech, open whether the local listener ran or not, as it is with it off."""
+    return hearing.map is None and bool(hearing.local) and not gap.words and not any(
         a - DOUBT < gap.end and b + DOUBT > gap.start for a, b in hearing.doubted)
 
 
@@ -105,10 +129,38 @@ def local_only(heard: list[Span], detected: list[Span]) -> int:
         (start, end), regions[bisect_right(highs, start):bisect_left(lows, end)]))
 
 
+def sounded(hearing: Hearing) -> list[Span]:
+    """What the sound calls speech: the map's, else the voice detector's."""
+    return list(hearing.regions) if hearing.map is None else hearing.map.speech()
+
+
 def speech_of(hearing: Hearing) -> list[Span]:
     heard = [(w.start, w.end) for w in hearing.local if w.end > w.start]
-    guards.fired("coverage.local_only", local_only(heard, hearing.regions))
-    return merged([*hearing.regions, *heard], 0.0)
+    sound = sounded(hearing)
+    guards.fired("coverage.local_only", local_only(heard, sound))
+    return merged([*sound, *heard], 0.0)
+
+
+def spoken(speech_map: SpeechMap, start: float, end: float) -> float:
+    """The share of the stretch's frames the map calls speech."""
+    first = int(start / FRAME)
+    tier = speech_map.tier[first:max(round(end / FRAME), first + 1)]
+    return float(np.mean(tier == SPEECH)) if len(tier) else 0.0
+
+
+def judged(speech_map: SpeechMap | None, group: list[Span]) -> str:
+    """What the map says of a stretch only the local words call speech; "" for any other: one of
+    the map's own speech is speech by construction. A map with no letters heard is the detector's
+    alone, which takes a chant for silence, so it does not judge."""
+    if speech_map is None:
+        return ""
+    sound = speech_map.speech()
+    if any(outside(piece, sound) != [piece] for piece in group):
+        return ""
+    if speech_map.source == "none":
+        return UNCHECKED
+    share = spoken(speech_map, group[0][0], group[-1][1])
+    return f"{NO_SOUND if share < NO_SPEECH else SOUNDED} ({share:.0%} of it)"
 
 
 def uncovered(hearing: Hearing) -> list[list[Span]]:
@@ -131,13 +183,14 @@ def gaps(hearing: Hearing, least: float | None = None) -> list[Gap]:
         inside = [w for w in hearing.local if start <= (w.start + w.end) / 2 <= end]
         speech = sum(b - a for a, b in group)
         if speech >= shortest:
-            found.append(Gap(start, end, speech, inside))
+            found.append(Gap(start, end, speech, inside, sound=judged(hearing.map, group)))
     return found
 
 
 def described(gap: Gap) -> str:
     said = f"{len(gap.words)} local words" if gap.words else "no words"
-    return f"gap {gap.start:.1f}-{gap.end:.1f} s ({gap.speech:.1f} s of speech, {said})"
+    sound = f"; {gap.sound}" if gap.sound else ""
+    return f"gap {gap.start:.1f}-{gap.end:.1f} s ({gap.speech:.1f} s of speech, {said}{sound})"
 
 
 def still_left(gap: Gap, outcome: str) -> list[Gap]:

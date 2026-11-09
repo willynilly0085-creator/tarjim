@@ -97,11 +97,15 @@ def relistener(provider: str, video: Path, asked: Asked) -> Relisten | None:
 
 
 def regions_in(wav: Any) -> Regions:
+    """The voice detector's speech; none when it cannot run, and the log names what is missing.
+    Since 2026-11-09 coverage reads the letters the aligner heard too (listen/clipmap.py): the log
+    said it checked against the local words alone, though the letters still told speech."""
     try:
         from tarjim.asr.vad import speech_regions
 
         return speech_regions(wav)
     except (ImportError, OSError, RuntimeError, ValueError) as error:
-        print(f"speech: no voice detector ({type(error).__name__}); pieces are cut on time and "
-              "coverage is checked against the local words alone", flush=True)
+        print(f"speech: no voice detector ({type(error).__name__}); missing: the detector's "
+              "speech. Pieces are cut on time, and coverage reads the letters the aligner heard "
+              "with the local words (when neither was heard, nothing is checked)", flush=True)
         return []
