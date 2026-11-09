@@ -20,7 +20,7 @@ from tarjim.asr.spread import (
     runs,
     share,
 )
-from tarjim.asr.waited import TIGHT, before, heard_there, ran_over, unheard, waited
+from tarjim.asr.waited import TIGHT, cleared, heard_there, waited
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
 from tarjim.scripts import split_words
@@ -116,22 +116,23 @@ class AlignEngine:
         for index, first in waited(utterances, over, words):
             line = utterances[index]
             size = len(split_words(line.text))
-            alone = self.searched_again(logp, line, words[first + size:])
+            alone = self.own_search(logp, line)
             if alone and alone[0].start < words[first].start and heard_there(alone):
                 words[first:first + size] = alone
+                self.clear_after(utterances, index, first, words)
                 moved += 1
         guards.fired("align.unwaited", moved)
 
-    def searched_again(self, logp: np.ndarray, line: Utterance,
-                       after: list[Word]) -> list[Word] | None:
-        """A waited turn's own search; run again up to the next line's start when it ran on
-        over that line's words where they are not heard (asr/waited.py, 2026-11-09)."""
-        alone = self.own_search(logp, line)
-        under = ran_over(alone, after) if alone else []
-        if not unheard(under):
-            return alone
-        shorter = before(line, under[0].start)
-        return self.own_search(logp, shorter) if shorter else None
+    @staticmethod
+    def clear_after(utterances: list[Utterance], index: int, first: int,
+                    words: list[Word]) -> None:
+        """The next line's words a turn searched again now runs on over, where their letters
+        are not heard, go after it (asr/waited.py, 2026-11-09)."""
+        after = first + len(split_words(utterances[index].text))
+        size = len(split_words(utterances[index + 1].text)) if index + 1 < len(utterances) else 0
+        line = words[after:after + size]
+        following = words[after + size] if after + size < len(words) else None
+        words[after:after + size] = cleared(words[first:after], line, following)
 
     def own_search(self, logp: np.ndarray, line: Utterance) -> list[Word] | None:
         """The line searched inside its own time; None when it cannot be followed: the first

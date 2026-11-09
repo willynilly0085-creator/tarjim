@@ -13,14 +13,15 @@ stretch always puts the letters somewhere, and a line the listener heard again (
 off its speech (the local words of a repeated line) was laid over the end of the turn before it
 on letters that are not its own: "Those trials were run in office jobs." over "on four days",
 "Can I bring my dog?" over "on the bus this time", each turn's subtitle cut short for the copy.
-And a turn whose own search runs on over the next line's words where they are not heard (RAN
-OVER) is searched again only up to that line's start: the one search had put a copy of a looped
-line on the end of mixed_en_ar's Arabic reply, and the reply searched alone ran 1 s over it, both
-shown in one dialogue subtitle cut to 0.9 s. Over words heard there, two voices said at once
-(the debate's "They can use the school" under "And what about students"), its times stay.
+A turn searched again that now runs on over the next line's words where their letters are not
+heard (a copy of a looped line the one search had put on the turn's last words) keeps its times,
+and that line goes after it (cleared): moved on whole when there is room before the line after,
+squeezed into that room when not. mixed_en_ar's Arabic reply and the copy were shown in one
+dialogue subtitle cut to 0.9 s, and cutting the reply back to the copy's start showed its last
+words before they were said. A line heard there, two voices said at once
+(the debate's "They can use the school" under "And what about students"), stays.
 """
 from dataclasses import replace
-from itertools import takewhile
 from statistics import mean
 
 from tarjim.listen.gemini_listen import Utterance
@@ -67,20 +68,22 @@ def heard_there(words: list[Word]) -> bool:
     return bool(scores) and mean(scores) >= HEARD
 
 
-def unheard(words: list[Word]) -> bool:
-    """Words whose letters are heard little where they are timed (2026-11-09); words with no
-    letters to hear say nothing either way."""
-    scores = [w.score for w in words if w.score is not None]
-    return bool(scores) and mean(scores) < HEARD
+def cleared(turn: list[Word], line: list[Word], following: Word | None) -> list[Word]:
+    """The line after a turn searched again, after the turn's end when it begins inside it and
+    its letters are not heard where it is (2026-11-09); otherwise as it was."""
+    end = max((w.end for w in turn), default=0.0)
+    if not line or line[0].start >= end - EVEN or heard_there(line) or not scored(line):
+        return line
+    start, stop = line[0].start, max(w.end for w in line)
+    span = stop - start
+    room = end + span if following is None else min(following.start, end + span)
+    last = max(room, stop)
+    if span <= 0 or last <= end + EVEN:
+        return line
+    scale = (last - end) / span
+    return [replace(w, start=end + (w.start - start) * scale, end=end + (w.end - start) * scale)
+            for w in line]
 
 
-def ran_over(turn: list[Word], after: list[Word]) -> list[Word]:
-    """The words after a turn searched again that begin before its new end (2026-11-09)."""
-    return list(takewhile(lambda w: w.start < turn[-1].end - EVEN, after))
-
-
-def before(line: Utterance, at: float) -> Utterance | None:
-    """The line searched again ending at `at`, its own search reaching TIGHT past its end; None
-    when nothing of its own time is left (2026-11-09)."""
-    end = min(line.end, at - TIGHT)
-    return replace(line, end=end) if end > line.start else None
+def scored(words: list[Word]) -> bool:
+    return any(w.score is not None for w in words)
