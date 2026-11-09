@@ -64,6 +64,22 @@ def test_a_turn_begun_over_the_end_of_another_starts_where_it_was_said(
     assert guards.counts()["align.unwaited"] == 1
 
 
+def test_a_piece_heard_early_keeps_the_times_its_letters_give(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-09: the listener gave a whole piece 3 s early (the bench's early fault), so a turn
+    seemed begun over the end of the one before; the one search found both where they were said,
+    the turn 3 s past the other's heard end, not waiting for it. Searched again in its own (wrong)
+    time it took the host's letters there: en_interview_music's "Today my guest" 2.5 s early."""
+    monkeypatch.setattr(vad, "speech_regions", lambda _wav: [(0.0, SECONDS)])
+    said = {"alpha": 3.5, "bravo": 4.5, "whiskey": 5.5, "ox": 6.4, "india": 7.4, "juliet": 8.4}
+    engine = AlignEngine.__new__(AlignEngine)
+    engine.emitter, engine.roman = Emitter(said), Roman()  # type: ignore[assignment]
+    host, turn = Utterance(0.0, 3.0, "S1", HOST.text), Utterance(2.8, 6.0, "S2", "ox india juliet")
+    words = engine.align(np.zeros(16), [host, turn], "English")
+    assert {w.text: round(w.start, 1) for w in words}["ox"] == 6.4
+    assert guards.counts()["align.unwaited"] == 0
+
+
 def test_a_turn_timed_close_to_its_own_start_is_not_searched_again(
         monkeypatch: pytest.MonkeyPatch) -> None:
     """Said 0.3 s before the listener's start, where its own letters are: the search kept it."""
