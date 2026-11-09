@@ -84,14 +84,15 @@ def relistener(provider: str, video: Path, asked: Asked) -> Relisten | None:
         return None
     from tarjim.hearing import cloud_listener
     from tarjim.listen.chunks import placeable, shift
+    from tarjim.speakers import asked_again
 
     once = cloud_listener(provider)
 
     def again(start: float, end: float) -> list[Utterance]:
         heard = once(media.audio_bytes(video, start, end)).utterances
         lines = placeable(shift(heard, (start, end)))  # as the hearing's lines (2026-11-08)
-        mark = f"~x{round(10 * start)}"
-        return [replace(u, speaker=f"{u.speaker}{mark}") if u.speaker else u for u in lines]
+        # the request's own names for its speakers (speakers.asked_again, 2026-11-09)
+        return [replace(u, speaker=asked_again(u.speaker, start)) for u in lines]
 
     return asked.asking(again)
 

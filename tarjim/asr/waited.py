@@ -30,24 +30,28 @@ heard 3 s early (the bench's early fault), and its own time holds other speech. 
 there it took the host's letters: en_interview_music's "Today my guest" 2.5 s early and
 en_long_seven's "Have you ever thought" 2.2 s early, their words then missing and said twice.
 
-Since 2026-11-09 they are kept only where its letters are heard (HEARD_THERE). A search inside a short
-stretch always puts the letters somewhere, and a line the listener heard again (a loop) or moved
-off its speech (the local words of a repeated line) was laid over the end of the turn before it
-on letters that are not its own: "Those trials were run in office jobs." over "on four days",
-"Can I bring my dog?" over "on the bus this time", each turn's subtitle cut short for the copy.
-A turn searched again that now runs on over the next line's words where their letters are not
-heard (a copy of a looped line the one search had put on the turn's last words) keeps its times,
-and that line goes after it (cleared): moved on whole when there is room before the line after,
-squeezed into that room when not. mixed_en_ar's Arabic reply and the copy were shown in one
-dialogue subtitle cut to 0.9 s, and cutting the reply back to the copy's start showed its last
-words before they were said. A line heard there, two voices said at once
+Since 2026-11-09 they are kept only where its letters are heard (HEARD_THERE). A search inside a
+short stretch always puts the letters somewhere, and a line the listener heard again (a loop) or
+moved off its speech (the local words of a repeated line) was laid over the end of the turn
+before it on letters that are not its own: "Those trials were run in office jobs." over "on four
+days", "Can I bring my dog?" over "on the bus this time", each turn's subtitle cut short for the
+copy. A turn searched again that now runs on over the next line's words where their letters are
+not heard (a copy of a looped line the one search had put on the turn's last words) keeps its
+times, and that line goes after it (cleared): moved on whole when there is room before the line
+after, squeezed into that room when not. mixed_en_ar's Arabic reply and the copy were shown in
+one dialogue subtitle cut to 0.9 s, and cutting the reply back to the copy's start showed its
+last words before they were said. A line heard there, two voices said at once
 (the debate's "They can use the school" under "And what about students"), stays.
+
+Nor are new times kept that take another turn's same words (asr/echoed.py, 2026-11-09): a reply
+"Thank you." searched again took the host's "Thank you", 2 s early.
 """
 from dataclasses import replace
 from statistics import mean
 from typing import NamedTuple
 
 from tarjim.asr.agree import FOUND
+from tarjim.asr.echoed import THERE, echo, echoes, found_there
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
 from tarjim.scripts import split_words
@@ -67,6 +71,8 @@ PAST = 1.0
 # real turns begun over a looped line 0.84 and 0.92; lines heard again where they were not
 # said scored 0.19 to 0.42, the letters of the speech under them taken for theirs.
 HEARD_THERE = 0.5
+# moved to asr/echoed.py on 2026-11-09 and still offered here
+__all__ = ["THERE", "echo", "echoes", "found_there"]
 EVEN = 1e-6  # seconds: times from two searches that meet at one frame differ by this much
 TRUSTED = 1.0  # the prior of a line timed as heard (listen/gemini_listen.Utterance)
 HEARD = 1 / 3  # share of a line's words the one search found where it put them: said there
@@ -146,3 +152,13 @@ def cleared(turn: list[Word], line: list[Word], following: Word | None) -> list[
 
 def scored(words: list[Word]) -> bool:
     return any(w.score is not None for w in words)
+
+
+def clear_after(utterances: list[Utterance], index: int, first: int, words: list[Word]) -> None:
+    """The next line's words a turn searched again now runs on over, where their letters are not
+    heard, go after it (cleared, 2026-11-09). Moved here from asr/align.py on 2026-11-09."""
+    after = first + len(split_words(utterances[index].text))
+    size = len(split_words(utterances[index + 1].text)) if index + 1 < len(utterances) else 0
+    line = words[after:after + size]
+    following = words[after + size] if after + size < len(words) else None
+    words[after:after + size] = cleared(words[first:after], line, following)

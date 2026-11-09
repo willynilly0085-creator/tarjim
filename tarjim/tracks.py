@@ -15,6 +15,7 @@ from bisect import bisect_left
 from itertools import pairwise
 from typing import NamedTuple
 
+from tarjim.asr.echoed import echo
 from tarjim.crossing import head_said_over
 from tarjim.dialogue import fits_one_line
 from tarjim.models import Word
@@ -69,13 +70,15 @@ def over_end(run: Run, host: Host, rules: Rules) -> int:
     their time, and the rest goes on the main track. Before, the turn's subtitle came up only
     once the other one's had gone, or cut its last words. The whole turn is the reply when it
     fits one line of an exchange; only its first words when they and the words around them
-    can be read in the time they get (crossing.head_said_over, 2026-11-09)."""
+    can be read in the time they get (crossing.head_said_over, 2026-11-09). None when the last
+    one's last word is timed on the same word of the turn (asr/echoed.echo, 2026-11-09): the
+    aligner gave one sound to both, and the turn was said after."""
     main, reach = host
     voice, replier = who(main[-1].speaker), who(run[0].speaker)
     if len(run) <= SHORT_REPLY or not (voice and replier) or voice == replier:
         return 0
-    if run[0].start >= reach - SAID_OVER:
-        return 0
+    if run[0].start >= reach - SAID_OVER or any(echo(main[-1], word) for word in run):
+        return 0  # 2026-11-09: a last word on the turn's same word is that word's sound
     if fits_one_line(run, rules):
         return len(run)
     return head_said_over(run, main, reach, rules)

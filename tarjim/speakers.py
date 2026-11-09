@@ -24,7 +24,9 @@ own ("S1~x415", listen/check.relistener), which names speakers its own way, and 
 that could not be linked to the clip's names ("S1~k2", listen/links.py). Where no voice placed
 the latter, it takes the name before its mark, which links.py chose: its request's own name, or
 a new one when another label of its request took that. The nearer turn, most often one of the
-piece's other speakers, is the worse guess: its request heard it as someone else.
+piece's other speakers, is the worse guess: its request heard it as someone else. The request's
+mark is made by asked_again; a cache written by the branch that named it "~r426" (2026-11-09) is
+read the same way.
 """
 import re
 from collections import Counter
@@ -35,9 +37,10 @@ from itertools import count
 from tarjim.models import Word
 
 PASS_TAG = re.compile(r"(?:^|(?<=\.))p\d+\.")
-UNLINKED = re.compile(r"(?:~[pkx]\d+)+$")  # ~p a pass, ~k a piece, ~x a request (2026-11-09)
+# ~p a pass, ~k a piece, ~x a request; ~r a request as reg-misc named it (2026-11-09)
+UNLINKED = re.compile(r"(?:~[pkxr]\d+)+$")
 PIECE = re.compile(r"^[^~]*~k\d+$")  # a piece's speaker linked to none of the clip's names
-REQUEST = re.compile(r"~x\d+$")  # a line heard again by a request of its own
+REQUEST = re.compile(r"~[xr]\d+$")  # a line heard again by a request of its own
 HALF = 0.5  # of its time a line heard again must be said over a turn to be part of it
 TOUCH = 0.3  # seconds: ...or this near to one
 GAP = 1.0  # seconds of silence that end a line even with the same speaker
@@ -71,6 +74,13 @@ def lines(words: list[Word]) -> list[Line]:
         else:
             found.append((k, k + 1))
     return found
+
+
+def asked_again(label: str, start: float) -> str:
+    """A speaker named in the request that heard a stretch again from `start` s: that request's
+    own name for them ("S1~x426"), linked to the clip's speakers by voice, else by time
+    (heard_again, 2026-11-09). No speaker stays none."""
+    return f"{label}~x{round(start * 10)}" if label else label
 
 
 def span(words: list[Word], line: Line) -> tuple[float, float]:

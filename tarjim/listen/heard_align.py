@@ -23,7 +23,7 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
 
     from tarjim.listen import settle
     from tarjim.listen.clipmap import Clip, clip_map
-    from tarjim.listen.opinion import doubted, sounded
+    from tarjim.listen.opinion import backing, doubted, held, sounded
     from tarjim.listen.whose import by_voice
 
     report("timing")
@@ -34,7 +34,10 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     # one map of the clip's speech for every timing, the detector run once (2026-11-09)
     lines = [(u.start, u.end) for u in heard.utterances]
     speech = clip_map(job.cache, Clip(audio, wav, rate), lines)
-    sound = settle.Sound(wav, rate, speech.speech(), doubted(opinion, kept), speech)
+    # the passes judged by all the local words' text, a fill by the ones kept words hold in
+    # place (listen/opinion.backing and held, 2026-11-09)
+    sound = settle.Sound(wav, rate, speech.speech(), doubted(opinion, kept),
+                         backing(opinion, kept), held(opinion, kept), speech_map=speech)
     done = settle.settled(job, heard, sound, kept)
     # shown on the job, the stretches given up too (2026-11-08)
     findings().heard(tuple((g.start, g.end) for g in done.left if not g.given_up),

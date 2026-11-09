@@ -19,14 +19,17 @@ class Placed:
     fills: list[Fill]  # the kept fills still needed
 
 
-def placed(heard: Heard, opinion: list[Word], duration: float) -> Placed:
+def placed(heard: Heard, opinion: list[Word], duration: float,
+           said: list[Word] | None = None) -> Placed:
     """The hearing the audio backs most, with what filled the stretches it left out on an earlier
-    run, while the lines chosen now still leave them out (listen/fills.py)."""
+    run, while the lines chosen now still leave them out (listen/fills.py). Which hearing is
+    judged by what the local listener `said` (all its words, by text, listen/opinion.backing,
+    2026-11-09), the confirmed `opinion` when not given; the lines move to `opinion` only."""
     from tarjim.asr.anchor import anchor
     from tarjim.listen.fills import still_needed
     from tarjim.listen.recover import best_heard
 
-    chosen = best_heard(heard.utterances, heard.passes, opinion)
+    chosen = best_heard(heard.utterances, heard.passes, opinion if said is None else said)
     moved = anchor(chosen, opinion, duration)
     fills = still_needed(heard.added, moved)
     extra = [fill.line for fill in fills]

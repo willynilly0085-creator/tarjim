@@ -22,7 +22,7 @@ from tarjim.asr.spread import (
     share,
 )
 from tarjim.asr.vad import mute
-from tarjim.asr.waited import TIGHT, cleared, heard_there, waited
+from tarjim.asr.waited import TIGHT, clear_after, echoes, heard_there, waited
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
 from tarjim.scripts import split_words
@@ -126,29 +126,21 @@ class AlignEngine:
     def unwaited(self, logp: np.ndarray, utterances: list[Utterance], over: list[bool],
                  words: list[Word]) -> None:
         """A turn the one search made wait for the turn it was said over gets the times its own
-        search inside its own time gives, when they start earlier and its letters are heard
-        there (asr/waited.py, 2026-11-09)."""
-        moved = 0
+        search inside its own time gives, when they start earlier, its letters are heard there
+        and they take no other turn's same words (asr/waited.py, asr/echoed.py, 2026-11-09)."""
+        moved = echoed = 0
         for index, first in waited(utterances, over, words):
-            line = utterances[index]
-            size = len(split_words(line.text))
-            alone = self.own_search(logp, line)
-            if alone and alone[0].start < words[first].start and heard_there(alone):
-                words[first:first + size] = alone
-                self.clear_after(utterances, index, first, words)
+            alone = self.own_search(logp, utterances[index])
+            if not alone or alone[0].start >= words[first].start:
+                continue  # not followed alone, or no earlier: the first search's times stay
+            took = echoes(alone, words, first)
+            echoed += took
+            if not took and heard_there(alone):
+                words[first:first + len(alone)] = alone
+                clear_after(utterances, index, first, words)
                 moved += 1
         guards.fired("align.unwaited", moved)
-
-    @staticmethod
-    def clear_after(utterances: list[Utterance], index: int, first: int,
-                    words: list[Word]) -> None:
-        """The next line's words a turn searched again now runs on over, where their letters
-        are not heard, go after it (asr/waited.py, 2026-11-09)."""
-        after = first + len(split_words(utterances[index].text))
-        size = len(split_words(utterances[index + 1].text)) if index + 1 < len(utterances) else 0
-        line = words[after:after + size]
-        following = words[after + size] if after + size < len(words) else None
-        words[after:after + size] = cleared(words[first:after], line, following)
+        guards.fired("align.echoed", echoed)
 
     def own_search(self, logp: np.ndarray, line: Utterance) -> list[Word] | None:
         """The line searched inside its own time; None when it cannot be followed: the first

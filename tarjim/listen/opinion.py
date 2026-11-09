@@ -9,8 +9,10 @@ another language than the one heard are not a second opinion on what was said, s
 are used: the aligner times the cloud listener's own lines on the sound alone, as it always can.
 
 Words in the right language can still be heard at the wrong times: since 2026-11-08 they are used
-only where the sound confirms them (sounded, asr/confirm.py).
+only where the sound confirms them (sounded, asr/confirm.py). Since 2026-11-09 the passes are
+judged by all their text (backing), and a fill takes the words kept ones hold in place (held).
 """
+from itertools import pairwise
 from typing import TYPE_CHECKING, Any
 
 from tarjim import guards
@@ -19,6 +21,13 @@ from tarjim.translate.glossary import language_code
 
 if TYPE_CHECKING:
     from tarjim.asr.confirm import Kept
+
+# seconds at most between two kept words that hold the words between them in place: those words
+# were said in that time, so none is further off. The drift the anchor leaves to the aligner
+# (asr/anchor.DRIFT) and the 0.5 s a line's times are rough (coverage.EDGE). On the bench the
+# right ones lay up to 2.3 s apart; on the Arabic dialogue 126 words between kept ones far apart
+# were timed up to 31 s off, filling the time between evenly (2026-11-09).
+SPAN = 2.5
 
 
 def named(languages: str) -> set[str]:
@@ -60,6 +69,37 @@ def doubted(words: list[Word], kept: list[Word]) -> list[tuple[float, float]]:
     2026-11-08)."""
     used = set(kept)
     return [(w.start, w.end) for w in words if w not in used]
+
+
+def backing(words: list[Word], kept: list[Word]) -> list[Word]:
+    """The local words that judge which pass the audio backs most (listen/recover.best_heard),
+    by their text in order, wherever they were timed: all of them once the sound confirmed any
+    (2026-11-09). Judged by the confirmed ones alone, a pass's lines that only words timed off
+    say counted as made up: the Arabic news read's last 12 s, heard by one pass of three, lost to
+    the vote that dropped them. When the sound confirmed none, none is trusted for its text
+    either (a script the aligner barely reads, or the wrong letters)."""
+    return words if kept else []
+
+
+def held(words: list[Word], kept: list[Word]) -> list[Word]:
+    """The kept words, with each stretch of left-out ones that kept words either side hold in
+    place: the listener says its words in order, so those were said between the two, when the
+    two are at most SPAN apart (2026-11-09). What fills speech the cloud listener left out
+    (listen/coverage.gaps): with the kept words alone a fill had holes, a run under the clip's
+    bar or a word with no length (the bench's long clips, 13 to 21 words missing)."""
+    ordered, used = sorted(words, key=lambda w: w.start), set(kept)
+    marks = [k for k, w in enumerate(ordered) if w in used]
+    out = [ordered[k] for k in marks[:1]]
+    for low, high in pairwise(marks):
+        between = ordered[low + 1:high]
+        out.extend([*between, ordered[high]] if pinned(ordered[low], between, ordered[high])
+                   else [ordered[high]])
+    return out
+
+
+def pinned(before: Word, between: list[Word], after: Word) -> bool:
+    """Whether the kept words around a stretch are close enough to hold it (none: nothing to)."""
+    return not between or after.start - before.end <= SPAN
 
 
 def told(kept: "Kept") -> None:
