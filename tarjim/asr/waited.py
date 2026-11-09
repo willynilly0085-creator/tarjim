@@ -29,7 +29,22 @@ that one's letters (2026-11-09): the listener's times are off there, as when a w
 heard 3 s early (the bench's early fault), and its own time holds other speech. Searched again
 there it took the host's letters: en_interview_music's "Today my guest" 2.5 s early and
 en_long_seven's "Have you ever thought" 2.2 s early, their words then missing and said twice.
+
+Since 2026-11-09 they are kept only where its letters are heard (HEARD_THERE). A search inside a short
+stretch always puts the letters somewhere, and a line the listener heard again (a loop) or moved
+off its speech (the local words of a repeated line) was laid over the end of the turn before it
+on letters that are not its own: "Those trials were run in office jobs." over "on four days",
+"Can I bring my dog?" over "on the bus this time", each turn's subtitle cut short for the copy.
+A turn searched again that now runs on over the next line's words where their letters are not
+heard (a copy of a looped line the one search had put on the turn's last words) keeps its times,
+and that line goes after it (cleared): moved on whole when there is room before the line after,
+squeezed into that room when not. mixed_en_ar's Arabic reply and the copy were shown in one
+dialogue subtitle cut to 0.9 s, and cutting the reply back to the copy's start showed its last
+words before they were said. A line heard there, two voices said at once
+(the debate's "They can use the school" under "And what about students"), stays.
 """
+from dataclasses import replace
+from statistics import mean
 from typing import NamedTuple
 
 from tarjim.asr.agree import FOUND
@@ -47,6 +62,12 @@ TIGHT = 0.3  # seconds either side of its own time a waited turn is searched in 
 # it (2026-11-09): waited turns on en_debate_overlap start within 0.4 s of it, the turns of a
 # piece heard 3 s early 1.8 s and more past it.
 PAST = 1.0
+# The mean likelihood of its words' letters at which a waited turn searched again is said there.
+# On the bench (2026-11-09) the debate's turns said over another's end scored 0.59 to 0.88 and
+# real turns begun over a looped line 0.84 and 0.92; lines heard again where they were not
+# said scored 0.19 to 0.42, the letters of the speech under them taken for theirs.
+HEARD_THERE = 0.5
+EVEN = 1e-6  # seconds: times from two searches that meet at one frame differ by this much
 TRUSTED = 1.0  # the prior of a line timed as heard (listen/gemini_listen.Utterance)
 HEARD = 1 / 3  # share of a line's words the one search found where it put them: said there
 SHORT = 4  # words: a reply this short said over waits whole, none of it found (align.SHORT_REPLY)
@@ -97,3 +118,31 @@ def heard(words: list[Word]) -> bool:
     (agree.FOUND); words with none say nothing."""
     scores = [w.score for w in words if w.score is not None]
     return not scores or sum(score >= FOUND for score in scores) >= HEARD * len(scores)
+
+
+def heard_there(words: list[Word]) -> bool:
+    """Whether a turn searched again is said where the search put it: its letters are heard
+    there (2026-11-09). Words with no letters to hear say nothing either way."""
+    scores = [w.score for w in words if w.score is not None]
+    return bool(scores) and mean(scores) >= HEARD_THERE
+
+
+def cleared(turn: list[Word], line: list[Word], following: Word | None) -> list[Word]:
+    """The line after a turn searched again, after the turn's end when it begins inside it and
+    its letters are not heard where it is (2026-11-09); otherwise as it was."""
+    end = max((w.end for w in turn), default=0.0)
+    if not line or line[0].start >= end - EVEN or heard_there(line) or not scored(line):
+        return line
+    start, stop = line[0].start, max(w.end for w in line)
+    span = stop - start
+    room = end + span if following is None else min(following.start, end + span)
+    last = max(room, stop)
+    if span <= 0 or last <= end + EVEN:
+        return line
+    scale = (last - end) / span
+    return [replace(w, start=end + (w.start - start) * scale, end=end + (w.end - start) * scale)
+            for w in line]
+
+
+def scored(words: list[Word]) -> bool:
+    return any(w.score is not None for w in words)
