@@ -7,12 +7,12 @@ is timed (agree.clip_baseline). Every group is then read with the star on, so so
 does not hold passes instead of dragging the words beside it, never on silence for sure (the
 speech map's hard tier).
 
-Then each run of words whose strict score is under the floor, and that is not said over another
-speaker's line (two voices at once score low and prove nothing), is read again with the skip on
-from AROUND seconds before it to AROUND after: a word the sound does not hold there is left out
-instead of squeezed in, and goes to asr/unplaced.py. When nothing there is left out the first
-times stay. With too few runs measured there are no prices and the reading stays strict.
+Then each run of words whose strict score is under the floor (asr/weak.py says which) is read
+again with the skip on: a word the sound does not hold there is left out instead of squeezed in,
+and goes to asr/unplaced.py. When nothing there is left out the first times stay. With too few
+runs measured there are no prices and the reading stays strict.
 """
+from bisect import bisect_right
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Any
 
@@ -27,8 +27,9 @@ from tarjim.asr.numbers import said
 from tarjim.asr.speechmap import SpeechMap, build
 from tarjim.asr.spread import longest
 from tarjim.asr.tolerant import Text, tolerant_spans
-from tarjim.asr.unplaced import Lines, settled
+from tarjim.asr.unplaced import Lines, all_copies, owners, settled
 from tarjim.asr.vad import mute
+from tarjim.asr.weak import Weak, Window
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
 
@@ -36,9 +37,6 @@ if TYPE_CHECKING:
     from tarjim.asr.align import AlignEngine
 
 STRICT, TOLERANT = "strict", "tolerant"
-AROUND = 2.0  # seconds either side of a run read again with the skip on
-
-Window = tuple[float, float, str]  # from, to (seconds) and the speaker whose words are read
 
 
 @dataclass(frozen=True)
@@ -46,6 +44,8 @@ class Heard:
     raw: np.ndarray  # the letters as heard: what a run's strict score is read from
     logp: np.ndarray  # with the speech map's penalties: what words are placed by
     speech: list[tuple[float, float]]  # the map's speech, in the sound's own seconds
+    lines: list[Utterance]  # the lines aligned in it
+    aside: frozenset[int] = frozenset()  # words of replies said over a turn
 
 
 def mapped(wav: Any, logp: np.ndarray, speech: SpeechMap | None) -> SpeechMap:
@@ -61,14 +61,12 @@ def mapped(wav: Any, logp: np.ndarray, speech: SpeechMap | None) -> SpeechMap:
 
 def heard_in(wav: Any, raw: np.ndarray, speech: SpeechMap | None,
              utterances: list[Utterance]) -> tuple[Heard, SpeechMap]:
-    """The sound's letters as heard and as the words are placed by, and its map. The heard
-    lines over silence are soft, not speech: a line stretched over silence no longer makes it
-    free, and a chant the detector misses is speech by its letters (asr/speechmap.py,
-    2026-11-09; before, every heard line was speech outright). A word is still not cut at a
-    soft frame (groups.densest): on the bench, cutting there moved a word off its speech in two
-    clips and helped none."""
+    """The sound's letters as heard and as the words are placed by, and its map, the heard lines
+    over silence soft, not speech (asr/speechmap.py; moved here from asr/align.py, 2026-11-09).
+    A word is still not cut at a soft frame (groups.densest): on the bench, cutting there moved
+    a word off its speech in two clips and helped none."""
     view = mapped(wav, raw, speech).heard([(u.start, u.end) for u in utterances])
-    return Heard(raw, mute(raw, view.penalty()), view.speech()), view
+    return Heard(raw, mute(raw, view.penalty()), view.speech(), utterances), view
 
 
 def mode() -> str:
@@ -90,14 +88,20 @@ def priced(engine: "AlignEngine", wav: Any, heard: Heard,
 
 
 def measured(engine: "AlignEngine", heard: Heard, turns: list[Utterance]) -> Calibration:
+    """The densest stretches read strictly, their runs' letters and scores measured."""
     evened = len(engine.evened)
     words = [w for group in sample(turns) for w in engine.align_group(heard.logp, group)]
     del engine.evened[evened:]  # read only to measure: not told
     aligned = [w for w in words if w.source == "aligned"]
     found = [aligned[first:past] for first, past in run_spans(aligned)]
     scores = [run_score(heard.raw, run, engine.tokens) for run in found]
-    return Calibration(calibrated(heard.raw, [ran(engine, heard.raw, run) for run in found]),
+    made = Calibration(calibrated(heard.raw, [ran(engine, heard.raw, run) for run in found]),
                        clip_baseline([s for s in scores if s is not None]))
+    star = made.costs.star_delta if made.costs else None
+    print(f"aligner: tolerant, measured on {len(found)} runs: " + (
+        "too few found, read strictly" if star is None else
+        f"what the text does not hold passes {star:.1f} below the loudest letter"), flush=True)
+    return made
 
 
 def ran(engine: "AlignEngine", raw: np.ndarray, run: list[Word]) -> Run:
@@ -107,47 +111,34 @@ def ran(engine: "AlignEngine", raw: np.ndarray, run: list[Word]) -> Run:
     return Run([t for w in run for t in engine.tokens(w.text)], low, high)
 
 
-def mended(engine: "AlignEngine", heard: Heard, lines: list[Utterance],
-           words: list[Word]) -> list[Word]:
+def mended(engine: "AlignEngine", heard: Heard, words: list[Word]) -> list[Word]:
     """The words with the weak runs read again with the skip on, and what that left out
     dropped as a copy or spread and marked (asr/unplaced.py)."""
-    words, left = list(words), set[int]()
-    for window in weak(engine, heard, lines, words):
+    from tarjim.asr.align import overlapping
+
+    words, left, over = list(words), set[int](), overlapping(heard.lines)
+    heard = replace(heard, aside=frozenset(i for i, k in enumerate(owners(heard.lines))
+                                           if k < len(over) and over[k]))
+    floor = engine.calibration.baseline if engine.calibration else 0.0
+    for window in Weak(words, heard.lines, floor).windows(
+            lambda run: run_score(heard.raw, run, engine.tokens)):
         left |= reread(engine, heard, words, window)
-    outcome = settled(words, left, Lines(lines, heard.speech))
+    outcome = settled(words, left, Lines(heard.lines, heard.speech))
     engine.dropped, engine.unplaced = outcome.dropped, outcome.regions
     return outcome.words
 
 
-def over_another(run: list[Word], lines: list[Utterance]) -> bool:
-    who, start, end = run[0].speaker, run[0].start, run[-1].end
-    return any(u.speaker != who and u.start < end and u.end > start for u in lines)
-
-
-def weak(engine: "AlignEngine", heard: Heard, lines: list[Utterance],
-         words: list[Word]) -> list[Window]:
-    """Around each run under the clip's floor not said over another speaker, one speaker's
-    stretches that meet made one."""
-    floor = engine.calibration.baseline if engine.calibration else 0.0
-    found: list[Window] = []
-    for first, past in run_spans(words):
-        run = words[first:past]
-        score = run_score(heard.raw, run, engine.tokens)
-        if score is None or score >= floor or over_another(run, lines):
-            continue
-        low, high, who = run[0].start - AROUND, run[-1].end + AROUND, run[0].speaker
-        if found and found[-1][2] == who and low <= found[-1][1]:
-            found[-1] = (found[-1][0], high, who)
-        else:
-            found.append((low, high, who))
-    return found
-
-
-def letters_of(engine: "AlignEngine", words: list[Word], window: Window) -> dict[int, list[int]]:
-    """The aligned words of the window's speaker inside it that have letters, with them."""
-    low, high, who = window
-    inside = [i for i, w in enumerate(words) if w.speaker == who and w.source == "aligned"
-              and low <= w.start and w.end <= high]
+def letters_of(engine: "AlignEngine", words: list[Word], window: Window,
+               aside: frozenset[int]) -> dict[int, list[int]]:
+    """The aligned words inside the window that have letters, with them, in the lines' order as
+    the first reading had them, a reply said over a turn (`aside`) put in by its time as the
+    words are shown (asr/fuse.slotted): sorted by time, two voices at once were read one word
+    of each after the other (2026-11-09)."""
+    found = [i for i, w in enumerate(words) if w.source == "aligned"
+             and window.low <= w.start and w.end <= window.high]
+    inside = [i for i in found if i not in aside]
+    for i in (i for i in found if i in aside):
+        inside.insert(bisect_right([words[j].start for j in inside], words[i].start), i)
     spoken = said([words[i].text for i in inside], engine.language)
     letters = {i: engine.tokens(s) for i, s in zip(inside, spoken, strict=True)}
     return {i: tokens for i, tokens in letters.items() if tokens}
@@ -156,9 +147,9 @@ def letters_of(engine: "AlignEngine", words: list[Word], window: Window) -> dict
 def reread(engine: "AlignEngine", heard: Heard, words: list[Word], window: Window) -> set[int]:
     """The window read again with the skip on; when it left words out, the others take their
     new times. The indices left out."""
-    letters = letters_of(engine, words, window)
-    first = max(0, int(window[0] / FRAME))
-    past = min(len(heard.logp), int(window[1] / FRAME) + 1)
+    letters = letters_of(engine, words, window, heard.aside)
+    first = max(0, int(window.low / FRAME))
+    past = min(len(heard.logp), int(window.high / FRAME) + 1)
     tokens = [t for found in letters.values() for t in found]
     costs = engine.calibration.costs if engine.calibration else None
     if costs is None or not tokens or past - first < len(tokens):
@@ -168,6 +159,8 @@ def reread(engine: "AlignEngine", heard: Heard, words: list[Word], window: Windo
                           engine.hard[first:past])
     indices = list(letters)
     left = {indices[k] for k, placed in enumerate(read.placed) if not placed}
+    if window.copies and not all_copies(words, left, Lines(heard.lines, heard.speech)):
+        return set()  # said over another speaker: only a copy is left out (asr/weak.py)
     if left:
         timed(engine, words, read_spans(read.spans, text, indices, first), left)
     return left

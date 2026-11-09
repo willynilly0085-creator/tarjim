@@ -77,3 +77,12 @@ def test_each_word_is_counted_once_by_its_guard() -> None:
     settled(words_of(*lines), set(range(4, 10)), Lines(lines, []))
     counts = guards.counts()
     assert (counts["unplaced.duplicate"], counts["unplaced.estimated"]) == (4, 2)
+
+
+def test_a_word_left_out_of_a_line_said_is_no_copy_of_the_same_word_nearby() -> None:
+    """The bench, 2026-11-09: a lone "The" the skip left out of "The tomatoes did not survive."
+    was dropped as a copy of the "The" of the next line."""
+    said = Utterance(0.0, 2.0, "S1", "The tomatoes did not survive.")
+    after = Utterance(2.5, 4.0, "S1", "The roof did, luckily.")
+    out = settled(words_of(said, after), {0}, Lines([said, after], [(0.0, 4.0)]))
+    assert not out.dropped and out.words[0].source == "estimated"

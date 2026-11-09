@@ -3,12 +3,16 @@ is timed (2026-11-09). Before, every written word was squeezed onto the sound, s
 listener wrote twice, or one it made up, took the time of the speech beside it and pushed that
 speech's words off their voice. Each run of one line's words left out is, in order:
 
-1. a copy, when 60% or more of its words are said by words placed within NEAR seconds of its
-   line (vote.norm): dropped, the listener wrote it twice (a Gemini loop too);
+1. a copy, when it is most of its line (SIMILAR of the line's words or more: a listener writes
+   a whole line twice, while a word the skip left out of a line said is a word missed) and
+   SIMILAR of its words are said by words placed within NEAR seconds of its line (vote.norm):
+   dropped, the listener wrote it twice (a Gemini loop too). Before 2026-11-09's bench a lone
+   "The" left out of a line said was dropped as a copy of another "the" close by;
 2. otherwise spread over the speech inside its own room in its line (piles.spread), between
    the line's words placed around it, and marked estimated;
 3. and its stretch given back as a Region of kind 'unplaced', for a later step to ask about.
 """
+from bisect import bisect_left, bisect_right
 from dataclasses import dataclass, field
 from difflib import SequenceMatcher
 from typing import NamedTuple
@@ -62,12 +66,40 @@ def pieces(left: set[int], owner: list[int]) -> list[list[int]]:
     return found
 
 
-def copied(words: list[Word], piece: list[int], line: Utterance, kept: set[int]) -> bool:
+class Near:
+    """The words by their start, so those around a line are found without reading them all."""
+
+    def __init__(self, words: list[Word]) -> None:
+        self.order = sorted(range(len(words)), key=lambda i: words[i].start)
+        self.starts = [words[i].start for i in self.order]
+
+    def around(self, line: Utterance, besides: set[int]) -> list[int]:
+        """The words starting within NEAR seconds of the line, less `besides`, in order."""
+        first = bisect_left(self.starts, line.start - NEAR)
+        past = bisect_right(self.starts, line.end + NEAR)
+        return sorted(i for i in self.order[first:past] if i not in besides)
+
+
+def copied(words: list[Word], piece: list[int], nearby: list[int]) -> bool:
+    """60% or more of the piece's words said, in order, by the words nearby."""
     mine = [n for n in (norm(words[i].text) for i in piece) if n]
-    near = [norm(w.text) for i, w in enumerate(words)
-            if i in kept and line.start - NEAR <= w.start and w.end <= line.end + NEAR]
+    near = [norm(words[i].text) for i in nearby]
     blocks = SequenceMatcher(None, mine, near, autojunk=False).get_matching_blocks()
     return bool(mine) and sum(b.size for b in blocks) >= SIMILAR * len(mine)
+
+
+def a_copy(words: list[Word], piece: list[int], lines: Lines, left: set[int]) -> bool:
+    """Most of its line, and a copy of words placed close by (rule 1)."""
+    owner = owners(lines.utterances)
+    line = lines.utterances[owner[piece[0]]]
+    most = len(piece) >= SIMILAR * len(split_words(line.text))
+    return most and copied(words, piece, Near(words).around(line, left))
+
+
+def all_copies(words: list[Word], left: set[int], lines: Lines) -> bool:
+    """Every run of `left` a copy of words placed close by."""
+    return all(a_copy(words, piece, lines, left)
+               for piece in pieces(left, owners(lines.utterances)))
 
 
 def room(words: list[Word], piece: list[int], owner: list[int], line: Utterance) -> Span:
@@ -86,10 +118,9 @@ def settled(words: list[Word], left: set[int], lines: Lines) -> Outcome:
     owner, outcome = owners(lines.utterances), Outcome(list(words))
     if len(owner) != len(words):
         return outcome
-    kept = set(range(len(words))) - left
     for piece in pieces(left, owner):
         line = lines.utterances[owner[piece[0]]]
-        if copied(words, piece, line, kept):
+        if a_copy(words, piece, lines, left):
             outcome.dropped |= set(piece)
             continue
         placed = spread([words[i] for i in piece], room(words, piece, owner, line), lines.speech)

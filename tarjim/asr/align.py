@@ -111,7 +111,7 @@ class AlignEngine:
                            else islice(timed, len(split_words(u.text))))]
         self.unwaited(logp, utterances, over, words)
         if self.costs is not None:  # the tolerant mode, the clip's prices measured
-            words = mended(self, heard, utterances, words)
+            words = mended(self, heard, words)
         tell_evened(self.evened, wav.start if isinstance(wav, Piece) else 0.0)
         return words
 
