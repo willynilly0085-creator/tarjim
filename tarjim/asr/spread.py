@@ -79,3 +79,13 @@ def fill_gaps(slots: list[Slot]) -> None:
             start = before
             end = max(start, after) if after is not None else start + GAP_FALLBACK * count
         share(slots[first:past], start, end)
+
+
+def free(speech: list[tuple[float, float]], span: tuple[float, float],
+         taken: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    """The speech inside the span less the stretches taken (asr/unplaced.py, 2026-11-09)."""
+    found = [(max(a, span[0]), min(b, span[1])) for a, b in speech]
+    for low, high in sorted(taken):
+        found = [part for a, b in found
+                 for part in ((a, min(b, low)), (max(a, high), b)) if part[1] > part[0]]
+    return [(a, b) for a, b in found if b > a]

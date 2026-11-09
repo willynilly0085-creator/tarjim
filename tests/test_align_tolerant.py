@@ -3,6 +3,7 @@ written twice with one copy said keeps one copy, a refrain said twice keeps both
 said is spread over its own time and marked, and the clip's prices are measured once."""
 import random
 from collections.abc import Iterator
+from dataclasses import replace
 from typing import Any
 
 import numpy as np
@@ -161,3 +162,51 @@ def test_the_prices_are_measured_once_a_clip(engine: AlignEngine) -> None:
     timer.agreement(timer.whole(lines))
     assert engine.calibrations.made == 1 and timer.passes() == 1
     assert engine.emitter.emissions.total == 1  # type: ignore[attr-defined]
+
+
+def test_a_loop_of_one_voice_never_takes_another_voice_s_line(engine: AlignEngine) -> None:
+    """The bench, 2026-11-09 (en_refrain_twice x loop_all): S2 says a line, S1 says it after,
+    and the listener loops S1's line. S2's real line was dropped as a copy of S1's and one of
+    S1's copies was timed onto S2's speech. A copy is only ever of its own speaker's words."""
+    at = line(COPY).start
+    said: dict[float, str] = {}
+    for k in (k for k in range(40) if not COPY <= k < GONE):
+        said |= said_at(k, line(k).start)
+    said |= said_at(COPY, at) | said_at(COPY, at + 1.5)
+    other = Utterance(at, at + 0.7, "S2", line(COPY).text)
+    mine = [Utterance(at + 1.5 * n, at + 1.5 * n + 0.7, "S1", line(COPY).text) for n in (1, 2)]
+    lines = sorted([line(k) for k in range(40) if not COPY <= k < GONE] + [other, *mine],
+                   key=lambda u: u.start)
+    lines = [replace(u, request="k0.v") for u in lines]  # one request: its labels compare
+    words = Timer(clip(said), RATE, "English", []).whole(lines)
+    found = [(round(w.start, 1), w.speaker) for w in words if w.text == WORDS[2 * COPY]]
+    assert found == [(round(at, 1), "S2"), (round(at + 1.5, 1), "S1")]
+
+
+def test_a_clip_heard_mostly_by_its_letters_alone_stays_strict(
+        engine: AlignEngine, monkeypatch: pytest.MonkeyPatch) -> None:
+    """The review of 2026-11-09 (en_chant_bed): where the voice detector hears no voice and the
+    letters do (a chant, singing, a vocal bed), the star fed on that sound and moved a word of
+    a text said exactly. Such a clip (asr/speechmap.ctc_only, 35% of the chant's speech, none
+    on any other clip) is read strictly."""
+    monkeypatch.setattr(vad, "speech_regions", lambda _wav: [])
+    wav, lines = scene(None, said_twice=False)
+    Timer(wav, RATE, "English", []).whole(lines)
+    assert engine.calibration is not None and engine.calibration.costs is None
+
+
+def test_a_clip_read_strictly_for_its_chant_spends_no_reading_on_prices(
+        engine: AlignEngine, monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-09: a clip read strictly because its letters alone hear much of its speech
+    reads no stretch to measure prices it will not use (the cpu tier)."""
+    monkeypatch.setattr(vad, "speech_regions", lambda _wav: [])
+    wav, lines = scene(None, said_twice=False)
+    calls: list[int] = []
+    group = engine.align_group
+    monkeypatch.setattr(engine, "align_group", lambda logp, g: calls.append(1) or group(logp, g))
+    Timer(wav, RATE, "English", []).whole(lines)
+    strict = len(calls)
+    monkeypatch.setenv("TARJIM_ALIGNER_MODE", "strict")
+    calls.clear()
+    Timer(wav, RATE, "English", []).whole(lines)
+    assert strict == len(calls)

@@ -62,6 +62,7 @@ NAMES = (
     "speaker.apart_piece",  # ...one whose own name another label took, left for the voice check
     "unplaced.duplicate",  # words the tolerant aligner left out, dropped as written twice (11-09)
     "unplaced.estimated",  # ...the others, spread over their line and marked
+    "unplaced.unheard",  # ...or, with no free speech in their time, not shown (11-09)
 )
 
 COUNTS: ContextVar[Counter[str] | None] = ContextVar("guards", default=None)
