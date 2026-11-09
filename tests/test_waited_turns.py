@@ -70,3 +70,55 @@ def test_a_turn_timed_close_to_its_own_start_is_not_searched_again(
     times = aligned(Utterance(5.3, 7.5, "S2", "ox india juliet"), monkeypatch)
     assert abs(times["whiskey"] - 4.9) < 0.1 and abs(times["india"] - 6.0) < 0.1
     assert guards.counts()["align.unwaited"] == 0
+
+
+def test_a_line_heard_again_over_a_turn_where_it_is_not_said_is_not_moved(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """A listener's loop (2026-11-09): "alpha bravo", said once at 0.5 s, heard again at 4.7 s
+    over the host's last word. Searched on its own inside its own time it took the host's
+    letters, with a likelihood of 0.19 to 0.42, and on the bench hid "on four days" and "on the
+    bus this time" under the copy. Its letters are not heard there: the first times stay."""
+    monkeypatch.setattr(vad, "speech_regions", lambda _wav: [(0.0, SECONDS)])
+    engine = AlignEngine.__new__(AlignEngine)
+    engine.emitter, engine.roman = Emitter(SAID), Roman()  # type: ignore[assignment]
+    again = Utterance(4.7, 5.9, "S1", "alpha bravo")
+    words = engine.align(np.zeros(16), [HOST, again], "English")
+    assert [w.text for w in words] == ["alpha", "bravo", "whiskey", "alpha", "bravo"]
+    assert words[3].start >= words[2].end
+    assert guards.counts()["align.unwaited"] == 0
+
+
+def test_a_turn_searched_again_stops_where_a_line_not_heard_there_begins(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """mixed_en_ar's loop (2026-11-09): the guest's reply, said over the host's line heard again,
+    searched on its own ran on 1 s over the next copy of that line, which the one search had put
+    on the reply's last words where none of its letters are heard. Both were shown in one
+    dialogue subtitle cut to 0.9 s. The reply is searched again up to where that copy begins:
+    its start is still where it was said and the two no longer share a subtitle."""
+    monkeypatch.setattr(vad, "speech_regions", lambda _wav: [(0.0, SECONDS)])
+    engine = AlignEngine.__new__(AlignEngine)
+    engine.emitter, engine.roman = Emitter(SAID), Roman()  # type: ignore[assignment]
+    turn = Utterance(4.7, 7.5, "S2", "ox india juliet")
+    again = Utterance(5.6, 6.4, "S1", "alpha bravo alpha bravo alpha")
+    words = engine.align(np.zeros(16), [HOST, turn, again], "English")
+    assert [w.text for w in words[3:6]] == ["ox", "india", "juliet"]
+    assert abs(words[3].start - 4.7) < 0.1
+    assert words[5].end <= words[6].start + 1e-6
+    assert guards.counts()["align.unwaited"] == 1
+
+
+def test_a_turn_searched_again_runs_on_over_a_line_heard_there(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """Two voices at once (2026-11-09): "And what about students" runs on over "They can use the
+    school", whose letters are heard where the one search put them. Its own times stay."""
+    monkeypatch.setattr(vad, "speech_regions", lambda _wav: [(0.0, SECONDS)])
+    said = SAID | {"kilo": 7.2, "lima": 7.8, "mike": 8.3, "oscar": 8.8, "papa": 9.3}
+    engine = AlignEngine.__new__(AlignEngine)
+    engine.emitter, engine.roman = Emitter(said), Roman()  # type: ignore[assignment]
+    turn = Utterance(4.7, 7.5, "S2", "ox india juliet")
+    reply = Utterance(7.2, 9.6, "S1", "kilo lima mike oscar papa")
+    words = engine.align(np.zeros(16), [HOST, turn, reply], "English")
+    assert [w.text for w in words[3:7]] == ["ox", "india", "juliet", "kilo"]
+    assert abs(words[3].start - 4.7) < 0.1 and abs(words[6].start - 7.2) < 0.1
+    assert words[5].end > words[6].start + 0.05
+    assert guards.counts()["align.unwaited"] == 1

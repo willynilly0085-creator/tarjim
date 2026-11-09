@@ -20,7 +20,7 @@ from tarjim.asr.spread import (
     runs,
     share,
 )
-from tarjim.asr.waited import TIGHT, waited
+from tarjim.asr.waited import TIGHT, before, heard_there, ran_over, unheard, waited
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
 from tarjim.scripts import split_words
@@ -110,16 +110,37 @@ class AlignEngine:
     def unwaited(self, logp: np.ndarray, utterances: list[Utterance], over: list[bool],
                  words: list[Word]) -> None:
         """A turn the one search made wait for the turn it was said over gets the times its own
-        search inside its own time gives, when they start earlier (asr/waited.py)."""
+        search inside its own time gives, when they start earlier and its letters are heard
+        there (asr/waited.py, 2026-11-09)."""
         moved = 0
         for index, first in waited(utterances, over, words):
-            evened = len(self.evened)
-            alone = self.align_group(logp, [utterances[index]], OWN)
-            if len(self.evened) == evened and alone[0].start < words[first].start:
-                words[first:first + len(alone)] = alone
+            line = utterances[index]
+            size = len(split_words(line.text))
+            alone = self.searched_again(logp, line, words[first + size:])
+            if alone and alone[0].start < words[first].start and heard_there(alone):
+                words[first:first + size] = alone
                 moved += 1
-            del self.evened[evened:]  # not followed alone: the first search's times stay
         guards.fired("align.unwaited", moved)
+
+    def searched_again(self, logp: np.ndarray, line: Utterance,
+                       after: list[Word]) -> list[Word] | None:
+        """A waited turn's own search; run again up to the next line's start when it ran on
+        over that line's words where they are not heard (asr/waited.py, 2026-11-09)."""
+        alone = self.own_search(logp, line)
+        under = ran_over(alone, after) if alone else []
+        if not unheard(under):
+            return alone
+        shorter = before(line, under[0].start)
+        return self.own_search(logp, shorter) if shorter else None
+
+    def own_search(self, logp: np.ndarray, line: Utterance) -> list[Word] | None:
+        """The line searched inside its own time; None when it cannot be followed: the first
+        search's times stay and it is not told as spread."""
+        evened = len(self.evened)
+        alone = self.align_group(logp, [line], OWN)
+        followed = len(self.evened) == evened
+        del self.evened[evened:]
+        return alone if followed else None
 
     def align_group(
             self, logp: np.ndarray, group: list[Utterance], reach: Reach = WIDE) -> list[Word]:
