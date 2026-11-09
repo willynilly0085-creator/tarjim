@@ -112,3 +112,55 @@ def test_the_same_words_give_the_same_speakers(monkeypatch: pytest.MonkeyPatch) 
     words = heard(monkeypatch, swapped, people("AB", 3))
     first = whose.checked(words, sound(end(talk)))
     assert all(whose.checked(words, sound(end(talk))) == first for _ in range(3))
+
+
+def slow_prints(monkeypatch: pytest.MonkeyPatch, seconds: float) -> list[float]:
+    """A computer where each voice print takes seconds (the first one also loads the model, so
+    it takes ten times as long), with turns.clock its clock; the list holds each print's time."""
+    from tarjim.asr import voiceprint
+
+    now, taken = [0.0], []
+    quick = voiceprint.print_of
+
+    def print_of(clip: np.ndarray) -> np.ndarray:
+        now[0] += seconds * (10 if not taken else 1)
+        taken.append(float(clip[0]))
+        return quick(clip)
+
+    monkeypatch.setattr(voiceprint, "print_of", print_of)
+    monkeypatch.setattr(turns, "clock", lambda: now[0])
+    return taken
+
+
+def test_a_slow_computer_hears_the_windows_two_seconds_apart(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    # 2026-11-09: at 50 ms a print the 750 windows of 17 min of talk would take 38 s
+    talk = by_turns(250, "AB")
+    words = heard(monkeypatch, talk, people("AB"))
+    taken = slow_prints(monkeypatch, 0.05)
+    steady, _ = turns.windows(words, sound(end(talk)))
+    starts = sorted({w.start for w in steady if w.line == steady[0].line})
+    assert np.allclose(np.diff(starts), turns.SLOW_HOP)
+    steady_talk = turns.owned(words)
+    assert len(steady) == len(turns.spots(steady_talk, turns.SLOW_HOP))
+    assert len(steady) < len(turns.spots(steady_talk))
+    assert len(taken) <= len(steady) + turns.PROBE + 1 + turns.GLIMPSES
+
+
+def test_a_quick_computer_keeps_the_one_second_hop(monkeypatch: pytest.MonkeyPatch) -> None:
+    # the first print also loads the model: that is not what the others will take
+    talk = by_turns(250, "AB")
+    words = heard(monkeypatch, talk, people("AB"))
+    slow_prints(monkeypatch, 0.035)
+    steady, _ = turns.windows(words, sound(end(talk)))
+    assert len(steady) == len(turns.spots(turns.owned(words)))
+
+
+def test_a_swap_is_still_undone_at_the_slow_hop(monkeypatch: pytest.MonkeyPatch) -> None:
+    talk = by_turns(20, "AB")
+    swapped = relabelled(talk, {k: "S2" if t.voice == "A" else "S1"
+                                for k, t in enumerate(talk) if k >= 12})
+    words = heard(monkeypatch, swapped, people("AB"))
+    slow_prints(monkeypatch, 1.0)
+    after = whose.checked(words, sound(end(talk)))
+    assert spoken(after, swapped) == [t.label for t in talk]

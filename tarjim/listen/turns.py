@@ -9,8 +9,11 @@ never more than MAX_WINDOWS (about 24 s of prints on the processor, measured 202
 threads, 20 ms a window); a stretch shorter than WINDOW is one window as long as the stretch.
 A line with no window (shorter than STEADY, or talked over) is glimpsed once, in its longest
 stretch of its speaker alone when that is GLIMPSE long or more: too little to make a voice from,
-enough to say which voice it leans to (listen/windowed.py).
+enough to say which voice it leans to (listen/windowed.py). A computer slower than that (a
+print taking more than BUDGET_S over all the prints, judged on PROBE of them after the first,
+which also loads the model) hears the windows SLOW_HOP apart instead, and the log says so.
 """
+import time
 from bisect import bisect_left
 from typing import Any, NamedTuple
 
@@ -27,6 +30,11 @@ MAX_WINDOWS = 1200  # prints in one clip at most
 EDGE = 1e-6  # seconds: a window may end this much past its line by rounding
 GLIMPSE = 1.0  # seconds: a line with no window is printed once in a stretch this long
 GLIMPSES = 300  # such prints in one clip at most (with the windows, about 28 s of prints)
+BUDGET_S = 30.0  # seconds all the prints of one job may take (the cpu tier, 2026-11-09)
+PROBE = 20  # prints timed to judge what all of them will take
+SLOW_HOP = 2.0  # seconds between windows when they would take longer than BUDGET_S
+
+clock = time.perf_counter
 
 
 class Window(NamedTuple):
@@ -90,9 +98,9 @@ def owned(words: list[Word]) -> list[Spot]:
     return found
 
 
-def hop(speech_s: float) -> float:
-    """HOP, or longer when the speech would make more than MAX_WINDOWS windows."""
-    return max(HOP, speech_s / MAX_WINDOWS)
+def hop(speech_s: float, least: float = HOP) -> float:
+    """least, or longer when the speech would make more than MAX_WINDOWS windows."""
+    return max(least, speech_s / MAX_WINDOWS)
 
 
 def in_line(line: Line, begin: float, end: float, step: float) -> list[Spot]:
@@ -102,9 +110,10 @@ def in_line(line: Line, begin: float, end: float, step: float) -> list[Spot]:
     return [Spot(line, begin + k * step, begin + k * step + WINDOW) for k in range(count)]
 
 
-def spots(steady: list[Spot]) -> list[Spot]:
-    """Where the windows are, MAX_WINDOWS at most, taken evenly when there would be more."""
-    step = hop(sum(s.end - s.start for s in steady))
+def spots(steady: list[Spot], least: float = HOP) -> list[Spot]:
+    """Where the windows are, least apart or more, MAX_WINDOWS at most, taken evenly when there
+    would be more."""
+    step = hop(sum(s.end - s.start for s in steady), least)
     found = [w for s in steady for w in in_line(s.line, s.start, s.end, step)]
     if len(found) <= MAX_WINDOWS:
         return found
@@ -127,15 +136,41 @@ def glimpses(words: list[Word], steady: list[Spot]) -> list[Spot]:
     return [found[k] for k in sorted(set(keep.tolist()))]
 
 
-def printed(words: list[Word], wav: Any, where: list[Spot]) -> list[Window]:
+class Printer(NamedTuple):
+    """The clip's words and sound, and the prints made of it so far, by where they are."""
+
+    words: list[Word]
+    wav: Any
+    done: dict[Spot, Window]
+
+
+def printed(p: Printer, where: list[Spot]) -> list[Window]:
     from tarjim.asr.voiceprint import print_of
 
-    return [Window(s.line, s.start, s.end, who(words[s.line[0]].speaker),
-                   print_of(wav[int(s.start * RATE):int(s.end * RATE)])) for s in where]
+    for s in where:
+        if s not in p.done:
+            p.done[s] = Window(s.line, s.start, s.end, who(p.words[s.line[0]].speaker),
+                               print_of(p.wav[int(s.start * RATE):int(s.end * RATE)]))
+    return [p.done[s] for s in where]
+
+
+def each_print(p: Printer, where: list[Spot]) -> float:
+    """Seconds one print takes here: PROBE of them timed, after the first (which loads the
+    model)."""
+    printed(p, where[:1])
+    began = clock()
+    probe = printed(p, where[1:PROBE + 1])
+    return (clock() - began) / len(probe) if probe else 0.0
 
 
 def windows(words: list[Word], wav: Any) -> tuple[list[Window], list[Window]]:
     """The windows of the clip's steady talk, and the glimpses of its other lines, each with
-    its print (sound at RATE)."""
-    steady = owned(words)
-    return printed(words, wav, spots(steady)), printed(words, wav, glimpses(words, steady))
+    its print (sound at RATE): SLOW_HOP apart when HOP apart would take more than BUDGET_S."""
+    steady, p = owned(words), Printer(words, wav, {})
+    where, also = spots(steady), glimpses(words, steady)
+    each = each_print(p, where)
+    if each * (len(where) + len(also)) > BUDGET_S:
+        where = spots(steady, SLOW_HOP)
+        print(f"speakers: a voice print takes {each * 1000:.0f} ms here, so the windows are "
+              f"{SLOW_HOP:g} s apart", flush=True)
+    return printed(p, where), printed(p, also)
