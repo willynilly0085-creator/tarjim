@@ -7,6 +7,12 @@ first words. Such a turn is searched again on its own, only within TIGHT of the 
 listener gave it, so its words cannot go to the other voice's matching letters seconds away; the
 new times are kept only when they start earlier. Searching it on its own from the first, outside
 the one search, drew the turns after it seconds off toward the speech left without its words.
+
+A turn found starting well past the heard end of the turn it seems said over did not wait for
+that one's letters (2026-11-09): the listener's times are off there, as when a whole piece is
+heard 3 s early (the bench's early fault), and its own time holds other speech. Searched again
+there it took the host's letters: en_interview_music's "Today my guest" 2.5 s early and
+en_long_seven's "Have you ever thought" 2.2 s early, their words then missing and said twice.
 """
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
@@ -18,6 +24,10 @@ from tarjim.scripts import split_words
 # 0.3 s before it was said.
 LATE = 0.4
 TIGHT = 0.3  # seconds either side of its own time a waited turn is searched in again
+# Found starting this long after the heard end of the turn it was said over, it did not wait for
+# it (2026-11-09): waited turns on en_debate_overlap start within 0.4 s of it, the turns of a
+# piece heard 3 s early 1.8 s and more past it.
+PAST = 1.0
 
 
 def waited(utterances: list[Utterance], said_over: list[bool],
@@ -28,12 +38,13 @@ def waited(utterances: list[Utterance], said_over: list[bool],
     reach, first = float("-inf"), 0
     for index, (line, over) in enumerate(zip(utterances, said_over, strict=True)):
         size = len(split_words(line.text))
-        if size and not over and line.start < reach and late(words[first], line):
+        if size and not over and line.start < reach and late(words[first], line, reach):
             found.append((index, first))
         first += size
         reach = reach if over else max(reach, line.end)
     return found
 
 
-def late(word: Word, line: Utterance) -> bool:
-    return word.start > line.start + LATE
+def late(word: Word, line: Utterance, reach: float) -> bool:
+    """Late after its own start, yet not past the other turn's heard end (2026-11-09)."""
+    return line.start + LATE < word.start <= reach + PAST
