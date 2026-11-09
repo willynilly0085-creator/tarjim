@@ -5,7 +5,8 @@ The voice detector ran about twice a job before: once for the coverage check and
 every alignment, on the clip and on each stretch of it. Now it runs once per sound file
 (`regions_of`, shared with the long clip's cutting in hearing.py), and every timing reads the one
 map. speech.json carries the key the transcript is derived with (listen/kept.derive_key): a map
-kept by other code or settings is made again; "listen again" clears it.
+kept by other code or settings is made again; "listen again" clears it. Every hearing leaves one,
+those that time nothing too (`untimed_map`), so what reads it later always finds the clip's.
 """
 import json
 from pathlib import Path
@@ -55,11 +56,12 @@ def letters_of(wav: Any) -> Any:
         return None if emitter is None else emitter.emissions(wav)
 
 
-def kept_map(cache: Path, frames: int) -> SpeechMap | None:
-    """The map kept for this clip, when the code and settings running now made it."""
+def kept_map(cache: Path, frames: int | None) -> SpeechMap | None:
+    """The map kept for this clip, when the code and settings running now made it (and it is
+    `frames` long, when that is given)."""
     try:
         data = json.loads((cache / SPEECH).read_text(encoding="utf-8"))
-        if data.get(DERIVE) != derive_key() or int(data["frames"]) != frames:
+        if data.get(DERIVE) != derive_key() or frames not in (None, int(data["frames"])):
             return None
         return restored(data)
     except (OSError, ValueError, KeyError, TypeError):
@@ -85,3 +87,23 @@ def clip_map(cache: Path, clip: Clip, heard: Regions) -> SpeechMap:
     print(f"speech: {sum(b - a for a, b in made.speech()):.1f} s of speech ({made.source}, "
           f"{sum(b - a for a, b in made.ctc_only()):.1f} s heard by the letters alone)", flush=True)
     return made.heard(heard)
+
+
+def untimed_map(cache: Path, audio: Path) -> SpeechMap | None:
+    """The map of a hearing that times nothing (the local listener standing in, or no speech
+    heard, 2026-11-09): the one kept for this code, else the detector's alone, its letters not
+    heard (source "none": a check reading it says it could not check). No letters are heard for
+    it: on these paths the aligner never ran, and a weak computer is not made to run it. None
+    when the sound cannot be read: the transcript stands without it."""
+    import soundfile
+
+    made = kept_map(cache, None)
+    if made is not None:
+        return made
+    try:
+        made = build(None, int(soundfile.info(str(audio)).duration / FRAME), regions_of(audio))
+    except (OSError, RuntimeError) as error:  # soundfile's own errors are RuntimeErrors
+        print(f"speech: no speech map ({type(error).__name__})", flush=True)
+        return None
+    keep_map(cache, made)
+    return made

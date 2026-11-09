@@ -77,11 +77,12 @@ class SpeechMap:
         return merged([*self.regions, *self.ctc_only()])
 
     def heard(self, spans: list[Span]) -> "SpeechMap":
-        """Heard lines over hard silence make it soft, never speech."""
+        """Heard lines over hard silence make it soft, never speech; padded as the detector's
+        speech is (asr/vad.speech_mask), as they were when they were speech: unpadded, an
+        overlapped line's last words were squeezed 0.3 s early on the bench (2026-11-09)."""
         tier = self.tier.copy()
-        for start, end in spans:
-            low, high = max(0, int(start / FRAME)), max(0, int(end / FRAME) + 1)
-            tier[low:high][tier[low:high] == HARD] = SOFT
+        lines = speech_mask(spans, self.frames)[:self.frames]
+        tier[lines & (tier == HARD)] = SOFT
         return replace(self, tier=tier)
 
     def view(self, first: int, past: int) -> "SpeechMap":

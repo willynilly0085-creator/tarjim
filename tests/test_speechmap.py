@@ -65,6 +65,18 @@ def test_a_heard_line_over_silence_is_soft_never_speech() -> None:
     assert (heard.tier[at(25.5):at(31.5)] == SPEECH).all()  # speech stays speech
 
 
+def test_a_heard_line_is_padded_as_the_detector_speech_is() -> None:
+    """2026-11-09: before the map a heard line was speech with the detector's padding either
+    side (asr/vad.PAD); without it, 0.04 s of a line's onset fell back to hard silence and an
+    overlapped line's last words were squeezed 0.3 s early on the bench (en_long_three_pieces,
+    slip). A line is soft over the same padding."""
+    from tarjim.asr.vad import PAD
+
+    heard = chanted().heard([(33.0, 39.0)])
+    assert (heard.tier[at(33.0 - PAD):at(39.0 + PAD)] == SOFT).all()
+    assert (heard.tier[at(32.5):at(33.0 - PAD) - 1] == HARD).all()  # and no further
+
+
 def test_faint_letter_mass_without_a_run_is_soft_and_a_quiet_bed_stays_hard() -> None:
     """A music bed the letters hardly hear keeps the full penalty, as before (no energy term:
     a loud bed would otherwise lose its protection, 2026-11-09 review)."""

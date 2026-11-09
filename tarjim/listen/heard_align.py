@@ -1,9 +1,9 @@
 """A cloud hearing's lines timed on the clip's sound, with the words this computer heard as the
 second opinion, then each word given to its speaker by voice. Moved out of hearing.py on 2026-11-08
 to make room there; hearing.py still offers it. Since 2026-11-09 every timing reads one map of
-the clip's speech (listen/clipmap.py). The second opinion is reached through
-the hearing module, as are the settle and check steps through theirs, so what tests and the bench
-put in place of them there is what runs."""
+the clip's speech (listen/clipmap.py), and every hearing leaves that map (`mapped`). The second
+opinion is reached through the hearing module, as are the settle and check steps through theirs,
+so what tests and the bench put in place of them there is what runs."""
 from collections.abc import Callable
 from dataclasses import replace
 from pathlib import Path
@@ -42,3 +42,13 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
                      done.agreement, tuple((g.start, g.end) for g in done.left if g.given_up))
     words = by_voice(done.transcript.words, wav, rate)
     return replace(done.transcript, words=words), done.whole and not heard.backup
+
+
+def mapped(job: Job, audio: Path, result: tuple[Transcript, bool]) -> tuple[Transcript, bool]:
+    """A hearing's result, the clip's speech map kept beside it whichever way it was heard
+    (2026-11-09: only the lines timed here made one, so the local listener's transcript and a
+    hearing with no speech left none)."""
+    from tarjim.listen.clipmap import untimed_map
+
+    untimed_map(job.cache, audio)
+    return result

@@ -18,7 +18,7 @@ from tarjim import hearing
 from tarjim.asr.base import Transcript
 from tarjim.findings import FINDINGS, Findings, findings
 from tarjim.job import Job
-from tarjim.listen import check, settle
+from tarjim.listen import check, clipmap, settle
 from tarjim.listen.coverage import Gap
 from tarjim.listen.merge import Heard
 from tarjim.models import Cue, Word
@@ -110,6 +110,8 @@ def test_hearing_writes_down_the_speech_left_and_the_timing_check(
     done = settle.Timed(Transcript("English", "hi"), False, 0.4, left=[Gap(12.0, 15.0, 3.0, [])])
     monkeypatch.setattr(settle, "settled", lambda *_args: done)
     monkeypatch.setattr(check, "regions_in", lambda _wav: [])
+    # no aligner is loaded for the speech map (2026-11-09): its letters are not heard here
+    monkeypatch.setattr(clipmap, "letters_of", lambda _wav: None)
     heard = Heard("English", [], [], local_words=[])
     hearing.listen_and_align(Job(tmp_path / "v.mp4"), audio, heard, lambda _stage: None)
     assert found.left == [(12.0, 15.0)] and found.agreement == 0.4
