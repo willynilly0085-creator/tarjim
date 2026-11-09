@@ -12,8 +12,9 @@ neighbouring turn (crowded.handed), and only last, holding the line for rules.sh
 starting the next one after it.
 """
 from tarjim.crowded import handed
-from tarjim.joins import TOLERANCE, Frame, joinable, joined, spoken_end
+from tarjim.joins import TOLERANCE, Frame, cut_between, joinable, joined, same_voice, spoken_end
 from tarjim.models import Cue
+from tarjim.reading import read_time
 from tarjim.rules import Rules
 
 LEAD_IN = 0.2
@@ -39,6 +40,7 @@ def fit_timing(cues: list[Cue], rules: Rules, cuts: list[float] | None = None) -
 
 def settle(cues: list[Cue], index: int, frame: Frame) -> int:
     """Places one subtitle and says which to place next: the same one again after a join."""
+    read_in_time(cues, index, frame)
     cue, gap = cues[index], frame.rules.min_gap
     floor = cues[index - 1].end + gap if index else 0.0
     ceiling = cues[index + 1].start - gap if index + 1 < len(cues) else NEVER
@@ -50,6 +52,56 @@ def settle(cues: list[Cue], index: int, frame: Frame) -> int:
     if fit(cue, floor, ceiling, frame):
         return index + 1
     return crowded(cues, index, frame, floor)
+
+
+def read_in_time(cues: list[Cue], index: int, frame: Frame) -> None:
+    """A subtitle that cannot be read (reading.read_time) before the next one comes up keeps
+    the time to be read, when the next one can still be read after it (2026-11-09). Before,
+    two voices crossing showed eight words for 1.36 s on en_debate_overlap. Otherwise it takes
+    only what the next one does not need (given_up)."""
+    if index + 1 >= len(cues) or not cues[index + 1].words:
+        return
+    cue, following = cues[index], cues[index + 1]
+    read = cue.start + read_time(cue.words) + frame.rules.min_gap
+    at = min(read, latest_start(cues, index, frame))
+    if at > following.start and not can_read(cues, index + 1, at, frame.rules):
+        at = min(at, given_up(cues, index, frame.rules))
+    following.start = max(following.start, at)
+
+
+def given_up(cues: list[Cue], index: int, rules: Rules) -> float:
+    """How late the next subtitle comes up for one that cannot wait long enough: as late as it
+    is still read in time; when it cannot be anyway, where both are shown at one pace
+    (2026-11-09). Before, a line the listener gave three times showed eleven words 0.90 s on
+    mixed_en_ar, and the answer over its end, too full to read either way, waited for nothing."""
+    cue, following = cues[index], cues[index + 1]
+    ceiling = cues[index + 2].start - rules.min_gap if index + 2 < len(cues) else NEVER
+    ends = shown_until(following, following.start, ceiling, rules)
+    spare = ends - read_time(following.words)
+    if spare >= following.start:
+        return spare
+    mine, both = read_time(cue.words), read_time([*cue.words, *following.words])
+    return cue.start + (ends - cue.start) * mine / both if both else following.start
+
+
+def latest_start(cues: list[Cue], index: int, frame: Frame) -> float:
+    """How late the next subtitle may come up for this one to be read: another voice's when
+    these words have been said; the same voice's LATE_START after its first word, only after
+    an exchange (two voices said at once) that can be shown for rules.shortest (one that
+    cannot is joined to it, and one voice alone is shown as long as it is said)."""
+    cue, following, rules = cues[index], cues[index + 1], frame.rules
+    head, tail = (cue.parts or [cue.words])[-1], (following.parts or [following.words])[0]
+    if not same_voice(head, tail, cut_between(cue, following, frame.cuts)):
+        return pushed_to(cues, index + 1, spoken_end(cue))
+    if not cue.is_dialogue or following.start - rules.min_gap - cue.start < rules.shortest:
+        return following.start
+    return pushed_to(cues, index + 1, first_said(following) + LATE_START)
+
+
+def can_read(cues: list[Cue], index: int, start: float, rules: Rules) -> bool:
+    """Whether the subtitle at index, brought up at start, is shown long enough to be read."""
+    ceiling = cues[index + 1].start - rules.min_gap if index + 1 < len(cues) else NEVER
+    return shown_until(cues[index], start, ceiling, rules) - start >= read_time(cues[index].words)
 
 
 def crowded(cues: list[Cue], index: int, frame: Frame, floor: float) -> int:
