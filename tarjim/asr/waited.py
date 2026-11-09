@@ -13,7 +13,17 @@ a line the listener put a minute late fell inside another line, where its words 
 searched alone it took that line's letters (4 of its 10 words found there), cutting that line's
 subtitle short under it. A turn really said over another's end is found there: 4 of 5 words for
 "That is far too simple.", both for the echoed "Common sense?", a slipped line 3 or 4 of 10 or 11.
+
+A turn waits only for another voice's line heard where it is (2026-11-09). One voice does not
+speak over its own line: a line put a minute late inside its own speaker's question, searched
+alone, took letters over the question (6 of its 11 words found there, so the share above let it
+through) and was shown rushed across two subtitles in en_long_seven. And a line whose words are
+not said where it was timed (1 of 11 found) made no turn wait: the guest's answer said over such
+a line in mixed_en_ar, moved under it, shared its subtitle and showed its first words late. The
+overlaps en_debate_overlap is made of are two voices, the one talked over 6 of 9 found or more.
 """
+from typing import NamedTuple
+
 from tarjim.asr.agree import FOUND
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
@@ -28,19 +38,37 @@ TIGHT = 0.3  # seconds either side of its own time a waited turn is searched in 
 MOST = 0.5  # share of a turn's words found where its own search puts them, to move it there
 
 
+class Under(NamedTuple):
+    """The line reaching furthest so far: where it ends, whose voice, whether it was heard."""
+    end: float
+    speaker: str
+    heard: bool
+
+
+NOTHING = Under(float("-inf"), "", False)
+
+
 def waited(utterances: list[Utterance], said_over: list[bool],
            words: list[Word]) -> list[tuple[int, int]]:
     """The waited turns as (line index, index of its first word in words). Words are in line
     order, each line's as many as split_words gives; a short reply said over is not a turn."""
     found: list[tuple[int, int]] = []
-    reach, first = float("-inf"), 0
+    under, first = NOTHING, 0
     for index, (line, over) in enumerate(zip(utterances, said_over, strict=True)):
         size = len(split_words(line.text))
-        if size and not over and line.start < reach and late(words[first], line):
+        if size and not over and waits(line, under, words[first]):
             found.append((index, first))
+        if not over and line.end > under.end:
+            under = Under(line.end, line.speaker, heard_there(words[first:first + size]))
         first += size
-        reach = reach if over else max(reach, line.end)
     return found
+
+
+def waits(line: Utterance, under: Under, word: Word) -> bool:
+    """Begun before the line under it ended, in another voice, over its heard letters, and
+    timed late (2026-11-09)."""
+    over = line.start < under.end and line.speaker != under.speaker and under.heard
+    return over and late(word, line)
 
 
 def late(word: Word, line: Utterance) -> bool:
