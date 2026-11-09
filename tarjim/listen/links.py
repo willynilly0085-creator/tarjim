@@ -23,7 +23,7 @@ from tarjim import guards
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.merge import Piece
 from tarjim.listen.vote import flatten, linked, near
-from tarjim.speakers import based
+from tarjim.speakers import PIECE, based
 
 Run = list[Utterance]
 Pairs = Counter[tuple[str, str]]
@@ -46,6 +46,13 @@ def at(run: Run, offset: float) -> Run:
     return [replace(u, start=u.start + offset, end=u.end + offset) for u in run]
 
 
+def linkable(name: str) -> bool:
+    """A name of the clip's or a piece's own speaker ("S1~k2"), never a line's only one pass
+    heard ("S2~p3"): taken as a speaker's name, it gave a guest to the host from there on
+    (2026-11-09). Without the piece's, the chain broke: 0.80 of the speakers right, not 0.93."""
+    return based(name) or bool(PIECE.match(name))
+
+
 def evidence(before: Run, piece: Piece, voted: Run) -> Pairs:
     """(the piece's voted label, the clip's name) and how many words of the lead link them: each
     pass's own labels go to the vote's through the words the pass shares with it, and to the
@@ -56,7 +63,7 @@ def evidence(before: Run, piece: Piece, voted: Run) -> Pairs:
     for run, lead in zip(piece.passes, piece.lead, strict=False):
         mine = linked(pairs(voted, run))
         for (name, label), count in pairs(before, at(lead, piece.start - piece.lead_s)).items():
-            if label in mine:
+            if label in mine and linkable(name):
                 found[name, mine[label]] += count
     chosen = linked(found)
     return Counter({(label, name): count for (name, label), count in found.items()
