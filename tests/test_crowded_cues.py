@@ -5,6 +5,7 @@ over the end of a turn was shown only once that turn's subtitle had gone."""
 from itertools import pairwise
 
 from tarjim.models import Cue, Word
+from tarjim.reading import read_time
 from tarjim.rules import DEFAULT_RULES
 from tarjim.segment import build_cues
 
@@ -108,13 +109,19 @@ SCHOOL = timed("They can use the school computers for that.",
                 (25.5, 26.08), (26.08, 26.22), (26.22, 26.46)], "S2")
 
 
-def test_a_long_turn_said_over_another_shows_both_while_they_are_said() -> None:
-    """Only the question's last word, said while the answer starts, gives way to the answer."""
+def test_a_long_turn_said_over_another_waits_for_it_to_be_read() -> None:
+    """Sharing the screen, the turn's end and the question's first words would be shown 1.44 s
+    at most, 5.6 words a second (2026-11-09): the turn keeps its subtitle whole and the question
+    comes up once it has been read, before its words end. On the aligner's own times the two
+    can be read sharing the screen, and do (test_readable_crossings)."""
     words = [*EXISTED, *STUDY, *SCHOOL]
     cues = build_cues(words, cuts=[])
-    kept_promises(cues, words)
-    assert [w for w in words if not on_screen(cues, w)] == STUDY[-1:]
-    assert holding(cues, STUDY[0]).is_dialogue and all(len(c.parts) <= 2 for c in cues)
+    assert [c.words for c in cues] == [EXISTED, STUDY, SCHOOL]
+    for first, second in pairwise(cues):
+        assert first.end + RULES.min_gap <= second.start + TOLERANCE, (first, second)
+    question = holding(cues, STUDY[0])
+    assert EXISTED[0].start + read_time(EXISTED) <= question.start <= EXISTED[-1].end
+    assert all(c.duration >= read_time(c.words) - TOLERANCE for c in cues)
     assert holding(cues, SCHOOL[0]).start == SCHOOL[0].start
 
 

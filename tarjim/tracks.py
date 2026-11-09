@@ -15,6 +15,7 @@ from bisect import bisect_left
 from itertools import pairwise
 from typing import NamedTuple
 
+from tarjim.crossing import head_said_over
 from tarjim.dialogue import fits_one_line
 from tarjim.models import Word
 from tarjim.rules import DEFAULT_RULES, Rules
@@ -27,6 +28,7 @@ SAID_OVER = 0.5  # seconds a long turn of another voice starts before the last o
 EDGE = 0.05
 
 Run = list[Word]
+Host = tuple[list[Word], float]  # the main track so far, and where its words end
 
 
 class Timeline(NamedTuple):
@@ -46,7 +48,7 @@ def tracks(words: list[Word], rules: Rules = DEFAULT_RULES) -> tuple[list[Word],
     reach = float("-inf")
     for index, run in enumerate(ordered):
         following = ordered[index + 1] if index + 1 < len(ordered) else None
-        over = taken(run, (main[-1], reach), following, rules) if main else 0
+        over = taken(run, (main, reach), following, rules) if main else 0
         if over:
             replies.append(run[:over])
         main.extend(run[over:])
@@ -54,29 +56,29 @@ def tracks(words: list[Word], rules: Rules = DEFAULT_RULES) -> tuple[list[Word],
     return main, replies
 
 
-def taken(run: Run, host: tuple[Word, float], following: Run | None, rules: Rules) -> int:
+def taken(run: Run, host: Host, following: Run | None, rules: Rules) -> int:
     """How many of the run's first words are said over the turn before it."""
     if said_over(run, host, following, rules):
         return len(run)
     return over_end(run, host, rules)
 
 
-def over_end(run: Run, host: tuple[Word, float], rules: Rules) -> int:
+def over_end(run: Run, host: Host, rules: Rules) -> int:
     """A labelled turn of another voice begun well before the last one ends (2026-11-08): the
     words said while that one is still said are a reply, a part of the subtitle that holds
     their time, and the rest goes on the main track. Before, the turn's subtitle came up only
     once the other one's had gone, or cut its last words. The whole turn is the reply when it
-    fits one line of an exchange; no reply at all when its words said over do not."""
-    last, reach = host
-    voice, replier = who(last.speaker), who(run[0].speaker)
+    fits one line of an exchange; only its first words when they and the words around them
+    can be read in the time they get (crossing.head_said_over, 2026-11-09)."""
+    main, reach = host
+    voice, replier = who(main[-1].speaker), who(run[0].speaker)
     if len(run) <= SHORT_REPLY or not (voice and replier) or voice == replier:
         return 0
     if run[0].start >= reach - SAID_OVER:
         return 0
     if fits_one_line(run, rules):
         return len(run)
-    over = sum(1 for word in run if word.start < reach - EDGE)
-    return over if fits_one_line(run[:over], rules) else 0
+    return head_said_over(run, main, reach, rules)
 
 
 def in_order(words: list[Word], rules: Rules = DEFAULT_RULES) -> list[Run]:
@@ -130,11 +132,11 @@ def spoken_between(after: float, before: float, timeline: Timeline, mine: set[in
     return False
 
 
-def said_over(run: Run, host: tuple[Word, float], following: Run | None, rules: Rules) -> bool:
+def said_over(run: Run, host: Host, following: Run | None, rules: Rules) -> bool:
     """A short reply said inside the turn before it: starting well inside it, as the aligner
     tests, or overlapping it while that speaker goes on right after it."""
-    last, reach = host
-    voice, replier = who(last.speaker), who(run[0].speaker)
+    main, reach = host
+    voice, replier = who(main[-1].speaker), who(run[0].speaker)
     if len(run) > SHORT_REPLY or (replier and replier == voice):
         return False  # one person's own words stay on the main track
     if run[0].start < reach - OVERLAP:
