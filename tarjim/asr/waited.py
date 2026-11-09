@@ -7,8 +7,14 @@ first words. Such a turn is searched again on its own, only within TIGHT of the 
 listener gave it, so its words cannot go to the other voice's matching letters seconds away; the
 new times are kept only when they start earlier. Searching it on its own from the first, outside
 the one search, drew the turns after it seconds off toward the speech left without its words.
+
+The listener's time for a turn can be seconds off too, and its own search then finds the same
+words in the other voice's turn: a reply "Thank you." put over the host's "Thank you so much for
+joining us." took the host's "Thank you", 2 s early (the bench's en_interview_music, 2026-11-09).
+New times that put a word where another turn's same word is timed are not kept (echoes).
 """
 from tarjim.listen.gemini_listen import Utterance
+from tarjim.listen.vote import norm
 from tarjim.models import Word
 from tarjim.scripts import split_words
 
@@ -37,3 +43,15 @@ def waited(utterances: list[Utterance], said_over: list[bool],
 
 def late(word: Word, line: Utterance) -> bool:
     return word.start > line.start + LATE
+
+
+def echoes(alone: list[Word], words: list[Word], first: int) -> bool:
+    """Whether the turn's own search put one of its words on the time of the same word of
+    another turn: the other voice's letters, not its own."""
+    others = [*words[:first], *words[first + len(alone):]]
+    return any(echo(a, o) for a in alone for o in others)
+
+
+def echo(one: Word, other: Word) -> bool:
+    """Two words of one text timed over each other: one sound, so one of them is not there."""
+    return norm(one.text) == norm(other.text) and one.start < other.end and other.start < one.end

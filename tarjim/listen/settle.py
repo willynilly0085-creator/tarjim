@@ -55,6 +55,10 @@ class Sound:
     speech: list[tuple[float, float]]
     # where the local words the sound left out were timed (listen/opinion.doubted, 2026-11-08)
     doubted: list[tuple[float, float]] = field(default_factory=list)
+    # every local word, by its text, to judge the passes by (listen/opinion.backing, 2026-11-09)
+    said: list[Word] | None = None
+    # the local words that fill speech left out (listen/opinion.held, 2026-11-09)
+    held: list[Word] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -138,14 +142,15 @@ def settled(job: Job, heard: Heard, sound: Sound, opinion: list[Word]) -> Timed:
     from tarjim.listen.kept import rederiving
 
     seconds = len(sound.wav) / sound.rate
-    found = timeable(placed(heard, opinion, seconds))
+    found = timeable(placed(heard, opinion, seconds, sound.said))
     # one budget for every stretch asked again in this job (2026-11-08)
     asked = Asked.load(job.cache, budget.budget_for(heard.provider, seconds,
                                                     rederiving(job.cache)))
-    repair = repaired(job, heard, Hearing(found.moved, opinion, sound.speech, sound.doubted), asked)
+    given = Hearing(found.moved, opinion, sound.speech, sound.doubted, sound.held)
+    repair = repaired(job, heard, given, asked)
     fills = [*found.fills, *repair.mended.fills]
     keep(job, replace(heard, added=fills), asked, [])  # before any timing (2026-11-08)
-    mended = Hearing(repair.mended.utterances, opinion, sound.speech, sound.doubted)
+    mended = replace(given, utterances=repair.mended.utterances)
     first = timed(repair, mended, sound)
     lines = by_time([*found.own, *repair.mended.added])
     chosen = better(first, lambda: timed(repair, Hearing(lines, [], sound.speech), sound),

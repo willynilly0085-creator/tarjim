@@ -20,7 +20,7 @@ from tarjim.asr.spread import (
     runs,
     share,
 )
-from tarjim.asr.waited import TIGHT, waited
+from tarjim.asr.waited import TIGHT, echoes, waited
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
 from tarjim.scripts import split_words
@@ -110,12 +110,14 @@ class AlignEngine:
     def unwaited(self, logp: np.ndarray, utterances: list[Utterance], over: list[bool],
                  words: list[Word]) -> None:
         """A turn the one search made wait for the turn it was said over gets the times its own
-        search inside its own time gives, when they start earlier (asr/waited.py)."""
+        search inside its own time gives, when they start earlier and take no other turn's same
+        words (asr/waited.py)."""
         moved = 0
         for index, first in waited(utterances, over, words):
             evened = len(self.evened)
             alone = self.align_group(logp, [utterances[index]], OWN)
-            if len(self.evened) == evened and alone[0].start < words[first].start:
+            earlier = alone[0].start < words[first].start
+            if len(self.evened) == evened and earlier and not echoes(alone, words, first):
                 words[first:first + len(alone)] = alone
                 moved += 1
             del self.evened[evened:]  # not followed alone: the first search's times stay

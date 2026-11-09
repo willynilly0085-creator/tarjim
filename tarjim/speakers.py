@@ -19,6 +19,11 @@ nearest (listen/whose.py), and where it could not, it takes the base speaker it 
 time, else the nearer base turn. Only a voice the check found near no base speaker's (a person the
 base pass missed) is kept a speaker of its own, under a name no base speaker has
 (listen/follow.adopted, 2026-11-08).
+
+A stretch heard again is a request of its own, and the listener names the speakers in it afresh:
+its "S1" is whoever speaks first there. Since 2026-11-09 such a line carries that request's name
+("S1~r426", asked_again) and is linked the same way: taken as the clip's S1, a second speaker's
+line asked alone was shown in the first one's colour.
 """
 import re
 from collections import Counter
@@ -28,7 +33,9 @@ from dataclasses import replace
 from tarjim.models import Word
 
 PASS_TAG = re.compile(r"(?:^|(?<=\.))p\d+\.")
-UNLINKED = re.compile(r"~p\d+$")
+# "~p2": a pass the vote could not link; "~r426": a stretch heard again from 42.6 s (2026-11-09)
+UNLINKED = re.compile(r"~[pr]\d+$")
+ASKED = re.compile(r"~r\d+$")
 GAP = 1.0  # seconds of silence that end a line even with the same speaker
 
 Line = tuple[int, int]  # the first word and the one past the last
@@ -60,6 +67,12 @@ def lines(words: list[Word]) -> list[Line]:
         else:
             found.append((k, k + 1))
     return found
+
+
+def asked_again(label: str, start: float) -> str:
+    """A speaker named in the request that heard a stretch again from `start` s: that request's
+    own name for them, to be linked to the clip's speakers like an unlinked pass's."""
+    return f"{label}~r{round(start * 10)}" if label else label
 
 
 def span(words: list[Word], line: Line) -> tuple[float, float]:
@@ -110,12 +123,14 @@ def overlapped(words: list[Word], line: Line) -> str:
 
 def linked_by_time(words: list[Word]) -> list[Word]:
     """The words with each unlinked line given to the base speaker it overlaps most, else the
-    nearer base turn, else (no base speaker in the clip) its own name without the pass tag."""
+    nearer base turn, else (no base speaker in the clip) its own name without the pass tag. A
+    line heard again that the voice could not link keeps its request's name, as before
+    2026-11-09: a stretch heard again is mostly one no base turn overlaps."""
     out = list(words)
     for line in lines(words):
         label = words[line[0]].speaker
         if unlinked(label):
-            name = (overlapped(words, line) or nearest(words, line, based)
-                    or UNLINKED.sub("", label))
+            name = UNLINKED.sub("", label) if ASKED.search(label) else (
+                overlapped(words, line) or nearest(words, line, based) or UNLINKED.sub("", label))
             out[line[0]:line[1]] = [replace(w, speaker=name) for w in out[line[0]:line[1]]]
     return out

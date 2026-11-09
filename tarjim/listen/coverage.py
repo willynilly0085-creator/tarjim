@@ -50,6 +50,9 @@ class Hearing:
     regions: list[Span]  # the voice detector's speech; none when it could not run
     # where the local words the sound did not confirm were timed (listen/opinion.doubted)
     doubted: list[Span] = field(default_factory=list)
+    # what fills a stretch: the local words kept ones hold in place (listen/opinion.held,
+    # 2026-11-09); none given, the kept ones alone
+    held: list[Word] = field(default_factory=list)
 
 
 def heard_nothing(hearing: Hearing, gap: Gap) -> bool:
@@ -120,10 +123,10 @@ def uncovered(hearing: Hearing) -> list[list[Span]]:
 
 def gaps(hearing: Hearing, least: float | None = None) -> list[Gap]:
     shortest = gap_seconds() if least is None else least
-    found = []
+    found, heard = [], hearing.held or hearing.local
     for group in uncovered(hearing):
         start, end = group[0][0], group[-1][1]
-        inside = [w for w in hearing.local if start <= (w.start + w.end) / 2 <= end]
+        inside = [w for w in heard if start <= (w.start + w.end) / 2 <= end]
         speech = sum(b - a for a, b in group)
         if speech >= shortest:
             found.append(Gap(start, end, speech, inside))
