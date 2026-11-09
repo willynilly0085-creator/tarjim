@@ -150,15 +150,17 @@ def settled(job: Job, heard: Heard, sound: Sound, opinion: list[Word]) -> Timed:
     # one budget for every stretch asked again in this job (2026-11-08)
     asked = Asked.load(job.cache, budget.budget_for(heard.provider, seconds,
                                                     rederiving(job.cache)))
-    given = Hearing(found.moved, opinion, sound.speech, sound.doubted, sound.held)
-    repair = repaired(job, heard, given, asked)
+    # every check reads the clip's speech map, so a stretch is judged the same whether the local
+    # listener ran or not (2026-11-09)
+    heard_by = Hearing(found.moved, opinion, sound.speech, sound.doubted, sound.held,
+                       sound.speech_map)
+    repair = repaired(job, heard, heard_by, asked)
     fills = [*found.fills, *repair.mended.fills]
     keep(job, replace(heard, added=fills), asked, [])  # before any timing (2026-11-08)
-    mended = replace(given, utterances=repair.mended.utterances)
-    first = timed(repair, mended, sound)
+    first = timed(repair, replace(heard_by, utterances=repair.mended.utterances), sound)
     lines = by_time([*found.own, *repair.mended.added])
-    chosen = better(first, lambda: timed(repair, Hearing(lines, [], sound.speech), sound),
-                    bool(opinion))
+    alone = Hearing(lines, [], sound.speech, map=sound.speech_map)
+    chosen = better(first, lambda: timed(repair, alone, sound), bool(opinion))
     words = [Fill(line) for line in chosen.added]  # judged by their words on a later run
     keep(job, replace(heard, added=[*fills, *words]), asked, chosen.left)
     paid(asked, chosen.left)

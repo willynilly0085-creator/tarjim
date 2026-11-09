@@ -13,6 +13,7 @@ from tarjim.listen.budget import Refused
 from tarjim.listen.coverage import (
     NOT_ASKED,
     NOT_REPAIRED,
+    UNSPOKEN,
     Gap,
     Hearing,
     described,
@@ -123,10 +124,9 @@ class Mender:
         self.hearing, self.relisten, self.name = hearing, relisten, name or "the same engine"
 
     def heard_again(self, gap: Gap) -> list[Utterance] | Unasked | None:
-        """What the engine hears in the stretch now, with a little sound either side (the job's
-        record adds it, listen/kept.py); None when no engine is asked about it any more: there is
-        none, or it answered TRIES times across runs. A request refused or failed is UNASKED: until
-        2026-11-08 it was [], heard nothing, and with the local listener on it was dropped."""
+        """What the engine hears in the stretch now, with sound either side (listen/kept.py);
+        None when no engine is asked about it any more (none, or TRIES answers across runs). A
+        request refused or failed is UNASKED: until 2026-11-08 it was [], and could be dropped."""
         if self.relisten is None:
             return None
         checkpoint()  # a cancel stops before another request
@@ -154,21 +154,19 @@ class Mender:
         return voiced([u for u in heard if not repeats(u, lines)], lines)
 
     def in_transcript(self, _gap: Gap) -> str | None:
-        """Whether the local words left out here are said where the transcript is timed. Lines
-        have no word times yet, so the check after alignment tells (listen/wordcover.py): until
-        2026-11-08 a gap was called filled here, and kept, whenever a line close by said its
-        words, wherever that line's words were timed."""
+        """Whether the local words left out here are said where the transcript is timed: the
+        check after alignment tells (listen/wordcover.py), as lines have no word times yet."""
         return "the local words here are said by a line close by; checked once it is timed"
 
     def unfilled(self, gap: Gap, heard: list[Utterance] | Unasked | None) -> str:
-        """NOT_REPAIRED keeps the stretch open: one not asked is, whatever the local words say."""
+        """NOT_REPAIRED keeps it open, as one not asked; NOT_ASKED lists it given up (2026-11-09)"""
         if isinstance(heard, Unasked):
             return NOT_REPAIRED
         said = self.in_transcript(gap) if gap.words else None
         if said:
             return said
         if heard_nothing(self.hearing, gap):  # the listener on this computer ran here
-            return "no listener heard words here; left as it is"
+            return f"no listener heard words here; {NOT_ASKED}, left as it is"
         if heard is None:
             why = ("the local words here repeat a line timed elsewhere" if gap.words
                    else "heard by no listener")
@@ -176,6 +174,8 @@ class Mender:
         return NOT_REPAIRED
 
     def fill(self, gap: Gap, lines: list[Utterance]) -> tuple[list[Utterance], str]:
+        if gap.unspoken:  # only local words call it speech, not the sound (2026-11-09)
+            return [], UNSPOKEN
         heard = self.heard_again(gap)
         again = [u for u in heard if self.novel(u, lines)] if isinstance(heard, list) else []
         if again:
