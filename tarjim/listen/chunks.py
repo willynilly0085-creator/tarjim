@@ -32,14 +32,19 @@ ListenSpan = Callable[[float, float], Heard]
 
 
 def chunk_seconds() -> float:
-    """The person's setting `listen_chunk_seconds`; 0 hears the whole clip in one request."""
-    from tarjim.config import setting
+    """The job's listen.chunk_seconds (2026-11-09). TARJIM_LISTEN_CHUNK_SECONDS still sets it
+    for tests and the bench, 0 there hearing the whole clip in one request."""
+    import os
 
+    from tarjim.prefs.active import active
+
+    raw = os.environ.get("TARJIM_LISTEN_CHUNK_SECONDS", "")
+    if not raw:
+        return float(active().listen.chunk_seconds)
     try:
-        chosen = float(setting("listen_chunk_seconds") or CHUNK_SECONDS)
+        return max(float(raw), 0.0)
     except ValueError:
         return CHUNK_SECONDS
-    return max(chosen, 0.0)
 
 
 def is_long(duration: float, target: float | None = None) -> bool:

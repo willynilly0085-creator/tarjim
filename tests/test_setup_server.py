@@ -8,6 +8,8 @@ from pathlib import Path
 import pytest
 
 from tarjim import config
+from tarjim.prefs import store
+from tarjim.prefs.edit import change
 from tarjim.server import pages
 from tarjim.server.app import Handler
 from tarjim.server.jobs import Board
@@ -87,11 +89,16 @@ def test_setup_only_accepts_known_values(port: int) -> None:
 
 
 def test_settings_turn_the_mark_on_videos_off_and_on(port: int) -> None:
+    """The page's switch and show_mark_on_videos write look.mark, the one the next job reads,
+    even with other settings already saved (2026-11-09)."""
     owner = {"X-Tarjim-Token": TOKEN, "Content-Type": "application/json"}
-    assert json.loads(call(port, "GET /setup", headers=owner).read())["video_mark"] == ""
-    for wanted, kept in (("no", "no"), ("maybe", "no"), ("yes", "yes")):
+    change({"look.bold": False})
+    assert json.loads(call(port, "GET /setup", headers=owner).read())["video_mark"] == "yes"
+    for wanted, kept in (("no", "no"), ("maybe", "no"), ("yes", "yes"), ("no", "no")):
         body = json.dumps({"video_mark": wanted}).encode()
         assert json.loads(call(port, "POST /setup", body, owner).read())["video_mark"] == kept
+        assert store.current().look.mark is (kept == "yes")
+    assert store.current().look.bold is False and "video_mark" not in config.settings()
 
 
 def test_someone_who_already_chose_a_translator_is_not_sent_through_setup_again(port: int) -> None:

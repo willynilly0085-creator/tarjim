@@ -8,16 +8,19 @@ the drawn font size and a letter width kept on the wide side, so two lines alway
 """
 from dataclasses import replace
 
-from tarjim.render.ass import Canvas
+from tarjim.prefs.model import Look
+from tarjim.render.canvas import DEFAULT_LOOK, Canvas
 from tarjim.rules import Rules
 
 SHORTEST_LINE = 8
 
 
-def fitted(rules: Rules, width: int, height: int) -> Rules:
+def fitted(rules: Rules, width: int, height: int, look: Look = DEFAULT_LOOK) -> Rules:
+    """The rules with as many letters a line as fit, at the person's size, side margin and
+    padding (2026-11-09)."""
     if width <= 0 or height <= 0:
         return rules  # a sound file: nothing is drawn
-    canvas = Canvas(width, height)
+    canvas = Canvas.drawn((width, height), look, "")
     free = width - 2 * canvas.margin_h - 2 * canvas.shadow
     fits = int(free / (canvas.font_size * rules.char_em))
     line = max(SHORTEST_LINE, min(rules.line_chars, fits))

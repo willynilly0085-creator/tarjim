@@ -1,6 +1,6 @@
 ---
 name: tarjim
-description: Use when the person wants a video or audio translated, subtitled or dubbed (a link or a file on their computer), in any language, or wants to change tarjim's settings (which AI listens or translates, their subscription, a local model, a glossary of names). Drives the tarjim tools; tarjim does the work on their computer.
+description: Use when the person wants a video or audio translated, subtitled or dubbed (a link or a file on their computer), in any language, or wants to change tarjim's settings (how subtitles look, read and are timed, which AI listens or translates, their subscription, a local model, a glossary of names). Drives the tarjim tools; tarjim does the work on their computer.
 ---
 
 # Using tarjim
@@ -23,5 +23,11 @@ not translate the video yourself.
    - Follow with `translation_status` until it is `done`; then `open_result` or `read_subtitles`.
 3. Settings: `get_settings`, `list_connections`, `use_connection(provider, model)`,
    `change_settings`, `set_glossary("name = translation")`, `list_tools` / `install_tool`.
-4. Never ask for or accept API keys in chat. Keys are entered on the tarjim page
+4. The person's own taste (how subtitles look, read and are timed, listening, translation
+   style, files, dub): `get_preferences(group, language)` returns every setting with its range,
+   `change_preferences({key: value}, language)` saves (a refused value comes back with its
+   Arabic reason, show it as is), `reset_preferences("all" | group | key)`, and
+   `use_preset(name)`. For one video only, pass `output` to `translate_video` as
+   `{"result": "burned", "tweaks": {key: value}}`.
+5. Never ask for or accept API keys in chat. Keys are entered on the tarjim page
    (`open_tarjim_page`); subscriptions sign in with `sign_in(provider)`.

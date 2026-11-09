@@ -8,9 +8,11 @@ from tarjim.findings import findings
 from tarjim.hearing import transcript_for
 from tarjim.job import Job
 from tarjim.models import Cue, Word
+from tarjim.prefs.active import active, using
 from tarjim.qa import Issue, check
 from tarjim.render.ass import Canvas, render_ass
 from tarjim.render.burn import burn
+from tarjim.render.fonts import usable
 from tarjim.render.mark import Mark, mark_for
 from tarjim.render.moments import moved
 from tarjim.render.placement import placed
@@ -36,10 +38,16 @@ def quiet(_stage: str) -> None:
 
 
 def cuts_for(job: Job) -> list[float]:
-    cached = job.cache / "cuts.json"
+    """Where the picture cuts, at the person's sensitivity; none when lines are not to end at
+    them (2026-11-09). Each sensitivity keeps its own cuts."""
+    timing = active().timing
+    if not timing.end_at_cuts:
+        return []
+    usual = timing.scene_sensitivity == media.SCENE_THRESHOLD
+    cached = job.cache / ("cuts.json" if usual else f"cuts-{timing.scene_sensitivity:g}.json")
     if cached.exists():
         return list(json.loads(cached.read_text(encoding="utf-8")))
-    cuts = media.scene_cuts(job.video)
+    cuts = media.scene_cuts(job.video, timing.scene_sensitivity)
     if cuts is None:
         return []
     cached.write_text(json.dumps(cuts), encoding="utf-8")
@@ -58,7 +66,8 @@ def translate(job: Job, cues: list[Cue], rules: Rules | None = None) -> list[Cue
         return media.audio_bytes(job.video, start, end)
 
     shaped = rules or job.rules
-    brief = Brief(job.language, job.dialect, shaped, glossary=current(job.target))
+    brief = Brief(job.language, job.dialect, shaped, glossary=current(job.target),
+                  manner=active().translate)
     rounds = Rounds(cues, audio, brief)
     failures = rounds.run()
     if failures and not rounds.translated():
@@ -92,7 +101,8 @@ def write_outputs(job: Job, made: Made, report: Report) -> None:
     cues = made.cues
     # the rules fitted to the picture, as the .ass, the translation and the check use: before
     # 2026-11-08 the .srt was wrapped by the unfitted ones and broke its lines differently
-    rules = made.rules or fitted(job.rules, made.info.width, made.info.height)
+    look = active().look
+    rules = made.rules or fitted(job.rules, made.info.width, made.info.height, look)
     job.output(".srt").write_text(render_srt(cues, rules), encoding="utf-8-sig")
     picture = write_picture(job, cues, made.info, report)
     if job.dub:
@@ -108,11 +118,15 @@ def write_picture(job: Job, cues: list[Cue], info: media.VideoInfo,
     for a file with no picture."""
     if not info.has_picture:
         return None
-    canvas = placed(job, cues, Canvas(info.width, info.height, job.font_name), info.duration)
+    look = active().look
+    font = usable(job.font_name, job.language.font)
+    canvas = placed(job, cues, Canvas.drawn((info.width, info.height), look, font),
+                    info.duration)
     mark = mark_for(canvas)
     canvas = moved(job, cues, canvas, mark)
-    subtitles = render_ass(cues, canvas, fitted(job.rules, canvas.width, canvas.height))
-    job.output(".ass").write_text(subtitles, encoding="utf-8")
+    subtitles = render_ass(cues, canvas, fitted(job.rules, canvas.width, canvas.height, look))
+    if active().output.keep_ass:  # the burn draws from the text, not the file
+        job.output(".ass").write_text(subtitles, encoding="utf-8")
     if job.burn:
         report("burning")
         burn(job.video, subtitles, job.output(".mp4"), mark)
@@ -129,6 +143,12 @@ def picture_for(job: Job, canvas: Canvas, mark: Mark | None) -> Path:
 
 
 def run(job: Job, report: Report = quiet) -> tuple[list[Cue], list[Issue]]:
+    """The job, with its own settings read by every step inside it (2026-11-09)."""
+    with using(job.settings):
+        return work(job, report)
+
+
+def work(job: Job, report: Report) -> tuple[list[Cue], list[Issue]]:
     guards.reset()  # each job counts from nothing, the command line's too (2026-11-08)
     job.claim_cache()
     media.check_readable(job.video)
@@ -138,7 +158,7 @@ def run(job: Job, report: Report = quiet) -> tuple[list[Cue], list[Issue]]:
     info = media.probe(job.video)
     # the target language's rules, its lines shortened for the picture's shape: before
     # 2026-11-08 the cues were cut by the default rules whatever the language
-    rules = fitted(job.rules, info.width, info.height)
+    rules = fitted(job.rules, info.width, info.height, active().look)
     cues = build_cues(words, cuts_for(job), rules)
     report("translating")
     cues = translate(job, cues, rules)

@@ -3,7 +3,7 @@ speakers an exchange (moved here from fit.py on 2026-11-08, when the solver also
 a short subtitle to part of a turn, crowded.handed)."""
 from dataclasses import dataclass
 
-from tarjim.dialogue import MAX_SPEAKERS, Reply, fits_one_line, last_end, like
+from tarjim.dialogue import Reply, fits_one_line, last_end, like
 from tarjim.models import Cue, Word, join_words
 from tarjim.rules import Rules
 from tarjim.speakers import who
@@ -26,7 +26,7 @@ def joinable(first: Cue, second: Cue, frame: Frame) -> bool:
         return False
     rules, parts = frame.rules, joined_parts(first, second, frame)
     span = max(spoken_end(first), spoken_end(second)) - first.start
-    if len(parts) > MAX_SPEAKERS or span > rules.max_duration + TOLERANCE:
+    if len(parts) > rules.max_speakers or span > rules.max_duration + TOLERANCE:
         return False
     if cut_between(first, second, frame.cuts) and span > rules.cut_dialogue_span:
         return False

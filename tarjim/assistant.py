@@ -5,6 +5,8 @@ from typing import Any
 from mcp.server.mcpserver import MCPServer
 
 from tarjim.assistant_http import call, fetch_text, wait_for
+from tarjim.assistant_prefs import Output, split_output
+from tarjim.assistant_prefs import attach as attach_prefs
 from tarjim.assistant_quality import answer
 from tarjim.assistant_settings import attach
 from tarjim.assistant_setup import install, start, status
@@ -30,7 +32,7 @@ def mode_for(output: str) -> str:
 
 
 @tarjim.tool()
-def translate_video(source: str, language: str = "ar", output: str = "burned",
+def translate_video(source: str, language: str = "ar", output: Output = "burned",
                     quality: str = "") -> Any:
     """Translate a video from a link (YouTube, X, ...) or a local file path.
 
@@ -41,13 +43,18 @@ def translate_video(source: str, language: str = "ar", output: str = "burned",
     "dubbed-clone" the speaker's own voice on this computer, "dubbed-studio", "dubbed-fish" cloud
     cloning, "dubbed-fishvoice" Arabic narrator, "dubbed-eleven" ElevenLabs voices,
     "dubbed-elevenclone" the speaker's voice there, "dubbed-speech" a linked voice service.
+    Settings for this video only: output as {"result": "burned", "tweaks": {key: value}},
+    keys from get_preferences marked per_job; a refused one stops the order with its reason.
     quality (links only): leave it empty the first time. The link is not started; the answer
     lists the qualities it offers, to ask the person. Then call again with their pick: a number
     such as "1080" or "720", "audio" (subtitles only), or "default".
     """
     target, _, dialect = language.partition("-")
-    order = {"target": target, "mode": mode_for(output),
-             "dialect": "msa" if dialect == "msa" else "saudi"}
+    result, tweaks = split_output(output)
+    order: dict[str, Any] = {"target": target, "mode": mode_for(result),
+                             "dialect": "msa" if dialect == "msa" else "saudi"}
+    if tweaks:
+        order["tweaks"] = tweaks
     if not source.lower().startswith(("http://", "https://")):
         return call("/jobs/local", {"path": source, **order})
     if quality:
@@ -170,6 +177,7 @@ def list_languages() -> Any:
 
 
 attach(tarjim)
+attach_prefs(tarjim)
 
 
 def main() -> None:

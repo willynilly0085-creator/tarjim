@@ -16,12 +16,22 @@ from tarjim.server.guard import (
     safe_name,
     token_ok,
 )
-from tarjim.server.job_routes import JobRoutes, refusal
+from tarjim.server.job_routes import JobRoutes, refusal, refused
 from tarjim.server.jobs import Board, Order, Task
 from tarjim.server.listener import OnlyListener
-from tarjim.server.orders import body_size, copy_limited, first, json_body, order_from
+from tarjim.server.orders import (
+    body_size,
+    copy_limited,
+    first,
+    json_body,
+    local_file,
+    order_from,
+    stamped,
+    upload_options,
+)
 from tarjim.server.pages import PageRoutes
 from tarjim.server.pairing import Pairing
+from tarjim.server.prefs_routes import PrefsRoutes
 from tarjim.server.quality_routes import QualityRoutes
 from tarjim.server.routes import GET_ROUTES, POST_ROUTES, KeyRoutes, Query, Routes, is_open
 from tarjim.server.setup_routes import SetupRoutes
@@ -33,7 +43,8 @@ BLOCK = 1024 * 1024
 TOKEN_HEADERS = ("X-Tarjim-Token", "X-Trans-Token")
 
 
-class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoutes, JobRoutes):
+class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoutes, JobRoutes,
+              PrefsRoutes):
     board: ClassVar[Board]
     token: ClassVar[str]
     uploads: ClassVar[Path]
@@ -121,26 +132,26 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoute
 
     def create_local(self, _query: Query) -> None:
         data = self.read_json()
-        text = str(data.get("path", "")).strip()
-        path = Path(text).expanduser()
-        here = path.is_absolute() and not text.startswith(("\\\\", "//"))
-        if not here or not path.is_file() or safe_name(path.name) is None:
+        path = local_file(str(data.get("path", "")))
+        if path is None:
             return self.reply(400, {"error": "file"})
-        self.accept(order_from(str(path.resolve()), data, path.name))
+        self.accept(order_from(str(path), data, path.name))
 
     def accept(self, order: Order) -> None:
-        refused = refusal(order)
-        if refused:
-            return self.reply(400, {"error": refused})
-        self.reply(200, self.board.submit(order).view())
+        reason = refusal(order)
+        if reason:
+            return self.reply(400, refused(order, reason))
+        self.reply(200, self.board.submit(stamped(order)).view())
 
     def upload(self, query: Query) -> None:
         name = safe_name(first(query, "name"))
         size = body_size(self.headers)
-        options = {k: first(query, k) for k in ("target", "mode", "dialect")}
-        refused = refusal(order_from("", options))
-        if name is None or not 0 < size <= MAX_UPLOAD or refused:
-            return self.reply(400, {"error": refused or ("big" if size > MAX_UPLOAD else "file")})
+        options = upload_options(query) or {}  # none: its own changes could not be read
+        reason = refusal(order_from("", options)) if options else "tweaks"
+        if reason:
+            return self.reply(400, refused(order_from("", options), reason))
+        if name is None or not 0 < size <= MAX_UPLOAD:
+            return self.reply(400, {"error": "big" if size > MAX_UPLOAD else "file"})
         folder = self.uploads / Task(Order("")).id
         folder.mkdir(parents=True, exist_ok=True)
         with (folder / name).open("wb") as out:

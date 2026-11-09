@@ -7,6 +7,8 @@ from tarjim.engines.choice import LISTENERS, TRANSLATORS, chosen
 from tarjim.engines.subscription import installed
 from tarjim.extension_home import extension_folder
 from tarjim.keys import status
+from tarjim.prefs.edit import change
+from tarjim.prefs.store import current
 from tarjim.server.guard import extension_origin
 from tarjim.server.onboard_routes import OnboardRoutes
 from tarjim.server.pairing import Pairing
@@ -19,8 +21,7 @@ from tarjim.ui_languages import available, codes
 GLOSSARY_CHARS = 5000
 MODEL_TAG = re.compile(r"^[\w.:/-]{2,80}$")
 FIELDS: dict[str, tuple[str, ...]] = {"ui_language": codes(), "listen_provider": LISTENERS,
-                                      "translate_provider": TRANSLATORS, "setup_done": ("yes",),
-                                      "video_mark": ("yes", "no")}
+                                      "translate_provider": TRANSLATORS, "setup_done": ("yes",)}
 Query = dict[str, list[str]]
 
 
@@ -35,6 +36,10 @@ def save_switches(data: dict[str, Any]) -> None:
         save("auto_update", "yes" if data["auto_update"] else "no")
     if isinstance(data.get("autostart"), bool):
         (autostart.enable if data["autostart"] else autostart.disable)()
+    if data.get("video_mark") in ("yes", "no"):
+        # The mark is look.mark in preferences.json since 2026-11-09: config.json's video_mark
+        # was no longer read once that file existed, so the switch did nothing.
+        change({"look.mark": data["video_mark"] == "yes"})
 
 
 class SetupRoutes(OnboardRoutes, PhoneRoutes, UpdateRoutes, VoiceRoutes):
@@ -69,6 +74,7 @@ class SetupRoutes(OnboardRoutes, PhoneRoutes, UpdateRoutes, VoiceRoutes):
         state["keys"] = status()
         state["chosen"] = {"listen": chosen("listen"), "translate": chosen("translate")}
         state["setup_done"] = "yes" if setup_finished() else ""
+        state["video_mark"] = "yes" if current().look.mark else "no"
         state["extension_path"] = extension_folder()
         state["local_model"] = setting("local_model")
         state["glossary"] = setting("glossary")

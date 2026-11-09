@@ -8,6 +8,7 @@ import { openWorkspace, repaintWorkspace } from "./workspace.js";
 import { repaintQuality } from "./quality.js";
 import { preferKeys } from "./connect.js";
 import { showSection } from "./ui.js";
+import { leavePrefs, openPrefs, repaintPrefs } from "./prefs.js";
 
 // Addresses that open settings on one section: the extension links here to add a key.
 const SECTIONS = { "#phone": "phone", "#connect": "connect", "#voice": "voice" };
@@ -18,21 +19,32 @@ async function boot() {
   fillLanguageMenu(setup.ui_languages, document.documentElement.lang);
   wireWizard();
   watchPairing();
-  $("ui-language").addEventListener("change", async () => {
-    await post("/setup", { ui_language: $("ui-language").value });
-    await load($("ui-language").value);
+  const speak = async (code) => {
+    await post("/setup", { ui_language: code });
+    await load(code);
     repaint();
     repaintAssistant();
     repaintQuality();
     repaintWorkspace();
-  });
+    repaintPrefs();
+  };
+  $("ui-language").addEventListener("change", () => speak($("ui-language").value));
   const manual = (from) => startWizard(setup, openWorkspace, from);
   const settings = async () => {
     $("open-settings").hidden = true;
     startSettings(await api("/setup"), openWorkspace, () => startAssistant(openWorkspace, manual));
   };
-  $("open-settings").addEventListener("click", settings);
+  // The settings button opens the settings page (2026-11-09); engines, keys and tools stay in
+  // the setup, one press away from its "عام" tab.
+  const prefs = () => {
+    $("open-settings").hidden = true;
+    const away = (then) => async (...args) => { await leavePrefs(); then(...args); };
+    return openPrefs({ close: away(openWorkspace), language: speak, engines: away(async () => settings()) },
+      $("target").value || "ar");
+  };
+  $("open-settings").addEventListener("click", prefs);
   if (setup.setup_done !== "yes" || location.hash === "#setup") return startAssistant(openWorkspace, manual);
+  if (location.hash === "#prefs") return prefs();
   const section = SECTIONS[location.hash];
   if (!section) return openWorkspace();
   if (section === "connect") preferKeys();

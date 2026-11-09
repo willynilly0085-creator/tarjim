@@ -9,6 +9,7 @@ from tarjim.whole import whole
 
 HEADROOM = 0.97
 VOICE_GAIN = 1.0
+FULL = 100  # dub.balance: the background at its own level, as it always was (2026-11-09)
 MIN_ROOM = 0.3
 GRACE = 0.25
 
@@ -26,10 +27,15 @@ def place(track: np.ndarray, line: Line, wav: np.ndarray) -> None:
 
 
 def mix(lines: list[Line], speech: list[np.ndarray], background: np.ndarray) -> np.ndarray:
+    """The voices over the music and sound under them, as loud as the person's dub.balance
+    keeps it; one balance, since the peak is brought to HEADROOM after (2026-11-09)."""
+    from tarjim.prefs.active import active
+
     track = np.zeros_like(background)
     for line, wav in zip(lines, speech, strict=True):
         place(track, line, wav)
-    track += background
+    balance = active().dub.balance
+    track += background if balance == FULL else background * (balance / FULL)
     peak = float(np.max(np.abs(track))) if track.size else 0.0
     return track * (HEADROOM / peak) if peak > HEADROOM else track
 

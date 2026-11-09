@@ -11,6 +11,7 @@ from tarjim.models import Word
 from tarjim.scripts import split_words
 
 PASSES = 3
+ONE_PASS = ("openai", "local")  # the listeners heard in one pass, whatever the setting
 CLOSE = 0.9
 
 Listen = Callable[[], tuple[str, list[Utterance]]]
@@ -52,9 +53,16 @@ class Heard:
     pieces: list[Piece] = field(default_factory=list)  # how a cloud listener heard it
     backup: bool = False  # heard by an engine after the chosen one: used, never kept
     empty: int = 0  # times the clip was heard with no speech in it, across runs
+    asked: int = PASSES  # passes asked of each piece: a kept one asked for others is not reused
 
 
-def listen_many(listen: Listen, passes: int = PASSES) -> Heard:
+def listen_many(listen: Listen, passes: int | None = None) -> Heard:
+    """The passes asked at once and voted on; as many as the job's listen.passes (2026-11-09),
+    odd, so a word is kept by a real majority of them."""
+    if passes is None:
+        from tarjim.prefs.active import active
+
+        passes = active().listen.passes
     with ThreadPoolExecutor(max_workers=passes) as pool:
         # each pass runs as part of the job: its programs are the job's, its cancel applies
         futures = [pool.submit(copy_context().run, listen) for _ in range(passes)]

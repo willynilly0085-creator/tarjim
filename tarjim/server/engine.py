@@ -5,13 +5,14 @@ from collections.abc import Callable
 from pathlib import Path
 
 from tarjim import same_code
-from tarjim.config import HOME, prepare_environment, private_home, save, setting, token
+from tarjim.config import HOME, prepare_environment, private_home, save, token
 from tarjim.fetch import is_url, resolve
 from tarjim.installer import module_command, wait_for_exit
 from tarjim.job import CHECKPOINT, PROGRESS, Job
+from tarjim.prefs.model import Prefs
 from tarjim.server.app import PORT, Handler, serve
 from tarjim.server.housekeeping import Undo
-from tarjim.server.jobs import DUBBING, Board, Task
+from tarjim.server.jobs import DUBBING, Board, Order, Task
 from tarjim.server.listener import Taken, take_port
 
 DOWNLOADS = Path.home() / "Downloads" / "tarjim"
@@ -25,6 +26,43 @@ def undo_for(job: Job) -> list[Undo]:
             Undo(work / stem), Undo(work, lambda name: name == stem)]
 
 
+def settings_for(order: Order) -> Prefs:
+    """The settings the order was made with; an order kept before 2026-11-09 has none, and
+    runs with what is saved now."""
+    from tarjim.prefs.job import from_snapshot
+    from tarjim.prefs.store import current, note
+
+    if not order.prefs:
+        return current(order.target, order.tweaks)
+    prefs = from_snapshot(order.prefs, order.target)
+    for line in prefs.notes:  # a folder gone since, a rule a newer release made stricter
+        note(line)
+    return prefs
+
+
+def folder_for(prefs: Prefs, downloads: Path) -> Path:
+    """Where the files go: the person's folder, or the usual one when they kept it, or when
+    theirs is gone (a drive taken out), which the settings' check already noted."""
+    from tarjim.prefs.table import SPECS
+
+    chosen = prefs.output.folder
+    if chosen == SPECS["output.folder"].default or not Path(chosen).is_dir():
+        return downloads
+    return Path(chosen)
+
+
+def job_for(task: Task, video: Path, downloads: Path) -> Job:
+    order = task.order
+    prefs = settings_for(order)
+    dub = DUBBING.get(order.mode, "")
+    folder = folder_for(prefs, downloads)
+    folder.mkdir(parents=True, exist_ok=True)
+    # a dub carries written subtitles unless the person wants the clean voice (2026-11-09)
+    burn = order.mode != "srt" and (not dub or prefs.output.burn_with_dub)
+    return Job(video, order.target, order.dialect, burn=burn, dub=dub, out_dir=folder,
+               cache_dir=HOME / "cache", relisten=order.relisten, prefs=prefs)
+
+
 def perform(task: Task, downloads: Path) -> None:
     order = task.order
     CHECKPOINT.set(task.checkpoint)
@@ -34,10 +72,7 @@ def perform(task: Task, downloads: Path) -> None:
     task.video = resolve(order.source, HOME / "sources", order.quality)
     task.checkpoint()
     task.moved = (0, 0)
-    downloads.mkdir(parents=True, exist_ok=True)
-    job = Job(task.video, order.target, order.dialect, burn=order.mode != "srt",
-              dub=DUBBING.get(order.mode, ""), out_dir=downloads, cache_dir=HOME / "cache",
-              relisten=order.relisten)
+    job = job_for(task, task.video, downloads)
     task.undo.extend(undo_for(job))
 
     def report(stage: str) -> None:
@@ -94,8 +129,8 @@ def run_alongside(port: int) -> Board:
     from tarjim.server.link_upgrade import refresh
     from tarjim.server.update_routes import watch
 
-    downloads = Path(setting("downloads") or DOWNLOADS)
-    board = Board(lambda task: perform(task, downloads), idle=release_models)
+    # the person's own folder comes with each order since 2026-11-09 (prefs output.folder)
+    board = Board(lambda task: perform(task, DOWNLOADS), idle=release_models)
     keep(board)
     sweep([HOME / "uploads", HOME / "sources", HOME / "cache"])
     service.begin(board, HOME / "uploads")

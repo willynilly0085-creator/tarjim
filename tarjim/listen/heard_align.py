@@ -11,6 +11,7 @@ from tarjim.asr.base import Transcript
 from tarjim.findings import findings
 from tarjim.job import Job
 from tarjim.listen.merge import Heard
+from tarjim.prefs.active import active
 
 
 def listen_and_align(job: Job, audio: Path, heard: Heard,
@@ -27,13 +28,19 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     wav, rate = soundfile.read(str(audio), dtype="float32")
     # first: its times correct a cloud listener's drift; the local listener is its own. Since
     # 2026-11-08 its words are used only where the sound confirms them (listen/opinion.sounded)
-    local = heard.local_words
-    opinion = hearing.second_opinion(audio, heard.language) if local is None else local
+    local, chosen = heard.local_words, active().listen
+    # turned off, a weak computer times on the sound alone, faster and less exactly (2026-11-09)
+    opinion = local
+    if opinion is None:
+        opinion = hearing.second_opinion(audio, heard.language) if chosen.second_opinion else []
     kept = sounded(opinion, wav)
     sound = settle.Sound(wav, rate, check.regions_in(wav), doubted(opinion, kept))
     done = settle.settled(job, heard, sound, kept)
     # shown on the job, the stretches given up too (2026-11-08)
     findings().heard(tuple((g.start, g.end) for g in done.left if not g.given_up),
                      done.agreement, tuple((g.start, g.end) for g in done.left if g.given_up))
-    words = by_voice(done.transcript.words, wav, rate)
+    # turned off, the speakers stay as the listener heard them and no voice print is fetched
+    words = done.transcript.words
+    if chosen.voice_check:
+        words = by_voice(words, wav, rate)
     return replace(done.transcript, words=words), done.whole and not heard.backup

@@ -60,6 +60,13 @@ def chain(role: str) -> list[str]:
     return [first, *backup]
 
 
+def tried(role: str, backup: bool) -> list[str]:
+    """The chain, or the chosen engine alone when the person turned this computer's backup off
+    (listen.local_backup and translate.local_backup, 2026-11-09)."""
+    found = chain(role)
+    return found if backup else found[:1]
+
+
 def local_translator() -> Asker:
     from tarjim.engines.local_servers import local_asker
 

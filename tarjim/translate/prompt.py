@@ -2,8 +2,10 @@ from dataclasses import dataclass
 
 from tarjim.languages import Language, language
 from tarjim.models import Cue, join_words
+from tarjim.prefs.model import Translate, resolve
 from tarjim.rules import DEFAULT_RULES, Rules
 from tarjim.translate.clean import MARKS
+from tarjim.translate.manner import added, fillers_rule, numbers_rule
 
 DIALECTS = {
     "saudi": "اللهجة السعودية البيضاء العفوية كما يتكلمها الناس يومياً "
@@ -16,16 +18,13 @@ ARABIC = """أنت مترجم أفلام ومسلسلات محترف. {have}قا
 
 المطلوب لكل خانة ترجمة عربية:
 - بـ{style}، وبنفس نبرة المتكلم (مزح، تعجب، سخرية، استغراب).
-{listen}- لا تتجاوز عدد الحروف المسموح للخانة (budget) — اختصر واحذف الحشو مثل \
-um و like و you know، مثل الترجمة الاحترافية. الـ budget المكتوب a+b حدّ لكل جزء من \
-الحوار لوحده، ولو رجّعت الخانة جملة واحدة فلك مجموعهما.
+{listen}- لا تتجاوز عدد الحروف المسموح للخانة (budget) — {fillers} الـ budget المكتوب a+b \
+حدّ لكل جزء من الحوار لوحده، ولو رجّعت الخانة جملة واحدة فلك مجموعهما.
 - ترجم الخانة لوحدها: لا تنقل كلاماً من خانة لخانة، ولا تدمج خانتين. لو الـ budget ما يكفي \
 جملة الخانة، اختصر ترجمتها هي، ولا ترحّل باقيها للخانة اللي بعدها.
 - {dialogue_rule}
-- أي عدد من 3 وفوق يُكتب بالأرقام اللاتينية 0-9 حتى لو نُطق كلمة \
-(three months ← 3 شهور، 18 times ← 18 مرة)؛ أما مرة ومرتين فتبقى كلمات. \
-بدون علامتي ؟ و ! مع بعض.
-- لو الخانة مجرد صوت بلا معنى، أرجع نصاً فارغاً.
+{numbers}
+{added}- لو الخانة مجرد صوت بلا معنى، أرجع نصاً فارغاً.
 
 أرجع JSON فقط: قائمة عناصر {{"id": رقم, "text": "الترجمة"}} لكل الخانات ({count}) بنفس الأرقام.
 
@@ -39,15 +38,14 @@ belongs to one speaker.
 For every slot write a {style} subtitle:
 - Natural, idiomatic, spoken {style} as in professional subtitles, keeping the speaker's tone \
 (joking, surprise, sarcasm, doubt).
-{listen}- Never exceed the slot's character budget: condense and drop fillers such as um, like and \
-you know, the way professional subtitlers do. A budget written a+b is a limit for each part \
-of an exchange on its own; one sentence for the whole slot may use their sum.
+{listen}- Never exceed the slot's character budget: {fillers} A budget written a+b is a limit \
+for each part of an exchange on its own; one sentence for the whole slot may use their sum.
 - Translate each slot on its own: never move words between slots and never merge slots. \
 If a slot's budget is too small for its sentence, shorten that slot's own translation; \
 never carry the rest into the next slot.
 - {dialogue_rule}
-- Write numbers of 3 and above as digits.
-- If a slot is only a meaningless sound, return an empty text.
+{numbers}
+{added}- If a slot is only a meaningless sound, return an empty text.
 
 Return JSON only: a list of {{"id": number, "text": "translation"}} for all {count} slots, \
 keeping the same ids.
@@ -75,6 +73,7 @@ GUESSED_SPEAKERS = {
 
 
 ARABIC_TARGET = language("ar")
+USUAL = resolve({}, {}, "ar").translate  # the prompt as it was before the settings
 HEARING = {
     "ar": ("معك الصوت الأصلي للمقطع، و",
            "- اسمع الصوت بنفسك وصحّح أي كلمة سمعها التفريغ الآلي غلط.\n"),
@@ -94,6 +93,7 @@ class Brief:
     glossary: tuple[tuple[str, str], ...] = ()
     slid: bool = False  # the last answer moved each translation into the next slot (drift.py)
     context: tuple[Cue, ...] = ()  # translated lines beside the asked ones, shown read only
+    manner: Translate = USUAL  # how the person wants it written (translate/manner.py)
 
     @property
     def arabic(self) -> bool:
@@ -137,9 +137,11 @@ def build_prompt(cues: list[Cue], brief: Brief) -> str:
     from tarjim.translate.glossary import instructions
 
     warning = SLID[key] if brief.slid else ""
+    manner = brief.manner
     return template.format(style=style, count=len(cues), items=items, dialogue_rule=rule,
-                           have=have, listen=listen) + instructions(brief.glossary) + warning + \
-        context_of(brief, key)
+                           have=have, listen=listen, fillers=fillers_rule(manner, key),
+                           numbers=numbers_rule(manner, key), added=added(manner, key)) + \
+        instructions(brief.glossary) + warning + context_of(brief, key)
 
 
 def format_item(number: int, cue: Cue, brief: Brief) -> str:

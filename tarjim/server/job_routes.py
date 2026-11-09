@@ -13,8 +13,14 @@ Query = dict[str, list[str]]
 
 def refusal(order: Order) -> str:
     """Why an order cannot be made, found when it is sent and not at the end of the work."""
+    from tarjim.translate.prompt import DIALECTS
+
     if order.mode not in MODES:
         return "mode"
+    if order.dialect not in DIALECTS:  # the prompt looked it up mid-job (2026-11-09)
+        return "dialect"
+    if order.tweaks and tweak_reasons(order):
+        return "tweaks"
     if order.mode not in DUBBING:
         return ""
     from tarjim.dub.make import DubUnavailable, choose
@@ -24,6 +30,25 @@ def refusal(order: Order) -> str:
     except DubUnavailable as error:
         return "dub_key" if "API key" in str(error) else "dub_language"
     return ""
+
+
+def tweak_reasons(order: Order) -> dict[str, str]:
+    """Why each of the order's own changes cannot be made: not a setting, not for one video,
+    a font this computer cannot write the language in, or a broken rule. Refused before the
+    job starts (2026-11-09)."""
+    from tarjim.prefs.job import vetted
+    from tarjim.prefs.store import load
+    from tarjim.prefs.view import font_refused
+
+    found = vetted(load().values, order.tweaks, order.target)
+    return {**font_refused(order.tweaks, order.target),
+            **{key: refusal.reason for key, refusal in found.items()}}
+
+
+def refused(order: Order, reason: str) -> dict[str, Any]:
+    """The answer to an order that cannot be made; with each refused change's reason."""
+    return {"error": reason, "refused": tweak_reasons(order)} if reason == "tweaks" else {
+        "error": reason}
 
 
 class JobRoutes:
@@ -36,8 +61,9 @@ class JobRoutes:
         raise NotImplementedError
 
     def check_order(self, _query: Query) -> None:
-        refused = refusal(order_from("", self.read_json()))
-        self.reply(400, {"error": refused}) if refused else self.reply(200, {"ok": True})
+        order = order_from("", self.read_json())
+        reason = refusal(order)
+        self.reply(400, refused(order, reason)) if reason else self.reply(200, {"ok": True})
 
     def reveal(self, _query: Query, task_id: str) -> None:
         self.on_output(task_id, desktop.reveal)

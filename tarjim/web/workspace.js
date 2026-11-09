@@ -6,6 +6,7 @@ import { recalledTarget, recallForm, recallVoice, remember } from "./order_memor
 import { problem } from "./problems.js";
 import { chosenQuality, forgetQuality, qualityBlocked, soundOnly, watchQuality } from "./quality.js";
 import { showUpdate } from "./update.js";
+import { clearTweaks, loadTweaks, repaintTweaks, showTweakRefusals, tweaks, watchTweaks } from "./order_tweaks.js";
 import { hasKey, linkedVoices, loadVoices, speechName, voicesKnown } from "./voices.js";
 
 const MEDIA = /\.(mp4|mkv|webm|mov|avi|m4v|mp3|m4a|wav|flac|ogg|opus|aac)$/i;
@@ -14,7 +15,8 @@ const state = { file: null, poll: 0, wired: false, recalled: false, languages: n
 const LINKED = { eleven: "voiceEleven", elevenclone: "voiceElevenClone", speech: "voiceSpeech" };
 const KEYED = { gemini: "gemini", fish: "fish", fishvoice: "fish" };
 const SEND = { "bad url": "sendBadLink", file: "sendFileBroken", big: "sendTooBig",
-  dub_language: "sendDubLanguage", dub_key: "sendDubKey", list: "err_list", mode: "actionFailed" };
+  dub_language: "sendDubLanguage", dub_key: "sendDubKey", list: "err_list", mode: "actionFailed",
+  dialect: "actionFailed", tweaks: "sendTweaks" };
 
 const linkReady = () => /^https?:\/\//i.test($("link").value.trim()) && !qualityBlocked();
 const ready = () => Boolean(state.file) || linkReady();
@@ -85,7 +87,8 @@ function take(file) {
 function choices() {
   const form = $("order");
   const output = form.mode.value;
-  return { target: $("target").value, dialect: form.dialect.value, mode: output === "dub" ? `dub-${$("voice").value}` : output };
+  return { target: $("target").value, dialect: form.dialect.value, mode: output === "dub" ? `dub-${$("voice").value}` : output,
+    tweaks: tweaks() };
 }
 
 function progress(fraction) {
@@ -98,11 +101,12 @@ function progress(fraction) {
 async function send() {
   if (!state.file) return post("/jobs", { url: $("link").value.trim(), ...choices(), quality: chosenQuality() });
   await post("/jobs/check", choices());
-  return upload(state.file, choices(), progress);
+  return upload(state.file, { ...choices(), tweaks: JSON.stringify(tweaks()) }, progress);
 }
 
 function sent() {
   say(t("started"));
+  clearTweaks();
   showFile(null);
   $("link").value = "";
   forgetQuality();
@@ -118,6 +122,7 @@ async function submit(event) {
     sent();
   } catch (error) {
     say(problem(error, SEND, { language: state.languages.get($("target").value) || "" }), true);
+    showTweakRefusals(error);
   } finally {
     $("go").textContent = t("translate");
     $("upload").hidden = true;
@@ -147,6 +152,7 @@ function wire() {
   watchQuality($("link"), sync);
   $("order").addEventListener("submit", submit);
   state.wired = true;
+  return true;
 }
 
 async function fillLanguages() {
@@ -158,13 +164,13 @@ async function fillLanguages() {
 
 // The recent jobs do not wait for the voices or the translator, which may ask services online.
 export async function openWorkspace() {
-  $("wizard").hidden = true;
-  $("assistant").hidden = true;
+  ["wizard", "assistant", "prefs"].forEach((id) => { $(id).hidden = true; });
   $("workspace").hidden = false;
   $("open-settings").hidden = false;
-  if (!state.wired) wire();
+  const fresh = !state.wired && wire();
   showUpdate();
   await fillLanguages();
+  if (fresh) watchTweaks($("target")); else loadTweaks($("target").value);
   clearInterval(state.poll);
   state.poll = watchJobs(state.languages);
   const first = !state.recalled;
@@ -176,4 +182,4 @@ export async function openWorkspace() {
   sync();
 }
 
-export const repaintWorkspace = () => markVoices();
+export const repaintWorkspace = () => { markVoices(); repaintTweaks(); };

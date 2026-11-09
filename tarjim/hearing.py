@@ -12,8 +12,13 @@ from tarjim.listen.heard_align import listen_and_align
 from tarjim.listen.kept import forget, keep_heard, keep_transcript, load_heard, reusable
 from tarjim.listen.merge import Heard
 from tarjim.models import Word
+from tarjim.prefs.active import active
 
 Regions = list[tuple[float, float]]
+# Said when the chosen listener heard nothing and the person keeps this computer's listener
+# from standing in (listen.local_backup, 2026-11-09): never a video quietly left with no lines.
+NO_STAND_IN = ("listening: the chosen listener heard no speech, and the listener on this "
+               "computer is turned off as its backup in the settings")
 # moved to listen/heard_align.py on 2026-11-08 and still offered here; the names tests and the
 # bench put other code in place of (cloud_listener, second_opinion, qwen_transcript) stay here
 __all__ = ["listen_and_align"]
@@ -50,12 +55,19 @@ def hear(job: Job, audio: Path, report: Callable[[str], None]) -> tuple[Transcri
     except QuotaExhausted:
         raise
     except RuntimeError as error:
-        return local_transcript(audio, error), False
+        return stand_in(audio, error), False
     if heard.utterances:
         return listen_and_align(job, audio, heard, report)
     if heard.local_words is not None:  # the local listener itself heard no speech
         return Transcript(language=heard.language, text=""), False
-    return local_transcript(audio), False
+    return stand_in(audio), False
+
+
+def stand_in(audio: Path, failure: RuntimeError | None = None) -> Transcript:
+    """This computer's listener in place of the chosen one, unless the person turned it off."""
+    if not active().listen.local_backup:
+        raise failure or RuntimeError(NO_STAND_IN)
+    return local_transcript(audio, failure)
 
 
 def heard_for(job: Job, audio: Path) -> Heard:
@@ -63,6 +75,8 @@ def heard_for(job: Job, audio: Path) -> Heard:
     with no speech in it is kept too and heard again at most TRIES times across runs, or until
     the person asks to listen again (2026-11-08: it was paid for in full on every run)."""
     kept = load_heard(job.cache)
+    if kept is not None and kept.asked != asked_for(kept.provider):
+        kept = None  # heard in another number of passes: heard again (2026-11-09)
     if kept is not None and (kept.utterances or kept.empty >= TRIES):
         return kept
     heard = listen_video(job.video, audio)
@@ -71,16 +85,24 @@ def heard_for(job: Job, audio: Path) -> Heard:
     return heard
 
 
+def asked_for(provider: str) -> int:
+    """How many passes a clip is heard in: the person's count, one for a single listener."""
+    from tarjim.listen.merge import ONE_PASS
+
+    return 1 if provider in ONE_PASS else active().listen.passes
+
+
 def listen_video(video: Path, audio: Path) -> Heard:
     """The chosen engine's hearing, or a backup's, marked so it is used but never kept."""
-    from tarjim.engines.choice import chain
+    from tarjim.engines.choice import tried
 
     failures: list[Exception] = []
-    for rank, provider in enumerate(chain("listen")):
+    for rank, provider in enumerate(tried("listen", active().listen.local_backup)):
         checkpoint()  # a backup engine is never started for a job that was cancelled
         try:
             heard = listen_with(provider, video, audio)
-            return replace(heard, provider=provider, backup=rank > 0)
+            return replace(heard, provider=provider, backup=rank > 0,
+                           asked=asked_for(provider))
         except (RuntimeError, OSError) as error:
             failures.append(error)
     raise failures[-1] if failures else RuntimeError("no listening engine")

@@ -15,7 +15,9 @@ def speaks_in_parts(cue: Cue, rules: Rules = DEFAULT_RULES) -> bool:
 
 
 def reveal_at(cue: Cue, rules: Rules = DEFAULT_RULES) -> float | None:
-    if not speaks_in_parts(cue, rules):
+    """When the second speaker's line shows; None shows both lines at once, as the person
+    can choose since 2026-11-09."""
+    if not rules.staged or not speaks_in_parts(cue, rules):
         return None
     moment = cue.parts[-1][0].start
     fits = cue.start + MIN_STAGE <= moment <= cue.end - MIN_STAGE

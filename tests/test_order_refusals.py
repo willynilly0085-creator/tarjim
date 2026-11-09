@@ -52,6 +52,16 @@ def test_a_dub_into_a_language_no_voice_speaks_is_refused_when_sent(port: int) -
     assert call(port, "POST /jobs/check", {**order, "mode": "evil"})[1] == {"error": "mode"}
 
 
+def test_a_dialect_tarjim_does_not_know_is_refused_when_sent(port: int) -> None:
+    """2026-11-09: the prompt looked the dialect up mid-job, so an unknown one failed the job
+    part way through, after the clip was heard and paid for."""
+    order = {"url": "https://example.com/v", "target": "ar", "dialect": "egyptian"}
+    assert call(port, "POST /jobs", order) == (400, {"error": "dialect"})
+    assert call(port, "POST /jobs/check", order) == (400, {"error": "dialect"})
+    for dialect in ("saudi", "msa", ""):
+        assert call(port, "POST /jobs/check", {**order, "dialect": dialect}) == (200, {"ok": True})
+
+
 def test_a_linked_voice_without_its_key_is_refused_when_sent(port: int) -> None:
     order = {"url": "https://example.com/v", "target": "fr", "mode": "dub-eleven"}
     assert call(port, "POST /jobs", order) == (400, {"error": "dub_key"})
