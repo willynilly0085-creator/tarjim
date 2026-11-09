@@ -503,6 +503,7 @@
   "prefsResetTab": "رجّع هالقسم للأصلي",
   "prefsResetAll": "رجّع كل شي للأصلي",
   "prefsResetAllSure": "بيرجع {n} إعداد للأصلي. أكيد؟",
+  "prefsResetAllOthers": "يشمل اللي غيرته للغات الثانية بعد.",
   "prefsResetAllYes": "إيه، رجّعها",
   "prefsNo": "لا",
   "prefsNothingChanged": "كل الإعدادات على الأصلي.",

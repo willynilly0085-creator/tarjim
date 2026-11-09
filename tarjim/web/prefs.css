@@ -19,6 +19,7 @@ body:has(#prefs:not([hidden])) .bar, main.prefs { width: min(1040px, 100% - 32px
   border-radius: var(--radius); background: var(--raised); }
 .preset-name .text-input { flex: 1 1 200px; min-height: 36px; }
 .reset-sure p { flex: 1 1 100%; font-weight: 550; }
+.reset-sure p.meta { margin-top: calc(-1 * var(--space-xs)); font-weight: 400; }
 .preset-own summary { width: fit-content; color: var(--muted); font-size: var(--text-meta); cursor: pointer; }
 .preset-own ul { display: grid; gap: var(--space-xs); margin: var(--space-xs) 0 0; padding: 0; list-style: none; }
 .preset-own li { display: flex; align-items: center; gap: var(--space-xs); }

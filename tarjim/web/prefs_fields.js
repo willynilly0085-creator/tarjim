@@ -11,7 +11,9 @@ const MOST_COLOURS = 6;
 let made = 0;
 
 const fresh = (key) => `pref-${key.replace(/\W/g, "-")}-${(made += 1)}`;
-const numberOf = (spec, raw) => (Number.isInteger(spec.default) ? Math.round(Number(raw)) : Number(raw));
+// The engine says whether a number is whole (2026-11-09): 17.0 arrives here as 17, so going by
+// the default sent 18 for 17.5 letters a second and 0 for a 0.4 s gap, under its own lowest.
+const numberOf = (spec, raw) => (spec.whole ? Math.round(Number(raw)) : Number(raw));
 const readout = (spec, value) => withUnit(spec.key, value);
 
 function slider(spec, id, said) {

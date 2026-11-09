@@ -503,6 +503,7 @@
   "prefsResetTab": "Reset this section",
   "prefsResetAll": "Reset everything",
   "prefsResetAllSure": "{n} settings will go back to the original. Sure?",
+  "prefsResetAllOthers": "Other languages' own settings go back too.",
   "prefsResetAllYes": "Yes, reset them",
   "prefsNo": "No",
   "prefsNothingChanged": "Everything is already at the original.",

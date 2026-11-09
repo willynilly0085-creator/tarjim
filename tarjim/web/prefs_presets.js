@@ -66,8 +66,11 @@ export function makePresets(hooks) {
     return el("li", {}, el("span", { className: "preset-own-name", textContent: name }), rename, drop);
   }
 
+  // Counted from what the engine puts back in every language (2026-11-09), not only the one
+  // shown: another language's own font or reading speed goes back too, and is said so.
   function askAll() {
-    const count = hooks.state().changed.length;
+    const { changed_all: everything = [], others } = hooks.state();
+    const count = everything.length;
     if (!count) return hooks.say(t("prefsNothingChanged"));
     const yes = button(t("prefsResetAllYes"), async () => {
       sure.hidden = true;
@@ -75,7 +78,8 @@ export function makePresets(hooks) {
       all.focus();
     }, "primary compact");
     const no = button(t("prefsNo"), () => { sure.hidden = true; all.focus(); });
-    sure.replaceChildren(el("p", { textContent: t("prefsResetAllSure", { n: count }) }), yes, no);
+    const elsewhere = others ? el("p", { className: "meta", textContent: t("prefsResetAllOthers") }) : "";
+    sure.replaceChildren(el("p", { textContent: t("prefsResetAllSure", { n: count }) }), elsewhere, yes, no);
     sure.hidden = false;
     yes.focus();
   }

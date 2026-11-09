@@ -41,10 +41,21 @@ IDLE: tuple[tuple[tuple[str, ...], Callable[[Values, str], bool], str], ...] = (
 
 
 def row(spec: Spec) -> dict[str, Any]:
+    # "whole" (2026-11-09): 17.0 reaches the page's script as 17, so the default cannot tell
+    # it a decimal setting; it rounded 17.5 letters a second to 18 and a 0.4 s gap to 0.
+    whole = isinstance(spec.default, int) and not isinstance(spec.default, bool)
     return {"key": spec.key, "group": spec.group, "tier": spec.tier, "kind": spec.kind,
             "label": spec.label, "default": spec.default, "low": spec.low, "high": spec.high,
-            "step": spec.step, "choices": list(spec.choices),
+            "step": spec.step, "whole": whole, "choices": list(spec.choices),
             "per_language": spec.per_language, "per_job": spec.per_job}
+
+
+def everywhere(values: Values, target: str) -> tuple[list[str], bool]:
+    """What reset("all") puts back, in every language, and whether that reaches another
+    language's own values (2026-11-09): the page counted only the language it shows."""
+    keys = [k for k in SPECS if values.get(k) is not None]
+    others = any(isinstance(values[k], dict) and set(values[k]) - {target} for k in keys)
+    return keys, others
 
 
 def idle(values: Values, target: str) -> dict[str, str]:
@@ -57,10 +68,12 @@ def state(target: str, group: str = "") -> dict[str, Any]:
     kept, prefs, start = load(), current(target), defaults(target)
     keys = in_group(group) if group else list(SPECS)
     quiet = idle(prefs.values, target)
+    everything, others = everywhere(kept.values, target)
     return {"language": target, "groups": list(GROUPS),
             "specs": [row(SPECS[k].at(target)) for k in keys],
             "values": {k: prefs.values[k] for k in keys},
             "changed": [k for k in keys if prefs.values[k] != start[k]],
+            "changed_all": everything, "others": others,
             "idle": {k: why for k, why in quiet.items() if k in keys},
             "preset": active(kept.values, kept.presets),
             "presets": {"built_in": list(BUILT_IN), "own": sorted(kept.presets)},

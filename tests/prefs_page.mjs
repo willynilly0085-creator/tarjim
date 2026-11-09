@@ -86,7 +86,7 @@ async function presets() {
 }
 
 async function reset() {
-  engine.state = { ...engine.state, changed: ["look.size_wide", "look.bold"] };
+  engine.state = { ...engine.state, changed: ["look.size_wide", "look.bold"], changed_all: ["look.size_wide", "look.bold"] };
   await (await import(`${web}/prefs.js`)).reload();
   field("look.size_wide").querySelector(".pref-reset").click();
   await wait(50);
@@ -100,5 +100,35 @@ async function reset() {
   return { posts: posts(), question, before, status: $(".prefs-status").textContent };
 }
 
-const SCENARIOS = { autosave, refusal, presets, reset };
+// A decimal whose default is whole (17.0 reaches here as 17) is sent as the slider shows it.
+async function decimals() {
+  $('.prefs-tab[data-tab="timing"]').click();
+  await wait(50);
+  const moved = { "text.reading_cps": "17.5", "timing.join_gap": "0.4", "timing.max_duration": "6.5" };
+  for (const [key, value] of Object.entries(moved)) {
+    const range = field(key).querySelector("input");
+    range.value = value;
+    range.fire("input");
+  }
+  engine.save = { saved: Object.keys(moved), refused: {}, notes: [] };
+  await wait(600);
+  return { posts: posts(), readout: field("text.reading_cps").querySelector("output").textContent };
+}
+
+// Everything puts back every language's own values: counted from what the engine would reset.
+async function resetElsewhere() {
+  const ask = async (changed, all) => {
+    engine.state = { ...engine.state, changed, changed_all: all, others: true };
+    await (await import(`${web}/prefs.js`)).reload();
+    $(".reset-all").click();
+    return { question: $(".reset-sure").hidden ? "" : $(".reset-sure").textContent, status: $(".prefs-status").textContent };
+  };
+  const only = await ask([], ["text.reading_cps"]);
+  const more = await ask(["look.bold"], ["look.bold", "text.reading_cps", "text.line_chars"]);
+  $(".reset-sure").querySelectorAll("button")[0].click();
+  await wait(50);
+  return { only, more, posts: posts() };
+}
+
+const SCENARIOS = { autosave, refusal, presets, reset, decimals, resetElsewhere };
 console.log(JSON.stringify(await SCENARIOS[scenario]()));

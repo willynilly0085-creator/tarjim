@@ -83,6 +83,31 @@ def test_reset_is_one_setting_one_tab_or_everything_after_one_question(tmp_path:
     assert seen["status"] == AR["prefsResetDone"]
 
 
+@needs_node
+@pytest.mark.usefixtures("prefs_home")
+def test_a_decimal_is_sent_as_the_slider_shows_it(tmp_path: Path) -> None:
+    """17.0 reaches the script as 17: rounding by the default sent 18, 0 and 7 (2026-11-09)."""
+    seen = run_page("decimals", tmp_path)
+    assert seen["posts"] == [["POST", "/prefs", {"values": {
+        "text.reading_cps": 17.5, "timing.join_gap": 0.4, "timing.max_duration": 6.5},
+        "language": "ar"}]]
+    assert seen["readout"].startswith("17.5")
+
+
+@needs_node
+@pytest.mark.usefixtures("prefs_home")
+def test_everything_counts_and_names_other_languages_values(tmp_path: Path) -> None:
+    seen = run_page("resetElsewhere", tmp_path)
+    others = AR["prefsResetAllOthers"]
+    # only another language's value changed: still asked, not "everything is original"
+    assert seen["only"]["status"] != AR["prefsNothingChanged"]
+    assert AR["prefsResetAllSure"].replace("{n}", "1") in seen["only"]["question"]
+    assert others in seen["only"]["question"]
+    assert AR["prefsResetAllSure"].replace("{n}", "3") in seen["more"]["question"]
+    assert others in seen["more"]["question"]
+    assert [p[1:] for p in seen["posts"]] == [["/prefs/reset", {"all": True}]]
+
+
 def test_every_setting_has_words_in_every_interface_language() -> None:
     for code in codes():
         words = json.loads((FOLDER / f"{code}.json").read_text(encoding="utf-8"))
