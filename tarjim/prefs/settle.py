@@ -6,6 +6,7 @@ release made stricter) the offending setting goes back to its default with a not
 server.log, so a job never fails because of a setting. When a preset is applied its own values
 stay and the other setting moves to the nearest value that works.
 """
+import math
 from collections.abc import Iterable
 from typing import Any
 
@@ -13,12 +14,18 @@ from tarjim.prefs.checks import RULES, Rule, broken
 from tarjim.prefs.spec import Refusal, Spec, Value, refuse
 from tarjim.prefs.table import SPECS
 
-SPREAD = 100  # values tried across a range that has no step
+SPREAD = 100  # values tried across a range that has no step, at least
+
+
+def even_step(spec: Spec) -> float:
+    """A round step for a range that has none, so a refusal offers 0.2 and not 0.1996
+    (2026-11-09)."""
+    return spec.step or 10 ** math.floor(math.log10((spec.high - spec.low) / SPREAD))
 
 
 def candidates(spec: Spec, near: Any) -> list[Value]:
     if spec.kind == "number":
-        step = spec.step or (spec.high - spec.low) / SPREAD
+        step = even_step(spec)
         count = round((spec.high - spec.low) / step)
         grid = [spec.low + i * step for i in range(count + 1)]
         typed = [round(v) if isinstance(spec.default, int) else round(v, 4) for v in grid]

@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from tarjim import assistant, assistant_settings
+from tarjim import assistant, assistant_prefs, assistant_settings
 from tarjim.server.routes import GET_ROUTES, POST_ROUTES
 
 SECRET_WORDS = ("key", "token", "password", "secret")
@@ -16,7 +16,8 @@ HUMAN_ONLY = {"save_key", "phone_connect", "phone_forget", "ask_pair", "decide_p
 NOT_SETTINGS = {"ping", "home", "asset", "legacy", "upload", "create_local", "send_output",
                 "system", "ui_language", "local_models", "scan_part", "reveal", "play",
                 "current_connection", "signed_in", "sign_in_code", "local_program",
-                "link_assistant", "phone_link", "key_status", "check_order"}
+                "link_assistant", "phone_link", "key_status", "check_order",
+                "prefs_preview"}  # a picture for the page, not a setting (2026-11-09)
 
 
 @pytest.fixture
@@ -60,7 +61,8 @@ def test_every_setting_the_page_can_change_has_a_chat_tool(asked: list[tuple[str
 
 
 def test_each_route_that_changes_a_setting_is_reached_by_some_tool() -> None:
-    source = inspect.getsource(assistant) + inspect.getsource(assistant_settings)
+    source = "".join(inspect.getsource(m) for m in (assistant, assistant_settings,
+                                                     assistant_prefs))
     for pattern, name in [*GET_ROUTES, *POST_ROUTES]:
         if name in HUMAN_ONLY | NOT_SETTINGS:
             continue

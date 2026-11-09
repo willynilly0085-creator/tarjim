@@ -75,11 +75,12 @@ def change(wanted: dict[str, Any], language: str = "ar") -> Outcome:
     with config.SAVING:
         kept = for_saving()
         clean, refused = parsed(wanted, language)
-        refused |= elsewhere(kept.values, clean, language)
-        clean = {k: v for k, v in clean.items() if k not in refused}
         before = resolve(kept.values, {}, language).values
         after, broke = changes(before, clean, language)
         refused |= {key: refusal.reason for key, refusal in broke.items()}
+        # Another language is named only for what this one takes (2026-11-09).
+        refused |= elsewhere(kept.values, {k: v for k, v in clean.items() if k not in refused},
+                             language)
         saved = [key for key in clean if key not in refused]
         for key in saved:
             stored(kept.values, key, after[key], language)
