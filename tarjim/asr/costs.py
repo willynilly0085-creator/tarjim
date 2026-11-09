@@ -8,8 +8,10 @@ spread is reported (scripts/synth/decode_bench.py) rather than trusted to set th
 (2026-11-08). With too few runs found (a chant, music, letters a script reads poorly), there is
 nothing to measure, and with many letters heard inside the found runs that their text does not
 explain (letters lost or wrong in reading the script, two voices at once) the letters cannot be
-trusted to tell a word not said: either way the aligner stays strict, no star and no skip.
+trusted to tell a word not said: either way the aligner stays strict, no star and no skip. So
+it does on a clip much of whose speech only its letters hear (SUNG).
 """
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import NamedTuple
 
@@ -18,6 +20,7 @@ from numpy.typing import NDArray
 
 from tarjim.asr.agree import FOUND
 from tarjim.asr.ctc import BLANK, FRAME, token_spans
+from tarjim.asr.letters import Key
 
 STAR_ENTER = 2.0  # nats, paid once on entering the star
 SKIP_BASE = 5.0  # nats for stepping over a word the sound does not hold
@@ -33,6 +36,12 @@ MIN_FRAMES = 200  # letter frames in them, likewise
 # two voices over each other 0.22; 60% of the letters dropped (kanji read as pinyin) >= 0.53;
 # 30% wrong >= 0.28. With either spoilt reading the skip left out 8-20% of the words said.
 UNEXPLAINED = 0.15
+# the share of a clip's speech its letters alone hear (asr/speechmap.SpeechMap.sung: a chant, a
+# song, a vocal bed the voice detector takes for no voice) from which it is read strictly. The
+# review of 2026-11-09: on en_chant_bed (0.35) the star fed on the chant and moved a word of a
+# text said exactly 0.28 s early; every other bench clip is 0.00. The spread above cannot tell
+# it: on every clip measured the star sat at FLOOR.
+SUNG = 0.1
 SHARE = 80  # the percentile of the spread the star is priced at
 MARGIN = 1.0
 FLOOR, CEILING = 1.0, 6.0  # nats below the loudest letter the star may sit
@@ -125,3 +134,28 @@ def calibrated(logp: NDArray[np.floating], runs: list[Run], skip: bool = False) 
     """The clip's prices; None, so the aligner stays strict, when too few runs are found."""
     delta = delta_of(measured(logp, runs))
     return None if delta is None else Costs(delta, skip=skip)
+
+
+@dataclass(frozen=True)
+class Calibration:
+    """What one clip was measured to allow: the prices (None: strict), and the score below
+    which a run is taken for not said where it is timed (agree.clip_baseline)."""
+    costs: Costs | None
+    baseline: float
+
+
+class Calibrations:
+    """One clip's calibration, made once and kept for that clip alone, as its letters are
+    (asr/letters.Letters): every timing of the clip, a stretch of it included, prices its
+    letters alike (2026-11-09)."""
+
+    def __init__(self) -> None:
+        self.last: tuple[Key, Calibration] | None = None
+        self.made = 0  # clips measured, for the tests
+
+    def __call__(self, key: Key, make: Callable[[], Calibration]) -> Calibration:
+        if self.last is None or self.last[0] != key:
+            self.last = None
+            self.last = (key, make())
+            self.made += 1
+        return self.last[1]

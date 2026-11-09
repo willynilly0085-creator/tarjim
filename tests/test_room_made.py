@@ -143,7 +143,7 @@ def test_a_mode_setting_is_in_the_derive_key(
     monkeypatch.setattr(config, "CONFIG", tmp_path / "config.json")
     before = kept.derive_key()
     monkeypatch.setenv("TARJIM_ALIGNER_MODE", "tolerant")
-    assert "aligner_mode" in kept.MODES and kept.derive_key() != before
+    assert "listen.aligner" in kept.MODES and kept.derive_key() != before
 
 
 def test_the_moved_names_are_still_found_where_they_were() -> None:

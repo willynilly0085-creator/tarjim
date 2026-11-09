@@ -41,7 +41,8 @@ DERIVED_FROM = ("listen", "asr", "segment.py", "dialogue.py", "model_pins.py", "
 # the settings that choose how a hearing is derived; each later mode setting joins them. Since
 # 2026-11-09 the person's own listening settings too (tarjim/prefs), each named in the key only
 # when it is not its default, so a transcript kept before them is still the one derived now.
-MODES = ("aligner_mode", "listen.passes", "listen.second_opinion", "listen.voice_check")
+# The aligner's mode is the person's setting listen.aligner since 2026-11-09 (it was read raw).
+MODES = ("listen.aligner", "listen.passes", "listen.second_opinion", "listen.voice_check")
 
 Row = dict[str, Any]
 # the record of stretches asked again lived here before 2026-11-08 (now listen/asked.py)

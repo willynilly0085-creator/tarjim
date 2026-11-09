@@ -1,6 +1,7 @@
 """Each default is what tarjim did before the setting existed (2026-11-09): a person who never
 opens the settings gets the same subtitles, timing, hearing and files as before."""
 from tarjim import media
+from tarjim.asr import tolerated
 from tarjim.dub import clone, mix
 from tarjim.languages import LANGUAGES
 from tarjim.lines import DASH
@@ -74,6 +75,8 @@ def test_hearing_files_and_dubbing_are_as_before() -> None:
     assert prefs.listen.passes == merge.PASSES
     assert prefs.listen.chunk_seconds == chunks.CHUNK_SECONDS
     assert prefs.listen.gap_seconds == coverage.GAP_SECONDS
+    # the aligner reads strictly, as it did before the tolerant mode (2026-11-09)
+    assert prefs.listen.aligner == tolerated.STRICT
     assert prefs.output.folder == default_folder() == str(engine.DOWNLOADS)
     assert prefs.dub.clone_steps == clone.STEPS and mix.VOICE_GAIN == 1.0
     assert prefs.dub.balance == 100 and prefs.output.enlarge == "1080"

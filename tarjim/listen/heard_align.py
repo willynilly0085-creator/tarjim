@@ -24,6 +24,7 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     from tarjim.listen import settle
     from tarjim.listen.clipmap import Clip, clip_map
     from tarjim.listen.opinion import backing, doubted, held, sounded
+    from tarjim.listen.timing import final_scores
     from tarjim.listen.whose import by_voice
 
     report("timing")
@@ -43,9 +44,10 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     findings().heard(tuple((g.start, g.end) for g in done.left if not g.given_up),
                      done.agreement, tuple((g.start, g.end) for g in done.left if g.given_up))
     # turned off, the speakers stay as the listener heard them and no voice print is fetched
-    words = done.transcript.words
-    if chosen.voice_check:
-        words = by_voice(words, wav, rate)
+    words = by_voice(done.transcript.words, wav, rate) if chosen.voice_check \
+        else done.transcript.words
+    # each run's strict score, read once on the words as shown, their speakers final (2026-11-09)
+    words = final_scores(wav, words)
     return replace(done.transcript, words=words), done.whole and not heard.backup
 
 

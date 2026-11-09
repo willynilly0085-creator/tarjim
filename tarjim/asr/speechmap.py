@@ -72,6 +72,11 @@ class SpeechMap:
         """Speech the letters heard and the detector did not: chant, singing."""
         return spans_of((self.tier == SPEECH) & ~self.vad)
 
+    def sung(self) -> float:
+        """The share of the speech the letters alone heard (asr/costs.SUNG, 2026-11-09)."""
+        total = sum(b - a for a, b in self.speech())
+        return sum(b - a for a, b in self.ctc_only()) / total if total else 0.0
+
     def speech(self) -> list[Span]:
         """The detector's speech with what only the letters heard: what coverage checks."""
         return merged([*self.regions, *self.ctc_only()])

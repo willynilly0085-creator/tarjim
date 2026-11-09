@@ -77,6 +77,7 @@ class Listen:
     local_backup: bool
     second_opinion: bool
     voice_check: bool
+    aligner: str
 
 
 @dataclass(frozen=True)
