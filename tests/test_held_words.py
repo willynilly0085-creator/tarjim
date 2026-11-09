@@ -6,8 +6,9 @@ the bench's en_long_three_pieces "rails, like a drawer. The first" (a run scorin
 bar) and two "a" with no length were left out of a 9 s stretch, and in en_long_seven "a picture of
 the moon." at a stretch's end; their subtitles went missing. The listener says its words in order,
 so words between two it said where the sound confirms them were said between those two; when
-their own times leave little more room than that, the stretch is theirs. Words with no kept word
-on one side, or with room for a drift, stay out, as A1 meant."""
+those two are close, the words cannot be far from where they are timed. Words with no kept word
+on one side, or between kept ones far apart, stay out, as A1 meant: on the Arabic dialogue 126
+words between kept ones far apart were timed up to 31 s off, filling the time between evenly."""
 from pathlib import Path
 from typing import Any
 
@@ -35,7 +36,7 @@ def said(text: str, start: float, step: float = 0.4) -> list[Word]:
 
 BEFORE = said("we built a roof that slides on", 20.0)  # 20.0-22.7
 RAILS = said("rails like a drawer the first", 22.8)  # under the bar, 22.8-25.1
-AFTER = said("version got stuck halfway every single", 25.2)
+AFTER = said("version got stuck halfway every single", 25.12)  # 2.42 s after BEFORE
 ALL = [*BEFORE, *RAILS, *AFTER]
 KEPT = [*BEFORE, *AFTER]
 
@@ -53,9 +54,17 @@ def test_words_past_the_last_kept_one_are_not_held() -> None:
     assert held([*BEFORE, *RAILS], BEFORE) == BEFORE
 
 
-def test_words_with_room_for_a_drift_between_the_kept_ones_are_not_held() -> None:
+def test_words_between_kept_ones_far_apart_are_not_held() -> None:
     late = said("version got stuck halfway every single", 29.0)  # 3.8 s past the words between
     assert held([*BEFORE, *RAILS, *late], [*BEFORE, *late]) == [*BEFORE, *late]
+
+
+def test_words_spread_over_a_long_time_between_kept_ones_are_not_held() -> None:
+    """Drifted words timed evenly between two kept words 20 s apart leave them no room at all,
+    yet any of them can be 20 s off."""
+    drifted = said(" ".join(f"w{k}" for k in range(50)), 22.8)  # 22.8-42.7
+    after = said("version got stuck", 42.8)
+    assert held([*BEFORE, *drifted, *after], [*BEFORE, *after]) == [*BEFORE, *after]
 
 
 def test_nothing_is_held_when_none_was_kept() -> None:

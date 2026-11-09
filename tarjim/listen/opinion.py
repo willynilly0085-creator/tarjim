@@ -21,9 +21,12 @@ from tarjim.translate.glossary import language_code
 if TYPE_CHECKING:
     from tarjim.asr.confirm import Kept
 
-# seconds the words between two kept ones may leave between them beyond their own length: a run
-# is looked for SLACK either side of its time (asr/agree.SLACK), so twice that (2026-11-09)
-ROOM = 1.0
+# seconds at most between two kept words that hold the words between them in place: those words
+# were said in that time, so none is further off. The drift the anchor leaves to the aligner
+# (asr/anchor.DRIFT) and the 0.5 s a line's times are rough (coverage.EDGE). On the bench the
+# right ones lay up to 2.3 s apart; on the Arabic dialogue 126 words between kept ones far apart
+# were timed up to 31 s off, filling the time between evenly (2026-11-09).
+SPAN = 2.5
 
 
 def named(languages: str) -> set[str]:
@@ -79,8 +82,8 @@ def backing(words: list[Word], kept: list[Word]) -> list[Word]:
 
 def held(words: list[Word], kept: list[Word]) -> list[Word]:
     """The kept words, with each stretch of left-out ones that kept words either side hold in
-    place: the listener says its words in order, so those were said between the two, and their
-    own times leave at most ROOM more between them (2026-11-09). What fills speech the cloud
+    place: the listener says its words in order, so those were said between the two, when the
+    two are at most SPAN apart (2026-11-09). What fills speech the cloud
     listener left out (listen/coverage.gaps): with the kept words alone it had holes, a run
     under the clip's bar or a word with no length (the bench's long clips, 13 to 21 missing)."""
     ordered, used = sorted(words, key=lambda w: w.start), set(kept)
@@ -94,11 +97,8 @@ def held(words: list[Word], kept: list[Word]) -> list[Word]:
 
 
 def pinned(before: Word, between: list[Word], after: Word) -> bool:
-    """Words between two kept ones that leave little room for a drift (none: nothing to hold)."""
-    if not between:
-        return True
-    own = between[-1].end - between[0].start
-    return after.start - before.end - own <= ROOM
+    """Whether the kept words around a stretch are close enough to hold it (none: nothing to)."""
+    return not between or after.start - before.end <= SPAN
 
 
 def told(kept: "Kept") -> None:
