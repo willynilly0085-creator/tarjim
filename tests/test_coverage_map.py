@@ -11,10 +11,11 @@ import pytest
 
 from tarjim.asr.base import Transcript
 from tarjim.asr.ctc import FRAME
-from tarjim.asr.speechmap import HARD, SPEECH, SpeechMap
+from tarjim.asr.speechmap import HARD, SOFT, SPEECH, SpeechMap
 from tarjim.job import Job
 from tarjim.listen import check, settle
-from tarjim.listen.coverage import NOT_REPAIRED, UNCHECKED, Gap, Hearing, gaps, speech_of
+from tarjim.listen.bysound import UNCHECKED
+from tarjim.listen.coverage import NOT_REPAIRED, Gap, Hearing, gaps, speech_of
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.merge import Heard
 from tarjim.listen.novel import Again
@@ -27,11 +28,13 @@ FAR = [Word("far", 50.0, 50.3)]  # the local listener ran, and heard nothing nea
 MURMUR = [Word(f"m{k}", 30.0 + 0.5 * k, 30.4 + 0.5 * k) for k in range(8)]  # 30-34 s, local only
 
 
-def sound_map(speech: list[tuple[float, float]], source: str = "vad+ctc") -> SpeechMap:
+def sound_map(speech: list[tuple[float, float]], source: str = "vad+ctc",
+              pad: float = 0.0) -> SpeechMap:
+    """The detector's speech `speech`, padded by `pad` in the map's frames as asr/vad pads it."""
     frames = int(60.0 / FRAME)
     vad = np.zeros(frames, dtype=bool)
     for start, end in speech:
-        vad[int(start / FRAME):int(end / FRAME)] = True
+        vad[round((start - pad) / FRAME):round((end + pad) / FRAME)] = True
     tier = np.where(vad, SPEECH, HARD).astype(np.int8)
     return SpeechMap(vad, tier, 0.1, source, tuple(speech))
 
@@ -75,7 +78,7 @@ def test_local_words_where_the_sound_holds_no_speech_are_given_up_and_listed(
     assert murmur.given_up and murmur.words == MURMUR and mended.added == []
     assert all(start < 29.0 for start, _end in asked.calls)  # never asked about
     log = capsys.readouterr().out
-    assert "the sound holds no speech (0% of it)" in log
+    assert "the sound holds no speech (0% of it not silent)" in log
     assert "no speech here by the sound; not asked again" in log
 
 
@@ -87,6 +90,40 @@ def test_local_words_are_judged_only_when_the_letters_were_heard(
     mended = mend(hearing(MURMUR, sound_map(TALK, source="none")), Asked(), "x")
     assert [u.text.split()[0] for u in mended.added] == ["m0"]
     assert UNCHECKED in capsys.readouterr().out
+
+
+def test_quiet_speech_the_letters_partly_heard_is_filled_from_the_local_words() -> None:
+    """Of a stretch only the local words call speech the map's own speech is never part, so it is
+    judged by how much of it the letters call silent (review of 2026-11-09): judged by the share
+    the map called speech, every such stretch was given up, quiet speech too."""
+    speech_map = sound_map(TALK)
+    speech_map.tier[round(30.0 / FRAME):round(34.0 / FRAME)] = SOFT
+    [murmur] = [g for g in gaps(hearing(MURMUR, speech_map)) if g.start >= 29.0]
+    assert not murmur.unspoken and murmur.sound.startswith("the sound holds speech (100%")
+    mended = mend(hearing(MURMUR, speech_map), Asked(), "x")
+    assert [u.text.split()[0] for u in mended.added] == ["m0"]
+    assert all(not g.given_up for g in mended.left)
+
+
+SHORT = [(0.0, 10.0), (20.0, 21.9)]  # 1.9 s found by the detector, 2.1 s with the map's padding
+NEAR = [Word(f"n{k}", 20.0 + 0.3 * k, 20.3 + 0.3 * k) for k in range(7)]  # 20.0-22.1 s
+
+
+def test_a_gap_is_the_same_with_or_without_the_local_listener() -> None:
+    """On 2026-11-09 a 1.9 s stretch of the detector's speech was a gap only with the local words,
+    which stretched it to 2.0 s: the map's own speech, padded as the aligner reads it, decides."""
+    off = gaps(hearing([], sound_map(SHORT, pad=0.1)))
+    on = gaps(hearing(NEAR, sound_map(SHORT, pad=0.1)))
+    assert [(g.start, round(g.speech, 2), g.sound) for g in off] == [(20.0, 1.9, "")]
+    assert [(g.start, g.sound) for g in on] == [(20.0, "")]
+
+
+def test_local_words_a_little_past_short_speech_do_not_make_it_a_gap() -> None:
+    """Local words timed past the map's speech by no more than a line's times are rough do not
+    lengthen it into a gap the stretch is not with the local listener off."""
+    short = [(0.0, 10.0), (20.0, 21.6)]  # 1.8 s padded; the local words end 0.3 s past it
+    assert gaps(hearing([], sound_map(short, pad=0.1))) == []
+    assert gaps(hearing(NEAR, sound_map(short, pad=0.1))) == []
 
 
 def test_local_words_beside_the_maps_speech_are_its_speech() -> None:
