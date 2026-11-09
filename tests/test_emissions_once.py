@@ -2,15 +2,18 @@
 check after timing read them from the whole clip's letters, never from hearing a slice again
 (2026-11-08: a slice pushed the whole clip out of the cache, and the check then heard all of it
 once more, up to four whole-clip passes on a computer without a graphics card)."""
+from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pytest
+import soundfile
 
 from tarjim.asr import align, vad
 from tarjim.asr.align import AlignEngine
 from tarjim.asr.ctc import FRAME
 from tarjim.asr.letters import Letters, piece
+from tarjim.listen.clipmap import Clip, clip_map, regions_of
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.timing import Timer
 
@@ -114,3 +117,29 @@ def test_the_passes_are_told_once_a_run_even_when_it_is_timed_twice(
     settle.better(made(0.1, 1), lambda: made(0.2, 2), second_opinion=True)
     told = [line for line in capsys.readouterr().out.splitlines() if "clip's letters" in line]
     assert told == ["timing: the aligner heard the clip's letters 2 time(s)"]
+
+
+def test_one_map_one_detector_run_and_one_pass_for_the_whole_job(
+        hearing: Hearing, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """The map, both timings, a stretch and the check read the letters heard once, and the voice
+    detector runs once for the job: before 2026-11-09 it ran again inside every alignment."""
+    runs: list[float] = []
+
+    def detected(wav: Any) -> list[tuple[float, float]]:
+        runs.append(len(wav) / RATE)
+        return [(0.0, SECONDS)]
+
+    monkeypatch.setattr(vad, "speech_regions", detected)
+    audio = tmp_path / "audio.wav"
+    sound = clip()
+    soundfile.write(audio, sound, RATE, subtype="FLOAT")
+    lines = [Utterance(2.5, 4.5, "S1", "alpha"), Utterance(24.5, 26.5, "S1", "bravo")]
+    made = clip_map(tmp_path, Clip(audio, sound, RATE), [(u.start, u.end) for u in lines])
+    assert regions_of(audio) == [(0.0, SECONDS)]  # the cut reads the same run
+    timer = Timer(sound, RATE, "English", [], made)
+    whole = timer.whole(lines)
+    again = timer.part([lines[1]])
+    assert abs(again[0].start - 25.0) < 0.1
+    assert timer.agreement(whole) == 1.0
+    assert hearing.passes == [SECONDS] and timer.passes() == 1
+    assert runs == [SECONDS]

@@ -29,9 +29,14 @@ def speech_mask(regions: list[tuple[float, float]], frames: int) -> np.ndarray:
     return mask
 
 
-def mute_silence(logp: np.ndarray, speech: np.ndarray) -> np.ndarray:
+def mute(logp: np.ndarray, penalty: np.ndarray) -> np.ndarray:
+    """Each frame's letters made less likely by its penalty, the blank never (2026-11-09: the
+    three tiers of asr/speechmap.py; before, silence paid SILENCE_PENALTY and speech nothing)."""
     muted = logp.copy()
-    silent = ~speech[:len(logp)]
     letters = np.arange(logp.shape[1]) != BLANK
-    muted[np.ix_(silent, letters)] -= SILENCE_PENALTY
+    muted[:, letters] -= penalty[:len(logp), None].astype(muted.dtype)
     return muted
+
+
+def mute_silence(logp: np.ndarray, speech: np.ndarray) -> np.ndarray:
+    return mute(logp, np.where(speech[:len(logp)], 0.0, SILENCE_PENALTY))

@@ -45,6 +45,7 @@ STANDS_IN = 0.8
 __all__ = ["Placed", "by_time", "placed"]
 
 if TYPE_CHECKING:
+    from tarjim.asr.speechmap import SpeechMap
     from tarjim.listen.check import Repair
 
 
@@ -55,6 +56,9 @@ class Sound:
     speech: list[tuple[float, float]]
     # where the local words the sound left out were timed (listen/opinion.doubted, 2026-11-08)
     doubted: list[tuple[float, float]] = field(default_factory=list)
+    # the clip's speech map every timing reads (listen/clipmap.py, 2026-11-09); `speech` is its
+    # speech, the detector's with what the letters alone heard
+    speech_map: "SpeechMap | None" = None
 
 
 @dataclass(frozen=True)
@@ -89,7 +93,7 @@ def timed(repair: "Repair", hearing: Hearing, sound: Sound) -> Timed:
     from tarjim.listen.check import rechecked
     from tarjim.listen.timing import Timer
 
-    timer = Timer(sound.wav, sound.rate, repair.language, hearing.local)
+    timer = Timer(sound.wav, sound.rate, repair.language, hearing.local, sound.speech_map)
     checked = rechecked(repair, hearing, timer)
     words = trusted(checked.words, hearing.local)
     text = " ".join(u.text for u in checked.utterances)

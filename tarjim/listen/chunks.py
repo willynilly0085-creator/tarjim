@@ -16,13 +16,12 @@ from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.lead import lead_of, pieces_of
 from tarjim.listen.links import named
 from tarjim.listen.merge import Heard, Piece, agreed
+from tarjim.listen.sized import CHUNK_SECONDS, TAIL_SHARE, chunk_seconds, is_long
 from tarjim.listen.vote import SIMILAR, norm
 from tarjim.scripts import split_words
 
-CHUNK_SECONDS = 75.0
 SEARCH_SHARE = 0.2  # a cut is looked for this share of a piece either side of its target
 LONGEST_SEARCH = 30.0
-TAIL_SHARE = 0.3  # a last piece shorter than this share of a piece joins the one before it
 OVERRUN = 1.0
 MINUTE = 60.0  # seconds, for reading back an mm:ss misread
 SHORTEST = 0.3  # seconds a line kept at its piece's edge lasts at the least
@@ -31,27 +30,8 @@ CLAMPED = 0.0  # ...and of a line kept at its piece's edge: not at all
 
 Span = tuple[float, float]
 ListenSpan = Callable[[float, float], Heard]
-
-
-def chunk_seconds() -> float:
-    """The job's listen.chunk_seconds (2026-11-09). TARJIM_LISTEN_CHUNK_SECONDS still sets it
-    for tests and the bench, 0 there hearing the whole clip in one request."""
-    import os
-
-    from tarjim.prefs.active import active
-
-    raw = os.environ.get("TARJIM_LISTEN_CHUNK_SECONDS", "")
-    if not raw:
-        return float(active().listen.chunk_seconds)
-    try:
-        return max(float(raw), 0.0)
-    except ValueError:
-        return CHUNK_SECONDS
-
-
-def is_long(duration: float, target: float | None = None) -> bool:
-    size = chunk_seconds() if target is None else target
-    return size > 0 and duration > size * (1 + TAIL_SHARE)
+# moved to listen/sized.py on 2026-11-09 and still offered here
+__all__ = ["CHUNK_SECONDS", "TAIL_SHARE", "chunk_seconds", "is_long"]
 
 
 def boundary(target: float, regions: list[Span], reach: float) -> float:

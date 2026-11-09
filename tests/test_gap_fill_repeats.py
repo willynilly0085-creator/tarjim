@@ -36,7 +36,8 @@ class Recorder:
     def __init__(self) -> None:
         self.sounds: list[float] = []
 
-    def align(self, sound: Any, utterances: list[Utterance], _language: str) -> list[Word]:
+    def align(self, sound: Any, utterances: list[Utterance], _language: str,
+              _speech: Any = None) -> list[Word]:
         self.sounds.append(len(sound) / 100)
         return [w for u in utterances for w in align.proportional(u)]
 

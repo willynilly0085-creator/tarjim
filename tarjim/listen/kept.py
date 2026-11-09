@@ -32,6 +32,7 @@ from tarjim.models import Word
 
 HEARD = "heard.json"
 TRANSCRIPT = "transcript.json"
+SPEECH = "speech.json"  # the clip's speech map (listen/clipmap.py, 2026-11-09)
 MADE_FROM_IT = "cues.*.json"
 DERIVE = "derive"
 ROOT = Path(__file__).resolve().parent.parent
@@ -178,9 +179,9 @@ def rederiving(cache: Path) -> bool:
 
 
 def forget(cache: Path) -> None:
-    """What a "listen again" clears: the hearing, what was asked again, its transcript and the
-    lines made from them."""
-    gone = [p for p in [cache / HEARD, cache / ASKED, cache / TRANSCRIPT,
+    """What a "listen again" clears: the hearing, what was asked again, its transcript, the speech
+    map and the lines made from them."""
+    gone = [p for p in [cache / HEARD, cache / ASKED, cache / TRANSCRIPT, cache / SPEECH,
                         *cache.glob(MADE_FROM_IT)] if p.exists()]
     for path in gone:
         path.unlink(missing_ok=True)

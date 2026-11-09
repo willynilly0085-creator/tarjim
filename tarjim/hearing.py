@@ -8,7 +8,7 @@ from tarjim.findings import findings
 from tarjim.gemini_client import QuotaExhausted
 from tarjim.job import Job, checkpoint
 from tarjim.listen.asked import TRIES
-from tarjim.listen.heard_align import listen_and_align
+from tarjim.listen.heard_align import listen_and_align, mapped
 from tarjim.listen.kept import forget, keep_heard, keep_transcript, load_heard, reusable
 from tarjim.listen.merge import Heard
 from tarjim.models import Word
@@ -37,7 +37,7 @@ def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcrip
     audio = job.cache / "audio.wav"
     try:
         media.extract_audio(job.video, audio)
-        transcript, lasting = hear(job, audio, report)
+        transcript, lasting = mapped(job, audio, hear(job, audio, report))
     finally:
         audio.unlink(missing_ok=True)
     if lasting:  # a backup's hearing, one that left speech to ask about again, or hearing
@@ -146,13 +146,11 @@ def cloud_listener(provider: str) -> Callable[[bytes], Heard]:
 
 
 def speech_regions_of(audio: Path) -> Regions:
-    """Where the pauses are, for cutting; with no voice detector the pieces are cut on time."""
-    import soundfile
+    """Where the pauses are, for cutting; with no voice detector the pieces are cut on time. Run
+    once per file: the timing reads the same (listen/clipmap.regions_of, 2026-11-09)."""
+    from tarjim.listen.clipmap import regions_of
 
-    from tarjim.listen.check import regions_in
-
-    wav, _ = soundfile.read(str(audio), dtype="float32")
-    return regions_in(wav)
+    return regions_of(audio)
 
 
 def second_opinion(audio: Path, language: str = "") -> list[Word]:

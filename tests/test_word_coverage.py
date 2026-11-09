@@ -49,7 +49,8 @@ class Aligner:
     def __init__(self, piles: str = "") -> None:
         self.piles = piles  # "": never, "first": in the first alignment, "always"
 
-    def align(self, wav: Any, utterances: list[Utterance], _language: str) -> list[Word]:
+    def align(self, wav: Any, utterances: list[Utterance], _language: str,
+              _speech: Any = None) -> list[Word]:
         offset = float(wav[0]) * SCALE
         return [self.word(t, u, offset) for u in utterances for t in split_words(u.text)]
 
