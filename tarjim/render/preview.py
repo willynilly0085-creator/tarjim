@@ -12,26 +12,27 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 
 from tarjim.languages import language
-from tarjim.lines import display_lines
 from tarjim.media import probe, run, source, tool
 from tarjim.models import Cue, Word
 from tarjim.prefs.model import Prefs
 from tarjim.render.ass import Canvas, render_ass
 from tarjim.render.burn import PLAIN, drawing
 from tarjim.render.fonts import usable
-from tarjim.render.mark import with_mark
+from tarjim.render.mark import Mark, with_mark
 from tarjim.render.placement import chosen_place
 from tarjim.render.room import fitted
-from tarjim.rules import Rules, rules_for
+from tarjim.rules import DASH_WIDTH, NARROW_EM, Rules, rules_for
 
 WIDE, TALL = (1920, 1080), (1080, 1920)
-SAMPLE = "gradients=s={w}x{h}:c0=0x1f2a33:c1=0xe2d6bd:x0=0:y0=0:x1={w}:y1=0:speed=0"
+SAMPLE = "gradients=s={w}x{h}:c0=0x1f2a33:c1=0xe2d6bd:x0=0:y0=0:x1={w}:y1=0:speed=0:seed=1"
+PLAIN_PICTURE = "color=c=black:s={w}x{h}"
 SAMPLES = {"ar": ("وش رايك نروح البحر بكرة الصبح؟", "فكرة حلوة، بس بدري"),
            "en": ("Shall we go to the beach tomorrow morning?", "Sounds good, but early")}
 LONGEST_TEXT = 160
 STILL = "still.jpg"
 PICKED = re.compile(r"fontselect: \(([^,]+), \d+, \d+\) -> ([^,]+),")
 SHOWN_AT = 0.0
+WRAPPING, NO_WRAPPING = 0, 2  # libass WrapStyle: smart wrapping, none
 
 
 @dataclass(frozen=True)
@@ -66,13 +67,31 @@ def sample_cue(lines: list[str]) -> Cue:
     return Cue(SHOWN_AT, 10.0, words, text, parts if len(parts) > 1 else [])
 
 
-def drawn(prefs: Prefs, size: tuple[int, int], cue: Cue) -> tuple[str, Canvas, Rules]:
+def sized(lines: list[str], rules: Rules, target: str) -> list[str]:
+    """tarjim's sample cut at a word to what a real speaker's line holds (2026-11-09): a job
+    never makes one longer, so a longer sample warned of a wrap no translation shows. The
+    English placeholder of a language with wide letters gets the same width in ems."""
+    room = (rules.line_chars - DASH_WIDTH) * (
+        1.0 if target in SAMPLES else rules.char_em / NARROW_EM)
+    cut = []
+    for line in lines:
+        words = line.split()
+        while len(words) > 1 and len(" ".join(words)) > room:
+            words.pop()
+        cut.append(" ".join(words))
+    return cut
+
+
+def drawn(prefs: Prefs, size: tuple[int, int], text: str) -> tuple[str, Canvas]:
     look = replace(prefs.look, fade_ms=0)
     usual = language(prefs.target).font
     canvas = chosen_place([], Canvas.drawn(size, look, usable(look.font or usual, usual)))
     rules = fitted(rules_for(language(prefs.target), prefs), size[0], size[1], look)
     rules = replace(rules, staged=False)
-    return render_ass([cue], canvas, rules), canvas, rules
+    lines = spoken(text, prefs.target)
+    if lines == list(SAMPLES.get(prefs.target, SAMPLES["en"])):
+        lines = sized(lines, rules, prefs.target)
+    return render_ass([sample_cue(lines)], canvas, rules), canvas
 
 
 def frame(shot: Shot) -> tuple[list[str], tuple[int, int]]:
@@ -87,23 +106,47 @@ def frame(shot: Shot) -> tuple[list[str], tuple[int, int]]:
     return ["-ss", f"{at:.3f}", *source(shot.video)], (info.width, info.height)
 
 
+def drawn_once(folder: Path, given: list[str], mark: Mark | None,
+               subtitles: str) -> tuple[bytes, str]:
+    """The JPEG ffmpeg and libass make of the subtitle file, and ffmpeg's log."""
+    (folder / PLAIN).write_text(with_mark(subtitles, mark), encoding="utf-8")
+    done = run([tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "info", *given,
+                *drawing(mark), "-frames:v", "1", "-q:v", "2", STILL], cwd=folder)
+    made = folder / STILL
+    if done.returncode != 0 or not made.is_file():
+        raise RuntimeError("preview failed: " + done.stderr.strip()[-200:])
+    return made.read_bytes(), done.stderr
+
+
+def unwrapped(subtitles: str) -> str:
+    """The same file with libass's own wrapping off, every line drawn whole."""
+    return subtitles.replace(f"WrapStyle: {WRAPPING}", f"WrapStyle: {NO_WRAPPING}", 1)
+
+
+def laid_out(folder: Path, size: tuple[int, int], subtitles: str) -> str:
+    """A fingerprint of where libass puts the letters, over a plain picture of the same size:
+    the mark and the picture under it are left out, so only the subtitle's layout counts."""
+    (folder / PLAIN).write_text(subtitles, encoding="utf-8")
+    done = run([tool("ffmpeg"), "-hide_banner", "-loglevel", "error", "-f", "lavfi", "-i",
+                PLAIN_PICTURE.format(w=size[0], h=size[1]), *drawing(None), "-frames:v", "1",
+                "-f", "md5", "-"], cwd=folder)
+    return done.stdout.strip()
+
+
 def still(prefs: Prefs, shot: Shot) -> Still:
+    """wraps (2026-11-09): the subtitle is laid out a second time with wrapping off; another
+    layout means libass broke a line the picture could not hold. Counting characters said a
+    line wraps when libass drew it on one line, for most languages at the original settings."""
     from tarjim.render.mark import mark_for
 
     given, size = frame(shot)
-    cue = sample_cue(spoken(shot.text, prefs.target))
-    subtitles, canvas, rules = drawn(prefs, size, cue)
+    subtitles, canvas = drawn(prefs, size, shot.text)
     mark = mark_for(canvas)
-    with tempfile.TemporaryDirectory(prefix="tarjim-preview-") as folder:
-        (Path(folder) / PLAIN).write_text(with_mark(subtitles, mark), encoding="utf-8")
-        done = run([tool("ffmpeg"), "-y", "-hide_banner", "-loglevel", "info", *given,
-                    *drawing(mark), "-frames:v", "1", "-q:v", "2", STILL], cwd=Path(folder))
-        made = Path(folder) / STILL
-        if done.returncode != 0 or not made.is_file():
-            raise RuntimeError("preview failed: " + done.stderr.strip()[-200:])
-        image = made.read_bytes()
-    wraps = any(len(line) > rules.line_chars for line in display_lines(cue.text, rules))
-    return Still(image, size[0], size[1], picked(done.stderr, canvas.font), wraps)
+    with tempfile.TemporaryDirectory(prefix="tarjim-preview-") as name:
+        folder = Path(name)
+        image, log = drawn_once(folder, given, mark, subtitles)
+        wraps = laid_out(folder, size, subtitles) != laid_out(folder, size, unwrapped(subtitles))
+    return Still(image, size[0], size[1], picked(log, canvas.font), wraps)
 
 
 def picked(log: str, font: str) -> str:

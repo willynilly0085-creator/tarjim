@@ -95,20 +95,24 @@ def reset_keys(what: str) -> list[str]:
     return in_group(what) if what in GROUPS else [what] if what in SPECS else []
 
 
+def reset_one(values: dict[str, Any], key: str, language: str) -> bool:
+    """One setting back to its default; True when something was changed."""
+    entry = values.get(key)
+    if language and SPECS[key].per_language and isinstance(entry, dict):
+        if language not in entry:
+            return False
+        stored(values, key, SPECS[key].at(language).default, language)
+        return True
+    return values.pop(key, None) is not None
+
+
 def reset(what: str = "all", language: str = "") -> list[str]:
     """Back to the default: one setting, a group (a tab of the page) or "all". With a language,
-    a per-language setting goes back for that language only."""
+    a per-language setting goes back for that language only, and every shared setting in the
+    scope still goes back (2026-11-09): skipping them left them changed with nothing said."""
     with config.SAVING:
         kept = for_saving()
-        done = []
-        for key in reset_keys(what):
-            entry = kept.values.get(key)
-            if language and isinstance(entry, dict) and language in entry:
-                stored(kept.values, key, SPECS[key].at(language).default, language)
-                done.append(key)
-            elif not language and entry is not None:
-                del kept.values[key]
-                done.append(key)
+        done = [key for key in reset_keys(what) if reset_one(kept.values, key, language)]
         if done:
             write(kept)
     return done

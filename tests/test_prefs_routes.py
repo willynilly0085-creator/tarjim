@@ -125,3 +125,18 @@ def test_presets_are_used_kept_renamed_and_deleted(port: int) -> None:
     assert ask(port, "POST /prefs/preset", {"delete": "ours"})[0] == 200
     assert ask(port, "POST /prefs/preset", {"delete": "ours"})[0] == 404
     assert ask(port, "POST /prefs/preset", {})[0] == 400
+
+
+def test_a_reset_with_a_language_still_resets_the_shared_settings(port: int,
+                                                                  prefs_home: Path) -> None:
+    """2026-11-09: a language narrows only the per-language settings; the shared ones in the
+    scope go back too, instead of staying changed with nothing said."""
+    wanted = {"look.size_wide": 110, "look.style": "outline", "text.reading_cps": 15}
+    ask(port, "POST /prefs", {"values": wanted, "language": "ar"})
+    ask(port, "POST /prefs", {"values": {"text.reading_cps": 16}, "language": "fr"})
+    out = ask(port, "POST /prefs/reset", {"group": "look", "language": "ar"})[1]
+    assert sorted(out["reset"]) == ["look.size_wide", "look.style"]
+    out = ask(port, "POST /prefs/reset", {"what": "all", "language": "ar"})[1]
+    assert out["reset"] == ["text.reading_cps"]
+    assert saved_file(prefs_home) == {"text.reading_cps": {"fr": 16.0}}
+    assert ask(port, "GET /prefs?lang=ar")[1]["changed"] == []

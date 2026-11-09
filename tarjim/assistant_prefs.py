@@ -30,7 +30,8 @@ def change_preferences(changes: dict[str, Any], language: str = "") -> Any:
 
 def reset_preferences(what: str = "all", language: str = "") -> Any:
     """Put settings back to the original: "all", a group (look, text, timing...) or one key.
-    With language, a per-language setting goes back for that language only."""
+    With language, a per-language setting goes back for that language only; shared ones in
+    the scope still go back for every language."""
     return call("/prefs/reset", {"what": what, "language": language})
 
 

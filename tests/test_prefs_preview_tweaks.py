@@ -136,3 +136,31 @@ def test_an_uploads_own_settings_ride_in_its_address(port: int) -> None:
     status, body = upload("%7B%22look.size_wide%22%3A300%7D")
     assert status == 400 and b"look.size_wide" in body
     assert upload("%7B%22look.size_wide%22%3A110%7D")[0] == 200
+
+
+@needs_ffmpeg
+@pytest.mark.parametrize(("target", "portrait"), [("ar", False), ("ar", True), ("en", False),
+                                                  ("en", True), ("ja", True), ("fr", True)])
+def test_wraps_says_what_libass_really_draws(target: str, portrait: bool) -> None:
+    """2026-11-09: the flag came from counting characters, so a sample libass drew on one line
+    was called wrapped for English, Japanese and Arabic standing; it now asks libass, and
+    tarjim's own sample holds no more than a real speaker's line in that language."""
+    from tarjim.prefs.model import resolve
+
+    prefs = resolve({}, {}, target)
+    assert not preview.still(prefs, Shot(portrait=portrait)).wraps
+    long = " ".join(["wonderful"] * 14) + " || fine"  # a speaker's line is never split
+    assert preview.still(prefs, Shot(portrait=portrait, text=long)).wraps
+
+
+def test_the_sample_holds_what_a_real_speakers_line_holds() -> None:
+    from tarjim.rules import DASH_WIDTH, Rules
+
+    narrow = Rules(line_chars=26, char_em=0.5)
+    assert preview.sized(["Shall we go to the beach tomorrow morning?"], narrow, "en") == [
+        "Shall we go to the beach"]
+    wide = Rules(line_chars=13, char_em=1.0)  # Japanese: the English sample gets the same ems
+    assert len(preview.sized(list(preview.SAMPLES["en"]), wide, "ja")[0]) <= 2 * (
+        13 - DASH_WIDTH)
+    assert preview.sized(["Unbreakablewordthatislong"], narrow, "en") == [
+        "Unbreakablewordthatislong"]

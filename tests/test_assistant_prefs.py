@@ -96,3 +96,10 @@ def test_a_chat_order_with_a_setting_that_breaks_is_refused_with_its_reason(
     assert out["error"] == 400 and "look.size_wide" in out["detail"]
     job = assistant.translate_video(str(clip), "ar", {"tweaks": {"look.size_wide": 110}})
     assert job["stage"] == "queued"
+
+
+def test_a_chat_reset_for_one_language_also_resets_the_shared_settings(live: int) -> None:
+    assistant_prefs.change_preferences({"look.style": "outline", "text.reading_cps": 15}, "ar")
+    out = assistant_prefs.reset_preferences("all", "ar")
+    assert sorted(out["reset"]) == ["look.style", "text.reading_cps"]
+    assert assistant_prefs.get_preferences()["changed"] == []
