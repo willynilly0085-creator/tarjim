@@ -66,8 +66,10 @@ def fill_of(row: Row) -> Fill:
 
 
 def piece_of(row: Row) -> Piece:
+    """A kept piece: its language since 2026-11-08, its lead since 2026-11-09 (none before)."""
     return Piece(float(row["start"]), float(row["end"]), [lines_of(run) for run in row["passes"]],
-                 str(row.get("language") or ""))  # each piece's own since 2026-11-08
+                 str(row.get("language") or ""), float(row.get("lead_s") or 0.0),
+                 [lines_of(run) for run in row.get("lead") or []])
 
 
 def load_heard(cache: Path) -> Heard | None:

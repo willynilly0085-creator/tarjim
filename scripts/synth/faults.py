@@ -8,6 +8,7 @@ times, so kept.load_heard votes them again piece by piece exactly as a fresh hea
 Faults are functions on a Draft, composed with "+" ("drift+omitted_one_pass") and seeded, so a
 run is the same every time. Lines carry the truth sentences they came from ("ids") until export.
 Truth marked "background" (speech in the sound nobody should subtitle) is never heard.
+Since 2026-11-09 each piece after the first also carries the lead its request heard (leads.py).
 
 `traced` also gives the regions each fault altered (faults.json beside the injected hearing):
 {start, end, fault, kind, sentences}: kind "altered" for a truth sentence whose lines changed in
@@ -26,6 +27,8 @@ from dataclasses import dataclass, field
 from itertools import pairwise
 from pathlib import Path
 from typing import Any
+
+import leads
 
 from tarjim.listen.chunks import CHUNK_SECONDS, joined, spans
 from tarjim.listen.coverage import merged
@@ -343,11 +346,20 @@ def local(line: Line, span: tuple[float, float]) -> Utterance:
     return Utterance(round(start, 3), round(end, 3), str(line["speaker"]), str(line["text"]))
 
 
+def led(lead_s: float, lead: list[list[Line]], span: tuple[float, float]) -> dict[str, Any]:
+    """A piece's lead as its Piece takes it: the lines at the times of its request."""
+    heard_from = (span[0] - lead_s, span[1])
+    return {"lead_s": lead_s, "lead": [[local(x, heard_from) for x in run] for run in lead]}
+
+
 def to_heard(d: Draft) -> Heard:
+    """The hearing; each piece after the first with its lead (leads.py) when tarjim takes one."""
+    found = leads.leads(d.truth, d.pieces, d.passes, CHUNK_SECONDS) if leads.supported() else \
+        [(0.0, [])] * len(d.pieces)
     pieces = [Piece(span[0], span[1], [[local(x, span) for x in sorted(run, key=lambda x:
                                                                            x["start"])]
-                                       for run in piece])
-              for span, piece in zip(d.pieces, d.passes, strict=True)]
+                                       for run in piece], **(led(*lead, span) if lead[0] else {}))
+              for span, piece, lead in zip(d.pieces, d.passes, found, strict=True)]
     utterances, passes = joined(pieces)
     return Heard(str(d.truth.get("language") or ""), utterances, passes, provider=PROVIDER,
                  pieces=pieces)

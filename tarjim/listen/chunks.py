@@ -2,9 +2,9 @@
 
 A cloud listener given minutes of sound in one request drifts and leaves speech out: on
 2026-10-31 all three passes over a 250-second clip stopped at 178 s and stretched their times to
-fill the rest. Short pieces keep every listener close to the sound. A piece's speakers keep the
-listener's labels: a tag per piece made one person a new speaker every 75 seconds, and a dub gives
-each speaker a voice of their own.
+fill the rest. Short pieces keep every listener close to the sound. Since 2026-11-09 each request
+also hears the end of the piece before it (listen/lead.py), and the labels of neighbouring pieces
+are linked from what both heard there (listen/links.py): one person, one speaker.
 """
 from collections.abc import Callable
 from dataclasses import replace
@@ -13,6 +13,8 @@ from itertools import pairwise
 from tarjim import guards
 from tarjim.job import checkpoint
 from tarjim.listen.gemini_listen import Utterance
+from tarjim.listen.lead import lead_of, pieces_of
+from tarjim.listen.links import named
 from tarjim.listen.merge import Heard, Piece, agreed
 from tarjim.listen.vote import SIMILAR, norm
 from tarjim.scripts import split_words
@@ -127,26 +129,34 @@ def placed_line(u: Utterance, length: float, free: Span,
     return replace(u, start=start, end=max(start + SHORTEST, min(u.end, high)), prior=CLAMPED)
 
 
-def shift(utterances: list[Utterance], span: Span, tag: str = "",
-          request: str = "") -> list[Utterance]:
-    """A piece's lines at clip times, each with its piece and the request that heard it."""
-    length = span[1] - span[0]
+def placed_in(utterances: list[Utterance], length: float) -> list[Utterance]:
+    """The lines of a request `length` seconds long at its own times (placed_line), in order."""
     inside = [u for u in utterances if u.start < length + OVERRUN]
     placed: list[Utterance] = []
     for k, u in enumerate(utterances):
         free = room(placed, utterances[k + 1:], length)
         if (line := placed_line(u, length, free, [*inside, *placed])) is not None:
             placed.append(line)
+    return placed
+
+
+def walled(u: Utterance, span: Span) -> Span:
+    """The piece, or the wall of a line heard over its cut (listen/lead.owned, 2026-11-09)."""
+    return span if u.piece is None else (span[0] + u.piece[0], span[0] + u.piece[1])
+
+
+def shift(utterances: list[Utterance], span: Span, tag: str = "",
+          request: str = "") -> list[Utterance]:
+    """A piece's lines at clip times, each with its piece and the request that heard it."""
     return [replace(u, start=u.start + span[0], end=u.end + span[0], speaker=f"{tag}{u.speaker}",
-                    piece=span, request=request) for u in placed]
+                    piece=walled(u, span), request=request)
+            for u in placed_in(utterances, span[1] - span[0])]
 
 
 def placeable(lines: list[Utterance]) -> list[Utterance]:
     """The lines whose time can be searched. One kept at its piece's edge (CLAMPED) says nothing
-    of where it was said, and the aligner searches only near the time it is given: put at the
-    edge, its words were shown where no one said them and crowded the piece's last line
-    (2026-11-08). It stays in the hearing, counted and told, and is held back from the timing
-    until it can be searched for across its piece."""
+    of where it was said, and the aligner searches only near the time it is given: its words were
+    shown where no one said them (2026-11-08). It stays in the hearing, counted and told."""
     kept = [u for u in lines if u.prior > CLAMPED]
     guards.fired("shift.held", len(lines) - len(kept))
     if len(kept) < len(lines):
@@ -165,8 +175,14 @@ def listen_one(span: Span, listen_span: ListenSpan) -> Heard:
 
 def listen_in_chunks(duration: float, regions: list[Span], listen_span: ListenSpan,
                      target: float | None = None) -> Heard:
-    heard = [(span, listen_one(span, listen_span)) for span in spans(duration, regions, target)]
-    pieces = [Piece(start, end, one.passes, one.language) for (start, end), one in heard]
+    """Each piece heard on its own; one after the first from a little before it (2026-11-09)."""
+    cut = spans(duration, regions, target)
+    size = chunk_seconds() if target is None else target
+    heard = []
+    for k, (start, end) in enumerate(cut):
+        lead_s = lead_of(cut, k, regions, size)
+        heard.append((lead_s, listen_one((start - lead_s, end), listen_span)))
+    pieces = pieces_of(cut, heard)
     if len(pieces) > 1:
         print(f"listening: {len(pieces)} pieces, cut in pauses", flush=True)
     utterances, passes = joined(pieces)
@@ -175,14 +191,14 @@ def listen_in_chunks(duration: float, regions: list[Span], listen_span: ListenSp
 
 def joined(pieces: list[Piece]) -> tuple[list[Utterance], list[list[Utterance]]]:
     """The clip's lines, each piece's passes voted on their own (merge.agreed), and its passes,
-    pass n being every piece's n-th pass. Each line names its request by the piece's place and
-    the pass's (2026-11-08): "k0.v" the vote of piece 0, "k0.p1" its pass 1, alike on a reload.
-    The same for a fresh hearing and a kept one, so a kept hearing is voted again exactly as it
-    was heard (2026-11-08: the joined passes were voted, and one broken line in one piece cost a
-    reply in another). A listener heard once (OpenAI) votes to its own pass, less any line no one
-    could speak, as a kept one already did."""
+    pass n being every piece's n-th pass. Each line names its request (2026-11-08): "k0.v" the
+    vote of piece 0, "k0.p1" its pass 1. The same for a fresh hearing and a kept one, so a kept
+    hearing is voted again exactly as it was heard (2026-11-08: the joined passes were voted, and
+    one broken line in one piece cost a reply in another). Each piece's speakers are named as the
+    clip's (listen/links.named, 2026-11-09); its passes keep their request's own names."""
+    voted = named(pieces, [agreed(p.passes) for p in pieces])
     utterances = [u for k, p in enumerate(pieces)
-                  for u in shift(agreed(p.passes), p.span, request=f"k{k}.v")]
+                  for u in shift(voted[k], p.span, request=f"k{k}.v")]
     rounds = max(len(p.passes) for p in pieces)
     passes = [[u for k, p in enumerate(pieces) if n < len(p.passes)
                for u in shift(p.passes[n], p.span, request=f"k{k}.p{n}")] for n in range(rounds)]

@@ -77,7 +77,9 @@ def paid(asked: Asked, left: list[Gap]) -> None:
 def relistener(provider: str, video: Path, asked: Asked) -> Relisten | None:
     """The engine that heard the clip, asked about one stretch of it (and a little sound either
     side) through the job's record; the local listener's words are already at hand, so it is not
-    asked again."""
+    asked again. Its request names speakers its own way, so since 2026-11-09 each one is marked
+    unlinked with the request ("S1~x415", the request's start in tenths of a second): its "S1"
+    was taken for the clip's S1, and the voice check places it now (speakers.py)."""
     if provider in ("", "local"):
         return None
     from tarjim.hearing import cloud_listener
@@ -87,7 +89,9 @@ def relistener(provider: str, video: Path, asked: Asked) -> Relisten | None:
 
     def again(start: float, end: float) -> list[Utterance]:
         heard = once(media.audio_bytes(video, start, end)).utterances
-        return placeable(shift(heard, (start, end)))  # as the hearing's lines (2026-11-08)
+        lines = placeable(shift(heard, (start, end)))  # as the hearing's lines (2026-11-08)
+        mark = f"~x{round(10 * start)}"
+        return [replace(u, speaker=f"{u.speaker}{mark}") if u.speaker else u for u in lines]
 
     return asked.asking(again)
 

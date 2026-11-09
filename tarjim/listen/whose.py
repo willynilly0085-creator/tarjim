@@ -4,8 +4,8 @@ The cloud listener names speakers by what it hears, and it can swap them: on 202
 interview had host and guest swapped after a two-second pause, in all three listenings, so from
 there on each one wore the other's colour. Here every line long enough to know a voice by gets a
 voice print (asr/voiceprint.py), and a line whose voice is clearly another speaker's, by MARGIN or
-more, is given to that speaker. A long video's pieces share the listener's labels
-(listen/chunks.py), so the voices of the whole clip are compared together. The labels are
+more, is given to that speaker. A long video's pieces have their labels linked to the clip's names
+(listen/links.py, 2026-11-09), so the voices of the whole clip are compared together. The labels are
 corrected, never invented: one speaker is never checked against nobody.
 
 Since 2026-11-08 a line is judged against averages that leave it out. With the line inside its own

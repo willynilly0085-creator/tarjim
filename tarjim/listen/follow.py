@@ -18,12 +18,11 @@ label whose voice is near no base speaker's (under NEAREST) is a speaker of its 
 never clashes with one of the base's, and unlinked labels in one such new voice are one speaker.
 """
 from bisect import bisect
-from itertools import count
 
 import numpy as np
 
 from tarjim.models import Word
-from tarjim.speakers import UNLINKED, Line, lines, unlinked, who
+from tarjim.speakers import Line, lines, own_name, unlinked, who
 
 NEAREST = 0.4  # how alike two voices must be at least to be one speaker
 
@@ -50,10 +49,9 @@ def followed(words: list[Word], heard: Labels, labels: Labels) -> Labels:
 
 
 def fresh(label: str, taken: set[str]) -> str:
-    """The label without its pass tag, or the first "S<n>" nobody has when that is taken."""
-    name = UNLINKED.sub("", label)
-    return name if name not in taken else next(
-        f"S{n}" for n in count(1) if f"S{n}" not in taken)
+    """The label without its pass tag, or the first "S<n>" nobody has when that is taken
+    (speakers.own_name since 2026-11-09, which a piece's unlinked speaker takes too)."""
+    return own_name(label, taken)
 
 
 def unit(voice: np.ndarray) -> np.ndarray | None:

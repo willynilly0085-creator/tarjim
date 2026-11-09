@@ -1,10 +1,9 @@
 """Who is speaking, from the listener's labels. A label may carry the voting pass that found a line
-("p2.S1", tarjim/listen/vote.py): that names the pass, not another person. Every piece of a long
-video keeps the listener's own labels (listen/chunks.py, since 2026-10-31), so a label names one
-speaker in the whole clip, and speakers are ranked by how much they talk in the whole clip: the
-one who talks most is the main voice. Only a transcript saved before then has labels tagged by
-piece ("c0.S1", "c1.S1"); those are still ranked within their piece, so the main voice of every
-piece keeps the main colour and voice when such a job is made again.
+("p2.S1", tarjim/listen/vote.py): that names the pass, not another person. Since 2026-11-09 every
+piece of a long video has its labels linked to the clip's names (listen/links.py), so a label
+names one speaker in the whole clip, and speakers are ranked by how much they talk in the whole
+clip: the one who talks most is the main voice. A transcript kept with no hearing beside it may
+still have labels tagged by piece ("c0.S1", "c1.S1"); those are ranked within their piece.
 
 A line the listener gave no speaker (a fill heard on this computer) was drawn in the main voice's
 colour, whoever said it. Since 2026-11-08 it takes the speaker of the nearer turn: within a few
@@ -19,16 +18,28 @@ nearest (listen/whose.py), and where it could not, it takes the base speaker it 
 time, else the nearer base turn. Only a voice the check found near no base speaker's (a person the
 base pass missed) is kept a speaker of its own, under a name no base speaker has
 (listen/follow.adopted, 2026-11-08).
+
+Since 2026-11-09 two more labels are unlinked the same way: a line heard again by a request of its
+own ("S1~x415", listen/check.relistener), which names speakers its own way, and a piece's speaker
+that could not be linked to the clip's names ("S1~k2", listen/links.py). Where no voice placed
+the latter, it takes the name before its mark, which links.py chose: its request's own name, or
+a new one when another label of its request took that. The nearer turn, most often one of the
+piece's other speakers, is the worse guess: its request heard it as someone else.
 """
 import re
 from collections import Counter
 from collections.abc import Callable, Iterable
 from dataclasses import replace
+from itertools import count
 
 from tarjim.models import Word
 
 PASS_TAG = re.compile(r"(?:^|(?<=\.))p\d+\.")
-UNLINKED = re.compile(r"~p\d+$")
+UNLINKED = re.compile(r"(?:~[pkx]\d+)+$")  # ~p a pass, ~k a piece, ~x a request (2026-11-09)
+PIECE = re.compile(r"^[^~]*~k\d+$")  # a piece's speaker linked to none of the clip's names
+REQUEST = re.compile(r"~x\d+$")  # a line heard again by a request of its own
+HALF = 0.5  # of its time a line heard again must be said over a turn to be part of it
+TOUCH = 0.3  # seconds: ...or this near to one
 GAP = 1.0  # seconds of silence that end a line even with the same speaker
 
 Line = tuple[int, int]  # the first word and the one past the last
@@ -76,14 +87,19 @@ def based(label: str) -> bool:
     return bool(label) and not unlinked(label)
 
 
-def nearest(words: list[Word], line: Line, fit: Callable[[str], bool] = bool) -> str:
-    """The speaker of the nearer word whose speaker fits (has one, by default) on either side of
-    a line, or "" when the clip has none."""
+def sides(words: list[Word], line: Line, fit: Callable[[str], bool]) -> list[tuple[float, str]]:
+    """(how far, whose) for the nearer word whose speaker fits on either side of a line."""
     start, end = span(words, line)
     before = next(((start - w.end, w.speaker) for w in reversed(words[:line[0]])
                    if fit(w.speaker)), None)
     after = next(((w.start - end, w.speaker) for w in words[line[1]:] if fit(w.speaker)), None)
-    near = [side for side in (before, after) if side]
+    return [side for side in (before, after) if side]
+
+
+def nearest(words: list[Word], line: Line, fit: Callable[[str], bool] = bool) -> str:
+    """The speaker of the nearer word whose speaker fits (has one, by default) on either side of
+    a line, or "" when the clip has none."""
+    near = sides(words, line, fit)
     return min(near)[1] if near else ""
 
 
@@ -97,25 +113,60 @@ def inherited(words: list[Word]) -> list[Word]:
     return out
 
 
-def overlapped(words: list[Word], line: Line) -> str:
-    """The base speaker whose lines share the most time with a line, or "" when none does."""
+def shares(words: list[Word], line: Line) -> dict[str, float]:
+    """The time each base speaker's lines share with a line."""
     start, end = span(words, line)
     shared: dict[str, float] = {}
     for other in lines(words):
         first, last, name = *span(words, other), words[other[0]].speaker
         if based(name) and min(end, last) > max(start, first):
             shared[name] = shared.get(name, 0.0) + min(end, last) - max(start, first)
+    return shared
+
+
+def overlapped(words: list[Word], line: Line) -> str:
+    """The base speaker whose lines share the most time with a line, or "" when none does."""
+    shared = shares(words, line)
     return max(shared, key=shared.__getitem__) if shared else ""
 
 
+def heard_again(words: list[Word], line: Line) -> str:
+    """A line heard again by a request of its own (2026-11-09): the turn said over HALF its time
+    or more, else the turn within TOUCH of it, else the request's own name for its speaker, as
+    before: a turn farther off is as likely the other person's."""
+    start, end = span(words, line)
+    shared = shares(words, line)
+    over = [name for name, seconds in shared.items() if seconds >= HALF * (end - start)]
+    touching = [side for side in sides(words, line, based) if side[0] <= TOUCH]
+    if over:
+        return max(over, key=shared.__getitem__)
+    return min(touching)[1] if touching else UNLINKED.sub("", words[line[0]].speaker)
+
+
+def own_name(label: str, taken: set[str]) -> str:
+    """The label without its marks, or the first "S<n>" nobody has when that is taken."""
+    name = UNLINKED.sub("", label)
+    return name if name not in taken else next(f"S{n}" for n in count(1) if f"S{n}" not in taken)
+
+
+def placed(words: list[Word], line: Line) -> str:
+    """Whose an unlinked line is: a piece's speaker linked to no one takes the name links.py gave
+    it, a line heard again goes by the turn it is said in, any other the base speaker it overlaps
+    most, else the nearer base turn, else (no base speaker in the clip) its own name without the
+    pass tag."""
+    label = words[line[0]].speaker
+    if PIECE.match(label):
+        return UNLINKED.sub("", label)
+    if REQUEST.search(label):
+        return heard_again(words, line)
+    return overlapped(words, line) or nearest(words, line, based) or UNLINKED.sub("", label)
+
+
 def linked_by_time(words: list[Word]) -> list[Word]:
-    """The words with each unlinked line given to the base speaker it overlaps most, else the
-    nearer base turn, else (no base speaker in the clip) its own name without the pass tag."""
+    """The words with each unlinked line given a base speaker by time (placed)."""
     out = list(words)
     for line in lines(words):
-        label = words[line[0]].speaker
-        if unlinked(label):
-            name = (overlapped(words, line) or nearest(words, line, based)
-                    or UNLINKED.sub("", label))
+        if unlinked(words[line[0]].speaker):
+            name = placed(words, line)
             out[line[0]:line[1]] = [replace(w, speaker=name) for w in out[line[0]:line[1]]]
     return out
