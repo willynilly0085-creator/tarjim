@@ -15,6 +15,10 @@ before it, and the aligner, which keeps the lines' order, then showed that turn 
 start of a stretched line is right; a drifted line's first words drift with it. Its end is
 brought back to where its last words were heard, so the stretch no longer hides the speech after
 it from the coverage check.
+
+A line with no known time (one kept at its piece's edge, listen/chunks.CLAMPED) is left where it
+is and out of the matching (2026-11-09): its words matched where it was said, 9 s before the
+edge, and the lines between, borrowing that 9 s, were shown over the turn before them.
 """
 from dataclasses import replace
 from difflib import SequenceMatcher
@@ -35,6 +39,7 @@ FIRST = 3  # matched words at an utterance's start that say how far it drifted
 REACH = 15.0  # a short utterance follows a matched neighbour this close
 EDGE = 0.5  # seconds kept after the last word heard
 TAIL = 0.6  # seconds kept for each word after it that the local listener did not match
+UNKNOWN = 0.0  # the prior of a line whose time is not known (listen/chunks.CLAMPED)
 
 Match = tuple[float, float, int]  # how far a word moved, where it was heard to end, its place
 
@@ -86,10 +91,14 @@ def moved(utterance: Utterance, delta: float, duration: float, ends: float | Non
 
 
 def anchor(utterances: list[Utterance], heard: list[Word], duration: float) -> list[Utterance]:
-    if not heard:
+    """The lines moved to where their words were heard; one whose time is not known stays as
+    it is and neither takes local words nor lends its move to a neighbour (2026-11-09)."""
+    known = [u for u in utterances if u.prior > UNKNOWN]
+    if not heard or not known:
         return utterances
-    found = shifts(utterances, heard)
-    deltas = [own_delta(u, found.get(k, [])) for k, u in enumerate(utterances)]
-    return [moved(u, d if d is not None else borrowed(k, utterances, deltas), duration,
-                  heard_end(u, found.get(k, [])))
-            for k, (u, d) in enumerate(zip(utterances, deltas, strict=True))]
+    found = shifts(known, heard)
+    deltas = [own_delta(u, found.get(k, [])) for k, u in enumerate(known)]
+    placed = iter([moved(u, d if d is not None else borrowed(k, known, deltas), duration,
+                         heard_end(u, found.get(k, [])))
+                   for k, (u, d) in enumerate(zip(known, deltas, strict=True))])
+    return [next(placed) if u.prior > UNKNOWN else u for u in utterances]

@@ -1,5 +1,6 @@
 """A cloud listener's drifted times are corrected by the words heard on this computer."""
-from tarjim.asr.anchor import anchor
+from tarjim.asr.anchor import UNKNOWN, anchor
+from tarjim.listen.chunks import CLAMPED
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
 
@@ -63,3 +64,19 @@ def test_a_move_never_passes_the_end_of_the_video() -> None:
     late = [Utterance(240.0, 247.0, "S1", said)]
     moved = anchor(late, heard_at(said, 247.6), 248.5)
     assert moved[0].end <= 248.5
+
+
+def test_a_line_of_unknown_time_neither_moves_nor_moves_its_neighbours() -> None:
+    """2026-11-09, en_long_seven slip: a line the listener put a minute late, past its piece, is
+    kept at the piece's edge with no trust in its time (chunks.CLAMPED). Its words matched the
+    local words where it was said, 9 s before the edge, and the lines before it, whose own local
+    words the sound had not confirmed, borrowed that 9 s: shown over the turn before them, with
+    the stretch they were said in asked again and heard twice."""
+    assert UNKNOWN == CLAMPED
+    edge = Utterance(64.43, 64.73, "S2", "The first version got stuck halfway every single time.",
+                     prior=CLAMPED)
+    lines = [Utterance(58.6, 59.2, "S3", "Every time."),
+             Utterance(59.95, 61.36, "S2", "We had to push it with a broom."), edge]
+    moved = anchor(lines, heard_at(edge.text, 55.5), 400.0)
+    assert moved == lines
+    assert [u.prior for u in moved] == [1.0, 1.0, 0.0]
