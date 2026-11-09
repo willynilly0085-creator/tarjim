@@ -13,6 +13,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 class OnlyListener(ThreadingHTTPServer):
     allow_reuse_address = sys.platform != "win32"
+    # The page loads its 40-odd scripts at once (2026-11-09): with the default queue of 5,
+    # Windows refused some of them and the page stopped half drawn.
+    request_queue_size = 64
 
     def server_bind(self) -> None:
         if sys.platform == "win32":
