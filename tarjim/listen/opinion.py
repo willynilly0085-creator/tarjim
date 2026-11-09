@@ -9,7 +9,8 @@ another language than the one heard are not a second opinion on what was said, s
 are used: the aligner times the cloud listener's own lines on the sound alone, as it always can.
 
 Words in the right language can still be heard at the wrong times: since 2026-11-08 they are used
-only where the sound confirms them (sounded, asr/confirm.py).
+only where the sound confirms them (sounded, asr/confirm.py). Since 2026-11-09 the passes are
+judged by all their text (backing), and a fill takes the words kept ones hold in place (held).
 """
 from itertools import pairwise
 from typing import TYPE_CHECKING, Any
@@ -83,9 +84,9 @@ def backing(words: list[Word], kept: list[Word]) -> list[Word]:
 def held(words: list[Word], kept: list[Word]) -> list[Word]:
     """The kept words, with each stretch of left-out ones that kept words either side hold in
     place: the listener says its words in order, so those were said between the two, when the
-    two are at most SPAN apart (2026-11-09). What fills speech the cloud
-    listener left out (listen/coverage.gaps): with the kept words alone it had holes, a run
-    under the clip's bar or a word with no length (the bench's long clips, 13 to 21 missing)."""
+    two are at most SPAN apart (2026-11-09). What fills speech the cloud listener left out
+    (listen/coverage.gaps): with the kept words alone a fill had holes, a run under the clip's
+    bar or a word with no length (the bench's long clips, 13 to 21 words missing)."""
     ordered, used = sorted(words, key=lambda w: w.start), set(kept)
     marks = [k for k, w in enumerate(ordered) if w in used]
     out = [ordered[k] for k in marks[:1]]
