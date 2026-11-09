@@ -112,16 +112,19 @@ class AlignEngine:
         """A turn the one search made wait for the turn it was said over gets the times its own
         search inside its own time gives, when they start earlier and take no other turn's same
         words (asr/waited.py)."""
-        moved = 0
+        moved = echoed = 0
         for index, first in waited(utterances, over, words):
             evened = len(self.evened)
             alone = self.align_group(logp, [utterances[index]], OWN)
-            earlier = alone[0].start < words[first].start
-            if len(self.evened) == evened and earlier and not echoes(alone, words, first):
+            followed = len(self.evened) == evened and alone[0].start < words[first].start
+            took = followed and echoes(alone, words, first)
+            if followed and not took:
                 words[first:first + len(alone)] = alone
                 moved += 1
+            echoed += took
             del self.evened[evened:]  # not followed alone: the first search's times stay
         guards.fired("align.unwaited", moved)
+        guards.fired("align.echoed", echoed)
 
     def align_group(
             self, logp: np.ndarray, group: list[Utterance], reach: Reach = WIDE) -> list[Word]:

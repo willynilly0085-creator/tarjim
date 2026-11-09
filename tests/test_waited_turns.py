@@ -99,4 +99,22 @@ def test_a_turn_is_not_moved_onto_the_same_words_said_by_the_other_voice(
     reply = Utterance(1.1, 2.5, "S2", "alpha bravo")
     words = engine.align(np.zeros(16), [host, reply], "English")
     assert [round(w.start, 1) for w in words][3:] == [3.0, 3.5]
-    assert guards.counts()["align.unwaited"] == 0
+    assert guards.counts()["align.unwaited"] == 0 and guards.counts()["align.echoed"] == 1
+
+
+def test_a_turn_said_with_the_other_voice_takes_the_one_sound_of_both(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-09: in a debate "Common sense?" was said with the other voice's "common sense."
+    at once, so the letters were there once; the one search put it after them, where none of its
+    letters were, and its own search, which found them, was refused as the other voice's words:
+    the reply came up 0.9 s late on silence (the bench's en_debate_overlap with jitter). Only a
+    turn whose letters the first search found where it waited has two sounds to tell apart."""
+    monkeypatch.setattr(vad, "speech_regions", lambda _wav: [(0.0, SECONDS)])
+    engine = AlignEngine.__new__(AlignEngine)
+    said = [("whiskey", 0.5), ("alpha", 1.0), ("bravo", 1.5)]
+    engine.emitter, engine.roman = emitter(said), Roman()  # type: ignore[assignment]
+    host = Utterance(0.3, 2.0, "S1", "whiskey alpha bravo")
+    reply = Utterance(1.1, 2.5, "S2", "alpha bravo")
+    words = engine.align(np.zeros(16), [host, reply], "English")
+    assert [round(w.start, 1) for w in words][3:] == [1.0, 1.5]
+    assert guards.counts()["align.unwaited"] == 1 and guards.counts()["align.echoed"] == 0
