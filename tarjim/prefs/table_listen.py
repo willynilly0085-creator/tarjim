@@ -20,4 +20,9 @@ LISTEN: tuple[Spec, ...] = (
            "والتوقيت أقل دقة)", True, ADVANCED),
     on_off("listen.voice_check", "يتأكد مين المتكلم من صوته (طافي أسرع، والمتكلم أقل دقة)",
            True, ADVANCED),
+    # How the aligner reads the text against the sound (asr/align.py, 2026-11-09): strict gives
+    # every written word a place; tolerant lets sound nobody wrote down pass, and a line written
+    # twice or never said is dropped or marked instead of being squeezed onto real speech.
+    pick("listen.aligner", "طريقة مطابقة الكلام مع الصوت (المرن يتجاوز السطر المكرر أو اللي "
+         "ما انقال)", ("strict", "tolerant"), ADVANCED),
 )

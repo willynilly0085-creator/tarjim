@@ -23,7 +23,9 @@ FILE = "preferences.json"
 VERSION = 1
 # The settings config.json held before this file: their new key and their old name.
 MIGRATED = {"look.mark": "video_mark", "listen.chunk_seconds": "listen_chunk_seconds",
-            "listen.gap_seconds": "coverage_gap_seconds", "output.folder": "downloads"}
+            "listen.gap_seconds": "coverage_gap_seconds", "output.folder": "downloads",
+            # 2026-11-09: the bench and scripts choose the aligner's mode by TARJIM_ALIGNER_MODE
+            "listen.aligner": "aligner_mode"}
 SAID: set[str] = set()
 
 

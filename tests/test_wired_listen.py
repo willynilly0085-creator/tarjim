@@ -121,10 +121,10 @@ def test_the_transcripts_key_names_each_changed_listening_setting_only() -> None
         assert kept.derive_key() == usual
     keys = set()
     for chosen in (prefs(passes=5), prefs(second_opinion=False), prefs(voice_check=False),
-                   prefs(chunk_seconds=60), prefs(gap_seconds=1.5)):
+                   prefs(chunk_seconds=60), prefs(gap_seconds=1.5), prefs(aligner="tolerant")):
         with using(chosen):
             keys.add(kept.derive_key())
-    assert usual not in keys and len(keys) == 5
+    assert usual not in keys and len(keys) == 6
 
 
 def aligned(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, chosen: Prefs) -> list[str]:

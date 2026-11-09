@@ -10,6 +10,7 @@ nothing to measure, and with many letters heard inside the found runs that their
 explain (letters lost or wrong in reading the script, two voices at once) the letters cannot be
 trusted to tell a word not said: either way the aligner stays strict, no star and no skip.
 """
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import NamedTuple
 
@@ -18,6 +19,7 @@ from numpy.typing import NDArray
 
 from tarjim.asr.agree import FOUND
 from tarjim.asr.ctc import BLANK, FRAME, token_spans
+from tarjim.asr.letters import Key
 
 STAR_ENTER = 2.0  # nats, paid once on entering the star
 SKIP_BASE = 5.0  # nats for stepping over a word the sound does not hold
@@ -125,3 +127,28 @@ def calibrated(logp: NDArray[np.floating], runs: list[Run], skip: bool = False) 
     """The clip's prices; None, so the aligner stays strict, when too few runs are found."""
     delta = delta_of(measured(logp, runs))
     return None if delta is None else Costs(delta, skip=skip)
+
+
+@dataclass(frozen=True)
+class Calibration:
+    """What one clip was measured to allow: the prices (None: strict), and the score below
+    which a run is taken for not said where it is timed (agree.clip_baseline)."""
+    costs: Costs | None
+    baseline: float
+
+
+class Calibrations:
+    """One clip's calibration, made once and kept for that clip alone, as its letters are
+    (asr/letters.Letters): every timing of the clip, a stretch of it included, prices its
+    letters alike (2026-11-09)."""
+
+    def __init__(self) -> None:
+        self.last: tuple[Key, Calibration] | None = None
+        self.made = 0  # clips measured, for the tests
+
+    def __call__(self, key: Key, make: Callable[[], Calibration]) -> Calibration:
+        if self.last is None or self.last[0] != key:
+            self.last = None
+            self.last = (key, make())
+            self.made += 1
+        return self.last[1]

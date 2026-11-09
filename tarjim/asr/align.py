@@ -5,11 +5,12 @@ from typing import Any, NamedTuple
 import numpy as np
 
 from tarjim import guards
+from tarjim.asr.costs import Calibration, Calibrations, Costs
 from tarjim.asr.ctc import FRAME, Emitter, Span, token_spans
 from tarjim.asr.groups import WINDOW_MARGIN, chunks, densest, quietest, tell_evened, windows
 from tarjim.asr.letters import Piece
 from tarjim.asr.numbers import said
-from tarjim.asr.speechmap import SOFT, SpeechMap, build
+from tarjim.asr.speechmap import HARD, SOFT, SpeechMap
 from tarjim.asr.spread import (
     GAP_FALLBACK,
     WORD_BASE,
@@ -21,7 +22,9 @@ from tarjim.asr.spread import (
     runs,
     share,
 )
-from tarjim.asr.vad import mute
+from tarjim.asr.tolerant import Text, tolerant_spans
+from tarjim.asr.tolerated import heard_in, mended, priced
+from tarjim.asr.unplaced import Region
 from tarjim.asr.waited import TIGHT, waited
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.models import Word
@@ -70,23 +73,19 @@ def overlapping(utterances: list[Utterance]) -> list[bool]:
     return flags
 
 
-def mapped(wav: Any, logp: np.ndarray, speech: SpeechMap | None) -> SpeechMap:
-    """The sound's part of the clip's speech map; with none (a dub's lines, 2026-11-09), the
-    sound's own, the voice detector run on it."""
-    first = wav.first if isinstance(wav, Piece) else 0
-    if speech is not None:
-        return speech.view(first, first + len(logp))
-    from tarjim.asr.vad import speech_regions
-
-    return build(logp, len(logp), speech_regions(wav))
-
-
 @lru_cache(maxsize=1)
 def shared_aligner() -> "AlignEngine":
     return AlignEngine()
 
 
 class AlignEngine:
+    calibrations: Calibrations  # the clip's prices in the tolerant mode (asr/tolerated.py)
+    calibration: Calibration | None = None
+    costs: Costs | None = None  # None: the strict reading
+    hard: np.ndarray  # the frames of silence for sure, where the star never sits
+    dropped: set[int]  # the words the last alignment dropped as written twice
+    unplaced: list[Region]  # ...and where it spread the words the sound did not hold
+
     def __init__(self, device: str | None = None) -> None:
         import uroman
 
@@ -95,26 +94,24 @@ class AlignEngine:
 
     def align(self, wav: Any, utterances: list[Utterance], language: str,
               speech: SpeechMap | None = None) -> list[Word]:
-        self.language = language
+        self.language, self.dropped, self.unplaced = language, set(), []
         self.evened: list[Utterance] = []  # lines spread evenly, told once at the end
-        logp = self.emitter.emissions(wav)
-        # the heard lines over silence are soft, not speech: a line stretched over silence no
-        # longer makes it free, and a chant the detector misses is speech by its letters
-        # (asr/speechmap.py, 2026-11-09; before, every heard line was speech outright). A word
-        # is still not cut at a soft frame (groups.densest): on the bench, cutting there moved a
-        # word off its speech in two clips and helped none
-        view = mapped(wav, logp, speech).heard([(u.start, u.end) for u in utterances])
-        self.speech = view.tier >= SOFT
-        logp = mute(logp, view.penalty())
+        heard, view = heard_in(wav, self.emitter.emissions(wav), speech, utterances)
+        self.speech, self.hard, logp = view.tier >= SOFT, view.tier == HARD, heard.logp
         over = overlapping(utterances)
         guards.fired("align.said_over", sum(over))  # here, not in overlapping: fuse asks it too
         turns = [u for u, said_over in zip(utterances, over, strict=True) if not said_over]
+        self.costs = None  # strict while the clip's prices are measured (2026-11-09)
+        self.calibration = priced(self, wav, heard, turns)
+        self.costs = self.calibration.costs if self.calibration else None
         timed = iter([w for group in chunks(turns) for w in self.align_group(logp, group)])
         # one search keeps words in order, so a reply said over a turn is searched on its own
         words = [w for u, said_over in zip(utterances, over, strict=True)
                  for w in (self.align_group(logp, [u]) if said_over
                            else islice(timed, len(split_words(u.text))))]
         self.unwaited(logp, utterances, over, words)
+        if self.costs is not None:  # the tolerant mode, the clip's prices measured
+            words = mended(self, heard, utterances, words)
         tell_evened(self.evened, wav.start if isinstance(wav, Piece) else 0.0)
         return words
 
@@ -163,7 +160,7 @@ class AlignEngine:
         owners = [(k, t) for k, s in enumerate(slots) for t in self.tokens(s.said)]
         group, low = search.group, search.low
         bounds = windows([group[slots[k].owner] for k, _ in owners], low, search.margin)
-        spans = token_spans(logp, [t for _, t in owners], bounds)
+        spans = self.read(logp, Text([t for _, t in owners], [k for k, _ in owners], bounds), low)
         if spans is None:
             return False
         per_slot: dict[int, list[Span]] = {}
@@ -176,3 +173,11 @@ class AlignEngine:
             slot.timed = True
             slot.score = sum(score for *_, score in word) / len(word)  # 2026-11-08
         return True
+
+    def read(self, logp: np.ndarray, text: Text, low: int) -> list[Span] | None:
+        """The letters' spans, strict or with the star the clip's prices allow, never on its
+        silence for sure (asr/tolerated.py); None when the text cannot be read here."""
+        if self.costs is None or not text.tokens or len(logp) < len(text.tokens):
+            return token_spans(logp, text.tokens, text.bounds)
+        spans = tolerant_spans(logp, text, self.costs, self.hard[low:low + len(logp)]).spans
+        return None if None in spans else [s for s in spans if s is not None]

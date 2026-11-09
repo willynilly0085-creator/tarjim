@@ -12,16 +12,32 @@ from tarjim.scripts import split_words
 
 CHUNK_SECONDS = 240.0
 WINDOW_MARGIN = 1.0
+# the tolerant aligner's prices are measured on the densest stretches of this length, at most a
+# minute in all (asr/costs.calibrated, 2026-11-09)
+SAMPLE_SECONDS, SAMPLES = 20.0, 3
 
 
-def chunks(utterances: list[Utterance]) -> list[list[Utterance]]:
+def chunks(utterances: list[Utterance], seconds: float = CHUNK_SECONDS) -> list[list[Utterance]]:
     groups: list[list[Utterance]] = []
     for utterance in utterances:
-        if groups and utterance.end - groups[-1][0].start <= CHUNK_SECONDS:
+        if groups and utterance.end - groups[-1][0].start <= seconds:
             groups[-1].append(utterance)
         else:
             groups.append([utterance])
     return groups
+
+
+def density(group: list[Utterance]) -> float:
+    words = sum(len(split_words(u.text)) for u in group)
+    return words / max(FRAME, max(u.end for u in group) - group[0].start)
+
+
+def sample(utterances: list[Utterance]) -> list[list[Utterance]]:
+    """The SAMPLES stretches of lines no longer than SAMPLE_SECONDS with the most words a
+    second, in their order."""
+    short = [g for g in chunks(utterances, SAMPLE_SECONDS)
+             if max(u.end for u in g) - g[0].start <= SAMPLE_SECONDS]
+    return sorted(sorted(short, key=density, reverse=True)[:SAMPLES], key=lambda g: g[0].start)
 
 
 def windows(utterances: list[Utterance], low: int,

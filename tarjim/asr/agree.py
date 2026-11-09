@@ -9,6 +9,7 @@ show with the voice. A run placed on silence is not found either: its letters ar
 The voice detector is not asked, since it takes chanting and singing for silence.
 """
 from collections.abc import Callable
+from dataclasses import replace
 from typing import Any
 
 import numpy as np
@@ -25,17 +26,23 @@ Tokens = Callable[[str], list[int]]
 Score = Callable[[list[Word]], float | None]
 
 
+def run_spans(words: list[Word]) -> list[tuple[int, int]]:
+    """Where each run said in one breath by one speaker begins and ends, as (first, past)."""
+    found: list[tuple[int, int]] = []
+    for index, word in enumerate(words):
+        first = found[-1][0] if found else 0
+        last = words[index - 1] if index else None
+        if (last is not None and word.start - last.end <= RUN_GAP
+                and word.speaker == last.speaker and index - first < RUN_WORDS):
+            found[-1] = (first, index + 1)
+        else:
+            found.append((index, index + 1))
+    return found
+
+
 def runs(words: list[Word]) -> list[list[Word]]:
     """The words in runs said in one breath by one speaker, none longer than RUN_WORDS."""
-    found: list[list[Word]] = []
-    for word in words:
-        last = found[-1] if found else []
-        if (last and word.start - last[-1].end <= RUN_GAP and word.speaker == last[-1].speaker
-                and len(last) < RUN_WORDS):
-            last.append(word)
-        else:
-            found.append([word])
-    return found
+    return [words[first:past] for first, past in run_spans(words)]
 
 
 def run_score(logp: np.ndarray, run: list[Word], tokens: Tokens) -> float | None:
@@ -61,6 +68,29 @@ def scorer(engine: Any, wav: Any) -> Score | None:
 
 def agreement(logp: np.ndarray, words: list[Word], tokens: Tokens) -> float | None:
     return share_found(lambda run: run_score(logp, run, tokens), words)
+
+
+def scored(words: list[Word], score: Score) -> list[Word]:
+    """Each word with its run's strict score (None for a run with no letters), so what reads
+    the words later finds it there and nothing is decoded again (2026-11-09)."""
+    found: list[Word] = []
+    for first, past in run_spans(words):
+        value = score(words[first:past])
+        found += [replace(w, score=value) for w in words[first:past]]
+    return found
+
+
+def share_scored(words: list[Word]) -> float | None:
+    """share_found read from the scores `scored` gave the words."""
+    counted = [w.score for w in words if w.score is not None]
+    return sum(s >= FOUND for s in counted) / len(counted) if counted else None
+
+
+def clip_baseline(scores: list[float]) -> float:
+    """The clip's own floor for a run found where it is timed: FOUND, or half the clip's median
+    run score when that is lower (two voices at once, a hoarse voice), so a whole clip whose
+    letters are faint is not taken for one timed wrong throughout (2026-11-09)."""
+    return min(FOUND, 0.5 * float(np.median(scores))) if scores else FOUND
 
 
 def share_found(score: Score, words: list[Word]) -> float | None:
