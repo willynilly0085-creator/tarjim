@@ -12,7 +12,7 @@ left, and nothing frees a model while another job is using it.
 import gc
 import threading
 from collections.abc import Iterator
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 
 UNLOAD_SECONDS = 5
 WAIT_SECONDS = 0.25
@@ -38,8 +38,10 @@ def empty_card() -> None:
         import torch
     except ImportError:
         return
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
+    # A card whose state broke (2026-11-10, tarjim/card.py) fails here too: freeing goes on.
+    with suppress(RuntimeError):
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
 
 def release_listening() -> None:
@@ -86,14 +88,19 @@ def free_for_listening() -> None:
 
 def release_models() -> bool:
     """When tarjim is idle; False when a job left behind is still using a model."""
-    from tarjim.dub.clone import voice_model
-
     if not HEAVY.acquire(blocking=False):
         return False
     try:
-        release_listening()
-        voice_model.cache_clear()
-        empty_card()
+        drop_models()
     finally:
         HEAVY.release()
     return True
+
+
+def drop_models() -> None:
+    """Every model off the card, for whoever holds `heavy()` (tarjim/card.py between tries)."""
+    from tarjim.dub.clone import voice_model
+
+    release_listening()
+    voice_model.cache_clear()
+    empty_card()

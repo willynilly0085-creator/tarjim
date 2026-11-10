@@ -21,8 +21,9 @@ def utterances_from(words: list[Word]) -> list[Utterance]:
 
 def listen_file(audio: Path) -> tuple[str, list[Utterance], list[Word]]:
     from tarjim.asr.qwen import shared_engine
+    from tarjim.card import survive
     from tarjim.memory import heavy
 
     with heavy():
-        transcript = shared_engine().transcribe(str(audio))
+        transcript = survive(lambda: shared_engine().transcribe(str(audio)), "listening")
     return transcript.language, utterances_from(transcript.words), transcript.words

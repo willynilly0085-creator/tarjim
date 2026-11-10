@@ -34,7 +34,9 @@ class Timer:
 
     def aligned(self, sound: Any, utterances: list[Utterance]) -> list[Word]:
         from tarjim.asr.align import shared_aligner
+        from tarjim.card import survive
         from tarjim.memory import heavy
 
         with heavy():
-            return shared_aligner().align(sound, utterances, self.language)
+            return survive(lambda: shared_aligner().align(sound, utterances, self.language),
+                           "timing")

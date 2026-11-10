@@ -19,6 +19,7 @@ def line_ends(words: list[tuple[float, float]], counts: list[int]) -> list[float
 
 def word_times(wav: np.ndarray, texts: list[str], language: str) -> list[tuple[float, float]]:
     from tarjim.asr.align import shared_aligner
+    from tarjim.card import survive
     from tarjim.listen.gemini_listen import Utterance
     from tarjim.memory import heavy
 
@@ -26,7 +27,9 @@ def word_times(wav: np.ndarray, texts: list[str], language: str) -> list[tuple[f
     total = heard.size / ALIGN_RATE
     utterances = [Utterance(0.0, total, "", text) for text in texts]
     with heavy():
-        return [(w.start, w.end) for w in shared_aligner().align(heard, utterances, language)]
+        words = survive(lambda: shared_aligner().align(heard, utterances, language),
+                        "dubbing: timing of the spoken lines")
+    return [(w.start, w.end) for w in words]
 
 
 def split_lines(wav: np.ndarray, texts: list[str], language: str) -> list[np.ndarray]:

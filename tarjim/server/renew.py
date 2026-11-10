@@ -16,11 +16,14 @@ from pathlib import Path
 
 from tarjim import same_code
 from tarjim.config import HOME
+from tarjim.device import CARD_FAILED
 from tarjim.installer import module_command, start_detached
 from tarjim.server.job_record import write_down
 from tarjim.server.jobs import Board
 
 SETTLE_SECONDS = 5.0
+CARD_LOST = ("the graphics card stopped answering in this run: restarting while nothing is "
+             "running, so the next job gets it back")
 
 
 def own_arguments(argv: list[str]) -> list[str]:
@@ -68,11 +71,17 @@ class Renewal:
         return same_code.fingerprint(self.snapshot.root) == before and compiles(
             self.snapshot.root)
 
-    def restart(self, board: Board) -> bool:
+    def card_lost(self) -> bool:
+        """The graphics card failed twice in this run (tarjim/card.py) and jobs now run on the
+        processor: only a new engine gets the card back (2026-11-10: PyTorch's hold on it broke
+        after hours of running and a sleep, and starting the engine again was the cure)."""
+        return not self.started and CARD_FAILED.is_set()
+
+    def restart(self, board: Board, why: str = "") -> bool:
         """At most once: a copy that fails to start leaves this engine running as it was."""
         self.started = True
         root = self.snapshot.root if self.snapshot else same_code.ROOT
-        print(f"tarjim's code changed on disk ({version_on_disk(root)}): restarting to use it",
-              flush=True)
+        print(why or f"tarjim's code changed on disk ({version_on_disk(root)}): "
+              "restarting to use it", flush=True)
         write_down(board, HOME)
         return start_detached(command(), HOME / "server.log", here=Path.cwd())
