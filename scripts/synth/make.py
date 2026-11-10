@@ -25,7 +25,7 @@ import numpy as np
 from scenarios import SCENARIOS, Line, Scenario, Voice, by_name
 
 HERE = Path(__file__).resolve().parent
-ROOT = Path(os.environ.get("TARJIM_SYNTH", r"C:\Users\PC\Desktop\tarjim-synth"))
+ROOT = Path(os.environ.get("TARJIM_SYNTH", r"C:\Users\PC\Desktop\tarjim-files\tarjim-synth"))
 TTS = ROOT / "work" / "tts"
 PAD_BEFORE, PAD_AFTER = 0.02, 0.05
 SENTENCE = re.compile(r"[^.?!؟]+[.?!؟]*")

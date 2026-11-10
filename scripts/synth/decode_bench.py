@@ -26,7 +26,7 @@ from typing import Any
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-SYNTH = Path(os.environ.get("TARJIM_SYNTH", r"C:\Users\PC\Desktop\tarjim-synth"))
+SYNTH = Path(os.environ.get("TARJIM_SYNTH", r"C:\Users\PC\Desktop\tarjim-files\tarjim-synth"))
 TOOLS = Path(r"C:\Users\PC\.tarjim\tools\ffmpeg\368ccdd16812dd8b"
              r"\ffmpeg-n8.1-latest-win64-lgpl-shared-8.1\bin")
 for _key, _value in {"HF_HOME": str(REPO / ".models"), "TARJIM_HOME": str(SYNTH / "home"),

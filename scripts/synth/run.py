@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Any
 from unittest import mock
 
-SYNTH = Path(os.environ.get("TARJIM_SYNTH", r"C:\Users\PC\Desktop\tarjim-synth"))
+SYNTH = Path(os.environ.get("TARJIM_SYNTH", r"C:\Users\PC\Desktop\tarjim-files\tarjim-synth"))
 TOOLS = Path(r"C:\Users\PC\.tarjim\tools\ffmpeg\368ccdd16812dd8b"
              r"\ffmpeg-n8.1-latest-win64-lgpl-shared-8.1\bin")
 REPO = Path(__file__).resolve().parents[2]
