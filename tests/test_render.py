@@ -26,7 +26,7 @@ def test_reply_line_appears_when_its_speaker_starts_talking() -> None:
     ass = render_ass([dialogue(46.8)], Canvas(720, 1280))
     events = [line for line in ass.splitlines() if line.startswith("Dialogue:")]
     assert len(events) == 2
-    assert "0:00:46.80" in events[0] and "\\alpha&HFF&}" in events[0]
+    assert "0:00:46.80" in events[0] and "\\1a&HFF&\\3a&HFF&}" in events[0]
     assert events[1].startswith("Dialogue: 0,0:00:46.80,0:00:47.80")
     srt = render_srt([dialogue(46.8)])
     first = srt.split("\n\n")[0].splitlines()
@@ -45,21 +45,13 @@ def test_srt_skips_empty_cues_and_numbers_the_rest() -> None:
     assert srt.startswith("1\n00:00:01,000 --> 00:00:02,000")
 
 
-def test_light_videos_get_one_box_behind_the_whole_subtitle() -> None:
+def test_every_subtitle_sits_on_one_see_through_box() -> None:
     from tarjim.render.ass import Canvas, render_ass
 
-    dark = render_ass([], Canvas(1920, 1080))
-    light = render_ass([], Canvas(1920, 1080, bright=True))
-    assert ",1,5,2,2," in dark and "&H00141414" in dark
-    assert ",4,1,14,2," in light and light.count("&H3A141414") == 2
-
-
-def test_brightness_is_read_from_the_ffmpeg_report() -> None:
-    from tarjim.media import mean_brightness
-
-    report = "lavfi.signalstats.YAVG=200.5\nnoise\nlavfi.signalstats.YAVG=180.5\n"
-    assert mean_brightness(report) == 190.5
-    assert mean_brightness("") == 0.0
+    boxed = render_ass([], Canvas(1920, 1080))
+    outlined = render_ass([], Canvas(1920, 1080, boxed=False))
+    assert ",4,1,14,2," in boxed and boxed.count("&H50131415") == 2
+    assert ",1,5,2,2," in outlined and "&H00141414" in outlined
 
 
 def test_a_boxed_dialogue_hides_only_the_letters_of_the_line_still_to_come() -> None:
@@ -68,9 +60,9 @@ def test_a_boxed_dialogue_hides_only_the_letters_of_the_line_still_to_come() -> 
 
     first, second = [Word("Nice", 0.0, 0.5, "S1")], [Word("idea", 1.5, 2.0, "S2")]
     cue = Cue(0.0, 3.0, first + second, "- one || - two", parts=[first, second])
-    boxed = render_ass([cue], Canvas(1920, 1080, bright=True))
+    boxed = render_ass([cue], Canvas(1920, 1080))
     assert r"\1a&HFF&\3a&HFF&" in boxed and r"\alpha" not in boxed
-    assert r"\alpha&HFF&" in render_ass([cue], Canvas(1920, 1080))
+    assert r"\alpha&HFF&" in render_ass([cue], Canvas(1920, 1080, boxed=False))
 
 
 def test_arabic_subtitles_let_libass_order_mixed_latin_words() -> None:

@@ -65,7 +65,7 @@ def margin(canvas: Canvas) -> int:
 
 def stroke(canvas: Canvas) -> int:
     """How far the subtitle's outline and shadow, or its box, reach past its lines."""
-    return canvas.shadow if canvas.bright else canvas.outline + canvas.shadow
+    return canvas.shadow if canvas.boxed else canvas.outline + canvas.shadow
 
 
 def room(canvas: Canvas, top: bool) -> int:

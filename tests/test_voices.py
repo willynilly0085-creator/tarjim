@@ -46,5 +46,5 @@ def test_speakers_are_ranked_within_each_piece_of_a_long_video() -> None:
 
 def test_the_outline_is_softened_only_without_a_box() -> None:
     cue = said("Hello there", 0.0, "S1")
-    assert "\\blur" in render_ass([cue], Canvas(1920, 1080))
-    assert "\\blur" not in render_ass([cue], Canvas(1920, 1080, bright=True))
+    assert "\\blur" in render_ass([cue], Canvas(1920, 1080, boxed=False))
+    assert "\\blur" not in render_ass([cue], Canvas(1920, 1080))
