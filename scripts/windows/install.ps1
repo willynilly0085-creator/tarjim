@@ -96,12 +96,27 @@ $tested = if ($pins) { @("--upgrade", "-c", $pins) } else { @() }
 $lifted = if ($pins) { Get-Pins $source "overrides.txt" } else { $null }
 if ($lifted) { $tested += @("--overrides", $lifted) }
 $python = Get-Python $source
-& uv tool install --force --python $python --torch-backend auto @tested "tarjim[dub] @ $source"
-if ($LASTEXITCODE -ne 0 -and $pins) {
-    Say "trying again without the tested library versions"
-    & uv tool install --force --python $python --torch-backend auto "tarjim[dub] @ $source"
+# A dropped connection is the usual reason an install stops (2026-11-10: uv gives up on a file
+# after about 20 seconds, and a 2 GB one then starts again from zero), so the same install is
+# tried again before the person has to run anything; what was downloaded is kept between tries.
+function Install-Engine($extra, [int]$Tries) {
+    foreach ($try in 1..$Tries) {
+        & uv tool install --force --python $python --torch-backend auto @extra "tarjim[dub] @ $source" | Out-Host
+        if ($LASTEXITCODE -eq 0) { return $true }
+        if ($try -lt $Tries) {
+            Say "the download stopped; trying again in 20 seconds (try $try of $Tries failed)"
+            Start-Sleep -Seconds 20
+        }
+    }
+    return $false
 }
-if ($LASTEXITCODE -ne 0) { Stop-With "the download or install stopped. Run install again; it continues where it stopped." }
+
+$done = Install-Engine $tested 3
+if (-not $done -and $pins) {
+    Say "trying again without the tested library versions"
+    $done = Install-Engine @() 1
+}
+if (-not $done) { Stop-With "the download or install stopped. Run install again; it continues where it stopped." }
 
 Say "step 3 of 3: starting tarjim (it runs in the background, with no window)"
 $engine = Join-Path (& uv tool dir) "tarjim\Scripts\pythonw.exe"
@@ -114,7 +129,9 @@ if (-not (Test-Engine)) { Stop-With "tarjim was installed but did not start. Run
 
 if (-not $Quiet) {
     # The shortcut starts tarjim when it has stopped, then opens its page (tarjim/shortcut.py).
-    & (Join-Path (Split-Path $python) "python.exe") -c "from tarjim import autostart, shortcut; autostart.enable(); shortcut.make()"
+    # The engine's own Python: $python is only the version number (from 1.0.39 to 1.0.69 this line
+    # used it as a path, so the install ended in an error here, with no shortcut and no page).
+    & (Join-Path (Split-Path $engine) "python.exe") -c "from tarjim import autostart, shortcut; autostart.enable(); shortcut.make()"
     Start-Process $Page
 }
 Say ""

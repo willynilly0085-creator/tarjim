@@ -32,3 +32,18 @@ def test_the_script_starts_the_engine_hidden_and_leaves_tests_alone() -> None:
     quiet = script[script.index("if (-not $Quiet)"):]
     for step in ("autostart.enable()", "shortcut.make()", "Start-Process $Page"):
         assert step in quiet, step
+
+
+def test_the_last_step_runs_the_engines_python_not_a_version_number() -> None:
+    """2026-11-10: `$python` holds "3.12"; used as a path it stopped the install before the
+    shortcut, the start with the computer and the page."""
+    script = (ROOT / "scripts" / "windows" / "install.ps1").read_text(encoding="utf-8")
+    quiet = script[script.index("if (-not $Quiet)"):]
+    assert 'Split-Path $engine) "python.exe"' in quiet
+    assert "Split-Path $python" not in script
+
+
+def test_a_dropped_connection_is_tried_again_before_the_person_has_to() -> None:
+    script = (ROOT / "scripts" / "windows" / "install.ps1").read_text(encoding="utf-8")
+    assert "Install-Engine $tested 3" in script and "Install-Engine @() 1" in script
+    assert "| Out-Host" in script  # uv's lines are shown, not swallowed as the function's result
