@@ -24,6 +24,10 @@ OUTLINE_COLOUR = "&H00141414"
 # (the owner, 2026-11-08: whatever sits under the subtitle must never spoil it).
 BOX_COLOUR = "&H50131415"
 BOX_PADDING = 0.22
+# The dark edge round each letter on the box, as a share of the letter's size (the owner,
+# 2026-11-10: the edge makes the letters clearer). It was one unit of the picture whatever its
+# size, so a 270-line video had a clear edge and a 1080-line one next to none.
+BOX_EDGE = 0.06
 BOTTOM_CENTRE, TOP_CENTRE = 2, 8
 SOFT_EDGE = "\\blur0.8"  # a slightly soft outline reads as a studio's, not a hard sticker
 TOP_LINE = "{\\an8}"
@@ -87,21 +91,25 @@ class Canvas:
         return round(self.width * 0.06)
 
     @property
-    def outline(self) -> int:
-        return 1 if self.boxed else max(2, round(self.font_size * 0.08))
+    def outline(self) -> float:
+        if self.boxed:
+            return round(self.font_size * BOX_EDGE, 1)
+        return max(2, round(self.font_size * 0.08))
 
     @property
-    def shadow(self) -> int:
+    def shadow(self) -> float:
+        """The box's padding, or the shadow's reach. A share of the letter, to a tenth, so the
+        look is the same at every picture size (2026-11-10)."""
         if self.boxed:
-            return max(4, round(self.font_size * BOX_PADDING))
-        return max(1, self.outline // 2)
+            return round(self.font_size * BOX_PADDING, 1)
+        return max(1, int(self.outline) // 2)
 
 
 def render_ass(cues: list[Cue], canvas: Canvas, rules: Rules = DEFAULT_RULES) -> str:
     header = HEADER.format(
         w=canvas.width, h=canvas.height, font=canvas.font, size=canvas.font_size,
         outline=canvas.outline, shadow=canvas.shadow, border=BOXED if canvas.boxed else OUTLINED,
-        edge=BOX_COLOUR if canvas.boxed else OUTLINE_COLOUR,
+        edge=OUTLINE_COLOUR,
         back=BOX_COLOUR if canvas.boxed else SHADOW_COLOUR,
         align=TOP_CENTRE if canvas.top else BOTTOM_CENTRE, mh=canvas.margin_h,
         mv=canvas.margin_v, charset=RIGHT_TO_LEFT if rules.rtl else 1, main=MAIN,

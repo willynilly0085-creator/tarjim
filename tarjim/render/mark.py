@@ -9,6 +9,7 @@ when that leaves too little room, or the picture's own text (render/placement.py
 edge, it goes to the other edge. The text is drawn by libass from the burn's .ass file and the
 logo by ffmpeg in the same pass (render/burn.py); the .srt and .ass files handed out carry none."""
 from dataclasses import dataclass
+from math import ceil
 from pathlib import Path
 
 from tarjim.config import setting
@@ -65,7 +66,7 @@ def margin(canvas: Canvas) -> int:
 
 def stroke(canvas: Canvas) -> int:
     """How far the subtitle's outline and shadow, or its box, reach past its lines."""
-    return canvas.shadow if canvas.boxed else canvas.outline + canvas.shadow
+    return ceil(canvas.shadow if canvas.boxed else canvas.outline + canvas.shadow)
 
 
 def room(canvas: Canvas, top: bool) -> int:

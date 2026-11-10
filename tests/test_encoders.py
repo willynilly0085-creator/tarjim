@@ -70,3 +70,40 @@ def test_the_phone_copy_without_x264_uses_the_next_encoder(
     monkeypatch.setattr(media, "probe", lambda _v: type("P", (), {"duration": 60.0})())
     made = delivery.phone_copy(video)
     assert made is not None and made.read_bytes() == b"video" and tried[-1] == "h264_mf"
+
+
+def limit_of(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, play: tuple[int, int],
+             kbps: int) -> int:
+    commands: list[list[str]] = []
+
+    def run(command: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
+        commands.append(command)
+        Path(command[-1]).write_bytes(b"video")
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    laid = f"PlayResX: {play[0]}{chr(10)}PlayResY: {play[1]}{chr(10)}"
+    (tmp_path / burn.PLAIN).write_text(laid, encoding="utf-8")
+    monkeypatch.setattr(burn, "run", run)
+    monkeypatch.setattr(burn, "video_kbps", lambda _video: kbps)
+    monkeypatch.setattr(burn, "codec", lambda _video: "h264")
+    monkeypatch.setattr(burn, "sound_codecs", lambda _video: ["aac"])
+    monkeypatch.setattr(burn, "tool", lambda _name: "ffmpeg")
+    burn.encode(tmp_path / "in.mp4", tmp_path / "out.mp4", tmp_path, None)
+    command = commands[0]
+    return int(command[command.index("-maxrate") + 1].rstrip("k")) if "-maxrate" in command else 0
+
+
+def test_a_weak_video_still_has_room_for_sharp_letters(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-10: a 270-line clip at 45 kbps, drawn at 1920x1080, was held to 207 kbps."""
+    assert limit_of(tmp_path, monkeypatch, (480, 270), 45) == 2074
+
+
+def test_a_rich_video_keeps_its_own_ceiling(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    assert limit_of(tmp_path, monkeypatch, (1920, 1080), 8000) == 9200
+
+
+def test_a_video_that_does_not_say_its_rate_has_no_ceiling(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    assert limit_of(tmp_path, monkeypatch, (480, 270), 0) == 0
