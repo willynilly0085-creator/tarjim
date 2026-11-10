@@ -8,6 +8,12 @@ description: Use when the person wants a video or audio translated, subtitled or
 tarjim is a tool on the person's computer. You operate it through the `tarjim` MCP tools; you do
 not translate the video yourself.
 
+0. If the `tarjim` tools are not there at all, their server did not start, and the usual reason is
+   that [uv](https://docs.astral.sh/uv/) is not installed. Tell the person, and with their
+   agreement install it (Windows: `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`;
+   macOS and Linux: `curl -LsSf https://astral.sh/uv/install.sh | sh`), then ask them to restart
+   this app so the tools load. On Windows they can instead download tarjim's ZIP from GitHub and
+   double-click `install.cmd`, which needs nothing first.
 1. Call `setup_status` first.
    - `missing`: call `install_tarjim`, tell the person it takes a few minutes, check
      `setup_status` again later, then `open_tarjim_page` so they can finish setup in the browser.

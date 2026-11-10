@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.0.70 (2026-11-10)
+
+- **Every subtitle sits on its see-through box, in every video.** The box used to appear only
+  when tarjim judged the bottom of the picture bright, so Arabic drawn over a headline or other
+  on-screen text could be unreadable.
+- **The letters keep the same dark edge at every resolution.** The edge and the box's padding
+  were a fixed thickness, clear at 270 lines and nearly gone at 1080; they are now a share of the
+  letter size.
+- **A weak video still gets sharp letters.** A small picture is enlarged before the subtitles are
+  drawn, but the encoder was held to the source's tiny rate (about 200 kbps for a 1080-line
+  picture). There is now a floor by picture size (about 2000 kbps at 1080 lines); a plain picture
+  still spends far less.
+- **A graphics-card failure no longer fails the job.** After sleep or a restart the card can
+  answer "CUDA out of memory" while nearly empty. The step is tried again on the card after
+  letting the models go, then on the processor, and the engine restarts itself when it is idle.
+- **The one-file install finishes.** From 1.0.39 to 1.0.69 its last step stopped with an error
+  after the engine had started: no desktop shortcut, no start with the computer, no page opened.
+- **A dropped connection during install is tried again by itself** (three times, keeping what
+  was downloaded), instead of stopping and falling back to untested library versions.
+- The assistant's instructions say what to do when tarjim's tools do not appear (uv is missing).
+
+Checked: 1142 tests; stills of the look at 270, 720 and 1080 lines; the install file run from a
+GitHub ZIP into empty folders, with the connection cut mid-download. Not run: a whole video
+through the new encoder floor, the processor fallback on real models, the install file's last
+step itself (it writes the shortcut and the startup entry), a clean Windows, Windows 10.
+
 ## 1.0.69 (2026-11-06)
 
 - **Libraries brought up to date** (24 of them), each run through every test and a real
