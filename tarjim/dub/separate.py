@@ -25,12 +25,13 @@ class Stems:
 
 
 def separate(video: Path) -> Stems:
+    from tarjim.card import survive
     from tarjim.memory import heavy
 
     mixture = decode(video, channels=2)
     try:
         with heavy():
-            voices, background = split_voices(mixture)
+            voices, background = survive(lambda: split_voices(mixture), "dubbing: separation")
     except (ImportError, RuntimeError, OSError, MemoryError) as error:
         print(f"dubbing: voices not separated from the background ({type(error).__name__}); "
               "the original sound is kept quietly under the new voices", flush=True)
@@ -82,9 +83,9 @@ def separation_model() -> Any:
 def split_voices(mixture: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """A window at a time, each heard with CONTEXT on both sides so the joins do not show. The
     level is the whole sound's, so every window is scaled alike."""
-    import torch
+    from tarjim.device import best_device
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = best_device()  # the processor once the card failed twice in this run (card.py)
     model = separation_model().to(device).eval()
     if model.samplerate != RATE:
         raise RuntimeError("unexpected demucs sample rate")

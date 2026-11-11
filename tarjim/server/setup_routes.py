@@ -21,7 +21,8 @@ from tarjim.ui_languages import available, codes
 GLOSSARY_CHARS = 5000
 MODEL_TAG = re.compile(r"^[\w.:/-]{2,80}$")
 FIELDS: dict[str, tuple[str, ...]] = {"ui_language": codes(), "listen_provider": LISTENERS,
-                                      "translate_provider": TRANSLATORS, "setup_done": ("yes",)}
+                                      "translate_provider": TRANSLATORS, "setup_done": ("yes",),
+                                      "post_summary": ("yes", "no")}
 Query = dict[str, list[str]]
 
 

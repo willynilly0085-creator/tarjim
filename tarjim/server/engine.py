@@ -92,7 +92,10 @@ def make(task: Task, job: Job, report: Callable[[str], None]) -> None:
     found = collecting()
     cues, issues = run(job, report)
     task.notes = found.notes(cues, issues)
-    candidates = [job.output(".dub.mp4"), job.output(".mp4"), job.output(".srt")]
+    from tarjim.post import SUFFIX
+
+    candidates = [job.output(".dub.mp4"), job.output(".mp4"), job.output(".srt"),
+                  job.output(SUFFIX)]
     task.outputs = [p for p in candidates if p.exists()]
 
 

@@ -46,6 +46,13 @@ def show_mark_on_videos(show: str) -> Any:
     return call("/setup", {"video_mark": "no" if show == "no" else "yes"})
 
 
+def write_post_summaries(write: str) -> Any:
+    """Whether each finished translation also gets a summary ready to post (a short text that
+    fits a tweet and a longer one), shown in translation_status as "post". "yes" (the default)
+    or "no"."""
+    return call("/setup", {"post_summary": "no" if write == "no" else "yes"})
+
+
 def set_glossary(terms: str) -> Any:
     """Fix how names are translated, one per line "term = translation"; prefix a language
     code to limit a line to it ("ar: tarjim = ترجم"). Replaces the list; "" clears it."""
@@ -154,7 +161,8 @@ def open_tarjim_page(section: str = "") -> str:
     return "Opened the tarjim page in the browser."
 
 
-TOOLS = (get_settings, change_settings, show_mark_on_videos, set_glossary, plan_setup, apply_setup,
+TOOLS = (get_settings, change_settings, show_mark_on_videos, write_post_summaries, set_glossary,
+         plan_setup, apply_setup,
          install_subscription_app, set_custom_api_address, start_local_ai, find_local_ai,
          list_models, test_setup, list_voice_services,
          use_voice_service, prefer_elevenlabs_voice, phone_bot, update_tarjim, open_tarjim_page)

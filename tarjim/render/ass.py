@@ -59,7 +59,7 @@ def colours(canvas: Canvas) -> dict[str, object]:
     box = ass_colour(look.box_colour, alpha_at(look.box_opacity, BOX_OPACITY, BOX_ALPHA))
     shadow = ass_colour("#000000", alpha_at(look.shadow, SHADOW_OPACITY, SHADOW_ALPHA))
     return {"main": ass_colour(look.text_colour), "bold": -1 if look.bold else 0,
-            "edge": box if canvas.boxed else ass_colour(look.outline_colour),
+            "edge": ass_colour(look.outline_colour),  # dark round the letters, on the box too
             "back": box if canvas.boxed else shadow}
 
 

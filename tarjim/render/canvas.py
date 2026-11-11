@@ -16,6 +16,10 @@ DEFAULT_LOOK = resolve({}, {}, "ar").look
 Move = tuple[float, float, int, bool]
 GAP = 0.3  # kept above the picture's own text, as a part of the font size (render/placement)
 GAP_PAST_PADDING = 0.08  # and never less than the box's padding and this
+# The dark edge round each letter on the box, as a share of the letter's size (the owner,
+# 2026-11-10: the edge makes the letters clearer). It was one unit of the picture whatever its
+# size, so a 270-line video had a clear edge and a 1080-line one next to none.
+BOX_EDGE = 0.06
 
 
 def part(value: float) -> float:
@@ -78,14 +82,18 @@ class Canvas:
         return round(self.width * part(self.look.side_margin))
 
     @property
-    def outline(self) -> int:
-        return 1 if self.boxed else max(2, round(self.font_size * part(self.look.outline_width)))
+    def outline(self) -> float:
+        if self.boxed:
+            return round(self.font_size * BOX_EDGE, 1)
+        return max(2, round(self.font_size * part(self.look.outline_width)))
 
     @property
-    def shadow(self) -> int:
+    def shadow(self) -> float:
+        """The box's padding, or the shadow's reach. A share of the letter, to a tenth, so the
+        look is the same at every picture size (2026-11-10)."""
         if self.boxed:
-            return max(4, round(self.font_size * part(self.look.box_padding)))
-        return max(1, self.outline // 2)
+            return round(self.font_size * part(self.look.box_padding), 1)
+        return max(1, int(self.outline) // 2)
 
     @property
     def gap(self) -> float:

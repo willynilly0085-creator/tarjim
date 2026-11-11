@@ -32,6 +32,12 @@ HEADROOM = 1.15
 # may spend more than the source did, or the aim is held back by the ceiling.
 HEADROOMS = {"normal": HEADROOM, "high": 1.6}
 WEIGHTS = {"av1": 2.0, "vp9": 1.6, "hevc": 1.6}
+# The least the ceiling may be, in kilobits a second for each million pixels drawn (2026-11-10).
+# A weak download says a tiny rate (a 270-line clip: 45 kbps); enlarged four times to draw sharp
+# letters its ceiling was 180 kbps for a 1080-line picture, sixteen times the pixels, and the
+# letters' edges were the first thing the encoder gave up. The encoders still aim at a quality,
+# so a plain picture spends far less than this; it is only room for the letters when needed.
+LETTERS_KBPS = 1000
 # Left as it is, a 10-bit or 4:2:2 source gives an H.264 that phones and browsers refuse.
 PLAYABLE = ",format=yuv420p"
 # Sound every MP4 player plays as it is; Vorbis, Opus or PCM in an MP4 is silent on many.
@@ -91,6 +97,14 @@ def ceiling_kbps(video: Path) -> int:
     return int(kbps * HEADROOM * WEIGHTS.get(codec(video), 1.0)) if kbps else 0
 
 
+def letters_floor(folder: Path, by: Enlarged | None) -> int:
+    """Room for sharp letters at the size the picture is drawn at, whatever the source spent."""
+    drawn = folder / PLAIN
+    laid = drawn_size(drawn.read_text(encoding="utf-8")) if drawn.is_file() else (0, 0)
+    width, height = (by.width, by.height) if by else laid
+    return round(width * height / 1_000_000 * LETTERS_KBPS)
+
+
 def encode(video: Path, target: Path, folder: Path, mark: Mark | None) -> Path:
     chosen = active().output  # the job's own (2026-11-09)
     by = enlargement(folder, chosen.enlarge)
@@ -98,6 +112,7 @@ def encode(video: Path, target: Path, folder: Path, mark: Mark | None) -> Path:
             *drawing(mark, by), *sound(sound_codecs(video)), "-movflags", "+faststart"]
     more = HEADROOMS.get(chosen.quality, HEADROOM) / HEADROOM
     rate = round(ceiling_kbps(video) * more * (by.factor if by else 1.0))
+    rate = max(rate, letters_floor(folder, by)) if rate else 0
     with whole(target) as part:
         first_that_works(base, (rate, chosen.quality), part, folder)
     return target

@@ -50,7 +50,8 @@ def test_every_subtitle_sits_on_one_see_through_box() -> None:
 
     boxed = render_ass([], Canvas(1920, 1080))
     outlined = render_ass([], Canvas(1920, 1080, boxed=False))
-    assert ",4,1,14,2," in boxed and boxed.count("&H50131415") == 2
+    # 2026-11-10: a dark edge round the letters, the box behind them
+    assert ",4,3.8,13.9,2," in boxed and "&H00141414,&H50131415" in boxed
     assert ",1,5,2,2," in outlined and "&H00141414" in outlined
 
 
@@ -76,3 +77,12 @@ def test_a_backslash_in_the_text_is_not_an_ass_command() -> None:
     ass = render_ass([Cue(0, 2, text=r"C:\Next \N folder")], Canvas(1280, 720))
     event = next(line for line in ass.splitlines() if line.startswith("Dialogue:"))
     assert "\\" not in event.split(",,", 1)[1].split("}", 1)[1]
+
+
+def test_the_letters_edge_and_box_are_the_same_share_at_every_picture_size() -> None:
+    """2026-11-10: the edge was one unit whatever the picture, clear at 270 lines and next to
+    nothing at 1080. Edge and padding are a share of the letter, so the look does not change."""
+    for width, height in ((480, 270), (1280, 720), (1920, 1080), (270, 480), (1080, 1920)):
+        canvas = Canvas(width, height)
+        assert abs(canvas.outline / canvas.font_size - 0.06) < 0.005
+        assert abs(canvas.shadow / canvas.font_size - 0.22) < 0.005

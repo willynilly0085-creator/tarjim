@@ -3,7 +3,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import NamedTuple
 
-from tarjim import guards, media
+from tarjim import guards, media, post
 from tarjim.findings import findings
 from tarjim.hearing import transcript_for
 from tarjim.job import Job
@@ -163,6 +163,7 @@ def work(job: Job, report: Report) -> tuple[list[Cue], list[Issue]]:
     report("translating")
     cues = translate(job, cues, rules)
     save_review(job, cues)
+    post.write(job, cues)  # an extra: it never fails the job
     report("writing")
     write_outputs(job, Made(cues, words, info, rules), report)
     report("done")

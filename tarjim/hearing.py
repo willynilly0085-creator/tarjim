@@ -185,7 +185,8 @@ def local_transcript(audio: Path, failure: RuntimeError | None = None) -> Transc
 
 def qwen_transcript(audio: Path) -> Transcript:
     from tarjim.asr.qwen import shared_engine
+    from tarjim.card import survive
     from tarjim.memory import heavy
 
     with heavy():
-        return shared_engine().transcribe(str(audio))
+        return survive(lambda: shared_engine().transcribe(str(audio)), "second listening")

@@ -8,6 +8,12 @@ description: Use when the person wants a video or audio translated, subtitled or
 tarjim is a tool on the person's computer. You operate it through the `tarjim` MCP tools; you do
 not translate the video yourself.
 
+0. If the `tarjim` tools are not there at all, their server did not start, and the usual reason is
+   that [uv](https://docs.astral.sh/uv/) is not installed. Tell the person, and with their
+   agreement install it (Windows: `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`;
+   macOS and Linux: `curl -LsSf https://astral.sh/uv/install.sh | sh`), then ask them to restart
+   this app so the tools load. On Windows they can instead download tarjim's ZIP from GitHub and
+   double-click `install.cmd`, which needs nothing first.
 1. Call `setup_status` first.
    - `missing`: call `install_tarjim`, tell the person it takes a few minutes, check
      `setup_status` again later, then `open_tarjim_page` so they can finish setup in the browser.
@@ -21,6 +27,9 @@ not translate the video yourself.
      below). Show them, ask which one, then call again with `quality` set to their pick
      (`1080`, `720`, `audio` for subtitles only, or `default`).
    - Follow with `translation_status` until it is `done`; then `open_result` or `read_subtitles`.
+   - A finished job carries `post`: a summary ready to post (`short` fits a tweet, `long` is a
+     fuller post). Offer it when the person wants to share the video; `write_post_summaries("no")`
+     turns it off.
 3. Settings: `get_settings`, `list_connections`, `use_connection(provider, model)`,
    `change_settings`, `set_glossary("name = translation")`, `list_tools` / `install_tool`.
 4. The person's own taste (how subtitles look, read and are timed, listening, translation

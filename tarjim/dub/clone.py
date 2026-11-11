@@ -50,10 +50,14 @@ def load(optimize: bool) -> Any:
     """From the pinned copy's folder (tarjim/model_pins.py), never by name."""
     from voxcpm import VoxCPM
 
+    from tarjim.device import CARD_FAILED
     from tarjim.model_pins import folder
 
+    # VoxCPM picks the card by itself; after the card failed twice (card.py, 2026-11-10) it is
+    # told the processor. Only then, so the usual load is the one every release was tested with.
+    where = {"device": "cpu"} if CARD_FAILED.is_set() else {}
     return VoxCPM.from_pretrained(str(folder(REPO)), load_denoiser=False,
-                                  local_files_only=True, optimize=optimize)
+                                  local_files_only=True, optimize=optimize, **where)
 
 
 @lru_cache(maxsize=1)

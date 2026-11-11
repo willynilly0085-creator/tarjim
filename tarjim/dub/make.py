@@ -1,5 +1,4 @@
 import re
-from contextlib import nullcontext
 from pathlib import Path
 from typing import Protocol
 
@@ -142,15 +141,22 @@ def speak(engine: str, job: Job, samples: dict[str, Path], lines: list[Line]) ->
     """A natural voice that fails is replaced by the voice on this computer, when there is one;
     otherwise the person sees why the natural voice failed."""
     try:
-        with heavy() if engine == "clone" else nullcontext():
-            return voices_for(engine, job.dub, job, samples).speak_all(lines)
+        if engine == "clone":
+            return own_voice(job, samples, lines)
+        return voices_for(engine, job.dub, job, samples).speak_all(lines)
     except RuntimeError:
         if engine != "gemini" or job.target not in CLONE_LANGUAGES or not clone_installed():
             raise
-    backup = "clone"
+    return own_voice(job, samples, fallback_spoken(lines, "clone", job.target))
+
+
+def own_voice(job: Job, samples: dict[str, Path], lines: list[Line]) -> list[np.ndarray]:
+    """The voice model on this computer, one user at a time, whatever the card does (card.py)."""
+    from tarjim.card import survive
+
     with heavy():
-        return voices_for(backup, backup, job, samples).speak_all(
-            fallback_spoken(lines, backup, job.target))
+        return survive(lambda: voices_for("clone", "clone", job, samples).speak_all(lines),
+                       "dubbing voice")
 
 
 def dub_video(job: Job, cues: list[Cue], words: list[Word], picture: Path | None) -> Path:

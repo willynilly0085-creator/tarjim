@@ -71,8 +71,9 @@ def list_translations() -> Any:
 
 @tarjim.tool()
 def translation_status(job_id: str, wait_seconds: int = 0) -> Any:
-    """One translation: stage, error, finished files. wait_seconds (up to 240) waits for
-    the job to finish first, for assistants that cannot pause on their own."""
+    """One translation: stage, error, finished files and, once done, "post": a summary ready
+    to post (short fits a tweet, long is a fuller post). wait_seconds (up to 240) waits for the
+    job to finish first, for assistants that cannot pause on their own."""
     return wait_for(job_id, max(0, min(wait_seconds, MAX_WAIT)))
 
 

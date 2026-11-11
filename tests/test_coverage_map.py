@@ -168,7 +168,8 @@ def test_every_hearing_the_settle_step_builds_reads_the_map(
     monkeypatch.setattr(check, "repaired", repaired)
     monkeypatch.setattr(check, "keep", lambda *_a: None)
     monkeypatch.setattr(settle, "timed", timed)
-    sound = settle.Sound(np.zeros(8000 * 60, dtype=np.float32), 8000, TALK, [], speech_map=speech_map)
+    quiet = np.zeros(8000 * 60, dtype=np.float32)
+    sound = settle.Sound(quiet, 8000, TALK, [], speech_map=speech_map)
     settle.settled(Job(tmp_path / "v.mp4"), Heard("English", [], []), sound, FAR)
     assert len(told) == 3 and all(h.map is speech_map for h in told)
 

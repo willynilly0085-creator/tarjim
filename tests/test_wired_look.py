@@ -16,9 +16,10 @@ REPLY = [Word("Exactly", 1.2, 1.9, "S1")]
 MAIN = [Word(w, 3.0 + k * 0.3, 3.2 + k * 0.3, "S1") for k, w in enumerate("abcdef")]
 CUES = [Cue(0.0, 2.5, ASK + REPLY, text="نفس الشيء || بالضبط", parts=[ASK, REPLY]),
         Cue(3.0, 6.0, MAIN, text="هذا كلام المتكلم الأول", parts=[MAIN])]
-# The style line tarjim wrote before the settings, field for field.
-STYLE = ("Style: Default,Dubai,63,&H00F0F5F7,&H00F0F5F7,&H50131415,&H50131415,-1,0,0,0,"
-         "100,100,0,0,4,1,14,2,115,115,76,-1")
+# The style line tarjim writes with nothing changed, field for field: since 1.0.70 a dark edge
+# round the letters on the box, edge and padding as shares of the letter (2026-11-10).
+STYLE = ("Style: Default,Dubai,63,&H00F0F5F7,&H00F0F5F7,&H00141414,&H50131415,-1,0,0,0,"
+         "100,100,0,0,4,3.8,13.9,2,115,115,76,-1")
 WIDE = (1920, 1080)
 
 
@@ -48,8 +49,8 @@ def test_nothing_changed_draws_the_file_drawn_before() -> None:
 def test_the_style_line_alone_takes_size_bold_box_and_margins() -> None:
     for chosen, at, value in (
             (prefs(size_wide=120), 2, "75"), (prefs(bold=False), 7, "0"),
-            (prefs(box_colour="#000000"), 5, "&H50000000"),
-            (prefs(box_opacity=100), 6, "&H00131415"), (prefs(box_padding=30), 17, "19"),
+            (prefs(box_colour="#000000"), 6, "&H50000000"),
+            (prefs(box_opacity=100), 6, "&H00131415"), (prefs(box_padding=30), 17, "18.9"),
             (prefs(bottom_margin_wide=10), 21, "108"), (prefs(side_margin=10), 19, "192")):
         lines = changed_lines(chosen)
         assert [a for a, _b in lines] == [STYLE], chosen.look

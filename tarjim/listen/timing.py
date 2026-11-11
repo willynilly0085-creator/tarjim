@@ -74,13 +74,21 @@ class Timer:
 
     def aligned(self, sound: Any, utterances: list[Utterance]) -> tuple[list[Word], set[int]]:
         """The words, and those of them the tolerant aligner dropped as written twice."""
-        from tarjim.asr.align import shared_aligner
+        from tarjim.card import survive
         from tarjim.memory import heavy
 
-        engine = shared_aligner()
         with heavy():
-            words = engine.align(sound, utterances, self.language, self.speech)
-        return words, set(getattr(engine, "dropped", ()))
+            words, dropped = survive(lambda: timed(sound, utterances, self), "timing")
+        return words, dropped
+
+
+def timed(sound: Any, utterances: list[Utterance], timer: "Timer") -> tuple[list[Word], set[int]]:
+    """One try of the aligner, made where the card allows now (tarjim/card.py, 2026-11-10)."""
+    from tarjim.asr.align import shared_aligner
+
+    engine = shared_aligner()
+    words = engine.align(sound, utterances, timer.language, timer.speech)
+    return words, set(getattr(engine, "dropped", ()))
 
 
 def run_scored(wav: Any, words: list[Word]) -> list[Word] | None:

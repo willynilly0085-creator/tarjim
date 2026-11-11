@@ -10,7 +10,7 @@ from typing import Any, ClassVar
 
 from tarjim import downloader, ffmpeg_update, node_update, python_update, same_code, update
 from tarjim.server.jobs import Board
-from tarjim.server.renew import Renewal
+from tarjim.server.renew import CARD_LOST, Renewal
 
 Query = dict[str, list[str]]
 TICK = 60.0
@@ -89,6 +89,9 @@ def upgrade_listening(board: Board) -> None:
 def tick(board: Board, port: int, renewal: Renewal, count: int) -> None:
     if idle(board) and renewal.due() and idle(board):
         close_soon(renewal.restart(board), board)
+        return
+    if renewal.card_lost() and idle(board):
+        close_soon(renewal.restart(board, CARD_LOST), board)
         return
     if count % LOOK_EVERY == 0:
         look(board, port)
