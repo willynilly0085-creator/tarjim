@@ -178,3 +178,26 @@ def test_a_job_read_by_the_page_carries_its_summary_and_the_setting_is_saved(
     assert seen(task)["post"] == {"short": "قصير", "long": "طويل"}
     assert seen(Task(Order("clip.mp4")))["post"] is None
     assert FIELDS["post_summary"] == ("yes", "no")
+
+
+def test_a_dropped_connection_does_not_lose_the_summary_on_the_phone(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-11: the line saying what follows arrived and the two texts never did."""
+    from tarjim.phone import sender, telegram
+    from tarjim.phone.words import say
+
+    class Dropping(Bot):
+        drops = 2
+
+        def say(self, _chat: int, text: str, **_extra: Any) -> int:
+            if len(self.said) == 1 and self.drops:
+                self.drops -= 1
+                raise telegram.TelegramError("ConnectionError")
+            return super().say(_chat, text)
+
+    monkeypatch.setattr(sender.time, "sleep", lambda _seconds: None)
+    summary = tmp_path / "v.ar.post.txt"
+    summary.write_text(post.Post("قصير", "طويل").text(), encoding="utf-8-sig")
+    bot = Dropping()
+    sender.Sender(bot, 1, 7, SimpleNamespace()).post([summary])  # type: ignore[arg-type]
+    assert bot.said == [say("postIntro"), "قصير", "طويل"]

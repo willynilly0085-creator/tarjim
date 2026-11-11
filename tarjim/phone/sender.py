@@ -9,7 +9,7 @@ from tarjim.phone import large
 from tarjim.phone.checklist import checklist
 from tarjim.phone.delivery import chosen_output, phone_copy
 from tarjim.phone.meter import amount
-from tarjim.phone.telegram import SEND_LIMIT, Bot, TelegramError
+from tarjim.phone.telegram import SEND_LIMIT, Bot, TelegramError, note
 from tarjim.phone.words import say
 
 ATTEMPTS = 3
@@ -67,13 +67,23 @@ class Sender:
         found = shown(outputs)
         if found is None:
             return
-        try:
-            self.bot.say(self.chat, say("postIntro"), disable_notification="true")
-            self.bot.say(self.chat, found["short"], disable_notification="true")
-            if found["long"]:
-                self.bot.say(self.chat, found["long"], disable_notification="true")
-        except TelegramError:
-            return
+        for text in (say("postIntro"), found["short"], found["long"]):
+            if text:
+                self.quietly(text)
+
+    def quietly(self, text: str) -> bool:
+        """A message that does not ring, tried again as an upload is. One try was not enough
+        (2026-11-11): the line saying what follows arrived, the connection dropped, and the
+        summary itself was never sent or mentioned in the log."""
+        for attempt in range(ATTEMPTS):
+            try:
+                self.bot.say(self.chat, text, disable_notification="true")
+                return True
+            except TelegramError as error:
+                note("sending the summary", error)
+                if attempt < ATTEMPTS - 1:
+                    time.sleep(PAUSE * (attempt + 1))
+        return False
 
     def send(self, outputs: list[Path], mode: str) -> None:
         wanted = chosen_output(outputs, mode)

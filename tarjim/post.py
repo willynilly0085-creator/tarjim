@@ -42,7 +42,7 @@ Rules:
 the file name name them; otherwise write "the speaker" in {language}.
 - Report, do not judge: no opinion, no praise, no words like "shocking" or "must watch".
 - No hashtags, no emojis, no links, and no mention of subtitles, the file or this task.
-- Write names as the subtitles write them.
+- Write names as the subtitles write them, without quotation marks around them.
 - A line "{gap}" marks a place where some lines were left out."""
 PLAIN = "the plain written form used in news posts"
 STANDARD = "clear Modern Standard Arabic as written in news posts, not a dialect"
