@@ -1,5 +1,43 @@
 # Changelog
 
+## 1.1.0 (2026-11-11)
+
+- **Words are no longer pulled away from where they are said.** Under music or noise the voice
+  detector misses speech, and the timing step would not place a word where the detector heard
+  none: on a real clip a question was shown ten seconds before it was asked. The listener's
+  times are now the fence a word stays inside, the aligner finds the exact moment inside it, and
+  the detector only helps to choose. One speech map is made for each clip, from the detector and
+  from the letters the aligner hears, and every step reads it.
+- **A line the listener timed late goes back to its place.** A line was moved to where its words
+  were heard only from two seconds of difference, while the aligner looks one second either side
+  of it; a line 1.9 seconds late was moved by nobody.
+- **Words heard on this computer are used only where the sound confirms them.** A word given a
+  length nobody can say it in (one word lasting four seconds) no longer counts as speech, so it
+  no longer sends the clip to be heard again and adds repeated or misheard lines.
+- **Speakers keep their names across the pieces of a long clip**, each later piece hearing the
+  end of the one before it, and a line can be given to the speaker whose voice it is (a small
+  voice-print model, 25 MB, fetched by itself the first time; without it nothing changes).
+- **Replies and overlapping talk:** a short reply is shown with the sentence it answers, two
+  people talking over each other never give a subtitle too fast to read, and a line repeated by
+  the listener is dropped.
+- **A settings page** in tarjim itself, seven tabs and 66 settings (look, timing and reading,
+  listening, translation, files, dubbing, general), each checked before it is saved and each
+  reaching the step it names; presets, a reset per language, and the same settings from chat.
+  With nothing changed tarjim behaves as before.
+- **A summary to post** with each translation: a short text that fits a tweet and a longer one,
+  under the finished job with a Copy button, on the phone after the video, beside the results
+  as `.post.txt`, and in `translation_status` for your AI. Settings turns it off.
+- **What a job knows is wrong it now says:** a finished job lists the problems tarjim found in
+  its own work (speech left without words, a line shown too fast), instead of looking done.
+- A limit on paid requests and seconds of sound for each job, so a hard clip cannot be heard
+  again without end.
+
+Checked: 2671 tests. The timing step on 18 made-up clips with known word times (about 5000
+words): words more than half a second from their place, 1.0.70 against this release: 54 to 0
+with the true line times, 120 to 0 with every line two seconds late; more than five seconds:
+13 and 42 to 0. The whole pipeline (342 synthetic cells of clip, fault and setting) ran with no failure and, against the branch before the merge, moved one cell (one speaker flip). A whole job on the made-up clip of speech over a loud bed, heard by Gemini: 245 of 245 words, median 0.06 s from their place, one word over half a second (0.53 s). Not checked: clips with real voices beyond one, macOS,
+Linux, Windows 10, and the summary with engines other than Gemini.
+
 ## 1.0.70 (2026-11-10)
 
 - **Every subtitle sits on its see-through box, in every video.** The box used to appear only

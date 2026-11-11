@@ -28,6 +28,10 @@ an `.srt`, or dubs it with a voice for every speaker.
   are pronounced and numbers as words, so the voice says them correctly.
 - **Three ways to use it:** a right-click menu in the browser ("ترجم للعربية"), a local web page,
   or a chat: add tarjim to the Claude app, Claude Code or Codex and ask it to translate a link.
+- **Every setting is yours:** a settings page with seven tabs (look, timing and reading, listening,
+  translation, files, dubbing, general), each value checked before it is saved, with presets and
+  a reset for each language; your AI reads and changes the same settings from chat. With nothing
+  changed, tarjim behaves as it always did.
 - **A summary to post:** each finished translation comes with a short text that fits a tweet and a
   longer one for a post anywhere, in the language you translated into, saying only what the video
   says. It shows under the job with a Copy button, arrives on the phone after the video, is saved
