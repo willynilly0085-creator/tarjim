@@ -26,12 +26,18 @@ from statistics import median
 
 from tarjim import guards
 from tarjim.asr.align import proportional
+from tarjim.asr.groups import WINDOW_MARGIN
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.vote import norm
 from tarjim.models import Word
 from tarjim.scripts import split_words
 
-DRIFT = 2.0  # smaller differences are the aligner's to settle (it searches a second either side)
+# A line moves when its words were heard further from it than the aligner reaches by itself: the
+# aligner looks WINDOW_MARGIN either side of a line and its words do not leave that. Until
+# 2026-11-11 this was 2 s against the aligner's 1 s, so a line between one and two seconds late
+# was moved by nobody: with every line of a made-up clip 2 s late, the lines measured at 1.9 s
+# stayed late (en_panel_noise 11 words more than 0.5 s off, en_debate_overlap 6 more than 1.5 s).
+DRIFT = WINDOW_MARGIN
 SHARE = 0.5  # of an utterance's words, heard in the same order by the local listener
 LEAST = 2
 RUN = 2  # matched words must come in runs: a lone "okay" can match the wrong one
