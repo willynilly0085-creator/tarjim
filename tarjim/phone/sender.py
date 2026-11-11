@@ -57,6 +57,23 @@ class Sender:
             self.tell(f"err_{self.task.error_code or 'unknown'}", str(self.task.view()["detail"]))
         elif self.task.stage == "done":
             self.send(list(self.task.outputs), str(self.task.order.mode))
+            self.post(list(self.task.outputs))
+
+    def post(self, outputs: list[Path]) -> None:
+        """The summary to post, after the result: a line saying what it is, then each text in a
+        message of its own, so a long press copies exactly what will be posted."""
+        from tarjim.post import shown
+
+        found = shown(outputs)
+        if found is None:
+            return
+        try:
+            self.bot.say(self.chat, say("postIntro"), disable_notification="true")
+            self.bot.say(self.chat, found["short"], disable_notification="true")
+            if found["long"]:
+                self.bot.say(self.chat, found["long"], disable_notification="true")
+        except TelegramError:
+            return
 
     def send(self, outputs: list[Path], mode: str) -> None:
         wanted = chosen_output(outputs, mode)

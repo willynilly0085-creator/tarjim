@@ -27,6 +27,9 @@ not translate the video yourself.
      below). Show them, ask which one, then call again with `quality` set to their pick
      (`1080`, `720`, `audio` for subtitles only, or `default`).
    - Follow with `translation_status` until it is `done`; then `open_result` or `read_subtitles`.
+   - A finished job carries `post`: a summary ready to post (`short` fits a tweet, `long` is a
+     fuller post). Offer it when the person wants to share the video; `write_post_summaries("no")`
+     turns it off.
 3. Settings: `get_settings`, `list_connections`, `use_connection(provider, model)`,
    `change_settings`, `set_glossary("name = translation")`, `list_tools` / `install_tool`.
 4. Never ask for or accept API keys in chat. Keys are entered on the tarjim page

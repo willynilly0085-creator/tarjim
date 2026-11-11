@@ -6,6 +6,7 @@ from typing import Any, ClassVar
 
 from tarjim import native_setup
 from tarjim.languages import LANGUAGES
+from tarjim.post import shown
 from tarjim.server.connections import ConnectionRoutes
 from tarjim.server.guard import (
     allowed_origin,
@@ -31,6 +32,11 @@ PORT = 17653
 MAX_UPLOAD = 8 * 1024**3
 BLOCK = 1024 * 1024
 TOKEN_HEADERS = ("X-Tarjim-Token", "X-Trans-Token")
+
+
+def seen(task: Task) -> dict[str, object]:
+    """A job as the page and the chat tools read it: its view, with its summary to post."""
+    return {**task.view(), "post": shown(task.outputs)}
 
 
 class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoutes, JobRoutes):
@@ -105,7 +111,7 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoute
                          for c, lang in LANGUAGES.items()])
 
     def list_jobs(self, _query: Query) -> None:
-        self.reply(200, [t.view() for t in self.board.recent()])
+        self.reply(200, [seen(t) for t in self.board.recent()])
 
     def create_json(self, _query: Query) -> None:
         self.create(self.read_json())
@@ -152,7 +158,7 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoute
 
     def show(self, _query: Query, task_id: str) -> None:
         task = self.board.get(task_id)
-        self.reply(200, task.view()) if task else self.reply(404, {"error": "job"})
+        self.reply(200, seen(task)) if task else self.reply(404, {"error": "job"})
 
     def send_output(self, _query: Query, task_id: str, name: str) -> None:
         task = self.board.get(task_id)

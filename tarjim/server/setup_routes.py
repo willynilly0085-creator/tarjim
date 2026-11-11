@@ -20,7 +20,8 @@ GLOSSARY_CHARS = 5000
 MODEL_TAG = re.compile(r"^[\w.:/-]{2,80}$")
 FIELDS: dict[str, tuple[str, ...]] = {"ui_language": codes(), "listen_provider": LISTENERS,
                                       "translate_provider": TRANSLATORS, "setup_done": ("yes",),
-                                      "video_mark": ("yes", "no")}
+                                      "video_mark": ("yes", "no"),
+                                      "post_summary": ("yes", "no")}
 Query = dict[str, list[str]]
 
 

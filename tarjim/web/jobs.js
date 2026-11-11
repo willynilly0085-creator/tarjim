@@ -1,5 +1,6 @@
 import { $, api, post } from "./api.js";
 import { t } from "./i18n.js";
+import { showPost } from "./post.js";
 import { problem } from "./problems.js";
 
 const STAGES = ["downloading", "hearing", "timing", "translating", "writing", "burning", "dubbing"];
@@ -137,6 +138,7 @@ function paint(row, job, languages, refresh) {
   error.textContent = job.stage === "failed" ? failure(job) : "";
   track(job, row.querySelector(".track"));
   actions(job, row.querySelector(".job-actions"), refresh);
+  showPost(row, job);
   const before = seen.get(job.id);
   seen.set(job.id, job.stage);
   if (before && before !== job.stage && job.finished) $("announcer").textContent = `${job.title}: ${t(`stage_${job.stage}`)}`;

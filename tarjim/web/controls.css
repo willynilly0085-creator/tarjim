@@ -22,6 +22,16 @@
 .job-actions [data-sure] { border-color: var(--muted); color: var(--text); }
 .section-title:focus { outline: none; }
 
+/* The summary to post under a finished job: text to copy, set apart as a quotation would be. */
+.job-post { display: grid; gap: var(--space-xs); margin-block-start: var(--space-xs); padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius); background: var(--raised); }
+.job-post-part { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: var(--space-sm); }
+.job-post-text { max-width: 68ch; line-height: 1.6; white-space: pre-line; overflow-wrap: anywhere; unicode-bidi: plaintext; }
+.job-post summary { width: fit-content; padding-block: 2px; border-radius: 6px; color: var(--muted); font-size: var(--text-meta); cursor: pointer; }
+.job-post summary:hover { color: var(--text); }
+.job-post summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.job-post details[open] summary { margin-block-end: var(--space-xs); }
+
 .drop-file-row { display: flex; align-items: center; gap: var(--space-sm); }
 .drop-file-row .drop-file { flex: 1; min-width: 0; }
 .notice.error { color: var(--danger); }
@@ -29,3 +39,5 @@
 /* On a phone the stage names would be cut to a letter or two; the stage above the track names
    the one running, so the dashes alone show how far along it is. */
 @media (max-width: 479px) { .job .track .dash-label { display: none; } }
+/* On a phone the Copy button goes under its text, so the text keeps the full width. */
+@media (max-width: 479px) { .job-post-part { grid-template-columns: minmax(0, 1fr); } .job-post-part .button-quiet { justify-self: start; } }

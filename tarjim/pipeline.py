@@ -2,7 +2,7 @@ import json
 from collections.abc import Callable
 from pathlib import Path
 
-from tarjim import media
+from tarjim import media, post
 from tarjim.hearing import transcript_for
 from tarjim.job import Job, checkpoint
 from tarjim.models import Cue, Word
@@ -117,6 +117,7 @@ def run(job: Job, report: Report = quiet) -> tuple[list[Cue], list[Issue]]:
     report("translating")
     cues = translate(job, cues)
     save_review(job, cues)
+    post.write(job, cues)  # an extra: it never fails the job
     report("writing")
     write_outputs(job, cues, words, report)
     report("done")

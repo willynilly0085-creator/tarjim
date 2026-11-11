@@ -46,7 +46,10 @@ def perform(task: Task, downloads: Path) -> None:
     from tarjim.pipeline import run
 
     run(job, report)
-    candidates = [job.output(".dub.mp4"), job.output(".mp4"), job.output(".srt")]
+    from tarjim.post import SUFFIX
+
+    candidates = [job.output(".dub.mp4"), job.output(".mp4"), job.output(".srt"),
+                  job.output(SUFFIX)]
     task.outputs = [p for p in candidates if p.exists()]
 
 
