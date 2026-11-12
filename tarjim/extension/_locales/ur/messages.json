@@ -588,5 +588,25 @@
   },
   "waking": {
     "message": "tarjim بند تھا؛ ابھی چلا رہے ہیں۔ ایک لمحہ…"
+  },
+  "postTitle": {
+    "message": "پوسٹ کے لیے خلاصہ"
+  },
+  "postLonger": {
+    "message": "طویل پوسٹ"
+  },
+  "copy": {
+    "message": "کاپی کریں"
+  },
+  "copied": {
+    "message": "کاپی ہو گیا"
+  },
+  "jobNotes": {
+    "message": "اس ترجمے میں جانچنے کی باتیں: $N$۔ تفصیل tarjim کے صفحے پر ہے۔",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

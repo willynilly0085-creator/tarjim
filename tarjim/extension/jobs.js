@@ -1,4 +1,5 @@
 import { api, failureText, modeLabel, post, sinceText, stageLabel, stepsFor, t } from "./shared.js";
+import { showNotes, showPost } from "./summary.js";
 
 const rows = new Map();
 const spoken = new Map();
@@ -141,6 +142,8 @@ function paint(row, job, languages, refresh) {
   error.textContent = job.stage === "failed" ? failureText(job) : "";
   trackFor(job, row.querySelector(".track"));
   actionsFor(job, row.querySelector(".job-actions"), refresh);
+  showNotes(row, job);
+  showPost(row, job);
 }
 
 function announce(job) {

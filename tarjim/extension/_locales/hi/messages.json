@@ -588,5 +588,25 @@
   },
   "waking": {
     "message": "tarjim बंद था; अभी चालू कर रहे हैं। एक पल…"
+  },
+  "postTitle": {
+    "message": "पोस्ट के लिए सारांश"
+  },
+  "postLonger": {
+    "message": "लंबी पोस्ट"
+  },
+  "copy": {
+    "message": "कॉपी करें"
+  },
+  "copied": {
+    "message": "कॉपी हो गया"
+  },
+  "jobNotes": {
+    "message": "इस अनुवाद में जाँचने योग्य बातें: $N$। विवरण tarjim के पेज पर हैं।",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

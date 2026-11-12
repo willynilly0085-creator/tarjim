@@ -588,5 +588,25 @@
   },
   "waking": {
     "message": "tarjim 未运行，正在启动，请稍候…"
+  },
+  "postTitle": {
+    "message": "可发布的摘要"
+  },
+  "postLonger": {
+    "message": "较长的帖子"
+  },
+  "copy": {
+    "message": "复制"
+  },
+  "copied": {
+    "message": "已复制"
+  },
+  "jobNotes": {
+    "message": "此翻译中需检查的地方：$N$。详情见 tarjim 页面。",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

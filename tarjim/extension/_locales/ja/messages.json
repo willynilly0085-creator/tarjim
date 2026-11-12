@@ -588,5 +588,25 @@
   },
   "waking": {
     "message": "tarjim が止まっていたので、いま起動しています。少しお待ちください…"
+  },
+  "postTitle": {
+    "message": "投稿用の要約"
+  },
+  "postLonger": {
+    "message": "長めの投稿"
+  },
+  "copy": {
+    "message": "コピー"
+  },
+  "copied": {
+    "message": "コピーしました"
+  },
+  "jobNotes": {
+    "message": "この翻訳で確認する点: $N$。詳細は tarjim のページにあります。",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

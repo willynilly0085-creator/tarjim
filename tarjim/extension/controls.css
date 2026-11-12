@@ -24,3 +24,15 @@
 .engine-keys { grid-column: 1 / -1; }
 .keys-line .text-button { margin-inline-start: 2px; }
 .job-note[data-kind="problem"] { color: var(--danger); }
+
+/* The summary to post under a finished job: text to copy, set apart as a quotation would be; in
+   this narrow panel the Copy button sits under its text. */
+.job-post { display: grid; gap: var(--space-xs); margin-top: var(--space-xs); padding: var(--space-sm);
+  border-radius: var(--radius); background: var(--raised); }
+.job-post-part { display: grid; gap: var(--space-xs); justify-items: start; }
+.job-post-text { line-height: 1.6; white-space: pre-line; overflow-wrap: anywhere; unicode-bidi: plaintext; }
+.job-post summary { width: fit-content; padding-block: 2px; border-radius: 6px; color: var(--muted); font-size: var(--text-meta); cursor: pointer; }
+.job-post summary:hover { color: var(--text); }
+.job-post summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.job-post details[open] summary { margin-bottom: var(--space-xs); }
+.job-notes { color: var(--accent-line); }

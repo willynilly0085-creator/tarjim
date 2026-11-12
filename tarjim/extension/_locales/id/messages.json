@@ -588,5 +588,25 @@
   },
   "waking": {
     "message": "tarjim sedang mati; sekarang sedang dinyalakan. Sebentar…"
+  },
+  "postTitle": {
+    "message": "Ringkasan untuk diposting"
+  },
+  "postLonger": {
+    "message": "Postingan lebih panjang"
+  },
+  "copy": {
+    "message": "Salin"
+  },
+  "copied": {
+    "message": "Disalin"
+  },
+  "jobNotes": {
+    "message": "Hal yang perlu diperiksa pada terjemahan ini: $N$. Rinciannya ada di halaman tarjim.",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

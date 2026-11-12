@@ -588,5 +588,25 @@
   },
   "waking": {
     "message": "tarjim был выключен, запускаем. Минутку…"
+  },
+  "postTitle": {
+    "message": "Краткое содержание для публикации"
+  },
+  "postLonger": {
+    "message": "Более длинный пост"
+  },
+  "copy": {
+    "message": "Копировать"
+  },
+  "copied": {
+    "message": "Скопировано"
+  },
+  "jobNotes": {
+    "message": "Что проверить в этом переводе: $N$. Подробности на странице tarjim.",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

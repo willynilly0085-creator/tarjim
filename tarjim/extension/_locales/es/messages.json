@@ -588,5 +588,25 @@
   },
   "waking": {
     "message": "tarjim estaba apagado; lo estamos iniciando. Un momento…"
+  },
+  "postTitle": {
+    "message": "Resumen para publicar"
+  },
+  "postLonger": {
+    "message": "Publicación más larga"
+  },
+  "copy": {
+    "message": "Copiar"
+  },
+  "copied": {
+    "message": "Copiado"
+  },
+  "jobNotes": {
+    "message": "Puntos por revisar en esta traducción: $N$. Los detalles están en la página de tarjim.",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

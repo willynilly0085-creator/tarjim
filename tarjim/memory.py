@@ -10,6 +10,7 @@ program: the next job waits there (its own pause and cancel still work) until th
 left, and nothing frees a model while another job is using it.
 """
 import gc
+import sys
 import threading
 from collections.abc import Iterator
 from contextlib import contextmanager, suppress
@@ -29,6 +30,7 @@ def heavy() -> Iterator[None]:
         checkpoint()
         yield
     finally:
+        trim_card()
         HEAVY.release()
 
 
@@ -44,12 +46,26 @@ def empty_card() -> None:
             torch.cuda.empty_cache()
 
 
+def trim_card() -> None:
+    """What a heavy step no longer uses goes back to the card at once, the models stay. Measured
+    2026-11-12 on a 7-minute clip: 6.3 GB of models in use and 12.5 GB held until tarjim had been
+    idle for five minutes, on a 16 GB card, so nothing else could use it meanwhile."""
+    torch = sys.modules.get("torch")  # never loaded for this alone
+    if torch is None:
+        return
+    with suppress(RuntimeError):
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+
 def release_listening() -> None:
     from tarjim.asr.align import shared_aligner
     from tarjim.asr.qwen import shared_engine
+    from tarjim.asr.voiceprint import session
 
     shared_engine.cache_clear()
     shared_aligner.cache_clear()
+    session.cache_clear()
 
 
 def release_local_translator() -> None:

@@ -588,5 +588,25 @@
   },
   "waking": {
     "message": "tarjim was off; starting it now. One moment…"
+  },
+  "postTitle": {
+    "message": "Summary to post"
+  },
+  "postLonger": {
+    "message": "Longer post"
+  },
+  "copy": {
+    "message": "Copy"
+  },
+  "copied": {
+    "message": "Copied"
+  },
+  "jobNotes": {
+    "message": "Things to check in this translation: $N$. The details are on tarjim's page.",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

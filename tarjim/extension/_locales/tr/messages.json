@@ -588,5 +588,25 @@
   },
   "waking": {
     "message": "tarjim kapalıydı; şimdi başlatılıyor. Bir dakika…"
+  },
+  "postTitle": {
+    "message": "Paylaşım için özet"
+  },
+  "postLonger": {
+    "message": "Daha uzun gönderi"
+  },
+  "copy": {
+    "message": "Kopyala"
+  },
+  "copied": {
+    "message": "Kopyalandı"
+  },
+  "jobNotes": {
+    "message": "Bu çeviride kontrol edilecek noktalar: $N$. Ayrıntılar tarjim sayfasında.",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

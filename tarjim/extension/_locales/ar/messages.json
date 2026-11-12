@@ -588,5 +588,25 @@
   },
   "waking": {
     "message": "ترجم كان طافي، نشغّله لك الحين. لحظات…"
+  },
+  "postTitle": {
+    "message": "ملخص للنشر"
+  },
+  "postLonger": {
+    "message": "منشور أطول"
+  },
+  "copy": {
+    "message": "انسخ"
+  },
+  "copied": {
+    "message": "تم النسخ"
+  },
+  "jobNotes": {
+    "message": "ملاحظات على هالترجمة: $N$. التفاصيل في صفحة ترجم.",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

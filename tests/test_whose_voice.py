@@ -93,3 +93,53 @@ def test_a_model_that_cannot_be_fetched_is_tried_again_only_an_hour_later(
     monkeypatch.setattr(voiceprint, "TRIED", [])
     assert not voiceprint.fetched() and not voiceprint.fetched()
     assert len(tries) == 1
+
+
+class CardThatFails:
+    """An onnxruntime session on the card whose every run fails, as a broken card's does."""
+
+    def get_providers(self) -> list[str]:
+        return ["CUDAExecutionProvider", "CPUExecutionProvider"]
+
+    def run(self, *_asked: object) -> list[object]:
+        raise ValueError("CUDA failure 2: out of memory")
+
+
+class Processor:
+    def get_providers(self) -> list[str]:
+        return ["CPUExecutionProvider"]
+
+    def run(self, *_asked: object) -> list[object]:
+        return [np.ones((1, 256), dtype=np.float32)]
+
+
+def test_a_card_that_refuses_the_voice_print_hands_it_to_the_processor(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-12: the voice print runs on the card when there is one; a card that fails must
+    not fail the job, whatever kind of error its library raises."""
+    from tarjim.asr import voiceprint
+
+    made: list[str] = []
+
+    class Sessions:
+        def __call__(self) -> object:
+            return (made and made[-1] == "processor" and Processor()) or CardThatFails()
+
+        def cache_clear(self) -> None:
+            made.append("processor")
+
+    monkeypatch.setattr(voiceprint, "session", Sessions())
+    monkeypatch.setattr(voiceprint, "NO_CARD", [])
+    found = voiceprint.embedded(np.zeros((10, 80), dtype=np.float32))
+    assert found.shape == (256,) and made == ["processor"] and voiceprint.NO_CARD == [True]
+
+
+def test_a_heavy_step_gives_the_cards_spare_memory_back_as_it_ends(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    from tarjim import memory
+
+    freed: list[str] = []
+    monkeypatch.setattr(memory, "trim_card", lambda: freed.append("trimmed"))
+    with memory.heavy():
+        assert freed == []
+    assert freed == ["trimmed"]

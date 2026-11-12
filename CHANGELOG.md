@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0 (2026-11-11)
+## 1.1.1 (2026-11-12)
 
 - **Words are no longer pulled away from where they are said.** Under music or noise the voice
   detector misses speech, and the timing step would not place a word where the detector heard
@@ -31,6 +31,14 @@
   its own work (speech left without words, a line shown too fast), instead of looking done.
 - A limit on paid requests and seconds of sound for each job, so a hard clip cannot be heard
   again without end.
+- **The browser extension shows the summary too**, and says when a translation has things to
+  check; before, only tarjim's page did.
+- **The graphics card is given back sooner.** After each heavy step tarjim returns what it no
+  longer uses (on a 7-minute clip it held 12.5 GB with 6.3 GB in use, until it had been idle for
+  five minutes), and the voice print runs on the card when there is one (0.2 s against 1.6 s).
+  Measured on the same clip, the rest of what runs on the processor is not worth moving: the
+  voice detector takes 2.4 s, and burning takes the same 27 s whether the picture is decoded,
+  enlarged and drawn on the processor or on the card, since the card's encoder sets the pace.
 
 Checked: 2671 tests. The timing step on 18 made-up clips with known word times (about 5000
 words): words more than half a second from their place, 1.0.70 against this release: 54 to 0

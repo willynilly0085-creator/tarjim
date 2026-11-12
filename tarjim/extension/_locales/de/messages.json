@@ -588,5 +588,25 @@
   },
   "waking": {
     "message": "tarjim war aus und wird jetzt gestartet. Einen Moment …"
+  },
+  "postTitle": {
+    "message": "Zusammenfassung zum Posten"
+  },
+  "postLonger": {
+    "message": "Längerer Beitrag"
+  },
+  "copy": {
+    "message": "Kopieren"
+  },
+  "copied": {
+    "message": "Kopiert"
+  },
+  "jobNotes": {
+    "message": "Zu prüfende Punkte in dieser Übersetzung: $N$. Die Details stehen auf der tarjim-Seite.",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }
