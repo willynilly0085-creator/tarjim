@@ -23,6 +23,8 @@ const ENTER = {
   extension: () => {
     $("extension-path").textContent = state.setup.extension_path;
     $("copy-path").textContent = t("copy");
+    $("firefox-path").textContent = state.setup.firefox_path;
+    $("copy-firefox").textContent = t("copy");
   },
   chat: () => renderChat(),
 };
@@ -85,11 +87,13 @@ export function wireWizard() {
   $("step-next").addEventListener("click", next);
   $("step-back").addEventListener("click", () => { at = Math.max(0, at - 1); clearInterval(poll); paint(); });
   wireConnect();
-  $("copy-path").addEventListener("click", async () => {
-    const path = $("extension-path");
-    if (await copyText(path.textContent)) $("copy-path").textContent = t("copied");
-    else selectText(path);
-  });
+  for (const [button, shown] of [["copy-path", "extension-path"], ["copy-firefox", "firefox-path"]]) {
+    $(button).addEventListener("click", async () => {
+      const path = $(shown);
+      if (await copyText(path.textContent)) $(button).textContent = t("copied");
+      else selectText(path);
+    });
+  }
 }
 
 export const repaint = () => {

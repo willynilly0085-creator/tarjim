@@ -7,6 +7,10 @@ learned from the requests rather than fixed here. The manifest and a small launc
 tarjim's home; Chrome and Edge find the manifest through the registry on Windows, and in a folder
 of their own on macOS and Linux. Written again at every engine start, so a moved tarjim folder or
 a new Python is picked up.
+
+Firefox names add-ons by the name in their manifest, not by where they were loaded from, so its
+manifest lists that name (extension_home.GECKO_ID); it is written once an add-on from Firefox was
+allowed, like the others (2026-11-12).
 """
 import contextlib
 import json
@@ -20,16 +24,22 @@ NAME = "sa.tarjim.wake"
 REGISTRY = ("Google\\Chrome", "Microsoft\\Edge", "Chromium", "BraveSoftware\\Brave-Browser")
 MAC = ("Google/Chrome", "Microsoft Edge", "Chromium", "BraveSoftware/Brave-Browser")
 LINUX = ("google-chrome", "microsoft-edge", "chromium", "BraveSoftware/Brave-Browser")
+CHROME, FIREFOX = "chrome-extension://", "moz-extension://"
 KNOWN: set[str] = set()
 SAVING = threading.Lock()
 
 
-def origins() -> list[str]:
+def allowed() -> list[str]:
+    """Every extension the person allowed, whichever browser it is in."""
     try:
         found = json.loads(setting("extension_origins") or "[]")
     except ValueError:
         return []
-    return sorted(o for o in found if isinstance(o, str) and o.startswith("chrome-extension://"))
+    return sorted(o for o in found if isinstance(o, str) and o.startswith((CHROME, FIREFOX)))
+
+
+def origins() -> list[str]:
+    return [o for o in allowed() if o.startswith(CHROME)]
 
 
 def launcher(folder: Path) -> Path:
@@ -55,6 +65,32 @@ def manifest(folder: Path, allowed: list[str]) -> Path:
     return path
 
 
+def firefox_manifest(folder: Path) -> Path:
+    from tarjim.extension_home import GECKO_ID
+
+    path = folder / f"{NAME}.firefox.json"
+    path.write_text(json.dumps({
+        "name": NAME, "description": "tarjim: start the engine", "path": str(launcher(folder)),
+        "type": "stdio", "allowed_extensions": [GECKO_ID]}, indent=1), encoding="utf-8")
+    return path
+
+
+def point_firefox(path: Path) -> None:
+    if sys.platform == "win32":
+        import winreg
+
+        key = f"Software\\Mozilla\\NativeMessagingHosts\\{NAME}"
+        with contextlib.suppress(OSError), winreg.CreateKey(winreg.HKEY_CURRENT_USER, key) as k:
+            winreg.SetValueEx(k, "", 0, winreg.REG_SZ, str(path))
+        return
+    home = Path.home()
+    folder = (home / "Library" / "Application Support" / "Mozilla" / "NativeMessagingHosts"
+              if sys.platform == "darwin" else home / ".mozilla" / "native-messaging-hosts")
+    if folder.parent.is_dir():  # only where Firefox is installed
+        folder.mkdir(exist_ok=True)
+        (folder / f"{NAME}.json").write_text(path.read_text(encoding="utf-8"), "utf-8")
+
+
 def point_browsers(path: Path) -> None:
     if sys.platform == "win32":
         import winreg
@@ -74,21 +110,24 @@ def point_browsers(path: Path) -> None:
 
 
 def register() -> None:
-    allowed = origins()
-    if not allowed:
+    known = allowed()
+    if not known:
         return
     folder = HOME / "native"
     with contextlib.suppress(OSError):
         folder.mkdir(parents=True, exist_ok=True)
-        point_browsers(manifest(folder, allowed))
+        if origins():
+            point_browsers(manifest(folder, origins()))
+        if any(o.startswith(FIREFOX) for o in known):
+            point_firefox(firefox_manifest(folder))
 
 
 def remember(origin: str) -> None:
     """An extension that reached the engine with its key may start it later. Cheap when known."""
-    if origin in KNOWN or not origin.startswith("chrome-extension://"):
+    if origin in KNOWN or not origin.startswith((CHROME, FIREFOX)):
         return
     with SAVING:
-        KNOWN.update(origins())
+        KNOWN.update(allowed())
         if origin not in KNOWN:
             KNOWN.add(origin)
             save("extension_origins", json.dumps(sorted(KNOWN)))

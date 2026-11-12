@@ -67,3 +67,21 @@ def test_only_extensions_that_used_the_key_may_start_the_engine(home: Path) -> N
     assert "-P -m tarjim.native_host" in launcher
     if sys.platform == "win32":
         assert "python.exe" in launcher and "pythonw" not in launcher
+
+
+def test_firefox_may_start_the_engine_once_its_add_on_was_allowed(
+        home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-12: Firefox knows the add-on by its own name, and is told of it only after a
+    Firefox add-on reached the engine with the key."""
+    from tarjim.extension_home import GECKO_ID
+
+    pointed: list[Path] = []
+    monkeypatch.setattr(native_setup, "point_firefox", pointed.append)
+    native_setup.remember(ORIGIN)
+    assert pointed == []  # a Chrome extension alone tells Firefox nothing
+    native_setup.remember("moz-extension://0f3a6c1e-1111-4222-8333-444455556666")
+    written = json.loads(pointed[0].read_text(encoding="utf-8"))
+    assert written["allowed_extensions"] == [GECKO_ID] and "allowed_origins" not in written
+    assert written["name"] == native_setup.NAME and Path(written["path"]).is_file()
+    chrome = json.loads((home / "native" / f"{native_setup.NAME}.json").read_text("utf-8"))
+    assert chrome["allowed_origins"] == [f"{ORIGIN}/"]  # and Chrome's list holds only Chrome's

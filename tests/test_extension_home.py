@@ -47,3 +47,23 @@ def test_asking_for_the_update_state_refreshes_the_folder_first(home: Path) -> N
     routes.update_state({})
     assert replies == [200]
     assert manifest.read_bytes() == (extension_home.PACKAGED / "manifest.json").read_bytes()
+
+
+def test_firefox_gets_the_same_files_with_a_manifest_it_can_read(home: Path) -> None:
+    """2026-11-12: Firefox runs no service worker and an add-on there names itself."""
+    import json
+
+    folder = Path(extension_home.firefox_folder())
+    assert folder == home.parent / "extension-firefox"
+    manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["background"] == {"scripts": ["background.js"], "type": "module"}
+    gecko = manifest["browser_specific_settings"]["gecko"]
+    assert gecko["id"] == extension_home.GECKO_ID and gecko["strict_min_version"] == "128.0"
+    assert gecko["data_collection_permissions"] == {"required": ["none"]}
+    packaged = json.loads((extension_home.PACKAGED / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["version"] == packaged["version"] and "service_worker" in packaged["background"]
+    assert (folder / "jobs.js").read_bytes() == (extension_home.PACKAGED / "jobs.js").read_bytes()
+    stale = folder / "retired.js"
+    stale.write_text("old", encoding="utf-8")
+    extension_home.firefox_folder()  # an update drops what it no longer ships, here too
+    assert not stale.exists() and extension_home.same_but_manifest(folder)

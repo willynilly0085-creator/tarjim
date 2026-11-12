@@ -178,8 +178,14 @@ tarjim lives in your browser: right-click any video or link and choose **ترج�
 language), then pick subtitles, burned-in subtitles or dubbing. The popup shows every job's stage
 and lets you pause, cancel or open the result.
 
-In Chrome open `chrome://extensions`, turn on Developer mode, choose **Load unpacked** and pick the
-`~/.tarjim/extension` folder. The extension pairs itself: press **Allow** on the tarjim page.
+In Chrome, Edge or Brave open `chrome://extensions`, turn on Developer mode, choose **Load unpacked**
+and pick the `~/.tarjim/extension` folder. The extension pairs itself: press **Allow** on the
+tarjim page.
+
+In Firefox (128 or later) open `about:debugging#/runtime/this-firefox`, press **Load Temporary
+Add-on** and pick `manifest.json` inside `~/.tarjim/extension-firefox`. Firefox installs for good
+only add-ons Mozilla has signed, so one loaded this way stays until Firefox closes; a signed
+build that installs with one click is not published yet.
 
 ### Chat
 

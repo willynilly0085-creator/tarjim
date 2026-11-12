@@ -46,3 +46,8 @@
 .job-notes .note-quiet { color: var(--muted); }
 /* On a phone the Copy button goes under its text, so the text keeps the full width. */
 @media (max-width: 479px) { .job-post-part { grid-template-columns: minmax(0, 1fr); } .job-post-part .button-quiet { justify-self: start; } }
+/* The same steps for another browser, folded under the first one's. */
+.other-browser { margin-block-start: var(--space-md); }
+.other-browser summary { width: fit-content; padding-block: 2px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+.other-browser summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.other-browser .how { margin-block-start: var(--space-sm); }

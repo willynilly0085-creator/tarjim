@@ -31,6 +31,10 @@
   its own work (speech left without words, a line shown too fast), instead of looking done.
 - A limit on paid requests and seconds of sound for each job, so a hard clip cannot be heard
   again without end.
+- **The extension runs in Firefox** (128 or later): tarjim keeps a second folder with a manifest
+  Firefox reads, tells Firefox it may start a stopped engine once its add-on was allowed, and the
+  setup page gives the steps. Until Mozilla has signed a build it is loaded as a temporary
+  add-on, which Firefox drops when it closes. Not run in Firefox by us yet.
 - **The browser extension shows the summary too**, and says when a translation has things to
   check; before, only tarjim's page did.
 - **The graphics card is given back sooner.** After each heavy step tarjim returns what it no
