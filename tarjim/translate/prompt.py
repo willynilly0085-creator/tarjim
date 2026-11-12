@@ -5,7 +5,7 @@ from tarjim.models import Cue, join_words
 from tarjim.prefs.model import Translate, resolve
 from tarjim.rules import DEFAULT_RULES, Rules
 from tarjim.translate.clean import MARKS
-from tarjim.translate.manner import added, fillers_rule, numbers_rule
+from tarjim.translate.manner import added, length_rule, numbers_rule
 
 DIALECTS = {
     "saudi": "اللهجة السعودية البيضاء العفوية كما يتكلمها الناس يومياً "
@@ -18,10 +18,7 @@ ARABIC = """أنت مترجم أفلام ومسلسلات محترف. {have}قا
 
 المطلوب لكل خانة ترجمة عربية:
 - بـ{style}، وبنفس نبرة المتكلم (مزح، تعجب، سخرية، استغراب).
-{listen}- لا تتجاوز عدد الحروف المسموح للخانة (budget) — {fillers} الـ budget المكتوب a+b \
-حدّ لكل جزء من الحوار لوحده، ولو رجّعت الخانة جملة واحدة فلك مجموعهما.
-- ترجم الخانة لوحدها: لا تنقل كلاماً من خانة لخانة، ولا تدمج خانتين. لو الـ budget ما يكفي \
-جملة الخانة، اختصر ترجمتها هي، ولا ترحّل باقيها للخانة اللي بعدها.
+{listen}{length}
 - {dialogue_rule}
 {numbers}
 {added}- لو الخانة مجرد صوت بلا معنى، أرجع نصاً فارغاً.
@@ -38,11 +35,7 @@ belongs to one speaker.
 For every slot write a {style} subtitle:
 - Natural, idiomatic, spoken {style} as in professional subtitles, keeping the speaker's tone \
 (joking, surprise, sarcasm, doubt).
-{listen}- Never exceed the slot's character budget: {fillers} A budget written a+b is a limit \
-for each part of an exchange on its own; one sentence for the whole slot may use their sum.
-- Translate each slot on its own: never move words between slots and never merge slots. \
-If a slot's budget is too small for its sentence, shorten that slot's own translation; \
-never carry the rest into the next slot.
+{listen}{length}
 - {dialogue_rule}
 {numbers}
 {added}- If a slot is only a meaningless sound, return an empty text.
@@ -139,7 +132,7 @@ def build_prompt(cues: list[Cue], brief: Brief) -> str:
     warning = SLID[key] if brief.slid else ""
     manner = brief.manner
     return template.format(style=style, count=len(cues), items=items, dialogue_rule=rule,
-                           have=have, listen=listen, fillers=fillers_rule(manner, key),
+                           have=have, listen=listen, length=length_rule(manner, key),
                            numbers=numbers_rule(manner, key), added=added(manner, key)) + \
         instructions(brief.glossary) + warning + context_of(brief, key)
 

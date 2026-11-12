@@ -20,7 +20,7 @@
 - **Replies and overlapping talk:** a short reply is shown with the sentence it answers, two
   people talking over each other never give a subtitle too fast to read, and a line repeated by
   the listener is dropped.
-- **A settings page** in tarjim itself, seven tabs and 68 settings (look, timing and reading,
+- **A settings page** in tarjim itself, seven tabs and 69 settings (look, timing and reading,
   listening, translation, files, dubbing, general), each checked before it is saved and each
   reaching the step it names; presets, a reset per language, and the same settings from chat.
   With nothing changed tarjim behaves as before.
@@ -31,11 +31,15 @@
   its own work (speech left without words, a line shown too fast), instead of looking done.
 - A limit on paid requests and seconds of sound for each job, so a hard clip cannot be heard
   again without end.
-- **A line too long to read in its time is given room** before the job lists it: it stays up
-  into the silence after it (never onto the next line or past a cut of the picture), and what
-  is still too long is asked for once more from the engine that translated, shorter, with every
-  word that carries information kept. An answer that does not fit, or is empty, changes nothing.
-  Settings turns the second step off.
+- **A translation that leaves nothing out.** tarjim has always asked for each line to fit what
+  its time lets a reader read, and to be condensed when the time is short, as subtitlers do. A
+  new setting, "Complete", asks for everything that is said, in full. On four made-up lines
+  the fitted translation dropped "new", "some papers" and "nobody else"; the complete one kept
+  them all and ran longer than a comfortable read. The usual way is unchanged.
+- **A line too long to read in its time stays up longer** before the job lists it: into the
+  silence after it, never onto the next line or past a cut of the picture; no word changes.
+  A second step, off unless turned on, asks the engine that translated for the line once more,
+  shorter; it never runs with a complete translation.
 - **The limit on hearing missed speech again is a setting.** On an 18-minute clip it left ten
   stretches without words; "No limit" hears every one again, whatever it costs.
 - **The extension runs in Firefox** (128 or later): tarjim keeps a second folder with a manifest

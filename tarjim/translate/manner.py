@@ -33,6 +33,37 @@ FILLERS: dict[str, Said] = {
              "any": "condense, but keep fillers such as um, like and you know when the "
                     "budget has room for them."},
 }
+# How much of what is said the translation holds (translate.length, 2026-11-12). "fit" is the
+# prompt's own words from before the setting, taken as they were; "full" asks for everything
+# said, for a person to whom nothing left out matters more than a line read at ease.
+LENGTH_FIT: dict[str, str] = {
+    "ar": """- لا تتجاوز عدد الحروف المسموح للخانة (budget) — {fillers} الـ budget المكتوب a+b \
+حدّ لكل جزء من الحوار لوحده، ولو رجّعت الخانة جملة واحدة فلك مجموعهما.
+- ترجم الخانة لوحدها: لا تنقل كلاماً من خانة لخانة، ولا تدمج خانتين. لو الـ budget ما يكفي \
+جملة الخانة، اختصر ترجمتها هي، ولا ترحّل باقيها للخانة اللي بعدها.""",
+    "any": """- Never exceed the slot's character budget: {fillers} A budget written a+b is a \
+limit for each part of an exchange on its own; one sentence for the whole slot may use their sum.
+- Translate each slot on its own: never move words between slots and never merge slots. \
+If a slot's budget is too small for its sentence, shorten that slot's own translation; \
+never carry the rest into the next slot.""",
+}
+LENGTH_FULL: dict[str, str] = {
+    "ar": """- ترجم كل ما قيل في الخانة كاملاً: لا تختصر ولا تحذف أي جزء من المعنى. {fillers} \
+رقم budget هو الطول المريح للقراءة فقط، ولو الترجمة الكاملة أطول منه فاتركها كاملة.
+- ترجم الخانة لوحدها: لا تنقل كلاماً من خانة لخانة، ولا تدمج خانتين، ولا ترحّل أي جزء من \
+ترجمتها للخانة اللي بعدها.""",
+    "any": """- Translate everything said in the slot, in full: never condense or leave out \
+any part of the meaning. {fillers} The budget is only the length that reads at ease; when \
+the full translation is longer, keep it full.
+- Translate each slot on its own: never move words between slots, never merge slots, and \
+never carry any part of a slot into the next one.""",
+}
+FULL_FILLERS: dict[str, Said] = {
+    "drop": {"ar": "كلمات الحشو وحدها (um و like و you know) تنحذف.",
+             "any": "Fillers alone (um, like, you know) are dropped."},
+    "keep": {"ar": "وخلّ كلمات الحشو مثل um و like و you know.",
+             "any": "Keep fillers such as um, like and you know too."},
+}
 REGISTER: dict[str, Said] = {
     "casual": {"ar": "- خلّ الأسلوب عفوي وخفيف مثل كلام الأصحاب.",
                "any": "- Keep the style casual and relaxed, the way friends talk."},
@@ -64,6 +95,13 @@ def numbers_rule(manner: Translate, key: str) -> str:
 
 def fillers_rule(manner: Translate, key: str) -> str:
     return FILLERS[manner.fillers][key]
+
+
+def length_rule(manner: Translate, key: str) -> str:
+    """The two lines about how long a translation may be, for the person's choice."""
+    if manner.length == "full":
+        return LENGTH_FULL[key].format(fillers=FULL_FILLERS[manner.fillers][key])
+    return LENGTH_FIT[key].format(fillers=fillers_rule(manner, key))
 
 
 def added(manner: Translate, key: str) -> str:

@@ -91,6 +91,7 @@ class Translate:
     question_marks: str
     local_backup: bool
     shorten: bool
+    length: str
 
 
 @dataclass(frozen=True)

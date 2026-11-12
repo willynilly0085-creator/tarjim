@@ -124,7 +124,9 @@ def make_room(cues: list[Cue], brief: Brief, parts: list[int], cuts: list[float]
     first = over(cues, rules, parts)
     held = given_time(cues, rules, cuts)
     left = over(cues, rules, parts)
-    said = said_shorter(cues, left, brief, parts) if left and active().translate.shorten else 0
+    manner = active().translate
+    asked = bool(left) and manner.shorten and manner.length == "fit"
+    said = said_shorter(cues, left, brief, parts) if asked else 0
     last = over(cues, rules, parts) if said else left
     if first or held:
         print(f"translation: {len(first)} line(s) too long for their time; {held} stay up "

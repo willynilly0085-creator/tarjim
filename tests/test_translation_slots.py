@@ -50,6 +50,13 @@ def exchange(speakers: tuple[str, str] = ("", "")) -> Cue:
     return Cue(0.0, 1.0, first + second, parts=[first, second])
 
 
+def shortening() -> Any:
+    from tarjim.prefs.active import using
+    from tarjim.prefs.model import resolve
+
+    return using(resolve({"translate.shorten": True}, {}, "fr"))
+
+
 def brief() -> Brief:
     return Brief(language("fr"), "", DEFAULT_RULES)
 
@@ -145,10 +152,11 @@ LONG = "Une traduction bien trop longue pour une seule seconde et demie, et mêm
 
 def test_a_line_too_long_for_its_time_is_asked_for_once_more_shorter(
         monkeypatch: pytest.MonkeyPatch, tmp_path: Path, found: Findings) -> None:
-    """2026-11-12: it used to be kept and listed with nothing tried."""
+    """2026-11-12: for a person who turned it on; nothing is ever shortened otherwise."""
     chosen = Answers([{"id": 1, "text": LONG}], [{"id": 1, "text": "Bonjour à tous."}])
     engines(monkeypatch, gemini=chosen, local=Answers())
-    done = pipeline.translate(job(tmp_path), [said(0.0, "Hello there.")])
+    with shortening():
+        done = pipeline.translate(job(tmp_path), [said(0.0, "Hello there.")])
     assert done[0].text == "Bonjour à tous." and found.over_budget == []
     assert len(chosen.prompts) == 2 and "limit" in chosen.prompts[1]
     assert LONG in chosen.prompts[1] and "Hello there." in chosen.prompts[1]
@@ -160,8 +168,10 @@ def test_a_shorter_answer_that_does_not_fit_leaves_the_line_and_lists_it(
         monkeypatch: pytest.MonkeyPatch, tmp_path: Path, found: Findings, second: Any) -> None:
     chosen = Answers([{"id": 1, "text": LONG}], second)
     engines(monkeypatch, gemini=chosen, local=Answers())
-    done = pipeline.translate(job(tmp_path), [said(0.0, "Hello there.")])
+    with shortening():
+        done = pipeline.translate(job(tmp_path), [said(0.0, "Hello there.")])
     assert done[0].text == LONG and found.over_budget == [1] and found.in_source == []
+    assert len(chosen.prompts) == 2
 
 
 def test_a_long_line_stays_up_into_the_silence_after_it_before_any_word_changes(
@@ -189,16 +199,36 @@ def test_a_line_never_stays_onto_the_next_one_or_past_a_cut_of_the_picture() -> 
     assert 1.5 < cut[0].end <= 2.0 - DEFAULT_RULES.min_gap + 1e-6
 
 
-def test_with_shortening_turned_off_the_long_line_is_kept_and_listed(
+def test_nothing_is_asked_for_shorter_unless_the_person_turned_it_on(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path, found: Findings) -> None:
+    """The owner, 2026-11-12: no shortening at all, accuracy first."""
+    chosen = Answers([{"id": 1, "text": LONG}])
+    engines(monkeypatch, gemini=chosen, local=Answers())
+    done = pipeline.translate(job(tmp_path), [said(0.0, "Hello there.")])
+    assert done[0].text == LONG and len(chosen.prompts) == 1 and found.over_budget == [1]
+
+
+def test_a_full_translation_is_asked_to_leave_nothing_out_and_is_never_shortened(
         monkeypatch: pytest.MonkeyPatch, tmp_path: Path, found: Findings) -> None:
     from tarjim.prefs.active import using
     from tarjim.prefs.model import resolve
 
     chosen = Answers([{"id": 1, "text": LONG}])
     engines(monkeypatch, gemini=chosen, local=Answers())
-    with using(resolve({"translate.shorten": False}, {}, "fr")):
+    with using(resolve({"translate.length": "full", "translate.shorten": True}, {}, "fr")):
         done = pipeline.translate(job(tmp_path), [said(0.0, "Hello there.")])
+    asked = chosen.prompts[0]
+    assert "never condense or leave out" in asked and "Fillers alone" in asked
+    assert "Never exceed" not in asked and "shorten that slot" not in asked
     assert done[0].text == LONG and len(chosen.prompts) == 1 and found.over_budget == [1]
+
+
+def test_the_usual_prompt_is_word_for_word_what_it_was() -> None:
+    from tarjim.translate.prompt import build_prompt
+
+    asked = build_prompt([said(0.0, "Hello there.")], brief())
+    assert "- Never exceed the slot's character budget: condense and drop fillers" in asked
+    assert "shorten that slot's own translation; never carry the rest into the next slot." in asked
 
 
 def test_no_engine_answering_at_all_still_fails_the_job_with_its_reason(
