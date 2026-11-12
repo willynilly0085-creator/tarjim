@@ -81,6 +81,7 @@ def test_the_job_asks_with_its_own_manner(tmp_path: Path,
         def __init__(self, _cues: list[Cue], _audio: Any, brief: Brief) -> None:
             seen.append(brief)
             self.stopped: list[Exception] = []
+            self.parts: list[int] = []
 
         def run(self) -> list[Exception]:
             return []
@@ -93,7 +94,7 @@ def test_the_job_asks_with_its_own_manner(tmp_path: Path,
     monkeypatch.setattr(rounds, "Rounds", Rounds)
     job = Job(tmp_path / "v.mp4", cache_dir=tmp_path)
     with using(resolve({"translate.register": "formal"}, {}, "ar")):
-        pipeline.translate(job, list(CUES))
+        pipeline.translate(job, [])
     assert seen[0].manner.register == "formal"
 
 

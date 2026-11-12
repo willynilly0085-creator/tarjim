@@ -179,3 +179,18 @@ def test_the_note_lists_only_refused_speech_the_chosen_timing_left_open(tmp_path
     finally:
         FINDINGS.reset(token)
     assert record.refused == [(20.0, 23.0)]  # the open gap, at its own times
+
+
+def test_a_person_who_would_rather_pay_lifts_the_limit() -> None:
+    """2026-11-12: the limit left ten stretches of an 18-minute clip without words."""
+    from tarjim.listen.budget import budget_for
+    from tarjim.prefs.active import using
+    from tarjim.prefs.model import resolve
+
+    assert budget_for("gemini", 1110.0).requests == 22  # limited: one a minute and three
+    with using(resolve({"listen.reask": "unlimited"}, {}, "ar")):
+        free = budget_for("gemini", 1110.0)
+    assert free.requests is None and free.audio is None
+    for start in range(0, 400, 10):
+        free.charge((float(start), start + 9.0))  # never refused
+    assert free.made == 40 and free.refused == []

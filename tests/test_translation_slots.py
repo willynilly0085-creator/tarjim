@@ -140,14 +140,65 @@ def test_an_exchange_no_engine_translated_is_shown_as_said_in_its_two_parts(
     assert done[1].text == "Once. || Yeah?"
 
 
-def test_text_over_its_budget_is_kept_and_listed_not_asked_again(
+LONG = "Une traduction bien trop longue pour une seule seconde et demie, et même pour trois"
+
+
+def test_a_line_too_long_for_its_time_is_asked_for_once_more_shorter(
         monkeypatch: pytest.MonkeyPatch, tmp_path: Path, found: Findings) -> None:
-    long = "Une traduction bien trop longue pour une seule seconde et demie"
-    chosen = Answers([{"id": 1, "text": long}])
+    """2026-11-12: it used to be kept and listed with nothing tried."""
+    chosen = Answers([{"id": 1, "text": LONG}], [{"id": 1, "text": "Bonjour à tous."}])
     engines(monkeypatch, gemini=chosen, local=Answers())
     done = pipeline.translate(job(tmp_path), [said(0.0, "Hello there.")])
-    assert done[0].text == long and len(chosen.prompts) == 1
-    assert found.over_budget == [1] and found.in_source == []
+    assert done[0].text == "Bonjour à tous." and found.over_budget == []
+    assert len(chosen.prompts) == 2 and "limit" in chosen.prompts[1]
+    assert LONG in chosen.prompts[1] and "Hello there." in chosen.prompts[1]
+
+
+@pytest.mark.parametrize("second", [[{"id": 1, "text": LONG + " encore"}], [{"id": 1, "text": ""}],
+                                    RuntimeError("busy"), [{"id": 1, "text": "Un || deux"}]])
+def test_a_shorter_answer_that_does_not_fit_leaves_the_line_and_lists_it(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path, found: Findings, second: Any) -> None:
+    chosen = Answers([{"id": 1, "text": LONG}], second)
+    engines(monkeypatch, gemini=chosen, local=Answers())
+    done = pipeline.translate(job(tmp_path), [said(0.0, "Hello there.")])
+    assert done[0].text == LONG and found.over_budget == [1] and found.in_source == []
+
+
+def test_a_long_line_stays_up_into_the_silence_after_it_before_any_word_changes(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path, found: Findings) -> None:
+    fits_in_three = "Une phrase qui se lit en trois secondes"
+    chosen = Answers([{"id": 1, "text": fits_in_three}, {"id": 2, "text": "Oui."}])
+    engines(monkeypatch, gemini=chosen, local=Answers())
+    cues = [said(0.0, "A sentence read in three seconds."), said(10.0, "Yes.")]
+    done = pipeline.translate(job(tmp_path), cues)
+    assert done[0].text == fits_in_three and len(chosen.prompts) == 1  # no word changed
+    assert 2.2 < done[0].end <= 3.5 and found.over_budget == []
+    assert done[1].end == 11.5  # a line that fits keeps its time
+
+
+def test_a_line_never_stays_onto_the_next_one_or_past_a_cut_of_the_picture() -> None:
+    from tarjim.translate import readable
+
+    crowded = [said(0.0, "a"), said(1.6, "b")]
+    crowded[0].text = crowded[1].text = "x" * 60
+    readable.given_time(crowded, DEFAULT_RULES, [])
+    assert crowded[0].end <= 1.6 - DEFAULT_RULES.min_gap + 1e-6
+    cut = [said(0.0, "a")]
+    cut[0].text = "x" * 60
+    readable.given_time(cut, DEFAULT_RULES, [2.0])
+    assert 1.5 < cut[0].end <= 2.0 - DEFAULT_RULES.min_gap + 1e-6
+
+
+def test_with_shortening_turned_off_the_long_line_is_kept_and_listed(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path, found: Findings) -> None:
+    from tarjim.prefs.active import using
+    from tarjim.prefs.model import resolve
+
+    chosen = Answers([{"id": 1, "text": LONG}])
+    engines(monkeypatch, gemini=chosen, local=Answers())
+    with using(resolve({"translate.shorten": False}, {}, "fr")):
+        done = pipeline.translate(job(tmp_path), [said(0.0, "Hello there.")])
+    assert done[0].text == LONG and len(chosen.prompts) == 1 and found.over_budget == [1]
 
 
 def test_no_engine_answering_at_all_still_fails_the_job_with_its_reason(

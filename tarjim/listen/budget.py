@@ -67,6 +67,8 @@ def budget_for(provider: str, seconds: float, rederive: bool = False) -> Budget:
     """At least REQUESTS requests and AUDIO seconds of sound; one more request a minute of the
     clip and a tenth of its length on longer clips; half the requests on a subscription."""
     passes = 1 if provider == SINGLE else active().listen.passes  # the job's (2026-11-09)
+    if active().listen.reask == "unlimited":  # the person's choice (2026-11-12)
+        return Budget(None, None, passes, rederive=rederive)
     requests = max(REQUESTS, BASE + ceil(seconds / 60))
     if provider == SUBSCRIPTION:
         requests = ceil(requests / 2)

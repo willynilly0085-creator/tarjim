@@ -54,7 +54,8 @@ def cuts_for(job: Job) -> list[float]:
     return cuts
 
 
-def translate(job: Job, cues: list[Cue], rules: Rules | None = None) -> list[Cue]:
+def translate(job: Job, cues: list[Cue], rules: Rules | None = None,
+              cuts: list[float] | None = None) -> list[Cue]:
     """Every engine of the chain while a line is untranslated (translate/rounds.py). The job
     fails only when no engine translated anything; otherwise what they did is kept, and why an
     engine stopped is kept on the job beside the lines left as said."""
@@ -73,6 +74,9 @@ def translate(job: Job, cues: list[Cue], rules: Rules | None = None) -> list[Cue
     if failures and not rounds.translated():
         raise first_failure(failures)
     rounds.finish(shaped)
+    from tarjim.translate.readable import make_room
+
+    findings().over_budget = make_room(cues, brief, rounds.parts, cuts or [])
     # Since 2026-11-08 only the last engine that ran explains the lines left as said: a line a
     # backup left out without failing is listed as such (in_source), not blamed on the quota of
     # the engine before it.
@@ -159,9 +163,10 @@ def work(job: Job, report: Report) -> tuple[list[Cue], list[Issue]]:
     # the target language's rules, its lines shortened for the picture's shape: before
     # 2026-11-08 the cues were cut by the default rules whatever the language
     rules = fitted(job.rules, info.width, info.height, active().look)
-    cues = build_cues(words, cuts_for(job), rules)
+    cuts = cuts_for(job)
+    cues = build_cues(words, cuts, rules)
     report("translating")
-    cues = translate(job, cues, rules)
+    cues = translate(job, cues, rules, cuts)
     save_review(job, cues)
     post.write(job, cues)  # an extra: it never fails the job
     report("writing")

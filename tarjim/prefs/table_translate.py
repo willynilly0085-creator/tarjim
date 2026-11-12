@@ -15,4 +15,7 @@ TRANSLATE: tuple[Spec, ...] = (
     pick("translate.question_marks", "علامتي ؟! مع بعض", ("collapse", "keep"), ADVANCED),
     on_off("translate.local_backup", "لو تعطلت الترجمة يكمل بالترجمة اللي على جهازك", True,
            ADVANCED),
+    # A line too long for its time is first left up longer (translate/readable.py, 2026-11-12);
+    # this is the second try, one request more, kept only when the answer fits.
+    on_off("translate.shorten", "اختصر السطر لو كان أطول من وقته", True, ADVANCED),
 )

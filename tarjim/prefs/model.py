@@ -78,6 +78,7 @@ class Listen:
     second_opinion: bool
     voice_check: bool
     aligner: str
+    reask: str
 
 
 @dataclass(frozen=True)
@@ -89,6 +90,7 @@ class Translate:
     fillers: str
     question_marks: str
     local_backup: bool
+    shorten: bool
 
 
 @dataclass(frozen=True)

@@ -31,7 +31,8 @@ def run_with(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, size: tuple[int, i
         seen.append(rules)
         return []
 
-    def translated(_job: Job, cues: list[Cue], rules: Rules | None = None) -> list[Cue]:
+    def translated(_job: Job, cues: list[Cue], rules: Rules | None = None,
+                   _cuts: list[float] | None = None) -> list[Cue]:
         seen.append(rules or DEFAULT_RULES)
         return cues
 
@@ -165,7 +166,7 @@ def test_the_picture_is_probed_once_a_run(
     monkeypatch.setattr(pipeline.media, "probe", probe)
     monkeypatch.setattr(pipeline, "transcript_for", lambda _j, _r: heard)
     monkeypatch.setattr(pipeline, "cuts_for", lambda _j: [])
-    monkeypatch.setattr(pipeline, "translate", lambda _j, cues, _r=None: cues)
+    monkeypatch.setattr(pipeline, "translate", lambda _j, cues, *_a: cues)
     monkeypatch.setattr(pipeline, "placed", lambda _j, _c, canvas, _d: canvas)
     monkeypatch.setattr(pipeline, "moved", lambda _j, _c, canvas, _m: canvas)
     job = Job(video, burn=False, cache_dir=tmp_path / "work", out_dir=tmp_path)

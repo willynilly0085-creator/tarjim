@@ -25,4 +25,8 @@ LISTEN: tuple[Spec, ...] = (
     # twice or never said is dropped or marked instead of being squeezed onto real speech.
     pick("listen.aligner", "طريقة مطابقة الكلام مع الصوت (المرن يتجاوز السطر المكرر أو اللي "
          "ما انقال)", ("strict", "tolerant"), ADVANCED),
+    # What a job may pay to hear missed speech again (listen/budget.py). The limit left ten
+    # stretches of an 18-minute clip without words on 2026-11-12; a person who would rather pay
+    # lifts it.
+    pick("listen.reask", "إعادة سماع الكلام الفايت", ("limited", "unlimited"), ADVANCED),
 )

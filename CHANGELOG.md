@@ -20,7 +20,7 @@
 - **Replies and overlapping talk:** a short reply is shown with the sentence it answers, two
   people talking over each other never give a subtitle too fast to read, and a line repeated by
   the listener is dropped.
-- **A settings page** in tarjim itself, seven tabs and 66 settings (look, timing and reading,
+- **A settings page** in tarjim itself, seven tabs and 68 settings (look, timing and reading,
   listening, translation, files, dubbing, general), each checked before it is saved and each
   reaching the step it names; presets, a reset per language, and the same settings from chat.
   With nothing changed tarjim behaves as before.
@@ -31,6 +31,13 @@
   its own work (speech left without words, a line shown too fast), instead of looking done.
 - A limit on paid requests and seconds of sound for each job, so a hard clip cannot be heard
   again without end.
+- **A line too long to read in its time is given room** before the job lists it: it stays up
+  into the silence after it (never onto the next line or past a cut of the picture), and what
+  is still too long is asked for once more from the engine that translated, shorter, with every
+  word that carries information kept. An answer that does not fit, or is empty, changes nothing.
+  Settings turns the second step off.
+- **The limit on hearing missed speech again is a setting.** On an 18-minute clip it left ten
+  stretches without words; "No limit" hears every one again, whatever it costs.
 - **The extension runs in Firefox** (128 or later): tarjim keeps a second folder with a manifest
   Firefox reads, tells Firefox it may start a stopped engine once its add-on was allowed, and the
   setup page gives the steps. Until Mozilla has signed a build it is loaded as a temporary
