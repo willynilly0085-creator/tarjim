@@ -128,7 +128,7 @@ def test_the_summary_is_written_after_the_translation_and_before_the_burn(
     monkeypatch.setattr(pipeline.media, "probe", lambda _video: picture)
     monkeypatch.setattr(pipeline, "cuts_for", lambda _job: [])
     monkeypatch.setattr(pipeline, "translate", lambda _job, c, *_a: steps.append("translate") or c)
-    monkeypatch.setattr(pipeline.post, "write", lambda _job, c: steps.append(f"post {len(c)}"))
+    monkeypatch.setattr(pipeline.post, "write", lambda _job, c, *_a: steps.append(f"post {len(c)}"))
     monkeypatch.setattr(pipeline, "write_outputs", lambda *_a: steps.append("outputs"))
     (tmp_path / "clip.mp4").write_bytes(b"video")
     pipeline.run(Job(tmp_path / "clip.mp4", out_dir=tmp_path, cache_dir=tmp_path / "cache"))

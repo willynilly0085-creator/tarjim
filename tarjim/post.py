@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from tarjim.asr.voices import Voices, told
 from tarjim.config import setting
 from tarjim.job import Job, checkpoint
 from tarjim.languages import Language
@@ -44,6 +45,8 @@ the file name name them; otherwise write "the speaker" in {language}.
 - Report, do not judge: no opinion, no praise, no words like "shocking" or "must watch".
 - No hashtags, no emojis, no links, and no mention of subtitles, the file or this task.
 - Write names as the subtitles write them, without quotation marks around them.
+- Never judge whether a person is a man or a woman from a name. Follow the voices given \
+below when there are any, otherwise the subtitles' own wording, otherwise leave it unsaid.
 - A line "{gap}" marks a place where some lines were left out."""
 PLAIN = "the plain written form used in news posts"
 STANDARD = "clear Modern Standard Arabic as written in news posts, not a dialect"
@@ -89,13 +92,14 @@ def room(language: Language) -> int:
     return TWEET if language.spaced else TWEET // 2
 
 
-def prompt(title: str, language: Language, lines: list[str]) -> str:
+def prompt(title: str, language: Language, lines: list[str],
+           voices: Voices = ()) -> str:
     register = STANDARD if language.code.split("-")[0] == "ar" else PLAIN
     task = TASK.format(language=language.name, register=register, short=room(language) - 10,
                        long=LONG, gap=GAP)
     quoted = [TAG.sub("", line) for line in lines]
-    return "\n".join([task, "", f"File name: {TAG.sub('', title)}", "<subtitles>", *quoted,
-                      "</subtitles>"])
+    return "\n".join([task + told(voices, "any"), "", f"File name: {TAG.sub('', title)}",
+                      "<subtitles>", *quoted, "</subtitles>"])
 
 
 def clipped(text: str, most: int) -> str:
@@ -132,14 +136,15 @@ def post_from(answer: Any, language: Language) -> Post | None:
     return Post(short, long) if short and long else None
 
 
-def summary(title: str, cues: list[Cue], language: Language) -> Post | None:
+def summary(title: str, cues: list[Cue], language: Language,
+            voices: Voices = ()) -> Post | None:
     """Asked of the engine that translated, then of its backup; None when neither answers."""
     from tarjim.engines.choice import asker, chain
 
     lines = thinned(spoken(cues))
     if not lines:
         return None
-    text = prompt(title, language, lines)
+    text = prompt(title, language, lines, voices)
     for provider in chain("translate"):
         checkpoint()
         try:
@@ -152,11 +157,11 @@ def summary(title: str, cues: list[Cue], language: Language) -> Post | None:
     return None
 
 
-def write(job: Job, cues: list[Cue]) -> Path | None:
+def write(job: Job, cues: list[Cue], voices: Voices = ()) -> Path | None:
     """The summary beside the results; an older one never stays beside newer subtitles."""
     target = job.output(SUFFIX)
     target.unlink(missing_ok=True)
-    found = summary(job.video.stem, cues, job.language) if wanted() else None
+    found = summary(job.video.stem, cues, job.language, voices) if wanted() else None
     if found is None:
         return None
     try:  # a folder that is not there yet, or cannot be written, is no reason to fail the job

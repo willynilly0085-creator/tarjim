@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 
+from tarjim.asr.voices import told
 from tarjim.languages import Language, language
 from tarjim.models import Cue, join_words
 from tarjim.prefs.model import Translate, resolve
 from tarjim.rules import DEFAULT_RULES, Rules
+from tarjim.speakers import who
 from tarjim.translate.clean import MARKS
 from tarjim.translate.manner import added, length_rule, numbers_rule
 
@@ -87,6 +89,7 @@ class Brief:
     slid: bool = False  # the last answer moved each translation into the next slot (drift.py)
     context: tuple[Cue, ...] = ()  # translated lines beside the asked ones, shown read only
     manner: Translate = USUAL  # how the person wants it written (translate/manner.py)
+    voices: tuple[tuple[str, str], ...] = ()  # each speaker's voice (asr/voices.py)
 
     @property
     def arabic(self) -> bool:
@@ -134,14 +137,27 @@ def build_prompt(cues: list[Cue], brief: Brief) -> str:
     return template.format(style=style, count=len(cues), items=items, dialogue_rule=rule,
                            have=have, listen=listen, length=length_rule(manner, key),
                            numbers=numbers_rule(manner, key), added=added(manner, key)) + \
-        instructions(brief.glossary) + warning + context_of(brief, key)
+        instructions(brief.glossary) + told(brief.voices, key) + warning + context_of(brief, key)
 
 
 def format_item(number: int, cue: Cue, brief: Brief) -> str:
     budget = "+".join(str(n) for n in brief.rules.budgets(cue.duration, len(cue.parts)))
     start, end = cue.start - brief.offset, cue.end - brief.offset
     unit = "ث" if brief.arabic else "s"
-    return f"{number}. [{start:.1f}-{end:.1f}{unit} | budget={budget}] {marked(cue)}"
+    heading = f"{start:.1f}-{end:.1f}{unit} | budget={budget}{spoken_by(cue, brief)}"
+    return f"{number}. [{heading}] {marked(cue)}"
+
+
+def spoken_by(cue: Cue, brief: Brief) -> str:
+    """Who says the slot, in its heading, when the voices are known: the model is told each
+    speaker's voice by name (asr/voices.py) and has to know whose line this is."""
+    parts = cue.parts if cue.is_dialogue else [cue.words]
+    names = [who(part[0].speaker) for part in parts if part]
+    if not brief.voices or not any(names):
+        return ""
+    if len(names) == 1:
+        return f" | {names[0]}"
+    return " | " + " ".join(f"{mark}={name}" for mark, name in zip(MARKS, names, strict=False))
 
 
 def marked(cue: Cue) -> str:

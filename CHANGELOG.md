@@ -42,6 +42,12 @@
   shorter; it never runs with a complete translation.
 - **The limit on hearing missed speech again is a setting.** On an 18-minute clip it left ten
   stretches without words; "No limit" hears every one again, whatever it costs.
+- **A man is no longer translated as a woman because of his name.** A man called Andrea came
+  out as a woman, in the subtitles and in the summary: an engine that only reads the lines
+  guessed from the name. tarjim now measures each speaker's voice from the clip's own sound, on
+  this computer, and tells the translator and the summary whose voice is a man's and whose a
+  woman's; a voice between the two is left unsaid. With the same made-up lines Gemini 4
+  Hydrogen wrote the feminine forms when told nothing and the masculine ones when told the voice.
 - **Gemini 4 can be picked, and the model you pick is the model asked.** With a Gemini
   subscription tarjim translated with the low variant of whatever was picked; it now asks the
   picked one, and its low variant only if that fails. Measured on sixteen made-up lines with

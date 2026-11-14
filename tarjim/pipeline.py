@@ -54,8 +54,15 @@ def cuts_for(job: Job) -> list[float]:
     return cuts
 
 
+class Around(NamedTuple):
+    """What the translation is told besides the lines: where the picture cuts, and each
+    speaker's voice (asr/voices.py)."""
+    cuts: tuple[float, ...] = ()
+    voices: tuple[tuple[str, str], ...] = ()
+
+
 def translate(job: Job, cues: list[Cue], rules: Rules | None = None,
-              cuts: list[float] | None = None) -> list[Cue]:
+              around: Around | None = None) -> list[Cue]:
     """Every engine of the chain while a line is untranslated (translate/rounds.py). The job
     fails only when no engine translated anything; otherwise what they did is kept, and why an
     engine stopped is kept on the job beside the lines left as said."""
@@ -67,8 +74,9 @@ def translate(job: Job, cues: list[Cue], rules: Rules | None = None,
         return media.audio_bytes(job.video, start, end)
 
     shaped = rules or job.rules
+    known = around or Around()
     brief = Brief(job.language, job.dialect, shaped, glossary=current(job.target),
-                  manner=active().translate)
+                  manner=active().translate, voices=known.voices)
     rounds = Rounds(cues, audio, brief)
     failures = rounds.run()
     if failures and not rounds.translated():
@@ -76,7 +84,7 @@ def translate(job: Job, cues: list[Cue], rules: Rules | None = None,
     rounds.finish(shaped)
     from tarjim.translate.readable import make_room
 
-    findings().over_budget = make_room(cues, brief, rounds.parts, cuts or [])
+    findings().over_budget = make_room(cues, brief, rounds.parts, list(known.cuts))
     # Since 2026-11-08 only the last engine that ran explains the lines left as said: a line a
     # backup left out without failing is listed as such (in_source), not blamed on the quota of
     # the engine before it.
@@ -166,9 +174,12 @@ def work(job: Job, report: Report) -> tuple[list[Cue], list[Issue]]:
     cuts = cuts_for(job)
     cues = build_cues(words, cuts, rules)
     report("translating")
-    cues = translate(job, cues, rules, cuts)
+    from tarjim.asr.voices import voices_of
+
+    voices = voices_of(job.video, words)
+    cues = translate(job, cues, rules, Around(tuple(cuts), voices))
     save_review(job, cues)
-    post.write(job, cues)  # an extra: it never fails the job
+    post.write(job, cues, voices)  # an extra: it never fails the job
     report("writing")
     write_outputs(job, Made(cues, words, info, rules), report)
     report("done")
