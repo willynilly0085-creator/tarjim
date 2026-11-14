@@ -9,6 +9,12 @@ from tarjim.google_ai import google_client
 
 MODELS = ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash",
           "gemini-flash-latest", "gemini-3-flash-preview"]
+# Newer or stronger models a person may pick, never asked unless picked (2026-11-14). Gemini 4
+# came out on 2026-10-13 to 11-12; the owner's Vertex key did not have it (404 in its region), so
+# tarjim's calls to it follow Google's migration notes and were not run. Measured with that key on
+# five made-up clips: gemini-3.1-pro-preview heard the same words as 3.8 Flash, timed its lines
+# several seconds worse and took three times as long.
+OFFERED = ["gemini-4-carbon", "gemini-4-argon", "gemini-4-hydrogen", "gemini-3.1-pro-preview"]
 ROUNDS = 3
 RETRY_PAUSE = 3.0
 MAX_WAIT = 90.0
@@ -29,12 +35,16 @@ STALLED_FOR = 20 * 60.0
 STALLED: dict[str, float] = {}
 TOO_MANY = 429
 USED_UP = "daily quota used up"
-# A 400 or 403 is about one model (not offered to this key, or not able to do this request): the
-# next one is asked. A 401, or one that names the key ("API key not valid" comes as a 400), is the
-# key itself, which no other model will accept either.
-REFUSED = (400, 403)
+# A 400, 403 or 404 is about one model (not offered to this key or in its region, or not able to
+# do this request): the next one is asked. A 401, or one that names the key ("API key not valid"
+# comes as a 400), is the key itself, which no other model will accept either. Until 2026-11-14 a
+# 404 was taken for a busy model and asked three times over.
+REFUSED = (400, 403, 404)
 BAD_KEY = 401
 KEY = re.compile(r"api[ _]?key", re.IGNORECASE)
+REASONING = ("gemini-3", "gemini-4")  # models that think at a chosen level
+# Gemini 4 chooses its own sampling: Google's notes say to send no temperature to it.
+OWN_SAMPLING = ("gemini-4",)
 DAILY = re.compile(r"per ?day", re.IGNORECASE)
 DELAY = re.compile(r"retryDelay'?\"?:\s*'?\"?(\d+(?:\.\d+)?)s")
 
@@ -55,7 +65,7 @@ def thinking(model: str, listening: bool) -> Any:
     default long thinking only made each answer slower. Listening keeps the model's default."""
     from google.genai import types
 
-    if listening or not model.startswith("gemini-3"):
+    if listening or not model.startswith(REASONING):
         return None
     return types.ThinkingConfig(thinking_level=types.ThinkingLevel.LOW)
 
@@ -160,7 +170,8 @@ class GeminiClient:
         from google.genai import types
 
         config = types.GenerateContentConfig(
-            response_mime_type="application/json", response_schema=schema, temperature=0.2,
+            response_mime_type="application/json", response_schema=schema,
+            temperature=None if model.startswith(OWN_SAMPLING) else 0.2,
             thinking_config=thinking(model, self.listening),
             http_options=types.HttpOptions(timeout=self.limit_ms(audio)))
         sound = [types.Part.from_bytes(data=audio, mime_type="audio/mp3")] if audio else []
