@@ -28,6 +28,7 @@ from tarjim.listen import gemini_listen  # noqa: E402
 from tarjim.listen.gemini_listen import listen  # noqa: E402
 
 HINT = os.environ.get("HEAR_HINT", "")
+SOUND = os.environ.get("HEAR_SOUND", "clip")  # "voices": the clip's voice alone (voices.py)
 if HINT:
     gemini_listen.PROMPT += (" Names and terms that may come up in this recording; when you "
                              "hear one, write it this way; never write one you do not hear: "
@@ -40,7 +41,7 @@ def heard(clip: str, number: int) -> Row:
     truth = json.loads((CLIPS / clip / "truth.json").read_text(encoding="utf-8"))
     code = truth["language"].split("_")[0].replace("cmn", "zh")
     client = GeminiClient(listening=True)
-    _language, lines = listen(media.audio_bytes(CLIPS / clip / "clip.wav", 0.0, None), client)
+    _language, lines = listen(media.audio_bytes(CLIPS / clip / f"{SOUND}.wav", 0.0, None), client)
     said = [unit for sentence in truth["sentences"] for unit in plain(sentence["text"], code)]
     wrote = [unit for line in lines for unit in plain(line.text, code)]
     errors = sum(step.kind != OK for step in steps(said, wrote))
@@ -51,7 +52,8 @@ def heard(clip: str, number: int) -> Row:
 def main() -> None:
     model, passes, clips = sys.argv[1], int(sys.argv[2]), sys.argv[3:]
     for clip in clips:
-        kept = RUNS / "_hear" / (model + ("+hint" if HINT else "")) / f"{clip}.json"
+        told = ("+hint" if HINT else "") + ("" if SOUND == "clip" else f"+{SOUND}")
+        kept = RUNS / "_hear" / (model + told) / f"{clip}.json"
         if not kept.exists():
             kept.parent.mkdir(parents=True, exist_ok=True)
             rows = [heard(clip, number) for number in range(passes)]
