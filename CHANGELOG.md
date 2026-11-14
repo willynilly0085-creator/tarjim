@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.1 (2026-11-12)
+## 1.1.1 (2026-11-14)
 
 - **Words are no longer pulled away from where they are said.** Under music or noise the voice
   detector misses speech, and the timing step would not place a word where the detector heard
@@ -31,17 +31,26 @@
   its own work (speech left without words, a line shown too fast), instead of looking done.
 - A limit on paid requests and seconds of sound for each job, so a hard clip cannot be heard
   again without end.
-- **A translation that leaves nothing out.** tarjim has always asked for each line to fit what
-  its time lets a reader read, and to be condensed when the time is short, as subtitlers do. A
-  new setting, "Complete", asks for everything that is said, in full. On four made-up lines
-  the fitted translation dropped "new", "some papers" and "nobody else"; the complete one kept
-  them all and ran longer than a comfortable read. The usual way is unchanged.
+- **The translation leaves nothing out.** tarjim used to ask for each line to fit what its time
+  lets a reader read, and to be condensed when the time is short, as subtitlers do. It now asks
+  for everything that is said, in full. On four made-up lines the fitted translation dropped
+  "new", "some papers" and "nobody else"; the complete one kept them all, and ran longer than a
+  comfortable read, which the job lists. "Fitted to the time" stays as a choice in Settings.
 - **A line too long to read in its time stays up longer** before the job lists it: into the
   silence after it, never onto the next line or past a cut of the picture; no word changes.
   A second step, off unless turned on, asks the engine that translated for the line once more,
   shorter; it never runs with a complete translation.
 - **The limit on hearing missed speech again is a setting.** On an 18-minute clip it left ten
   stretches without words; "No limit" hears every one again, whatever it costs.
+- **Newer Gemini models can be picked.** Gemini 4 (Carbon, Argon, Hydrogen) and Gemini 3.1 Pro
+  are in the list of models for a Vertex key; a key from AI Studio already lists what it has.
+  A model a key does not have is passed over at once, where it used to be asked three times.
+  Gemini 3.8 Flash stays the model tarjim asks first: on five made-up clips Gemini 3.1 Pro
+  heard the same words, timed its lines several seconds worse and took three times as long.
+  The owner's key did not have Gemini 4, so tarjim's calls to it were not run.
+- **Libraries brought up to date** (13 of them): Google's Gemini library 3.0 to 3.3,
+  Transformers 5.23, ONNX Runtime 1.32 and others, each run through every test and a whole
+  translation heard by Gemini before release. None fixes a published vulnerability.
 - **The extension runs in Firefox** (128 or later): tarjim keeps a second folder with a manifest
   Firefox reads, tells Firefox it may start a stopped engine once its add-on was allowed, and the
   setup page gives the steps. Until Mozilla has signed a build it is loaded as a temporary

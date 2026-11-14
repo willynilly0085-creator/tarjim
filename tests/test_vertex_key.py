@@ -67,4 +67,6 @@ def test_a_vertex_key_is_checked_without_listing_models(monkeypatch: pytest.Monk
 
 
 def test_a_vertex_key_is_offered_tarjims_own_models() -> None:
-    assert [row[0] for row in provider_models.gemini_rows(PAID)] == MODELS
+    from tarjim.gemini_client import OFFERED
+
+    assert [row[0] for row in provider_models.gemini_rows(PAID)] == [*MODELS, *OFFERED]

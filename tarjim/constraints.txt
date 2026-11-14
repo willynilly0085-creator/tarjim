@@ -4,7 +4,7 @@ accelerate==1.15.0
 aiohappyeyeballs==2.7.1
 aiohttp==3.14.5
 aiosignal==1.4.0
-annotated-doc==0.0.5
+annotated-doc==0.0.6
 annotated-types==0.8.0
 anyio==4.16.0
 attrs==26.1.0
@@ -14,7 +14,7 @@ catt-tashkeel==1.0.2 ; sys_platform != 'darwin'
 certifi==2026.10.23
 cffi==2.1.1
 charset-normalizer==3.5.2
-click==8.5.0
+click==8.5.1
 cloudpickle==3.1.2
 colorama==0.4.6 ; sys_platform == 'win32'
 cryptg==0.6.1
@@ -27,13 +27,13 @@ docopt==0.6.2
 dynet38==2.2 ; python_full_version < '3.15'
 edge-tts==7.3.1
 einops==0.8.2
-filelock==4.2.9
+filelock==4.2.10
 fish-audio-sdk==1.4.0
 flatbuffers==25.12.19 ; sys_platform != 'darwin'
 frozenlist==1.8.0
 fsspec==2026.9.0
-google-auth==2.62.1
-google-genai==3.0.0
+google-auth==2.62.2
+google-genai==3.3.0
 h11==0.16.0
 hf-xet==1.8.0 ; platform_machine == 'AMD64' or platform_machine == 'ARM64' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64'
 httpcore==1.0.9
@@ -57,9 +57,9 @@ keyring==25.7.0
 lameenc==1.9.0
 lazy-loader==0.6
 librosa==0.11.0 ; platform_machine == 'x86_64' and sys_platform == 'darwin'
-librosa==1.0.0 ; platform_machine != 'x86_64' or sys_platform != 'darwin'
+librosa==1.0.1 ; platform_machine != 'x86_64' or sys_platform != 'darwin'
 llvmlite==0.50.0
-markdown-it-py==4.2.0
+markdown-it-py==4.3.0
 markupsafe==3.0.4
 mcp==2.3.0
 mcp-types==2.3.0
@@ -75,9 +75,9 @@ num2words==0.5.14
 numba==0.68.1
 numpy==1.26.4 ; platform_machine == 'x86_64' and sys_platform == 'darwin'
 numpy==2.5.4 ; platform_machine != 'x86_64' or sys_platform != 'darwin'
-onnxruntime-gpu==1.31.1 ; sys_platform != 'darwin'
+onnxruntime-gpu==1.32.0 ; sys_platform != 'darwin'
 opentelemetry-api==1.45.2
-ormsgpack==1.13.0
+ormsgpack==1.13.1
 packaging==26.3
 platformdirs==4.14.5
 pooch==1.9.0
@@ -97,7 +97,7 @@ pywin32==312 ; sys_platform == 'win32'
 pywin32-ctypes==0.2.3 ; sys_platform == 'win32'
 pyyaml==6.0.3
 referencing==0.37.0
-regex==2026.9.29
+regex==2026.11.9
 requests==2.34.2
 rich==15.0.0
 rpds-py==2026.9.1
@@ -116,7 +116,7 @@ soundfile==0.14.0
 soxr==1.1.0
 soynlp==0.0.493
 sphn==0.2.1
-sse-starlette==3.6.0
+sse-starlette==3.7.0
 standard-aifc==3.13.0 ; python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform == 'darwin'
 standard-chunk==3.13.0 ; python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform == 'darwin'
 standard-sunau==3.13.0 ; python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform == 'darwin'
@@ -127,9 +127,9 @@ tenacity==9.1.4
 threadpoolctl==3.8.0
 tokenizers==0.23.3
 tqdm==4.70.1
-transformers==5.22.1
+transformers==5.23.0
 truststore==0.10.5 ; sys_platform != 'emscripten'
-typer==0.27.3
+typer==0.29.1
 typing-extensions==4.16.0
 typing-inspection==0.4.5
 urllib3==2.8.0

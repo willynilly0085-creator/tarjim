@@ -221,7 +221,8 @@ def test_a_line_cleared_with_room_after_the_turn_keeps_its_length() -> None:
     turn = [Word("ox", 4.7, 5.0, "S2", score=0.9), Word("india", 5.2, 6.0, "S2", score=0.9)]
     copy = [Word("alpha", 5.5, 5.9, "S1", score=0.01), Word("bravo", 6.0, 6.4, "S1", score=0.02)]
     moved = cleared(turn, copy, Word("kilo", 9.0, 9.4, "S1", score=0.9))
-    assert [(w.start, w.end) for w in moved] == pytest.approx([(6.0, 6.4), (6.5, 6.9)])
+    # flat: pytest 9.2 no longer compares pairs inside a list
+    assert [t for w in moved for t in (w.start, w.end)] == pytest.approx([6.0, 6.4, 6.5, 6.9])
     assert cleared(turn, [replace(w, score=None) for w in copy], None) == copy
     later = [replace(w, start=w.start + 1, end=w.end + 1) for w in copy]
     assert cleared(turn, later, None) == later
