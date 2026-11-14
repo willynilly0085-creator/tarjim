@@ -85,3 +85,11 @@ def test_firefox_may_start_the_engine_once_its_add_on_was_allowed(
     assert written["name"] == native_setup.NAME and Path(written["path"]).is_file()
     chrome = json.loads((home / "native" / f"{native_setup.NAME}.json").read_text("utf-8"))
     assert chrome["allowed_origins"] == [f"{ORIGIN}/"]  # and Chrome's list holds only Chrome's
+
+
+def test_the_windows_launcher_is_read_as_utf8(home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-14: a batch file is read in the console's code page; without chcp a Python under
+    a folder named in Arabic was not found and the browser could not wake the engine."""
+    monkeypatch.setattr(native_setup.sys, "platform", "win32")
+    text = native_setup.launcher(home).read_text(encoding="utf-8")
+    assert text.startswith("@chcp 65001>nul") and "-m tarjim.native_host" in text

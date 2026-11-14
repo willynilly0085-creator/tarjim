@@ -117,7 +117,7 @@ def test_turned_off_in_settings_nothing_is_asked_or_written(
     assert post.write(job_in(tmp_path), cues("مرحبا")) is None and asked.prompts == []
 
 
-def test_the_summary_is_written_after_the_translation_and_before_the_burn(
+def test_the_summary_is_written_after_the_translation_while_the_results_are(
         tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     steps: list[str] = []
     made = cues("مرحبا")
@@ -132,7 +132,8 @@ def test_the_summary_is_written_after_the_translation_and_before_the_burn(
     monkeypatch.setattr(pipeline, "write_outputs", lambda *_a: steps.append("outputs"))
     (tmp_path / "clip.mp4").write_bytes(b"video")
     pipeline.run(Job(tmp_path / "clip.mp4", out_dir=tmp_path, cache_dir=tmp_path / "cache"))
-    assert steps == ["translate", "post 1", "outputs"]
+    # 2026-11-14: beside the writing and the burn, not before them, and done when the job is
+    assert steps[0] == "translate" and sorted(steps[1:]) == ["outputs", "post 1"]
 
 
 class Bot:

@@ -48,7 +48,10 @@ def launcher(folder: Path) -> Path:
     if sys.platform == "win32":
         path = folder / "wake.bat"
         console = python.with_name("python.exe")
-        path.write_text(f'@"{console}" -P -m tarjim.native_host\r\n', encoding="utf-8")
+        # chcp: a batch file is read in the console's code page, and this one is UTF-8; without
+        # it a Python under a folder with Arabic letters was not found (2026-11-14)
+        path.write_text(f'@chcp 65001>nul\r\n@"{console}" -P -m tarjim.native_host\r\n',
+                        encoding="utf-8")
         return path
     path = folder / "wake.sh"
     path.write_text(f'#!/bin/sh\nexec "{python}" -P -m tarjim.native_host\n', encoding="utf-8")

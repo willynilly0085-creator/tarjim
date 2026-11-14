@@ -106,3 +106,27 @@ def test_the_installer_copy_runs_outside_the_package(tmp_path: Path) -> None:
     done = subprocess.run([sys.executable, str(copy), "--help"], cwd=tmp_path, capture_output=True,
                           text=True, check=False)
     assert done.returncode == 0, done.stderr
+
+
+def test_an_update_that_failed_is_not_started_again_by_itself_for_a_day(
+        home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-14: it was started again a minute after every start of the engine."""
+    import json
+
+    from tarjim.server import update_routes
+
+    state = {"available": True, "automatic": True, "can_install": True}
+    monkeypatch.setattr(update, "view", lambda: state)
+    monkeypatch.setattr(update_routes, "idle", lambda _board: True)
+    started: list[int] = []
+    monkeypatch.setattr(update_routes, "replace_engine", lambda port, _board: started.append(port))
+    monkeypatch.setattr(update, "repair_due", lambda: False)
+    (home / "update.json").write_text(json.dumps({"state": "failed", "at": 1000.0}),
+                                      encoding="utf-8")
+    assert update.failed_lately(now=1000.0 + 3600) and not update.failed_lately(now=1000.0 + 90000)
+    monkeypatch.setattr(update.time, "time", lambda: 1000.0 + 3600)
+    update_routes.look(None, 17653)  # type: ignore[arg-type]
+    assert started == []
+    monkeypatch.setattr(update.time, "time", lambda: 1000.0 + 90000)
+    update_routes.look(None, 17653)  # type: ignore[arg-type]
+    assert started == [17653]

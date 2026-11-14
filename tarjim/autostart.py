@@ -89,14 +89,34 @@ def starts_anything(script: str) -> bool:
     return found is not None and Path(found.group(1)).exists()
 
 
+WIDE = b"\xff\xfe"  # how a file in UTF-16 begins
+
+
+def written() -> str:
+    """The entry's text, in whichever of the two encodings it was written."""
+    raw = entry().read_bytes()
+    text = raw.decode("utf-16" if raw.startswith(WIDE) else "utf-8", errors="replace")
+    return text.replace("\r\n", "\n")  # as read_text gives it
+
+
+def write(text: str) -> None:
+    """Windows' script host reads a script as UTF-16 or in the computer's own code page, never
+    as UTF-8: written so (until 2026-11-14), a Python under a user folder with Arabic letters in
+    its name was not found at sign-in, and the engine never started by itself."""
+    entry().write_text(text, encoding="utf-16" if sys.platform == "win32" else "utf-8")
+
+
 def refresh() -> None:
-    """A Startup script written by an older version for this same Python becomes today's."""
+    """A Startup script written by an older version for this same Python becomes today's, and
+    one written in UTF-8 is written again (write)."""
     if sys.platform != "win32" or not enabled():
         return
     with contextlib.suppress(OSError):
-        text, wanted = entry().read_text(encoding="utf-8"), windows_script(quiet_python())
-        if text != wanted and (launch(quiet_python()) in text or not starts_anything(text)):
-            entry().write_text(wanted, encoding="utf-8")
+        wide = entry().read_bytes().startswith(WIDE)
+        text, wanted = written(), windows_script(quiet_python())
+        ours = launch(quiet_python()) in text or not starts_anything(text)
+        if (text != wanted and ours) or (text == wanted and not wide):
+            write(wanted)
 
 
 def mac_agent(python: str) -> str:
@@ -121,7 +141,7 @@ def enable() -> None:
     python = quiet_python()
     text = {"win32": windows_script, "darwin": mac_agent}.get(sys.platform, linux_entry)(python)
     entry().parent.mkdir(parents=True, exist_ok=True)
-    entry().write_text(text, encoding="utf-8")
+    write(text)
 
 
 def disable() -> None:

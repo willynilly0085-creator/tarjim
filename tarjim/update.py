@@ -21,6 +21,7 @@ from tarjim.release_pins import REPO
 RELEASES = os.environ.get("TARJIM_RELEASES", f"https://api.github.com/repos/{REPO}/releases/latest")
 ARCHIVE = os.environ.get("TARJIM_ARCHIVE", f"https://github.com/{REPO}/archive/refs/tags/{{tag}}.zip")
 CHECK_EVERY = 24 * 3600
+RETRY_FAILED_AFTER = 24 * 3600  # seconds before a failed update is tried again by itself
 TAG = re.compile(r"^v?(\d+)\.(\d+)\.(\d+)$")
 ASK_SECONDS = 15
 
@@ -85,6 +86,16 @@ def progress() -> dict[str, Any]:
         return dict(json.loads((config.HOME / "update.json").read_text(encoding="utf-8")))
     except (OSError, ValueError):
         return {}
+
+
+def failed_lately(now: float | None = None) -> bool:
+    """An update that failed less than a day ago: it is not started again by itself before
+    then (2026-11-14: one that could not finish was started again a minute after every start of
+    the engine, and the engine closed for it each time)."""
+    last = progress()
+    at = last.get("at")
+    recent = isinstance(at, int | float) and (now or time.time()) - at < RETRY_FAILED_AFTER
+    return last.get("state") == "failed" and bool(recent)
 
 
 def extension_version() -> str:

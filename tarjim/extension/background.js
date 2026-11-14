@@ -67,6 +67,10 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 const RETRY = 60 * 60 * 1000;
 
 async function matchEngine() {
+  // Only a copy loaded from tarjim's own folder changes when it is reloaded: one installed from
+  // a store keeps its files, would never match, and would be reloaded every hour for nothing.
+  const self = await chrome.management?.getSelf?.().catch(() => null);
+  if (self && self.installType !== "development") return;
   const engine = (await api("/update").catch(() => null))?.extension;
   const { reloadedFor, reloadedAt = 0 } = await chrome.storage.local.get(["reloadedFor", "reloadedAt"]);
   if (!engine || engine === chrome.runtime.getManifest().version) return;

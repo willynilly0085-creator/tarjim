@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.1.2 (2026-11-14)
+
+- **The end of a clip longer than a minute is no longer lost.** A cloud listener asked for
+  seconds sometimes writes the times after the first minute as minutes and seconds with the
+  colon left out: 1:09 comes back as 109, forty seconds late. On a real 96-second clip two of
+  the three hearings did so, they outvoted the one that was right, and the last third of the
+  clip was shown as a few misheard words. Such a hearing is now recognised and read back whole
+  before the hearings are compared, and the line said across the minute ends where it was said.
+- **A slip of the tongue is not translated word for word.** Asked for the complete translation,
+  a model wrote "And then he, the issue was" as "ثم هو، كانت القضية". A word the speaker starts,
+  breaks off and says again is now written once; nothing of the meaning is left out.
+- **Eastern digits and "?!" kept together now do what they say.** Both choices in Settings were
+  undone by a later step whatever was picked: ٣ was turned back to 3 and ؟! made one mark.
+- **tarjim starts with the computer for a user whose Windows name has Arabic letters.** The small
+  start-up script and the file the browser wakes the engine with were written in a way Windows
+  does not read such a path in, so the engine was not found. Both are written again by
+  themselves the first time this version runs.
+- **An update that failed is not tried again every minute.** It was started again a minute
+  after every start of the engine, closing it each time; now once a day, and from the page
+  whenever you ask.
+- **The video is ready sooner.** The summary to post is written while the subtitles are being
+  put on the picture, not before: with a slow model that was up to half a minute of waiting.
+- **The job's log says which engine wrote the translation**, and how many lines each one wrote
+  when a second engine had to help.
+- A time that is not a number in a listener's answer is no longer taken for a line, and a copy
+  of the extension installed from a store is not reloaded every hour.
+
 ## 1.1.1 (2026-11-14)
 
 - **Words are no longer pulled away from where they are said.** Under music or noise the voice

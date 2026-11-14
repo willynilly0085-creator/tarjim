@@ -49,7 +49,8 @@ def look(board: Board, port: int) -> None:
     if not idle(board):
         return
     state = update.view()
-    if state["available"] and state["automatic"] and state["can_install"]:
+    wanted = state["available"] and state["automatic"] and state["can_install"]
+    if wanted and not update.failed_lately():
         replace_engine(port, board)
     elif update.repair_due():
         close_soon(update.repair(port), board)

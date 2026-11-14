@@ -1,9 +1,13 @@
 import json
 from collections.abc import Callable
+from contextvars import copy_context
+from dataclasses import replace
 from pathlib import Path
+from threading import Thread
 from typing import NamedTuple
 
 from tarjim import guards, media, post
+from tarjim.asr.voices import Voices, voices_of
 from tarjim.findings import findings
 from tarjim.hearing import transcript_for
 from tarjim.job import Job
@@ -154,6 +158,16 @@ def picture_for(job: Job, canvas: Canvas, mark: Mark | None) -> Path:
     return burn(job.video, render_ass([], canvas, job.rules), job.cache / "marked.mp4", mark)
 
 
+def summary_begun(job: Job, cues: list[Cue], voices: Voices) -> Thread:
+    """The summary, written while the results are (2026-11-14): its one request kept the burn
+    waiting, half a minute with a slow engine. On its own copy of the lines, as part of the job;
+    an extra, it never fails the job."""
+    lines = [replace(cue) for cue in cues]
+    thread = Thread(target=copy_context().run, args=(post.write, job, lines, voices), daemon=True)
+    thread.start()
+    return thread
+
+
 def run(job: Job, report: Report = quiet) -> tuple[list[Cue], list[Issue]]:
     """The job, with its own settings read by every step inside it (2026-11-09)."""
     with using(job.settings):
@@ -174,13 +188,12 @@ def work(job: Job, report: Report) -> tuple[list[Cue], list[Issue]]:
     cuts = cuts_for(job)
     cues = build_cues(words, cuts, rules)
     report("translating")
-    from tarjim.asr.voices import voices_of
-
     voices = voices_of(job.video, words)
     cues = translate(job, cues, rules, Around(tuple(cuts), voices))
     save_review(job, cues)
-    post.write(job, cues, voices)  # an extra: it never fails the job
+    summary = summary_begun(job, cues, voices)
     report("writing")
     write_outputs(job, Made(cues, words, info, rules), report)
+    summary.join()
     report("done")
     return cues, check(cues, rules)

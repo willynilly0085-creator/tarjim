@@ -20,7 +20,7 @@ def test_starting_with_the_computer_can_be_turned_on_and_off(
     autostart.enable()
     entry = autostart.entry()
     assert autostart.enabled() and entry.is_file()
-    assert "tarjim.server" in entry.read_text(encoding="utf-8")
+    assert "tarjim.server" in autostart.written()
     autostart.disable()
     assert not autostart.enabled() and not entry.exists()
 
@@ -29,7 +29,7 @@ def test_windows_starts_the_engine_without_a_window(home: Path,
                                                    monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(autostart.sys, "platform", "win32")
     autostart.enable()
-    script = autostart.entry().read_text(encoding="utf-8")
+    script = autostart.written()
     assert "pythonw" in script.lower() and ", 0, False" in script
 
 
@@ -54,7 +54,7 @@ def test_an_older_startup_script_for_this_python_is_brought_up_to_date(
     entry.write_text(r'CreateObject("WScript.Shell").Run """C:\py\pythonw.exe"" -P -m '
                      'tarjim.server", 0, False\n', encoding="utf-8")
     autostart.refresh()
-    assert entry.read_text(encoding="utf-8") == autostart.windows_script(r"C:\py\pythonw.exe")
+    assert autostart.written() == autostart.windows_script(r"C:\py\pythonw.exe")
 
 
 def test_a_startup_script_for_another_python_is_left_alone(
@@ -68,7 +68,7 @@ def test_a_startup_script_for_another_python_is_left_alone(
     entry.parent.mkdir(parents=True)
     entry.write_text(autostart.windows_script(str(other)), encoding="utf-8")
     autostart.refresh()
-    assert entry.read_text(encoding="utf-8") == autostart.windows_script(str(other))
+    assert autostart.written() == autostart.windows_script(str(other))
 
 
 def test_a_startup_script_whose_python_is_gone_is_repaired(
@@ -80,4 +80,30 @@ def test_a_startup_script_whose_python_is_gone_is_repaired(
     entry.write_text(autostart.windows_script(str(home / "moved" / "pythonw.exe")),
                      encoding="utf-8")
     autostart.refresh()
-    assert entry.read_text(encoding="utf-8") == autostart.windows_script(r"C:\copy\pythonw.exe")
+    assert autostart.written() == autostart.windows_script(r"C:\copy\pythonw.exe")
+
+
+def test_the_windows_script_is_written_the_way_windows_reads_it(
+        home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-14: written in UTF-8, a Python under a user folder named in Arabic was not found
+    at sign-in: Windows reads a script as UTF-16 or in the computer's code page."""
+    monkeypatch.setattr(autostart.sys, "platform", "win32")
+    python = home / "مستخدم" / "pythonw.exe"
+    python.parent.mkdir()
+    python.touch()
+    monkeypatch.setattr(autostart, "quiet_python", lambda: str(python))
+    autostart.enable()
+    assert autostart.entry().read_bytes().startswith(autostart.WIDE)
+    assert "مستخدم" in autostart.written()
+
+
+def test_a_script_written_in_utf8_before_is_written_again(
+        home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(autostart.sys, "platform", "win32")
+    monkeypatch.setattr(autostart, "quiet_python", lambda: r"C:\py\pythonw.exe")
+    entry = autostart.entry()
+    entry.parent.mkdir(parents=True)
+    entry.write_text(autostart.windows_script(r"C:\py\pythonw.exe"), encoding="utf-8")
+    autostart.refresh()
+    assert entry.read_bytes().startswith(autostart.WIDE)
+    assert autostart.written() == autostart.windows_script(r"C:\py\pythonw.exe")
