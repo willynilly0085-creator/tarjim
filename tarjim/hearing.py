@@ -10,6 +10,7 @@ from tarjim.job import Job, checkpoint
 from tarjim.listen.asked import TRIES
 from tarjim.listen.heard_align import listen_and_align, mapped
 from tarjim.listen.kept import forget, keep_heard, keep_transcript, load_heard, reusable
+from tarjim.listen.known import tell
 from tarjim.listen.merge import Heard
 from tarjim.models import Word
 from tarjim.prefs.active import active
@@ -32,8 +33,10 @@ def transcript_for(job: Job, report: Callable[[str], None] = print) -> Transcrip
         findings().recall(job.cache)  # its timing check is shown again (2026-11-08)
         return kept
     from tarjim.memory import free_for_listening
+    from tarjim.translate.glossary import current
 
     free_for_listening()
+    tell(job.video, current(job.target))  # what is known of it, for every request of this job
     audio = job.cache / "audio.wav"
     try:
         media.extract_audio(job.video, audio)

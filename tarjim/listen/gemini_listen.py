@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 from tarjim.gemini_client import GeminiClient
+from tarjim.listen.known import hint
 
 SECONDS_PER_LETTER = 0.07  # about 14 letters a second in ordinary speech
 SHORTEST = 0.3
@@ -46,7 +47,8 @@ class Utterance:
 
 
 def listen(audio: bytes, client: Hearer | None = None) -> tuple[str, list[Utterance]]:
-    answer = (client or GeminiClient(listening=True)).ask(PROMPT, audio, SCHEMA)
+    # with what is known of the clip before it is heard (listen/known.py, 2026-11-14)
+    answer = (client or GeminiClient(listening=True)).ask(PROMPT + hint(), audio, SCHEMA)
     if not isinstance(answer, dict):
         raise RuntimeError("listening returned nothing readable")
     utterances = [u for row in answer.get("utterances", []) if (u := parse(row)) is not None]

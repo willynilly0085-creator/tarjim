@@ -4,6 +4,7 @@ from typing import Any
 
 from tarjim import qualities
 from tarjim.job import checkpoint, progress
+from tarjim.listen.known import note
 from tarjim.media import tool
 
 # The quality's name (tarjim_quality, set by tarjim) follows a space when there is one, so the
@@ -108,7 +109,9 @@ def download_now(url: str, folder: Path, quality: str = "") -> Path:
         path = Path(ydl.prepare_filename(info))
         try:
             ydl.process_ie_result(info, download=True)
-            return media(path, url)
+            video = media(path, url)
+            note(video, info)  # its title and description, for the listener (listen/known.py)
+            return video
         except BaseException:
             clear(folder, path.stem, before)
             raise

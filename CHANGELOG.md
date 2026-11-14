@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.4 (2026-11-14)
+
+- **Names are heard right when tarjim knows them before it listens.** A listener that has never
+  met a name writes the nearest thing it knows, the same way every time, so nothing could catch
+  it: "Lakkha Singh" came out "Naka Singh", "Casa Branca" came out "Casablanca", and the
+  translation of a wrong name is wrong. Now the listener is told what is known of a clip before
+  it hears it: the title, the channel and the description of a link, the name of a file you
+  gave, and the terms of your glossary. It is told to use them only to write what it hears, and
+  never to write a name nobody says. Measured on real speech, the clips heard afresh with a
+  title and a description as people write them: every name that had been wrong came out right,
+  and of the names in the description that nobody says, none was written, under noise too.
+  No extra request. The listener on your own computer and OpenAI's are not told yet.
+
 ## 1.1.3 (2026-11-14)
 
 - **Lines are put where they are said, on every computer.** The listener writes what was said
