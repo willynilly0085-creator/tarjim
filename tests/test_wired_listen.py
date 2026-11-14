@@ -11,7 +11,7 @@ from tarjim import hearing, media
 from tarjim.asr.base import Transcript
 from tarjim.engines import choice
 from tarjim.job import Job
-from tarjim.listen import check, chunks, coverage, kept, opinion, settle, whose
+from tarjim.listen import check, chunks, clipmap, coverage, kept, opinion, settle, whose
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.heard_align import listen_and_align
 from tarjim.listen.merge import Heard, listen_many
@@ -147,6 +147,9 @@ def aligned(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, chosen: Prefs) -> l
     monkeypatch.setattr(settle, "settled", lambda *_a: done)
     monkeypatch.setattr(check, "regions_in", lambda _wav: [])
     monkeypatch.setattr(opinion, "sounded", lambda found, _wav: found)
+    # no aligner is loaded for the speech map: a computer without its model (GitHub's) is
+    # where this test first ran, 2026-11-14
+    monkeypatch.setattr(clipmap, "letters_of", lambda _wav: None)
     with using(chosen):
         listen_and_align(Job(tmp_path / "v.mp4", cache_dir=tmp_path), audio,
                          Heard("en", SAID, [SAID], provider="gemini"), lambda _s: None)

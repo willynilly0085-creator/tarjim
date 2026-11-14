@@ -22,6 +22,8 @@ def names_in(entries: list[str]) -> set[str]:
 
 
 def windows_entries() -> list[str]:
+    if sys.platform != "win32":  # said so the type check on another system skips the registry
+        return []
     import winreg
 
     found: list[str] = []

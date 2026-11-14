@@ -8,6 +8,7 @@ authors = [{ name = "Indicators (indicators.sa)", email = "willy.nilly0085@gmail
 dependencies = [
     "numpy",
     "soundfile",
+    "librosa",  # each speaker's pitch, told to the translator (asr/voices.py)
     "google-genai",
     "transformers>=5.13",
     "accelerate",
