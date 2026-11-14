@@ -213,3 +213,13 @@ def test_an_answer_folded_into_one_of_its_own_fields_is_read_as_the_answer() -> 
     assert post.post_from(folded, AR) == post.Post("قصير", "طويل")
     assert post.post_from({"short": "{ليس جواباً", "long": "طويل"}, AR) == post.Post(
         "{ليس جواباً", "طويل")
+
+
+def test_a_results_folder_that_is_not_there_yet_does_not_fail_the_job(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-14: the summary is written before the other results, and a run whose folder
+    nothing had made yet stopped there."""
+    engines(monkeypatch, only=Engine({"short": "قصير", "long": "طويل"}))
+    job = Job(tmp_path / "clip.mp4", out_dir=tmp_path / "not" / "made" / "yet")
+    written = post.write(job, cues("مرحبا"))
+    assert written is not None and post.read(written) == post.Post("قصير", "طويل")

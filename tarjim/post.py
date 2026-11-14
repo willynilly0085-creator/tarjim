@@ -159,7 +159,12 @@ def write(job: Job, cues: list[Cue]) -> Path | None:
     found = summary(job.video.stem, cues, job.language) if wanted() else None
     if found is None:
         return None
-    target.write_text(found.text(), encoding="utf-8-sig")
+    try:  # a folder that is not there yet, or cannot be written, is no reason to fail the job
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(found.text(), encoding="utf-8-sig")
+    except OSError as error:
+        print(f"post summary: not written ({type(error).__name__}: {error})"[:300], flush=True)
+        return None
     return target
 
 
