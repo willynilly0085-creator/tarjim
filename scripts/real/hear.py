@@ -5,6 +5,10 @@ against the words said (words.py). For choosing between models on the first of t
     python hear.py <model> <passes> <clip> [clip ...]
 
 Kept in runs/_hear/<model>/<clip>.json, each pass's lines too, so a model is asked once.
+
+With HEAR_HINT set, its text is added to the listening prompt (names a title, a description
+or the glossary would give) and the results are kept under <model>+hint: what context does to
+the hearing, and whether a name given but never said gets written anyway.
 """
 import json
 import os
@@ -20,7 +24,14 @@ from words import OK, plain, steps  # noqa: E402
 
 from tarjim import media  # noqa: E402
 from tarjim.gemini_client import GeminiClient  # noqa: E402
+from tarjim.listen import gemini_listen  # noqa: E402
 from tarjim.listen.gemini_listen import listen  # noqa: E402
+
+HINT = os.environ.get("HEAR_HINT", "")
+if HINT:
+    gemini_listen.PROMPT += (" Names and terms that may come up in this recording; when you "
+                             "hear one, write it this way; never write one you do not hear: "
+                             f"{HINT}")
 
 Row = dict[str, Any]
 
@@ -40,7 +51,7 @@ def heard(clip: str, number: int) -> Row:
 def main() -> None:
     model, passes, clips = sys.argv[1], int(sys.argv[2]), sys.argv[3:]
     for clip in clips:
-        kept = RUNS / "_hear" / model / f"{clip}.json"
+        kept = RUNS / "_hear" / (model + ("+hint" if HINT else "")) / f"{clip}.json"
         if not kept.exists():
             kept.parent.mkdir(parents=True, exist_ok=True)
             rows = [heard(clip, number) for number in range(passes)]
