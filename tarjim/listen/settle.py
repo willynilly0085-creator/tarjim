@@ -146,9 +146,12 @@ def settled(job: Job, heard: Heard, sound: Sound, opinion: list[Word]) -> Timed:
     from tarjim.listen.asked import Asked
     from tarjim.listen.check import keep, paid, repaired
     from tarjim.listen.kept import rederiving
+    from tarjim.listen.soundtime import where_heard
 
     seconds = len(sound.wav) / sound.rate
-    found = timeable(placed(heard, opinion, seconds, sound.said))
+    # each line where the sound holds it, before speech with no words is looked for (2026-11-14)
+    found = where_heard(timeable(placed(heard, opinion, seconds, sound.said)), sound.wav,
+                        heard.language)
     # one budget for every stretch asked again in this job (2026-11-08)
     asked = Asked.load(job.cache, budget.budget_for(heard.provider, seconds,
                                                     rederiving(job.cache)))

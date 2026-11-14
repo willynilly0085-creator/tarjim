@@ -50,6 +50,7 @@ NAMES = (
     "novel.timed_over",  # ...whose time timed words already fill
     "novel.echoes",  # ...that echoes timed words close by
     "shift.minutes",  # a pass written in minutes and seconds read back whole (2026-11-14)
+    "sound.moved",  # a line put where the sound holds its letters (listen/soundtime.py)
     "shift.slipped",  # a line past its piece's end read back from an mm:ss misread
     "shift.clamped",  # ...kept at the piece's edge, said nowhere else in the piece
     "shift.hallucinated",  # ...dropped, a copy of a line the piece has

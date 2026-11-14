@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.1.3 (2026-11-14)
+
+- **Lines are put where they are said, on every computer.** The listener writes what was said
+  far better than when: three hearings of one 90-second Arabic clip came back on three clocks,
+  the lines were put up to 13 seconds before their speech, three sentences were pressed into
+  the time of one and written a second time further on. Until now only the listener on your own
+  computer corrected a line's time; it reads some languages poorly and a weak computer does not
+  run it. Now the sound itself is asked: each stretch's lines are searched once more in its
+  sound, in their order, and a line not heard where the listener put it goes where it is
+  heard. No extra listening and no extra request. Measured on real recorded speech with the
+  same hearings before and after (12 clips, 26 minutes, Arabic, English and French, clean, over
+  noise, over music, two voices): words wrong 147 to 87 of 3115, words shown outside their own
+  sentence 58 to 0, and that Arabic clip from a third of its words wrong to 2 of 140. No clip
+  got worse.
+- **A way to measure tarjim on real speech** (`scripts/real`): recorded sentences that come
+  with what was said and a translator's version (FLEURS), put together into clips whose timing
+  is known, run through tarjim as a job runs, and scored on the three things a subtitle owes:
+  heard right, means what was said, on screen while it is said. It found the fault above on its
+  first run.
+
 ## 1.1.2 (2026-11-14)
 
 - **The end of a clip longer than a minute is no longer lost.** A cloud listener asked for
