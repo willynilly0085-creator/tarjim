@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from tarjim import guards
+from tarjim.doubts import Doubts
 from tarjim.models import Cue
 from tarjim.qa import Issue
 
@@ -43,6 +44,9 @@ class Findings:
     # how often each layer that makes up for another fired in this job (tarjim/guards.py,
     # 2026-11-08): evidence for the bench, never shown on the page
     guards: dict[str, int] = field(default_factory=dict)
+    # the lines the job is not sure of, in hearing, meaning and timing (tarjim/doubts.py,
+    # 2026-11-14); None: not asked (the command line's own checks, a job before them)
+    doubts: Doubts | None = None
 
     def heard(self, left: tuple[Span, ...], agreement: float | None,
               given_up: tuple[Span, ...] = ()) -> None:
@@ -52,7 +56,7 @@ class Findings:
         """What the page lists under the finished job; a problem says the job is done with
         notes, a readability warning alone does not."""
         def at(numbers: list[int]) -> list[float]:
-            return [cues[n - 1].start for n in sorted(set(numbers)) if 0 < n <= len(cues)]
+            return starts(cues, numbers)
 
         def kind(name: str) -> list[int]:
             return [issue.number for issue in issues if issue.kind == name]
@@ -67,8 +71,23 @@ class Findings:
                 note("readability", at(readable), problem=False),
                 note("sounds", at(self.sounds), problem=False),
                 note("budget_used", [start for start, _end in self.refused], problem=False),
-                *self.timing()]
+                *self.timing(), *self.doubted(cues)]
         return [row for row in rows if row["count"]]
+
+    def doubted(self, cues: list[Cue]) -> list[Note]:
+        """The lines to look at (tarjim/doubts.py), listed quietly: how often a listed line is
+        really wrong is not measured yet. A line left as it was said is already listed; a job
+        in which nobody could be asked about any line's hearing says so."""
+        found = self.doubts
+        if found is None:
+            return []
+        said = set(self.in_source)
+        nobody = 1 if found.lines and found.unheard == found.lines else 0
+        return [note("hearing_doubt", starts(cues, list(found.hearing)), problem=False),
+                {"kind": "hearing_unchecked", "problem": False, "count": nobody, "at": []},
+                note("meaning_doubt", starts(cues, [n for n in found.meaning if n not in said]),
+                     problem=False),
+                note("timing_doubt", starts(cues, list(found.timing)), problem=False)]
 
     def stop(self) -> list[Note]:
         """Why lines are shown as said: a used-up quota or a timed-out subscription said in the
@@ -105,6 +124,11 @@ class Findings:
             return []
         return [{"kind": "timing", "problem": True, "count": 1, "at": [],
                  "share": round(self.agreement * 100)}]
+
+
+def starts(cues: list[Cue], numbers: list[int]) -> list[float]:
+    """When each numbered line (from 1) comes up, in order, once each."""
+    return [cues[n - 1].start for n in sorted(set(numbers)) if 0 < n <= len(cues)]
 
 
 def note(kind: str, at: list[float], problem: bool = True) -> Note:

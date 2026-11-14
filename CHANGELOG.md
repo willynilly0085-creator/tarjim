@@ -24,6 +24,13 @@
   put on the picture, not before: with a slow model that was up to half a minute of waiting.
 - **The job's log says which engine wrote the translation**, and how many lines each one wrote
   when a second engine had to help.
+- **A finished job says which lines it is not sure of.** Every line used to be shown with the
+  same confidence. Now the job lists, quietly under its row: lines whose words only one hearing
+  wrote (one pass of three, with nothing else to back it), translations in which a number or a
+  name from your glossary is missing or which are much shorter than what was said, and lines
+  that may come up before or after their speech. A clip heard only once, with nothing to
+  compare it with, says so. These are places to look, found with no extra listening and no
+  extra request; how often a listed line is really wrong has not been measured yet.
 - A time that is not a number in a listener's answer is no longer taken for a line, and a copy
   of the extension installed from a store is not reloaded every hour.
 

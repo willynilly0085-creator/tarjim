@@ -16,6 +16,11 @@ class Word:
     # outside equality, so two words alike in text and time are still one (2026-11-08)
     score: float | None = field(default=None, compare=False)  # the aligner's, for its letters
     source: str = field(default="unknown", compare=False)  # one of SOURCES
+    # who wrote this word here (listen/witness.py, 2026-11-14): how many hearings of the chosen
+    # listener did (its passes, a stretch asked again), and whether the listener on this
+    # computer did; None: nobody else to ask
+    backed: int | None = field(default=None, compare=False)
+    local: bool | None = field(default=None, compare=False)
 
 
 DIALOGUE_SEPARATOR = " || "

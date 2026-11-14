@@ -74,6 +74,8 @@ class Timed:
     # speech still without words, shown on the job, with the stretches given up
     left: list[Gap] = field(default_factory=list)
     passes: int = 0  # how often the clip's letters were heard so far in this run
+    # every line that filled speech the hearing left out (listen/witness.py, 2026-11-14)
+    fills: list[Fill] = field(default_factory=list)
 
 
 def worth_keeping(left: list[Gap]) -> bool:
@@ -164,4 +166,4 @@ def settled(job: Job, heard: Heard, sound: Sound, opinion: list[Word]) -> Timed:
     words = [Fill(line) for line in chosen.added]  # judged by their words on a later run
     keep(job, replace(heard, added=[*fills, *words]), asked, chosen.left)
     paid(asked, chosen.left)
-    return chosen
+    return replace(chosen, fills=[*fills, *words])

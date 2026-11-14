@@ -30,7 +30,9 @@ from tarjim.ui_languages import FOLDER
 WEB = Path(__file__).resolve().parents[1] / "tarjim" / "web"
 EMOJI = re.compile("[\U0001F300-\U0001FAFF☀-➿]")
 KINDS = ("speech_left", "in_source", "untranslated", "overlap", "readability", "timing",
-         "sounds", "engine_stopped", "budget_used")
+         "sounds", "engine_stopped", "budget_used", "hearing_doubt", "hearing_unchecked",
+         "meaning_doubt", "timing_doubt")
+UNCOUNTED = ("timing", "engine_stopped", "hearing_unchecked")  # said once, with no "how many"
 
 
 @pytest.fixture
@@ -123,7 +125,7 @@ def test_every_page_language_words_the_notes_without_emoji(path: Path) -> None:
     keys = ["stage_doneNotes", *(f"note_{kind}" for kind in KINDS)]
     assert all(words.get(key, "").strip() for key in keys)
     assert not [key for key in keys if EMOJI.search(words[key])]
-    counted = [kind for kind in KINDS if kind not in ("timing", "engine_stopped")]
+    counted = [kind for kind in KINDS if kind not in UNCOUNTED]
     assert all("{n}" in words[f"note_{kind}"] for kind in counted)
     assert "{share}" in words["note_timing"] and "{reason}" in words["note_engine_stopped"]
 

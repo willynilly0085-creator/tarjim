@@ -8,6 +8,7 @@ from typing import NamedTuple
 
 from tarjim import guards, media, post
 from tarjim.asr.voices import Voices, voices_of
+from tarjim.doubts import reviewed
 from tarjim.findings import findings
 from tarjim.hearing import transcript_for
 from tarjim.job import Job
@@ -98,10 +99,10 @@ def translate(job: Job, cues: list[Cue], rules: Rules | None = None,
 
 
 def save_review(job: Job, cues: list[Cue]) -> None:
-    rows = [{"start": round(c.start, 2), "end": round(c.end, 2), "source": c.source,
-             "text": c.text} for c in cues]
-    review = job.cache / f"cues.{job.target}.json"
-    review.write_text(json.dumps(rows, ensure_ascii=False, indent=1), encoding="utf-8")
+    """Kept for review, with what the job is not sure of in them (doubts.py, 2026-11-14)."""
+    from tarjim.translate.glossary import current
+
+    findings().doubts = reviewed(job.cache / f"cues.{job.target}.json", cues, current(job.target))
 
 
 class Made(NamedTuple):

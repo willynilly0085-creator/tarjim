@@ -107,11 +107,14 @@ def setup(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Job:
     return Job(tmp_path / "clip.mp4", cache_dir=tmp_path / "cache")
 
 
+ABOUT_A_WORD = ("score", "source", "backed", "local")
+
+
 def timing(found: Any) -> Any:
     """What a clip gets, less each word's source and score (2026-11-08), which say how it got
-    its time and change none of it."""
+    its time, and who wrote it (2026-11-14), and change none of it."""
     if isinstance(found, dict):
-        return {k: timing(v) for k, v in found.items() if k not in ("score", "source")}
+        return {k: timing(v) for k, v in found.items() if k not in ABOUT_A_WORD}
     return [timing(v) for v in found] if isinstance(found, list) else found
 
 

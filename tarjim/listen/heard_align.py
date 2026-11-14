@@ -7,13 +7,17 @@ so what tests and the bench put in place of them there is what runs."""
 from collections.abc import Callable
 from dataclasses import replace
 from pathlib import Path
+from typing import Any, NamedTuple
 
 from tarjim.asr.base import Transcript
 from tarjim.findings import findings
 from tarjim.job import Job
+from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.merge import Heard
 from tarjim.models import Word
 from tarjim.prefs.active import active
+
+OWN_WORDS = ("local", "words")  # the requests of lines made of the local listener's words
 
 
 def listen_and_align(job: Job, audio: Path, heard: Heard,
@@ -24,12 +28,9 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     from tarjim.listen import settle
     from tarjim.listen.clipmap import Clip, clip_map
     from tarjim.listen.opinion import backing, doubted, held, sounded
-    from tarjim.listen.timing import final_scores
-    from tarjim.listen.whose import by_voice
 
     report("timing")
     wav, rate = soundfile.read(str(audio), dtype="float32")
-    chosen = active().listen
     opinion = second_opinion(audio, heard)
     kept = sounded(opinion, wav)
     # one map of the clip's speech for every timing, the detector run once (2026-11-09)
@@ -43,12 +44,33 @@ def listen_and_align(job: Job, audio: Path, heard: Heard,
     # shown on the job, the stretches given up too (2026-11-08)
     findings().heard(tuple((g.start, g.end) for g in done.left if not g.given_up),
                      done.agreement, tuple((g.start, g.end) for g in done.left if g.given_up))
-    # turned off, the speakers stay as the listener heard them and no voice print is fetched
-    words = by_voice(done.transcript.words, wav, rate) if chosen.voice_check \
-        else done.transcript.words
-    # each run's strict score, read once on the words as shown, their speakers final (2026-11-09)
-    words = final_scores(wav, words)
+    # who wrote each word (listen/witness.py, 2026-11-14): the passes, what asking again brought
+    # (a fill made of the local words is the local listener's own), and the local listener,
+    # which is no witness to its own hearing
+    second = backing(opinion, kept) if heard.local_words is None else []
+    again = [fill.line for fill in done.fills if fill.line.request not in OWN_WORDS]
+    words = final_words(done.transcript.words, (wav, rate), Witnesses(heard.passes, second, again))
     return replace(done.transcript, words=words), done.whole and not heard.backup
+
+
+class Witnesses(NamedTuple):
+    passes: list[list[Utterance]]
+    local: list[Word]
+    again: list[Utterance]
+
+
+def final_words(words: list[Word], sound: tuple[Any, int], who: Witnesses) -> list[Word]:
+    """The words as shown: each given to its speaker by voice (turned off, the speakers stay as
+    the listener heard them and no voice print is fetched), then each run's strict score read
+    once, their speakers final (2026-11-09), then who wrote each word (2026-11-14)."""
+    from tarjim.listen.timing import final_scores
+    from tarjim.listen.whose import by_voice
+    from tarjim.listen.witness import witnessed
+
+    wav, rate = sound
+    if active().listen.voice_check:
+        words = by_voice(words, wav, rate)
+    return witnessed(final_scores(wav, words), who.passes, who.local, who.again)
 
 
 def second_opinion(audio: Path, heard: Heard) -> list[Word]:
