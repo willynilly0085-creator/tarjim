@@ -8,7 +8,6 @@ is a finished job. The subtitles are handed to the model as material, never as i
 it is told to say only what they say.
 """
 import json
-import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -18,6 +17,7 @@ from tarjim.config import setting
 from tarjim.job import Job, checkpoint
 from tarjim.languages import Language
 from tarjim.models import DIALOGUE_SEPARATOR, Cue
+from tarjim.quoted import inert
 
 SUFFIX = ".post.txt"
 TWEET = 280  # what a post on X holds; a letter of an unspaced script counts twice there
@@ -50,7 +50,6 @@ below when there are any, otherwise the subtitles' own wording, otherwise leave 
 - A line "{gap}" marks a place where some lines were left out."""
 PLAIN = "the plain written form used in news posts"
 STANDARD = "clear Modern Standard Arabic as written in news posts, not a dialect"
-TAG = re.compile(r"</?\s*subtitles\s*>", re.IGNORECASE)  # a line never closes the tag it sits in
 
 
 @dataclass(frozen=True)
@@ -97,8 +96,8 @@ def prompt(title: str, language: Language, lines: list[str],
     register = STANDARD if language.code.split("-")[0] == "ar" else PLAIN
     task = TASK.format(language=language.name, register=register, short=room(language) - 10,
                        long=LONG, gap=GAP)
-    quoted = [TAG.sub("", line) for line in lines]
-    return "\n".join([task + told(voices, "any"), "", f"File name: {TAG.sub('', title)}",
+    quoted = [inert(line) for line in lines]  # no line closes the tag it sits in
+    return "\n".join([task + told(voices, "any"), "", f"File name: {inert(title)}",
                       "<subtitles>", *quoted, "</subtitles>"])
 
 
