@@ -6,56 +6,40 @@ its lines (lengths, overlaps, one share for the whole clip of words found where 
 and showed every line with the same confidence. Each line is now asked the three, from what the
 job already has in hand: no new listening, no request, the same on every computer.
 
-- hearing: its words stand on one hearing (listen/witness.alone), a third of the line or more,
-  or a name or a number among them: there a wrong word costs the meaning whatever the
-  translation does. A line with nobody to ask is counted apart, never as sure.
+- hearing: one of its words stands on one hearing (listen/witness.alone). A line with nobody to
+  ask is counted apart, never as sure.
 - meaning: what can be read off the two texts (translate/faithful.py).
 - timing: the line comes up or goes more than LATE from its own first or last word, one of
   those two was given a guessed time, or a third of its words are not found in the sound where
   they are timed (the clip's own floor, asr/agree.clip_baseline).
 
-These say where to look, not what is wrong. How often a listed line is really wrong, and how
-many wrong lines are not listed, has not been measured, so the job lists them quietly
-(findings.py) and the rules here are a first setting, not a tuned one.
+These say where to look, not what is wrong, so the job lists them quietly (findings.py).
+Measured on real speech (scripts/real, 22 clips in 12 languages, 2026-11-14): of 28 lines listed
+for their hearing 21 held a word that was not said, and they covered 9 of the 18 sentences whose
+meaning a judge found spoiled by the hearing; the first rule (a third of the line, or a name or
+a number, on one hearing) listed 11 lines and covered 5. What agreement cannot see is a word
+every hearing got wrong the same way: half of those sentences. The timing and meaning lists
+are still a first setting: too few faults in that material to tune them on.
 """
 import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from tarjim.breaks import SENTENCE_END
 from tarjim.listen.witness import alone
 from tarjim.models import Cue, Word
 from tarjim.translate.faithful import unfaithful
 from tarjim.translate.glossary import Glossary
 
-SHARE = 3  # a line is doubted when one word in this many is
+SHARE = 3  # a line's timing is doubted when one word in this many is weak
 LATE = 0.5  # seconds a line may come up or go from its own first or last word
 GUESSED = ("estimated", "unplaced")  # a time no listener and no letter gave (models.SOURCES)
-OPENING = "\"'“‘«([¿¡-"
-CLOSING = "\"'”’»)]"
 KINDS = ("hearing", "meaning", "timing")
 
 
-def weighty(words: list[Word], k: int) -> bool:
-    """A number, or a name: a capital that opens neither the line nor a sentence, and is not
-    the English "I"."""
-    text = words[k].text.lstrip(OPENING)
-    if any(ch.isdigit() for ch in text):
-        return True
-    opens = k == 0 or words[k - 1].text.rstrip(CLOSING).endswith(SENTENCE_END)
-    myself = text == "I" or text[:2] in ("I'", "I’")
-    return text[:1].isupper() and not opens and not myself
-
-
 def hearing_of(cue: Cue) -> bool | None:
-    """Whether the line stands on one hearing; None with nobody to ask."""
-    told = [(k, single) for k, word in enumerate(cue.words)
-            if (single := alone(word)) is not None]
-    if not told:
-        return None
-    lone = [k for k, single in told if single]
-    much = bool(lone) and len(lone) * SHARE >= len(told)
-    return much or any(weighty(cue.words, k) for k in lone)
+    """Whether a word of the line stands on one hearing; None with nobody to ask."""
+    told = [single for word in cue.words if (single := alone(word)) is not None]
+    return any(told) if told else None
 
 
 def weak(word: Word, floor: float) -> bool:

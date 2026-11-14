@@ -146,6 +146,10 @@ class GeminiClient:
             self.refused.add(model)
             return
         if waited >= LONG_WAIT or "timeout" in type(error).__name__.lower():
+            # said, with how long: a job that waited six minutes to be heard left no trace of
+            # why (2026-11-14, the real-speech bench)
+            print(f"gemini: {model} kept a request {waited:.0f} s and gave no answer "
+                  f"({code or type(error).__name__}); the next model is asked", flush=True)
             self.slow.add(model)
             STALLED[model] = time.monotonic() + STALLED_FOR
             return

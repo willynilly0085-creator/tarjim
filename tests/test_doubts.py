@@ -36,9 +36,11 @@ def test_a_line_a_third_of_whose_words_one_pass_wrote_stands_on_one_hearing() ->
     assert hearing_of(cue(words)) is True
 
 
-def test_one_small_word_alone_does_not_doubt_the_line() -> None:
-    words = [*said("we met the banker"), word("uh", 2.0, backed=1), *said("there too", 2.5)]
-    assert hearing_of(cue(words)) is False
+def test_one_word_alone_doubts_the_line() -> None:
+    """Measured on real speech (2026-11-14): asking for a third of the line, or a name, listed
+    11 lines where this lists 28, three in four of them with a word that was not said."""
+    words = [*said("we met the banker"), word("daily", 2.0, backed=1), *said("there too", 2.5)]
+    assert hearing_of(cue(words)) is True
 
 
 def test_a_name_one_pass_alone_wrote_doubts_the_line_whatever_its_length() -> None:
@@ -51,13 +53,6 @@ def test_a_number_one_pass_alone_wrote_doubts_the_line() -> None:
     words = [*said("he paid them about"), word("350", 2.0, backed=1),
              *said("million dollars that year", 2.5)]
     assert hearing_of(cue(words)) is True
-
-
-def test_the_first_word_of_a_sentence_is_not_taken_for_a_name() -> None:
-    words = [*said("we met there."), word("Then", 2.0, backed=1), *said("he left us", 2.5)]
-    assert hearing_of(cue(words)) is False
-    opening = [word("Then", 0.0, backed=1), *said("he left the room quietly", 0.5)]
-    assert hearing_of(cue(opening)) is False
 
 
 def test_the_listener_on_this_computer_clears_a_name_one_pass_wrote() -> None:

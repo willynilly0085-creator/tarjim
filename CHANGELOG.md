@@ -14,6 +14,12 @@
   noise, over music, two voices): words wrong 147 to 87 of 3115, words shown outside their own
   sentence 58 to 0, and that Arabic clip from a third of its words wrong to 2 of 140. No clip
   got worse.
+- **The lines listed for their hearing are the ones worth looking at.** A line is now listed
+  when any of its words was written by one hearing only. Measured on real speech in 12
+  languages: three in four listed lines hold a word that was not said, and the list covers
+  twice as many of the sentences whose meaning the hearing spoiled as the first rule did. A
+  word every hearing got wrong the same way cannot be seen this way.
+- A listening request that hangs is now said in the log, with how long it was kept.
 - **A way to measure tarjim on real speech** (`scripts/real`): recorded sentences that come
   with what was said and a translator's version (FLEURS), put together into clips whose timing
   is known, run through tarjim as a job runs, and scored on the three things a subtitle owes:

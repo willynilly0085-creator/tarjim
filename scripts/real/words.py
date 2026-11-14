@@ -18,6 +18,9 @@ MARKS = re.compile("[ً-ْٰـ]")  # Arabic short vowels and the stretch mark
 SHAPES = str.maketrans({"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا", "ى": "ي", "ی": "ي", "ک": "ك",
                         "ة": "ه", "ؤ": "و", "ئ": "ي", "’": "'", "‘": "'"})
 OK, SUB, INS, DEL = "ok", "sub", "ins", "del"
+# written with spaces that people and listeners place differently: compared a letter at a
+# time, as the unspaced scripts are (2026-11-14: Korean scored 11% wrong on spacing alone)
+LETTER_BY_LETTER = ("ko",)
 
 
 class Step(NamedTuple):
@@ -34,6 +37,8 @@ def plain(text: str, language: str = "") -> list[str]:
     for mark in "-‑—/":
         text = text.replace(mark, " ")
     words = split_words(text)
+    if language in LETTER_BY_LETTER:
+        words = [letter for word in words for letter in word]
     spoken = " ".join(said(words, language)) if language else " ".join(words)
     return [unit for word in split_words(spoken.replace("-", " ")) if (unit := norm(word))]
 
