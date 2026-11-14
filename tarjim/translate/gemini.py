@@ -151,7 +151,7 @@ class Translator:
         not, and is asked again (fill_twice)."""
         answer = self.client.ask(build_prompt(cues, brief), sound, SCHEMA)
         items = answer if isinstance(answer, list) else []
-        results = map_results(items, len(cues), arabic=brief.arabic)
+        results = map_results(items, len(cues), brief.arabic, brief.manner)
         if not results:
             raise RuntimeError(f"empty translation: none of {len(cues)} lines came back")
         for number, cue in enumerate(cues, start=1):

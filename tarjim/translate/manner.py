@@ -59,9 +59,16 @@ the full translation is longer, keep it full.
 - Translate each slot on its own: never move words between slots, never merge slots, and \
 never carry any part of a slot into the next one.""",
 }
+# A slip of the tongue is no part of the meaning (2026-11-14): told only that fillers go, a
+# model asked for everything said wrote "And then he, the issue was" as "ثم هو، كانت القضية".
 FULL_FILLERS: dict[str, Said] = {
-    "drop": {"ar": "كلمات الحشو وحدها (um و like و you know) تنحذف.",
-             "any": "Fillers alone (um, like, you know) are dropped."},
+    "drop": {"ar": "كلمات الحشو وحدها (um و like و you know) تنحذف، ومثلها زلة اللسان: الكلمة أو "
+                   "العبارة اللي يبدأها المتكلم ويقطعها ثم يعيدها (he, the issue was أو "
+                   "we've, we saw أو the the) تنكتب مرة واحدة مثل ما قصدها.",
+             "any": "Fillers alone (um, like, you know) are dropped, and so is a slip of the "
+                    "tongue: a word or phrase the speaker starts, breaks off and says again "
+                    "(\"he, the issue was\", \"we've, we saw\", \"the the\") is written "
+                    "once, the way they meant it."},
     "keep": {"ar": "وخلّ كلمات الحشو مثل um و like و you know.",
              "any": "Keep fillers such as um, like and you know too."},
 }

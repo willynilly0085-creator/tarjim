@@ -219,6 +219,7 @@ def test_a_full_translation_is_asked_to_leave_nothing_out_and_is_never_shortened
         done = pipeline.translate(job(tmp_path), [said(0.0, "Hello there.")])
     asked = chosen.prompts[0]
     assert "never condense or leave out" in asked and "Fillers alone" in asked
+    assert "a slip of the tongue" in asked and "is written once" in asked  # 2026-11-14
     assert "Never exceed" not in asked and "shorten that slot" not in asked
     assert done[0].text == LONG and len(chosen.prompts) == 1 and found.over_budget == [1]
 

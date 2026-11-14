@@ -23,3 +23,18 @@ def test_marks_are_removed_and_unmarked_answers_left_as_they_are() -> None:
     assert in_order("[A] جملة وحدة") == "جملة وحدة"
     assert in_order("صح || في الهند") == "صح || في الهند"
     assert in_order("[A] x || y") == "x || y"
+
+
+def test_the_digits_and_paired_marks_a_person_chose_are_left_as_chosen() -> None:
+    """2026-11-14: eastern digits were turned back to 0-9 and ?! made one mark whatever the
+    person chose, so translate.numbers=eastern and translate.question_marks=keep did nothing."""
+    from tarjim.prefs.model import resolve
+    from tarjim.translate.clean import normalize
+
+    usual = resolve({}, {}, "ar").translate
+    chosen = resolve({"translate.numbers": "eastern", "translate.question_marks": "keep"},
+                     {}, "ar").translate
+    assert normalize("بعد ٣ أيام؟!", manner=usual) == "بعد 3 أيام؟"
+    assert normalize("بعد ٣ أيام؟!", manner=chosen) == "بعد ٣ أيام؟!"
+    assert normalize("بعد ٣  أيام؟!") == "بعد 3 أيام؟"  # no choice given: as before
+

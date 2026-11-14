@@ -108,7 +108,7 @@ def said_shorter(cues: list[Cue], numbers: list[int], brief: Brief, parts: list[
               f"{str(error)[:160]})", flush=True)
         return 0
     found = map_results(answer if isinstance(answer, list) else [], len(numbers),
-                        arabic=brief.arabic)
+                        brief.arabic, brief.manner)
     kept = 0
     for k, n in enumerate(numbers, start=1):
         if fits(found.get(k, ""), cues[n - 1], budgets[n]):

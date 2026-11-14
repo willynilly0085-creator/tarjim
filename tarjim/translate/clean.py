@@ -1,28 +1,34 @@
 import re
 
+from tarjim.prefs.model import Translate
+
 MARKS = ("A", "B", "C", "D")
 MARK = re.compile(r"^\s*[\[(]\s*([A-D])\s*[\])]\s*[-–—]?\s*")
 
 EASTERN_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
 
 
-def normalize(text: str, arabic: bool = True) -> str:
-    if arabic:
+def normalize(text: str, arabic: bool = True, manner: Translate | None = None) -> str:
+    """The digits and the paired ?! as the person chose them (translate.numbers and
+    translate.question_marks). Until 2026-11-14 eastern digits were turned back to 0-9 and ?!
+    was made one mark whatever was chosen, so those two choices did nothing."""
+    if arabic and (manner is None or manner.numbers != "eastern"):
         text = text.translate(EASTERN_DIGITS)
-    question = "؟" if arabic else "?"
-    text = text.replace("؟!", "؟").replace("!؟", "؟").replace("?!", question)
+    if manner is None or manner.question_marks == "collapse":
+        question = "؟" if arabic else "?"
+        text = text.replace("؟!", "؟").replace("!؟", "؟").replace("?!", question)
     return " ".join(text.split())
 
 
-def map_results(items: list[object], count: int,
-                arabic: bool = True) -> dict[int, str]:
+def map_results(items: list[object], count: int, arabic: bool = True,
+                manner: Translate | None = None) -> dict[int, str]:
     results: dict[int, str] = {}
     for item in items:
         if not isinstance(item, dict):
             continue
         number, text = line_number(item.get("id")), item.get("text")
         if 1 <= number <= count and isinstance(text, str):
-            results[number] = normalize(in_order(text), arabic)
+            results[number] = normalize(in_order(text), arabic, manner)
     return results
 
 

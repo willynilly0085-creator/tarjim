@@ -68,6 +68,12 @@ class Rounds:
             translator.failures.append(error)
         self.sounds |= translator.sounds
         self.stopped = translator.failures
+        # which engine wrote the lines, in the job's log (2026-11-14: it said nothing, and a
+        # translation by a weaker model after a failure looked like the chosen one's)
+        model = str(getattr(translator.client, "model_used", "") or "")
+        done = sum(1 for cue in wanted if cue.text.strip())
+        print(f"translation: {done} of {len(wanted)} line(s) by {provider}"
+              + (f" ({model})" if model else ""), flush=True)
         return translator.failures
 
     def translated(self) -> bool:
