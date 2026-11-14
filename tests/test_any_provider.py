@@ -143,12 +143,17 @@ def test_a_key_without_a_chosen_model_uses_the_one_the_provider_suggests(
     assert compatible.api_asker("deepseek").model == "deepseek-chat"
 
 
-def test_antigravity_translates_with_the_light_variant_and_no_tools(
+def test_antigravity_translates_with_the_model_as_picked_and_no_tools(
         monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-14: the low variant was asked whatever the person had picked."""
     seen: dict[str, Any] = {}
+    asked: list[str] = []
 
     def fake_run(command: list[str], _prompt: str, _folder: str) -> Any:
         seen["command"] = command
+        asked.append(command[-1])
+        if command[-1].endswith("-high") and seen.get("high_fails"):
+            return subprocess.CompletedProcess(command, 1, "", "503 overloaded")
         envelope = {"status": "SUCCESS", "structured_output": {"result": GOOD}}
         return subprocess.CompletedProcess(command, 0, json.dumps(envelope), "")
 
@@ -159,6 +164,9 @@ def test_antigravity_translates_with_the_light_variant_and_no_tools(
     monkeypatch.setattr(antigravity, "run", fake_run)
     assert antigravity.AntigravityAsker().ask("Translate.", None, SCHEMA) == GOOD
     command = seen["command"]
-    assert command[-2:] == ["--model", "gemini-3.8-flash-low"]
-    assert "Do not use any tool" in command[2] and command[2].endswith("Translate.")
-    assert antigravity.light_variant("claude-sonnet-4-6") == "claude-sonnet-4-6"
+    assert command[-2:] == ["--model", "gemini-3.8-flash-high"] and command[2].endswith(
+        "Translate.") and "Do not use any tool" in command[2]
+    assert antigravity.light_variant("claude-sonnet-4-6") == "claude-sonnet-4-6" and asked.pop()
+    seen["high_fails"] = True  # a picked model that fails is answered for by its low variant
+    assert antigravity.AntigravityAsker().ask("Translate.", None, SCHEMA) == GOOD
+    assert asked == ["gemini-3.8-flash-high", "gemini-3.8-flash-low"]

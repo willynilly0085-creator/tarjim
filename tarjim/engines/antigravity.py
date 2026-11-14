@@ -29,8 +29,8 @@ from tarjim.engines.web import EngineError, TimedOut, unwrap, wrap
 
 PLAIN = ("--sandbox", "--disable-slash-commands")
 # The effort is part of the model's id here. On a 24-line clip Flash (Low) took 10 s, (Medium)
-# 88 s and (High) failed after 209 s, for the same Saudi translation: text is translated with the
-# low variant of the chosen model whenever the account has one.
+# 88 s and (High) failed after 209 s, for the same Saudi translation, so the low variant is the
+# one suggested, and the one that answers when a picked higher one fails (as_picked).
 EFFORT = re.compile(r"-(medium|high|xhigh|max)$")
 # An agent left to itself sometimes reaches for a terminal command, which headless mode refuses,
 # and then answers nothing ("no output produced"); it is told plainly that none is needed.
@@ -57,9 +57,27 @@ class AntigravityAsker:
         program's default). Either is tried again once, since the service sometimes answers 503
         or drops the answer halfway ("The stream was interrupted")."""
         if not audio:
-            model = light_variant(setting("antigravity_model"))
-            return self.twice(DIRECT + prompt, None, schema, model)
+            return self.as_picked(DIRECT + prompt, schema)
         return self.twice(HEAR + prompt, audio, schema, hearing_model())
+
+    def as_picked(self, prompt: str, schema: dict[str, Any]) -> Any:
+        """Text goes to the model as the person picked it, effort and all. Until 2026-11-14 the
+        low variant was asked whatever was picked, for speed; on sixteen made-up lines Gemini 4
+        Hydrogen (High) was right on all of them in 31 s, and (Low) took the bank of a river for
+        a money bank in 12 s. A picked model that fails is answered for by its low variant, so
+        a slow or refused one costs one try and not the job."""
+        picked = setting("antigravity_model")
+        light = light_variant(picked)
+        if light == picked:
+            return self.twice(prompt, None, schema, picked)
+        try:
+            return self.once(prompt, None, schema, picked)
+        except EngineError as error:
+            if NOT_SIGNED_IN in str(error):
+                raise
+            print(f"translation: {picked} did not answer ({str(error)[:120]}); asking {light}",
+                  flush=True)
+            return self.twice(prompt, None, schema, light)
 
     def twice(self, prompt: str, audio: bytes | None, schema: dict[str, Any], model: str) -> Any:
         try:

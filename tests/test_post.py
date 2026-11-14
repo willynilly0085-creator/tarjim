@@ -1,4 +1,5 @@
 """The summary to post: what is asked, what is kept of the answer, and where it shows."""
+import json
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -203,3 +204,12 @@ def test_a_dropped_connection_does_not_lose_the_summary_on_the_phone(
     bot = Dropping()
     sender.Sender(bot, 1, 7, SimpleNamespace()).post([summary])  # type: ignore[arg-type]
     assert bot.said == [say("postIntro"), "قصير", "طويل"]
+
+
+def test_an_answer_folded_into_one_of_its_own_fields_is_read_as_the_answer() -> None:
+    """2026-11-14: a model wrote the whole answer as JSON text inside "long"."""
+    inside = json.dumps({"short": "قصير", "long": "طويل"}, ensure_ascii=False, indent=2)
+    folded = {"long": inside, "short": ""}
+    assert post.post_from(folded, AR) == post.Post("قصير", "طويل")
+    assert post.post_from({"short": "{ليس جواباً", "long": "طويل"}, AR) == post.Post(
+        "{ليس جواباً", "طويل")

@@ -42,12 +42,15 @@
   shorter; it never runs with a complete translation.
 - **The limit on hearing missed speech again is a setting.** On an 18-minute clip it left ten
   stretches without words; "No limit" hears every one again, whatever it costs.
-- **Newer Gemini models can be picked.** Gemini 4 (Carbon, Argon, Hydrogen) and Gemini 3.1 Pro
-  are in the list of models for a Vertex key; a key from AI Studio already lists what it has.
-  A model a key does not have is passed over at once, where it used to be asked three times.
-  Gemini 3.8 Flash stays the model tarjim asks first: on five made-up clips Gemini 3.1 Pro
-  heard the same words, timed its lines several seconds worse and took three times as long.
-  The owner's key did not have Gemini 4, so tarjim's calls to it were not run.
+- **Gemini 4 can be picked, and the model you pick is the model asked.** With a Gemini
+  subscription tarjim translated with the low variant of whatever was picked; it now asks the
+  picked one, and its low variant only if that fails. Measured on sixteen made-up lines with
+  traps (idioms, negation, a river's bank): Gemini 4 Hydrogen (High) was right on all sixteen
+  in 31 s, Hydrogen (Low) took the bank for a money bank in 12 s, and Gemini 3.8 Flash by a
+  key was weak on one line in 6 s. For hearing, Hydrogen and 3.8 Flash heard the same words
+  on five made-up clips (94% to 100%). Gemini 4 and Gemini 3.1 Pro are also in the list for a
+  Vertex key, and a model a key does not have is passed over at once, where it used to be
+  asked three times.
 - **Libraries brought up to date** (13 of them): Google's Gemini library 3.0 to 3.3,
   Transformers 5.23, ONNX Runtime 1.32 and others, each run through every test and a whole
   translation heard by Gemini before release. None fixes a published vulnerability.

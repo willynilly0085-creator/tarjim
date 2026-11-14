@@ -7,6 +7,7 @@ The summary is an extra: nothing that goes wrong here fails the job, and a job w
 is a finished job. The subtitles are handed to the model as material, never as instructions, and
 it is told to say only what they say.
 """
+import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -106,9 +107,25 @@ def clipped(text: str, most: int) -> str:
     return cut.rstrip(" ،,;:.") + "…"
 
 
+def unfolded(answer: dict[str, Any]) -> dict[str, Any]:
+    """The answer itself when a model wrote the whole of it, as JSON text, inside one of its
+    own fields (2026-11-14: Gemini 4 Hydrogen (High) through the Gemini subscription, and the
+    summary file then held that JSON instead of the two texts)."""
+    for value in answer.values():
+        if isinstance(value, str) and value.lstrip().startswith("{"):
+            try:
+                inner = json.loads(value)
+            except ValueError:
+                continue
+            if isinstance(inner, dict) and inner.get("short") and inner.get("long"):
+                return inner
+    return answer
+
+
 def post_from(answer: Any, language: Language) -> Post | None:
     if not isinstance(answer, dict):
         return None
+    answer = unfolded(answer)
     short = clipped(" ".join(str(answer.get("short") or "").split()), room(language))
     rows = (" ".join(row.split()) for row in str(answer.get("long") or "").splitlines())
     long = clipped("\n".join(row for row in rows if row), LONG + 100)
