@@ -5,7 +5,7 @@
            x local off x oracle good, none                                        (72 cells)
     gate   every scenario x every fault, once, at seed 0; the four settings local off/on x
            oracle good/none turn with the cell (clip index + fault index), so every fault and
-           every clip meets all four                         (18 x 19 = 342 cells today)
+           every clip meets all four                         (18 x 20 = 360 cells today)
     gate4  the same with all four settings on every pair                       (1368 cells)
     full   every scenario x every fault x local on/off/wrong x oracle good/none/invent/quota
            x seeds 0, 1, 2 (defined, not meant to be run often)

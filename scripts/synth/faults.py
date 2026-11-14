@@ -44,6 +44,7 @@ EARLY = 3.0
 WRONG_SHARE = 0.1
 SHORTEST = 0.05
 SLIP, SLIP_SHARE = 60.0, 0.05  # an mm:ss misread: 1:05 heard as 2:05
+MINUTE_PASSES = 2  # minute: the passes of the first piece written in minutes and seconds
 TAIL_SHARE = 0.2  # omitted_tail: this share of a piece's speech, at its end
 TAIL_PASSES = 2
 LOOP_COPIES = 2  # loop_all: the line said again this many times, right after itself
@@ -239,6 +240,32 @@ def slip(d: Draft) -> None:
         line["end"] += SLIP
 
 
+def colonless(seconds: float) -> float:
+    """A time as minutes and seconds with the colon left out: 69.12 s, 1:09.12, as 109.12."""
+    return 100.0 * (seconds // 60) + seconds % 60
+
+
+def minute(d: Draft) -> None:
+    """Minutes and seconds with the colon left out, as a cloud listener was seen to write them
+    (2026-11-14): the last two passes of the first piece give every time from its first minute
+    on so, 1:09 as 109, and the pass before them is right. Their line said up to the minute runs
+    to the start of the next, as that listener's lines did (each ended where the next began):
+    its end is then past the minute too, which is what walled off every line after it. Only the
+    first piece: a later one is read back at its request's times before it is kept
+    (listen/lead.split). `slip` moves single lines a whole minute in every pass, which is not
+    how it was seen to happen. The right pass heard one word fewer, as passes differ, so one
+    written so is the fullest and the vote's base, as it was that day."""
+    for line in d.passes[0][0][:1]:
+        line["text"] = line["text"].rsplit(" ", 1)[0]
+    for run in d.passes[0][-MINUTE_PASSES:]:
+        run.sort(key=lambda x: x["start"])
+        for line, after in pairwise(run):
+            if line["end"] < SLIP <= after["start"]:
+                line["end"] = after["start"]
+        for line in run:
+            line["start"], line["end"] = colonless(line["start"]), colonless(line["end"])
+
+
 def two_labels(lines: list[Line]) -> tuple[str, str] | None:
     order: list[str] = []
     for line in sorted(lines, key=lambda x: x["start"]):
@@ -326,6 +353,7 @@ FAULTS: dict[str, Callable[[Draft], None]] = {
     "omitted_one_pass": omitted_one_pass, "omitted_all": omitted_all,
     "duplicated": duplicated, "merged": merged_turns, "labels_swapped": labels_swapped,
     "one_line": one_line, "wrong_words": wrong_words, "early": early, "slip": slip,
+    "minute": minute,
     "swapped_inside": swapped_inside, "omitted_tail": omitted_tail,
     "labels_permuted": labels_permuted, "loop_all": loop_all,
     "tail_hallucination": tail_hallucination, "piece_empty": piece_empty}

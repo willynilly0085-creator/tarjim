@@ -16,22 +16,20 @@ from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.lead import lead_of, pieces_of
 from tarjim.listen.links import named
 from tarjim.listen.merge import Heard, Piece, agreed
+from tarjim.listen.minutes import OVERRUN, SLIPPED, ended, read_back, room, unslipped
 from tarjim.listen.sized import CHUNK_SECONDS, TAIL_SHARE, chunk_seconds, is_long
 from tarjim.listen.vote import SIMILAR, norm
 from tarjim.scripts import split_words
 
 SEARCH_SHARE = 0.2  # a cut is looked for this share of a piece either side of its target
 LONGEST_SEARCH = 30.0
-OVERRUN = 1.0
-MINUTE = 60.0  # seconds, for reading back an mm:ss misread
 SHORTEST = 0.3  # seconds a line kept at its piece's edge lasts at the least
-SLIPPED = 0.5  # how far the time of a line read back from an mm:ss misread is trusted
-CLAMPED = 0.0  # ...and of a line kept at its piece's edge: not at all
+CLAMPED = 0.0  # how far the time of a line kept at its piece's edge is trusted: not at all
 
 Span = tuple[float, float]
 ListenSpan = Callable[[float, float], Heard]
-# moved to listen/sized.py on 2026-11-09 and still offered here
-__all__ = ["CHUNK_SECONDS", "TAIL_SHARE", "chunk_seconds", "is_long"]
+# moved to listen/sized.py (2026-11-09) and listen/minutes.py (2026-11-14), still offered here
+__all__ = ["CHUNK_SECONDS", "OVERRUN", "SLIPPED", "TAIL_SHARE", "chunk_seconds", "is_long"]
 
 
 def boundary(target: float, regions: list[Span], reach: float) -> float:
@@ -55,33 +53,6 @@ def spans(duration: float, regions: list[Span], target: float | None = None) -> 
     return list(pairwise([0.0, *cuts, duration]))
 
 
-def undone(seconds: float) -> float | None:
-    """A time read as minutes and seconds written without the colon (1:05 as 105), or None when
-    it cannot be one."""
-    minutes, rest = divmod(seconds, 100.0)
-    return MINUTE * minutes + rest if rest < MINUTE else None
-
-
-def unslipped(u: Utterance, length: float, room: Span) -> Utterance | None:
-    """The line at its mm:ss misread's time, when that falls inside the piece between the end of
-    the line before it and the start of the line after it: one that lands on another line was
-    not misread (2026-11-08: only the line before was checked, and a line said at 45 s read back
-    to 65 s, among the lines after it)."""
-    start, end = undone(u.start), undone(u.end)
-    if start is None or not room[0] <= start <= length:
-        return None
-    end = end if end is not None and end >= start else start + u.end - u.start
-    end = max(start, min(end, length + OVERRUN))
-    return replace(u, start=start, end=end, prior=SLIPPED) if end <= room[1] else None
-
-
-def room(placed: list[Utterance], rest: list[Utterance], length: float) -> Span:
-    """Where a misread line may be read back to: after the line placed before it and before the
-    next line of the piece in the listener's order (a raw pass is not sorted, 2026-11-08)."""
-    later = next((u.start for u in rest if u.start < length + OVERRUN), length + OVERRUN)
-    return (placed[-1].end if placed else 0.0), later
-
-
 def novel(u: Utterance, lines: list[Utterance]) -> bool:
     """Its words are not mostly those of one line the piece already has."""
     mine = {norm(w) for w in split_words(u.text)} - {""}
@@ -98,7 +69,7 @@ def placed_line(u: Utterance, length: float, free: Span,
     high = length + OVERRUN
     if u.start < high:
         start = max(u.start, -OVERRUN)
-        return replace(u, start=start, end=max(start, min(u.end, high)))
+        return replace(u, start=start, end=max(start, ended(u, high)))
     fixed = unslipped(u, length, free)
     if guards.when("shift.slipped", fixed is not None):
         return fixed
@@ -110,7 +81,9 @@ def placed_line(u: Utterance, length: float, free: Span,
 
 
 def placed_in(utterances: list[Utterance], length: float) -> list[Utterance]:
-    """The lines of a request `length` seconds long at its own times (placed_line), in order."""
+    """The lines of a request `length` seconds long at its own times (placed_line), in order;
+    a pass written in minutes and seconds is read back whole first (listen/minutes.py)."""
+    utterances = read_back(utterances, length)
     inside = [u for u in utterances if u.start < length + OVERRUN]
     placed: list[Utterance] = []
     for k, u in enumerate(utterances):
@@ -175,7 +148,12 @@ def joined(pieces: list[Piece]) -> tuple[list[Utterance], list[list[Utterance]]]
     vote of piece 0, "k0.p1" its pass 1. The same for a fresh hearing and a kept one, so a kept
     hearing is voted again exactly as it was heard (2026-11-08: the joined passes were voted, and
     one broken line in one piece cost a reply in another). Each piece's speakers are named as the
-    clip's (listen/links.named, 2026-11-09); its passes keep their request's own names."""
+    clip's (listen/links.named, 2026-11-09); its passes keep their request's own names. A piece
+    heard with no lead holds its passes as their listener wrote them, in a kept hearing too: they
+    are placed in the piece before the vote, as a piece with a lead was when it was heard
+    (2026-11-14: voted as written, two passes in minutes and seconds outvoted the right one)."""
+    pieces = [replace(p, passes=[placed_in(run, p.end - p.start) for run in p.passes])
+              if p.lead_s <= 0 else p for p in pieces]
     voted = named(pieces, [agreed(p.passes) for p in pieces])
     utterances = [u for k, p in enumerate(pieces)
                   for u in shift(voted[k], p.span, request=f"k{k}.v")]

@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
@@ -58,8 +59,8 @@ def parse(row: Any) -> Utterance | None:
         text = " ".join(str(row["text"]).split())
     except (KeyError, TypeError, ValueError):
         return None
-    if not text or end < start:
-        return None
+    if not text or not (math.isfinite(start) and math.isfinite(end)) or end < start:
+        return None  # NaN compares false to everything and passed every later check (2026-11-14)
     if end == start:  # a short reply ("Yes.") is often given one moment, not a length
         end = start + max(SHORTEST, SECONDS_PER_LETTER * len(text))
     return Utterance(start, end, str(row.get("speaker", "")), text)

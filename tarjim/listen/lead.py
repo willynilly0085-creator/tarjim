@@ -15,6 +15,7 @@ from difflib import SequenceMatcher
 from tarjim import guards
 from tarjim.listen.gemini_listen import Utterance
 from tarjim.listen.merge import Heard, Piece
+from tarjim.listen.minutes import read_back_all
 from tarjim.listen.vote import SIMILAR, norm
 from tarjim.scripts import joined, split_words
 
@@ -90,11 +91,11 @@ def split(run: Run, lead_s: float, length: float, before: Run) -> tuple[Run, Run
     times, and the lead's as heard. Its lines are placed first at the request's own times, the
     ones its listener wrote: an mm:ss misread is read back there (2026-11-09: read back after the
     lead was taken off, 1:03 written 103 in a 7 s lead became 96 and no time at all)."""
-    if lead_s <= 0:
-        return run, []
     from tarjim.listen.chunks import placed_in
 
     run = placed_in(run, lead_s + length)
+    if lead_s <= 0:
+        return run, []
     lead = [u for u in run if middle(u) < lead_s]
     own = [line for u in run if u.end > lead_s and (line := owned(u, lead_s, length, before))]
     return own, lead
@@ -111,7 +112,8 @@ def pieces_of(spans: list[Span], heard: list[tuple[float, Heard]]) -> list[Piece
     pieces: list[Piece] = []
     for (start, end), (lead_s, one) in zip(spans, heard, strict=True):
         before = tail(pieces[-1], start - lead_s) if pieces else []
-        runs = [split(run, lead_s, end - start, before) for run in one.passes]
+        heard_so = read_back_all(one.passes, lead_s + end - start)  # at the request's times
+        runs = [split(run, lead_s, end - start, before) for run in heard_so]
         lead = [lines for _, lines in runs] if lead_s > 0 else []
         pieces.append(Piece(start, end, [own for own, _ in runs], one.language, lead_s, lead))
     return pieces

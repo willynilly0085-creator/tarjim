@@ -48,3 +48,10 @@ def test_words_the_aligner_could_not_place_share_the_gap() -> None:
     assert middle[0].start == 16.88 and middle[-1].end == 23.3
     assert all(abs((s.end - s.start) - 6.42 / 3) < 1e-6 for s in middle)
     assert all(a.end == b.start for a, b in pairwise(middle))
+
+
+def test_a_time_that_is_not_a_number_is_no_line() -> None:
+    """2026-11-14: NaN compares false to everything, so "end < start" let it through."""
+    for bad in (float("nan"), float("inf")):
+        assert parse({"start": bad, "end": 2.0, "speaker": "S1", "text": "hi"}) is None
+        assert parse({"start": 1.0, "end": bad, "speaker": "S1", "text": "hi"}) is None
