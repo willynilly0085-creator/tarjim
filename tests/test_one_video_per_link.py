@@ -12,6 +12,7 @@ import pytest
 
 from tarjim import fetch
 from tarjim.job import CHECKPOINT
+from tarjim.listen.known import ABOUT
 from tarjim.server.jobs import Stopped, classify
 from tarjim.ui_languages import FOLDER, codes
 
@@ -63,6 +64,11 @@ def written(folder: Path) -> list[str]:
     return sorted(p.name for p in folder.rglob("*")) if folder.exists() else []
 
 
+def with_its_note(video: Path) -> list[str]:
+    """A download and what its link said of it, kept beside it for the listener (2026-11-14)."""
+    return sorted([video.name, f"{video.name}{ABOUT}"])
+
+
 @pytest.mark.parametrize("name", ["feed.xml", "page.html"])
 def test_a_link_to_a_list_is_refused_before_anything_is_written(
         site: str, tmp_path: Path, name: str) -> None:
@@ -73,7 +79,7 @@ def test_a_link_to_a_list_is_refused_before_anything_is_written(
 
 def test_a_link_to_one_video_still_downloads_it(site: str, tmp_path: Path) -> None:
     video = fetch.download(f"{site}/one.mp4", tmp_path)
-    assert video.read_bytes() == CLIP and written(tmp_path) == [video.name]
+    assert video.read_bytes() == CLIP and written(tmp_path) == with_its_note(video)
 
 
 def test_a_download_stopped_at_the_size_limit_leaves_nothing(
@@ -118,7 +124,7 @@ def test_a_video_link_that_also_names_its_playlist_takes_just_the_video(
     asked = fake_youtube(monkeypatch, site)
     video = fetch.download("https://www.youtube.com/watch?v=abcdefghijk&list=PLx", tmp_path)
     assert asked == ["https://www.youtube.com/watch?v=abcdefghijk"]
-    assert written(tmp_path) == [video.name] and "abcdefghijk" in video.name
+    assert written(tmp_path) == with_its_note(video) and "abcdefghijk" in video.name
 
 
 def test_a_youtube_playlist_is_refused_without_opening_its_videos(

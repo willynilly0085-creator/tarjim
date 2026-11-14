@@ -12,6 +12,7 @@ from typing import Any, ClassVar
 import pytest
 
 from tarjim import fetch
+from tarjim.listen.known import ABOUT
 from tarjim.server.jobs import Order
 from tarjim.server.orders import order_from
 from tarjim.server.quality_routes import QualityRoutes
@@ -118,7 +119,9 @@ def test_exactly_the_picked_quality_is_downloaded_with_its_sound(
     video_has(monkeypatch, formats(site))
     video = fetch.download(URL, tmp_path, quality)
     assert sorted(Site.asked) == sorted(pieces)
-    assert video.name.endswith(suffix) and [p.name for p in tmp_path.iterdir()] == [video.name]
+    # the video, and what its link said of it for the listener (listen/known.py)
+    kept = sorted(p.name for p in tmp_path.iterdir())
+    assert video.name.endswith(suffix) and kept == [video.name, f"{video.name}{ABOUT}"]
 
 
 def test_a_portrait_video_is_named_by_its_shorter_side(
