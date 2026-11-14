@@ -87,7 +87,11 @@ def test_one_sentence_for_a_guessed_exchange_may_use_the_sum_of_its_parts(
 
 @pytest.mark.parametrize("target", ["ar", "fr"])
 def test_the_prompt_says_a_split_budget_is_a_limit_for_each_part(target: str) -> None:
-    prompt = build_prompt([exchange(2.0)], Brief(language(target), "saudi", DEFAULT_RULES))
+    from tarjim.prefs.model import resolve
+
+    fitted = resolve({"translate.length": "fit"}, {}, target).translate
+    prompt = build_prompt([exchange(2.0)],
+                          Brief(language(target), "saudi", DEFAULT_RULES, manner=fitted))
     assert "budget=" in prompt and "a+b" in prompt
 
 

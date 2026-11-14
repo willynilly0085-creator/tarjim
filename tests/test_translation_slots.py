@@ -54,7 +54,7 @@ def shortening() -> Any:
     from tarjim.prefs.active import using
     from tarjim.prefs.model import resolve
 
-    return using(resolve({"translate.shorten": True}, {}, "fr"))
+    return using(resolve({"translate.shorten": True, "translate.length": "fit"}, {}, "fr"))
 
 
 def brief() -> Brief:
@@ -223,10 +223,14 @@ def test_a_full_translation_is_asked_to_leave_nothing_out_and_is_never_shortened
     assert done[0].text == LONG and len(chosen.prompts) == 1 and found.over_budget == [1]
 
 
-def test_the_usual_prompt_is_word_for_word_what_it_was() -> None:
+def test_the_fitted_prompt_is_word_for_word_what_it_was() -> None:
+    from dataclasses import replace
+
+    from tarjim.prefs.model import resolve
     from tarjim.translate.prompt import build_prompt
 
-    asked = build_prompt([said(0.0, "Hello there.")], brief())
+    fitted = replace(brief(), manner=resolve({"translate.length": "fit"}, {}, "fr").translate)
+    asked = build_prompt([said(0.0, "Hello there.")], fitted)
     assert "- Never exceed the slot's character budget: condense and drop fillers" in asked
     assert "shorten that slot's own translation; never carry the rest into the next slot." in asked
 

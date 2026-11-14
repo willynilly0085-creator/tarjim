@@ -1,7 +1,8 @@
 """How the person wants a translation written, as lines of the prompt (2026-11-09).
 
 Each first choice of translate.* is what the prompt said before the setting existed, word for
-word, so a person who changed nothing is asked for the same translation. The other choices
+word, so a person who changed nothing is asked for the same translation; all but the length,
+whose first choice since 2026-11-14 is the complete translation (below). The other choices
 replace a line (numbers, fillers, question marks) or add one (register, profanity, names); they
 are fixed text, never the person's own words, so no setting can tell the model to answer in
 another language or break its JSON. The glossary comes after them and still wins for a name.

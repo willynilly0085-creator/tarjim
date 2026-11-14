@@ -66,7 +66,7 @@ GUESSED_SPEAKERS = {
 
 
 ARABIC_TARGET = language("ar")
-USUAL = resolve({}, {}, "ar").translate  # the prompt as it was before the settings
+USUAL = resolve({}, {}, "ar").translate  # how a person who changed nothing is translated for
 HEARING = {
     "ar": ("معك الصوت الأصلي للمقطع، و",
            "- اسمع الصوت بنفسك وصحّح أي كلمة سمعها التفريغ الآلي غلط.\n"),

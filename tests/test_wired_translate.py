@@ -35,11 +35,16 @@ def changed(code: str = "ar", **values: Any) -> tuple[list[str], list[str]]:
     return [old for old in before if old not in after], [new for new in after if new not in before]
 
 
-def test_nothing_changed_asks_as_before() -> None:
-    text = "\n".join(asked())
-    assert BEFORE_AR in text and FILLERS_AR in text
-    assert BEFORE_ANY in "\n".join(asked("en"))
-    assert build_prompt(CUES, Brief()) == "\n".join(asked()) == build_prompt(
+def test_fitted_asks_as_before_and_nothing_changed_asks_for_everything_said() -> None:
+    """Since 2026-11-14 the complete translation is the first choice; fitted is the prompt
+    tarjim wrote before, word for word."""
+    fitted = "\n".join(asked(length="fit"))
+    assert BEFORE_AR in fitted and FILLERS_AR in fitted
+    assert BEFORE_ANY in "\n".join(asked("en", length="fit"))
+    usual = "\n".join(asked())
+    assert BEFORE_AR in usual and FILLERS_AR not in usual and "لا تختصر ولا تحذف" in usual
+    assert "never condense or leave out" in "\n".join(asked("en"))
+    assert build_prompt(CUES, Brief()) == usual == build_prompt(
         CUES, replace(Brief(), manner=prompt.USUAL))
 
 

@@ -6,9 +6,11 @@ from tarjim.prefs.spec import Spec
 
 TRANSLATE: tuple[Spec, ...] = (
     pick("translate.register", "أسلوب الكلام", ("natural", "casual", "formal")),
-    # fit: each line kept to what its time lets a reader read, as subtitlers do. full: nothing
-    # that is said is left out or condensed (the owner, 2026-11-12: accuracy before all else).
-    pick("translate.length", "طول الترجمة", ("fit", "full")),
+    # full: nothing that is said is left out or condensed. fit: each line kept to what its time
+    # lets a reader read, as subtitlers do, which is what tarjim asked for until 2026-11-14. Full
+    # comes first since then (the owner: accuracy before all else): on four made-up lines the
+    # fitted translation dropped "new", "some papers" and "nobody else".
+    pick("translate.length", "طول الترجمة", ("full", "fit")),
     # eastern: ٠-٩, for Arabic only (Persian and Urdu write other digits); words: the numbers
     # under ten spelled out, in place of the prompt's own rule for numbers.
     pick("translate.numbers", "شكل الأرقام", ("latin", "eastern", "words")),
