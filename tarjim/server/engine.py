@@ -166,7 +166,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     wait_for_exit(args.after)  # the engine this one replaces lets go of the port
     try:
-        listener = take_port(args.port, Handler)  # first: a second engine starts nothing
+        listener = take_port(args.port, Handler, args.after)  # first: a second starts nothing
     except Taken as busy:
         print(busy, flush=True)
         return 1

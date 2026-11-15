@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.10 (2026-11-15)
+
+- **An engine that restarts onto new code no longer leaves no engine at all.** An engine whose
+  code changed starts a copy of itself and closes. Twice the copy was refused the port within a
+  second of its start and closed too: nothing was left running, the phone bot went quiet and the
+  extension found no engine until tarjim was started by hand. The copy now keeps asking for the
+  port for half a minute, and writes in the log what it saw.
+
 ## 1.1.9 (2026-11-15)
 
 - **The Firefox add-on stays.** Firefox keeps for good only an add-on Mozilla has signed, so the
