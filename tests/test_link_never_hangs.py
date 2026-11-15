@@ -67,3 +67,33 @@ def test_a_read_that_fails_says_its_own_reason(monkeypatch: pytest.MonkeyPatch) 
 def test_a_read_in_time_is_what_was_read(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(fetch, "looked", lambda url: {"title": url})
     assert fetch.look("https://example.com/v") == {"title": "https://example.com/v"}
+
+
+def test_a_download_whose_link_is_never_read_fails_and_frees_the_next_one(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """The engine downloads one link at a time: on 2026-11-15 the one that never returned
+    kept every later job waiting, and the engine from ever restarting on its fix."""
+    from tarjim.server.reasons import classify
+
+    held = threading.Event()
+    monkeypatch.setattr(fetch, "one_video", lambda _ydl, _url: held.wait(30))
+    monkeypatch.setattr(fetch, "READ_SECONDS", 0.2)
+    try:
+        with pytest.raises(TimeoutError) as given_up:
+            fetch.download("https://example.com/v", tmp_path / "got")
+        assert classify(given_up.value) == "download"
+        assert fetch.IN_USE.acquire(timeout=1)
+        fetch.IN_USE.release()
+    finally:
+        held.set()
+
+
+def test_a_cancel_while_the_link_is_read_is_still_a_cancel() -> None:
+    class Stopped(BaseException):
+        pass
+
+    def stopped() -> None:
+        raise Stopped
+
+    with pytest.raises(Stopped):
+        fetch.within(5.0, stopped, "reading")

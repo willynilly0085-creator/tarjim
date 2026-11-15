@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.8 (2026-11-15)
+
+- **A link that cannot be read no longer stops every job after it.** tarjim downloads one
+  link at a time. When reading a link never returned (the fault fixed in 1.1.7), the job
+  stayed on "downloading" for good, every job after it waited behind it, and the engine,
+  never idle, could not restart itself onto the fix: it had to be stopped by hand. Reading
+  the link before a download is now given up after two minutes; the job fails with "could
+  not download the video from that link" and the next one starts.
+
 ## 1.1.7 (2026-11-15)
 
 - **A YouTube link no longer stays on "reading the qualities" for good.** On Windows the engine

@@ -1,7 +1,9 @@
 import tempfile
 import threading
+from collections.abc import Callable
+from contextvars import copy_context
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeVar
 
 from tarjim import qualities
 from tarjim.job import checkpoint, progress
@@ -51,6 +53,8 @@ class Budget:
         self.ffmpeg[1] = str(left)
 
 LOOK_SECONDS = 40.0  # a read takes 3; a format tested on a slow line, a few more
+READ_SECONDS = 120.0  # the same read before a download, where nobody is watching a message
+T = TypeVar("T")
 
 
 def asking() -> dict[str, Any]:
@@ -95,28 +99,36 @@ def looked(url: str) -> dict[str, Any]:
         return {**qualities.offer(ydl, one_video(ydl, url)), "limit": LARGEST}
 
 
+def within(seconds: float, work: Callable[[], T], doing: str) -> T:
+    """What `work` gives, or a TimeoutError when it has not ended in time. It runs in a thread
+    of its own with this one's context and is left behind when given up: nothing can stop a
+    library that never returns, but the one waiting goes on (2026-11-15: a read that never
+    returned kept the phone on one message, and a download of it kept every later job)."""
+    done: list[T] = []
+    failed: list[BaseException] = []
+
+    def run() -> None:
+        try:
+            done.append(work())
+        except BaseException as error:  # raised again where it is waited for, a cancel too
+            failed.append(error)
+
+    worker = threading.Thread(target=copy_context().run, args=(run,), daemon=True)
+    worker.start()
+    worker.join(seconds)
+    if failed:
+        raise failed[0]
+    if not done:
+        raise TimeoutError(f"{doing} did not end in {seconds:.0f} s")
+    return done[0]
+
+
 def look(url: str) -> dict[str, Any]:
     """The qualities this link offers, read without downloading anything. Not under IN_USE: a
     download holds it for as long as it runs, and reading must not wait behind one. Given up
     after LOOK_SECONDS whatever keeps it: the person asked is waiting, and the link then goes
     on with the usual quality."""
-    read: list[dict[str, Any]] = []
-    failed: list[Exception] = []
-
-    def reading() -> None:
-        try:
-            read.append(looked(url))
-        except Exception as error:  # told to the one who asked, as its own reason
-            failed.append(error)
-
-    reader = threading.Thread(target=reading, daemon=True)
-    reader.start()
-    reader.join(LOOK_SECONDS)
-    if failed:
-        raise failed[0]
-    if not read:
-        raise TimeoutError(f"the link's qualities were not read in {LOOK_SECONDS:.0f} s")
-    return read[0]
+    return within(LOOK_SECONDS, lambda: looked(url), "reading the link's qualities")
 
 
 def download(url: str, folder: Path, quality: str = "") -> Path:
@@ -134,7 +146,8 @@ def download_now(url: str, folder: Path, quality: str = "") -> Path:
     choice = qualities.Choice(quality)
     with YoutubeDL(options(folder, choice)) as ydl:
         choice.ydl = ydl
-        info = {**one_video(ydl, url), "tarjim_quality": choice.named}
+        read = within(READ_SECONDS, lambda: one_video(ydl, url), "reading the link to download")
+        info = {**read, "tarjim_quality": choice.named}
         path = Path(ydl.prepare_filename(info))
         try:
             ydl.process_ie_result(info, download=True)
