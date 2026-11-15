@@ -36,6 +36,7 @@ from tarjim.server.prefs_routes import PrefsRoutes
 from tarjim.server.quality_routes import QualityRoutes
 from tarjim.server.routes import GET_ROUTES, POST_ROUTES, KeyRoutes, Query, Routes, is_open
 from tarjim.server.setup_routes import SetupRoutes
+from tarjim.server.text_routes import TextRoutes
 from tarjim.tools import shelf
 
 PORT = 17653
@@ -50,7 +51,7 @@ def seen(task: Task) -> dict[str, object]:
 
 
 class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoutes, JobRoutes,
-              PrefsRoutes):
+              PrefsRoutes, TextRoutes):
     board: ClassVar[Board]
     token: ClassVar[str]
     uploads: ClassVar[Path]

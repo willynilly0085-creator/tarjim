@@ -608,5 +608,44 @@
         "content": "$1"
       }
     }
+  },
+  "textMenu": {
+    "message": "翻译所选文字"
+  },
+  "textModeLabel": {
+    "message": "所选文字的翻译"
+  },
+  "textModeMenu": {
+    "message": "右键"
+  },
+  "textModeButton": {
+    "message": "文字旁的按钮"
+  },
+  "textModeCard": {
+    "message": "立即"
+  },
+  "textHintMenu": {
+    "message": "选中任意文字，点右键，然后选择“翻译所选文字”。"
+  },
+  "textHintButton": {
+    "message": "选中的文字旁会出现一个小按钮，在此后打开的页面上生效。"
+  },
+  "textHintCard": {
+    "message": "选中的任何文字都会立即送去翻译，在此后打开的页面上生效。"
+  },
+  "textModeRefused": {
+    "message": "未获得权限，翻译仍通过右键进行。"
+  },
+  "textWorking": {
+    "message": "正在翻译…"
+  },
+  "textAsk": {
+    "message": "翻译"
+  },
+  "textLong": {
+    "message": "所选文字太长。请选择较短的部分（最多 6000 个字符）。"
+  },
+  "textNoPage": {
+    "message": "浏览器不允许扩展在此页面上运行。"
   }
 }

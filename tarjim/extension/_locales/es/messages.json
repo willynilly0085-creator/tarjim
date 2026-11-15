@@ -608,5 +608,44 @@
         "content": "$1"
       }
     }
+  },
+  "textMenu": {
+    "message": "Traducir el texto seleccionado"
+  },
+  "textModeLabel": {
+    "message": "Traducción del texto seleccionado"
+  },
+  "textModeMenu": {
+    "message": "Clic derecho"
+  },
+  "textModeButton": {
+    "message": "Botón junto al texto"
+  },
+  "textModeCard": {
+    "message": "Al instante"
+  },
+  "textHintMenu": {
+    "message": "Selecciona un texto, haz clic derecho y elige «Traducir el texto seleccionado»."
+  },
+  "textHintButton": {
+    "message": "Aparece un botón pequeño junto al texto que selecciones, en las páginas que abras desde ahora."
+  },
+  "textHintCard": {
+    "message": "Todo texto que selecciones se envía a traducir al instante, en las páginas que abras desde ahora."
+  },
+  "textModeRefused": {
+    "message": "No se dio el permiso, así que la traducción sigue con clic derecho."
+  },
+  "textWorking": {
+    "message": "Traduciendo…"
+  },
+  "textAsk": {
+    "message": "Traducir"
+  },
+  "textLong": {
+    "message": "La selección es larga. Selecciona una parte más corta (hasta 6000 caracteres)."
+  },
+  "textNoPage": {
+    "message": "El navegador no deja que las extensiones funcionen en esta página."
   }
 }

@@ -608,5 +608,44 @@
         "content": "$1"
       }
     }
+  },
+  "textMenu": {
+    "message": "Markierten Text übersetzen"
+  },
+  "textModeLabel": {
+    "message": "Markierten Text übersetzen"
+  },
+  "textModeMenu": {
+    "message": "Rechtsklick"
+  },
+  "textModeButton": {
+    "message": "Knopf am Text"
+  },
+  "textModeCard": {
+    "message": "Sofort"
+  },
+  "textHintMenu": {
+    "message": "Markiere einen Text, klicke mit rechts und wähle „Markierten Text übersetzen“."
+  },
+  "textHintButton": {
+    "message": "Neben jedem markierten Text erscheint ein kleiner Knopf, auf Seiten, die du ab jetzt öffnest."
+  },
+  "textHintCard": {
+    "message": "Jeder markierte Text wird sofort zur Übersetzung gesendet, auf Seiten, die du ab jetzt öffnest."
+  },
+  "textModeRefused": {
+    "message": "Die Erlaubnis wurde nicht erteilt, die Übersetzung bleibt beim Rechtsklick."
+  },
+  "textWorking": {
+    "message": "Wird übersetzt…"
+  },
+  "textAsk": {
+    "message": "Übersetzen"
+  },
+  "textLong": {
+    "message": "Die Markierung ist lang. Markiere einen kürzeren Teil (bis 6000 Zeichen)."
+  },
+  "textNoPage": {
+    "message": "Der Browser lässt auf dieser Seite keine Erweiterungen zu."
   }
 }

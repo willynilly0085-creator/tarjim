@@ -608,5 +608,44 @@
         "content": "$1"
       }
     }
+  },
+  "textMenu": {
+    "message": "Translate the selected text"
+  },
+  "textModeLabel": {
+    "message": "Translating selected text"
+  },
+  "textModeMenu": {
+    "message": "Right-click"
+  },
+  "textModeButton": {
+    "message": "Button by the text"
+  },
+  "textModeCard": {
+    "message": "Right away"
+  },
+  "textHintMenu": {
+    "message": "Select any text, right-click, then choose Translate the selected text."
+  },
+  "textHintButton": {
+    "message": "A small button appears by any text you select, on pages you open from now on."
+  },
+  "textHintCard": {
+    "message": "Any text you select is sent for translation right away, on pages you open from now on."
+  },
+  "textModeRefused": {
+    "message": "Permission was not given, so translation stays on right-click."
+  },
+  "textWorking": {
+    "message": "Translating…"
+  },
+  "textAsk": {
+    "message": "Translate"
+  },
+  "textLong": {
+    "message": "The selection is long. Select a shorter part (up to 6000 characters)."
+  },
+  "textNoPage": {
+    "message": "The browser does not let extensions work on this page."
   }
 }

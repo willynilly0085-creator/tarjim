@@ -17,7 +17,8 @@ NOT_SETTINGS = {"ping", "home", "asset", "legacy", "upload", "create_local", "se
                 "system", "ui_language", "local_models", "scan_part", "reveal", "play",
                 "current_connection", "signed_in", "sign_in_code", "local_program",
                 "link_assistant", "phone_link", "key_status", "check_order",
-                "prefs_preview"}  # a picture for the page, not a setting (2026-11-09)
+                "prefs_preview",  # a picture for the page, not a setting (2026-11-09)
+                "translate_text"}  # words selected in the browser, not a setting (2026-11-15)
 
 
 @pytest.fixture

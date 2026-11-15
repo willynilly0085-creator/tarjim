@@ -2,6 +2,7 @@ import { buildMenus, isMode, OTHER, refreshMenus } from "./menus.js";
 import { claimPending, sendWaitingJob } from "./pairing.js";
 import { clickedPost, downloadable } from "./posts.js";
 import { ApiError, api, errorLabel, loadWords, remember, t } from "./shared.js";
+import { answer, showCard, syncSelection, TEXT } from "./textcard.js";
 
 const POLL = "poll";
 
@@ -12,6 +13,7 @@ self.addEventListener("unhandledrejection", (event) => {
 async function start() {
   await loadWords();
   buildMenus();
+  syncSelection();
   chrome.alarms.create(POLL, { periodInMinutes: 0.5 });
 }
 
@@ -28,12 +30,27 @@ function notify(id, title, message) {
   chrome.notifications.create(id, { type: "basic", iconUrl: "icons/128.png", title, message });
 }
 
+// The selected text's translation, in a card under it; said plainly where no card can be shown.
+async function translateSelection(tab, frameId, text) {
+  await loadWords();
+  if (tab?.id && await showCard(tab, frameId, text)) return;
+  notify(`nocard-${Date.now()}`, t("appName"), t("textNoPage"));
+}
+
+chrome.runtime.onMessage.addListener(answer);
+chrome.permissions.onAdded.addListener(syncSelection);
+chrome.permissions.onRemoved.addListener(syncSelection);
+chrome.commands?.onCommand.addListener((command, tab) => {
+  if (command === "translate-selection") translateSelection(tab);
+});
+
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   await loadWords();
   if (info.menuItemId === OTHER) {
     chrome.tabs.create({ url: chrome.runtime.getURL("app.html?page=1") });
     return;
   }
+  if (info.menuItemId === TEXT) return void translateSelection(tab, info.frameId, info.selectionText);
   if (!isMode(info.menuItemId)) return;
   const url = await pickUrl(info, tab);
   if (!url) {

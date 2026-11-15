@@ -608,5 +608,44 @@
         "content": "$1"
       }
     }
+  },
+  "textMenu": {
+    "message": "Seçili metni çevir"
+  },
+  "textModeLabel": {
+    "message": "Seçili metnin çevirisi"
+  },
+  "textModeMenu": {
+    "message": "Sağ tık"
+  },
+  "textModeButton": {
+    "message": "Metnin yanında düğme"
+  },
+  "textModeCard": {
+    "message": "Hemen"
+  },
+  "textHintMenu": {
+    "message": "Bir metin seçin, sağ tıklayın ve «Seçili metni çevir» seçeneğini seçin."
+  },
+  "textHintButton": {
+    "message": "Seçtiğiniz metnin yanında küçük bir düğme çıkar; bundan sonra açtığınız sayfalarda."
+  },
+  "textHintCard": {
+    "message": "Seçtiğiniz her metin hemen çeviriye gönderilir; bundan sonra açtığınız sayfalarda."
+  },
+  "textModeRefused": {
+    "message": "İzin verilmedi, bu yüzden çeviri sağ tıkta kalıyor."
+  },
+  "textWorking": {
+    "message": "Çevriliyor…"
+  },
+  "textAsk": {
+    "message": "Çevir"
+  },
+  "textLong": {
+    "message": "Seçim uzun. Daha kısa bir bölüm seçin (6000 karaktere kadar)."
+  },
+  "textNoPage": {
+    "message": "Tarayıcı bu sayfada eklentilerin çalışmasına izin vermiyor."
   }
 }

@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.11 (2026-11-15)
+
+- **Translate the text you select on any page.** Select text, right-click and choose
+  "Translate the selected text" (or press Alt+Shift+Y): a small card under the selection shows
+  its translation into your language, with a Copy button. The translation is made by the same
+  engine you connected for your videos, through tarjim on your computer: no key is kept in the
+  browser, and nothing is shortened. Text already in your language is translated into English
+  (into Arabic when your language is English).
+- In the extension's settings, "Translating selected text" can be set to show a small button by
+  whatever you select, or the card right away. Either one makes the browser ask you first, since
+  tarjim must then be allowed on every page; until you choose it, tarjim reads no page at all.
+
 ## 1.1.10 (2026-11-15)
 
 - **An engine that restarts onto new code no longer leaves no engine at all.** An engine whose

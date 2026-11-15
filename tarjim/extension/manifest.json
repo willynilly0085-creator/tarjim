@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_appName__",
   "description": "__MSG_appDesc__",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "default_locale": "en",
   "author": "Indicators",
   "homepage_url": "https://indicators.sa/",
@@ -11,5 +11,12 @@
   "options_ui": { "page": "app.html?view=settings", "open_in_tab": true },
   "background": { "service_worker": "background.js", "type": "module" },
   "permissions": ["contextMenus", "storage", "alarms", "notifications", "activeTab", "scripting", "nativeMessaging"],
-  "host_permissions": ["http://127.0.0.1/*", "http://localhost/*"]
+  "host_permissions": ["http://127.0.0.1/*", "http://localhost/*"],
+  "optional_host_permissions": ["<all_urls>"],
+  "commands": {
+    "translate-selection": {
+      "suggested_key": { "default": "Alt+Shift+Y" },
+      "description": "__MSG_textMenu__"
+    }
+  }
 }

@@ -608,5 +608,44 @@
         "content": "$1"
       }
     }
+  },
+  "textMenu": {
+    "message": "選択したテキストを翻訳"
+  },
+  "textModeLabel": {
+    "message": "選択したテキストの翻訳"
+  },
+  "textModeMenu": {
+    "message": "右クリック"
+  },
+  "textModeButton": {
+    "message": "テキストの横のボタン"
+  },
+  "textModeCard": {
+    "message": "すぐに"
+  },
+  "textHintMenu": {
+    "message": "テキストを選択して右クリックし、「選択したテキストを翻訳」を選びます。"
+  },
+  "textHintButton": {
+    "message": "選択したテキストの横に小さなボタンが出ます。これから開くページで有効です。"
+  },
+  "textHintCard": {
+    "message": "選択したテキストはすぐに翻訳に送られます。これから開くページで有効です。"
+  },
+  "textModeRefused": {
+    "message": "許可されなかったため、翻訳は右クリックのままです。"
+  },
+  "textWorking": {
+    "message": "翻訳中…"
+  },
+  "textAsk": {
+    "message": "翻訳"
+  },
+  "textLong": {
+    "message": "選択範囲が長すぎます。短い部分を選択してください（6000文字まで）。"
+  },
+  "textNoPage": {
+    "message": "このページではブラウザーが拡張機能の動作を許可していません。"
   }
 }

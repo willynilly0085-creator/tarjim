@@ -608,5 +608,44 @@
         "content": "$1"
       }
     }
+  },
+  "textMenu": {
+    "message": "Terjemahkan teks yang dipilih"
+  },
+  "textModeLabel": {
+    "message": "Penerjemahan teks yang dipilih"
+  },
+  "textModeMenu": {
+    "message": "Klik kanan"
+  },
+  "textModeButton": {
+    "message": "Tombol di dekat teks"
+  },
+  "textModeCard": {
+    "message": "Langsung"
+  },
+  "textHintMenu": {
+    "message": "Pilih teks apa pun, klik kanan, lalu pilih «Terjemahkan teks yang dipilih»."
+  },
+  "textHintButton": {
+    "message": "Tombol kecil muncul di dekat teks yang Anda pilih, di halaman yang Anda buka mulai sekarang."
+  },
+  "textHintCard": {
+    "message": "Teks apa pun yang Anda pilih langsung dikirim untuk diterjemahkan, di halaman yang Anda buka mulai sekarang."
+  },
+  "textModeRefused": {
+    "message": "Izin tidak diberikan, jadi penerjemahan tetap lewat klik kanan."
+  },
+  "textWorking": {
+    "message": "Menerjemahkan…"
+  },
+  "textAsk": {
+    "message": "Terjemahkan"
+  },
+  "textLong": {
+    "message": "Teks yang dipilih panjang. Pilih bagian yang lebih pendek (hingga 6000 karakter)."
+  },
+  "textNoPage": {
+    "message": "Peramban tidak mengizinkan ekstensi bekerja di halaman ini."
   }
 }

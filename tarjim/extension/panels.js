@@ -2,6 +2,7 @@ import { $, show } from "./dom.js";
 import { keyStatus, saveKey } from "./keys.js";
 import { askToPair, claimPending, openPage, sendWaitingJob } from "./pairing.js";
 import { ApiError, api, remember, settings, t } from "./shared.js";
+import { chooseTextMode } from "./textcard.js";
 
 window.addEventListener("unhandledrejection", (event) => {
   if (!(event.reason instanceof ApiError)) return;
@@ -93,8 +94,21 @@ async function fillSummary() {
   $("open-phone").textContent = t(phone?.paired ? "phoneSettingsButton" : "phoneLinkButton");
 }
 
+const TEXT_HINTS = { menu: "textHintMenu", button: "textHintButton", card: "textHintCard" };
+
+// The browser asks the person before tarjim may look at what they select on every page; when
+// they say no, the choice goes back to what it was.
+async function pickTextMode(event) {
+  const allowed = await chooseTextMode(event.target.value);
+  const { textMode } = await settings();
+  document.querySelector(`input[name=textMode][value=${textMode}]`).checked = true;
+  $("text-mode-note").textContent = t(allowed ? TEXT_HINTS[textMode] : "textModeRefused");
+}
+
 export async function openSettings() {
   const saved = await settings();
+  document.querySelector(`input[name=textMode][value=${saved.textMode}]`).checked = true;
+  $("text-mode-note").textContent = t(TEXT_HINTS[saved.textMode]);
   $("server").value = saved.server;
   $("settings-token").value = saved.token;
   const keys = await keyStatus().catch(() => ({}));
@@ -137,6 +151,7 @@ export function wirePanels({ ready, back, leave }) {
   $("open-full-setup").addEventListener("click", openSetup);
   $("setup-done").addEventListener("click", againOn("setup", "setup-note", "setupNotDone", back));
   $("settings-form").addEventListener("submit", saveSettings);
+  document.querySelectorAll("input[name=textMode]").forEach((el) => el.addEventListener("change", pickTextMode));
   $("retry-connect").addEventListener("click", againOn("offline", "offline-note", "stillOffline", back));
   $("close-settings").addEventListener("click", back);
   $("open-settings").addEventListener("click", () => { leave(); openSettings(); });

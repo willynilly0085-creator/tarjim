@@ -608,5 +608,44 @@
         "content": "$1"
       }
     }
+  },
+  "textMenu": {
+    "message": "ترجم النص المحدد"
+  },
+  "textModeLabel": {
+    "message": "ترجمة النص المحدد"
+  },
+  "textModeMenu": {
+    "message": "كليك يمين"
+  },
+  "textModeButton": {
+    "message": "زر جنب النص"
+  },
+  "textModeCard": {
+    "message": "على طول"
+  },
+  "textHintMenu": {
+    "message": "حدد أي نص واضغط كليك يمين ثم «ترجم النص المحدد»."
+  },
+  "textHintButton": {
+    "message": "يطلع زر صغير جنب أي نص تحدده، في الصفحات اللي تفتحها من الحين."
+  },
+  "textHintCard": {
+    "message": "أي نص تحدده ينرسل للترجمة على طول، في الصفحات اللي تفتحها من الحين."
+  },
+  "textModeRefused": {
+    "message": "ما انعطى الإذن، فالترجمة تبقى من كليك يمين."
+  },
+  "textWorking": {
+    "message": "نترجم…"
+  },
+  "textAsk": {
+    "message": "ترجم"
+  },
+  "textLong": {
+    "message": "النص المحدد طويل. حدد جزء أقصر (لين 6000 حرف)."
+  },
+  "textNoPage": {
+    "message": "المتصفح ما يسمح للإضافات تشتغل في هذي الصفحة."
   }
 }

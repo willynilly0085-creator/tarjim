@@ -608,5 +608,44 @@
         "content": "$1"
       }
     }
+  },
+  "textMenu": {
+    "message": "Traduzir o texto selecionado"
+  },
+  "textModeLabel": {
+    "message": "Tradução do texto selecionado"
+  },
+  "textModeMenu": {
+    "message": "Clique direito"
+  },
+  "textModeButton": {
+    "message": "Botão junto ao texto"
+  },
+  "textModeCard": {
+    "message": "Na hora"
+  },
+  "textHintMenu": {
+    "message": "Selecione um texto, clique com o botão direito e escolha «Traduzir o texto selecionado»."
+  },
+  "textHintButton": {
+    "message": "Um pequeno botão aparece junto ao texto que selecionar, nas páginas que abrir a partir de agora."
+  },
+  "textHintCard": {
+    "message": "Todo texto que selecionar é enviado para tradução na hora, nas páginas que abrir a partir de agora."
+  },
+  "textModeRefused": {
+    "message": "A permissão não foi dada, por isso a tradução continua no clique direito."
+  },
+  "textWorking": {
+    "message": "Traduzindo…"
+  },
+  "textAsk": {
+    "message": "Traduzir"
+  },
+  "textLong": {
+    "message": "A seleção é longa. Selecione uma parte mais curta (até 6000 caracteres)."
+  },
+  "textNoPage": {
+    "message": "O navegador não deixa as extensões funcionarem nesta página."
   }
 }

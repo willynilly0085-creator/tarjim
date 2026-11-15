@@ -182,6 +182,12 @@ In Chrome, Edge or Brave open `chrome://extensions`, turn on Developer mode, cho
 and pick the `~/.tarjim/extension` folder. The extension pairs itself: press **Allow** on the
 tarjim page.
 
+The extension also translates text: select any text on a page, right-click and choose
+**Translate the selected text** (or press Alt+Shift+Y). A card under the selection shows the
+translation, made by the engine you connected for your videos; no key is kept in the browser. In
+the extension's settings you can have a small button, or the card itself, appear as soon as you
+select; the browser asks you first, because tarjim must then be allowed on every page.
+
 In Firefox (128 or later) open
 <https://github.com/willynilly0085-creator/tarjim/releases/latest/download/tarjim-firefox.xpi>
 and press **Continue to Installation**, then **Add**. If Firefox saves the file instead, open

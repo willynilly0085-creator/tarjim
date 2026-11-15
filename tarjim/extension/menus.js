@@ -1,4 +1,5 @@
 import { api, settings, t } from "./shared.js";
+import { TEXT } from "./textcard.js";
 
 export const ROOT = "tarjim";
 export const OTHER = "tarjim-other";
@@ -67,6 +68,7 @@ async function build() {
   }
   await create({ id: "tarjim-line", parentId: ROOT, type: "separator", contexts: CONTEXTS });
   await create({ id: OTHER, parentId: ROOT, title: t("menuOther"), contexts: CONTEXTS });
+  await create({ id: TEXT, title: t("textMenu"), contexts: ["selection"] });
 }
 
 export const isMode = (id) => ITEMS.some(([mode]) => mode === id);

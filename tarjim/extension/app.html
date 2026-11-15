@@ -164,6 +164,15 @@
       <button class="button-quiet wide" id="open-keys-settings" type="button" data-i18n="keysButton"></button>
       <button class="button-quiet wide" id="open-phone" type="button" data-i18n="phoneLinkButton"></button>
       <button class="primary wide" id="open-full-setup" type="button" data-i18n="setupFull"></button>
+      <fieldset class="field" id="text-mode">
+        <legend class="field-label" data-i18n="textModeLabel"></legend>
+        <div class="segments">
+          <label><input type="radio" name="textMode" value="menu"><span data-i18n="textModeMenu"></span></label>
+          <label><input type="radio" name="textMode" value="button"><span data-i18n="textModeButton"></span></label>
+          <label><input type="radio" name="textMode" value="card"><span data-i18n="textModeCard"></span></label>
+        </div>
+        <p class="notice" id="text-mode-note" role="status" aria-live="polite"></p>
+      </fieldset>
       <details class="advanced">
         <summary data-i18n="advanced"></summary>
         <form id="settings-form" class="stack" novalidate>
