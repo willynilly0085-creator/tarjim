@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.1.5 (2026-11-15)
+
+- **A subtitle no longer sits on the video's own captions when they take a second line.** A
+  video that carries captions of its own gets its subtitles lifted above them, once for the
+  whole video. When those captions took a second line for one sentence, the line said then was
+  drawn right on it, and neither could be read: a video already lifted moved no line at all,
+  and text that is up only about as long as one line was looked at once, so it was never taken
+  for text that stays. Now such a line is looked at just inside its start and its end, and in a
+  lifted video it goes above text that stands right on the video's own captions. Words that
+  are only part of the scene (a wall behind a speaker) still move nothing. A line under a
+  second long counts text that is there at both its ends.
+- **The summary to post no longer names the account that shared the clip.** A link from X is
+  titled with the account's name and then its words, and the summary took that name for the
+  person in the clip ("in a clip by ..."), a name nobody in the clip says. The summary is now
+  told what the video is called without the account that posted it, and names a person only
+  when the subtitles or the title do.
+
 ## 1.1.4 (2026-11-14)
 
 - **Names are heard right when tarjim knows them before it listens.** A listener that has never

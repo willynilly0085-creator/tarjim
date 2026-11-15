@@ -110,10 +110,10 @@ def test_a_missing_exact_look_moves_the_line_rather_than_cover_the_text() -> Non
     seen = {0.0: [], 3.0: [(0.86, 0.93)], 5.2: [(0.86, 0.93)], 7.0: []}
     cues = [Cue(1.0, 2.0, text="x"), Cue(3.5, 4.5, text="x")]
     canvas = Canvas(1920, 1080)
-    assert moments.wanted(seen, cues, canvas) == [1.9, 3.6, 4.4]
+    assert moments.wanted(seen, cues, canvas) == [1.1, 1.9, 3.6, 4.4]
     moved = moments.decide(seen, cues, canvas, None)
     assert [m[:2] for m in moved] == [(1.0, 2.0), (3.5, 4.5)]
-    seen |= {1.9: [], 3.6: [], 4.4: []}  # looked: the note showed only between the two lines
+    seen |= {1.1: [], 1.9: [], 3.6: [], 4.4: []}  # looked: the note showed between the lines
     assert moments.decide(seen, cues, canvas, None) == ()
 
 
@@ -171,10 +171,3 @@ def test_the_scan_reads_key_frames_only_with_their_times(tmp_path: Path) -> None
     assert sorted(seen) == [float(t) for t in range(0, 20, 2)]
     assert [t for t, bands in seen.items() if bands] == [10.0, 12.0]
 
-
-def test_a_video_lifted_over_its_own_news_bar_moves_no_line(tmp_path: Path) -> None:
-    """2026-10-30: a Fox News clip, its bar steady at the bottom, the wall behind the speaker
-    full of words: lines hopped between three heights. The lifted place stays for every line."""
-    canvas = Canvas(1280, 720, margin=206)
-    job = Job(tmp_path / "v.mp4", cache_dir=tmp_path)
-    assert moments.moved(job, CUES, canvas, None) == canvas

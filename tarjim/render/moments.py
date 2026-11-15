@@ -6,21 +6,26 @@ and tarjim's subtitle was drawn over it. Netflix's style guide moves a subtitle 
 text for as long as the text shows, and so does this, line by line.
 
 When text shows comes from every key frame of the video (render/timeline.py). A line moves when
-a key frame inside it shows text where the subtitle is drawn. Key frames are seconds apart, so a
-line with such a frame just before or after it, and none inside showing text, is decided by the
-exact frame just inside its start or its end. That look decodes from the key frame before it,
-so it costs up to one key frame's spacing; only lines beside text take one, and all of them
-together get frames.BUDGET seconds. A look that could not be had moves the line anyway: moved
-for nothing, a line stays readable; left in place, it covers the text.
+a frame inside it shows text where the subtitle is drawn. Key frames are seconds apart, so a
+line with such a frame in it, or just before or after it, is also looked at exactly, just
+inside its start and its end: both, because text up for about as long as the line is in one key
+frame at most, and only the line's two ends show it twice (2026-11-15). Such a look decodes
+from the key frame before it, so it costs up to one key frame's spacing; only lines beside text
+take them, and all of them together get frames.BUDGET seconds. A look that could not be had
+moves the line anyway: moved for nothing, a line stays readable; left in place, it covers the
+text.
 
 A moved line goes just above that text. It never goes to the top on its own: on 2026-10-30, on a
 news clip, lines flipped between the bottom and the top while the speaker talked, because the
 words on the wall behind him (scene text, moving with the camera) were taken for burned-in text.
-So only steady text counts, seen at the same rows in looks a second or more apart; a line that
-cannot be lifted below the middle stays where it is; and lines moved one after another share
-one height, so they do not jitter. A video whose subtitle already sits off its own steady text
-(a news channel's bar, at the bottom or the top) moves no line: its passing text was scene text
-every time it was looked at.
+So only steady text counts, seen at the same rows in looks a second or more apart or at both
+ends of the line; a line that cannot be lifted below the middle stays where it is; and lines
+moved one after another share one height, so they do not jitter. In a video whose subtitle is
+already lifted off its own steady text (a news channel's bar, a creator's captions) the words
+on that wall came back at the same rows each time the camera did, so there a line moves only
+for text standing right on the video's own: its captions with a line more (2026-11-15, a
+trailer whose caption took a second line for one sentence, and the subtitle sat on it). A
+video whose subtitle is at the top moves no line.
 What was seen is kept in the job's folder, and looking never fails a job."""
 import json
 from bisect import bisect_left, bisect_right
@@ -44,6 +49,7 @@ EDGE = 0.1
 STEADY = 0.006  # rows, as a share of the height: burned-in text stays exactly where it is
 APART = 1.0  # seconds between two looks that show it, so one moment is not taken for two
 TOGETHER = 1.5  # seconds between moved lines that share one height
+NEXT = 0.5  # of a text line's height: the most between a caption's line and one added on it
 
 
 def hit(bands: list[Band], canvas: Canvas) -> bool:
@@ -53,22 +59,33 @@ def hit(bands: list[Band], canvas: Canvas) -> bool:
     return any(meets(band, canvas, bottom - block, bottom) for band in bands)
 
 
+def ends(cue: Cue) -> tuple[float, float]:
+    """Where to look just inside the line's start and its end."""
+    edge = min(EDGE, (cue.end - cue.start) / 2)
+    return round(cue.start + edge, 3), round(cue.end - edge, 3)
+
+
 def neighbours(seen: Seen, cue: Cue) -> list[tuple[float, float]]:
     """(the nearest frame before the line, where to look inside its start), and the same for
     the nearest frame after it and its end."""
     times = sorted(seen)
     first, past = bisect_left(times, cue.start), bisect_right(times, cue.end)
-    edge = min(EDGE, (cue.end - cue.start) / 2)
-    before = [(t, round(cue.start + edge, 3)) for t in times[max(0, first - 1):first]
-              if t >= cue.start - NEAR]
-    after = [(t, round(cue.end - edge, 3)) for t in times[past:past + 1] if t <= cue.end + NEAR]
+    start, end = ends(cue)
+    before = [(t, start) for t in times[max(0, first - 1):first] if t >= cue.start - NEAR]
+    after = [(t, end) for t in times[past:past + 1] if t <= cue.end + NEAR]
     return before + after
 
 
+def beside(seen: Seen, cue: Cue, canvas: Canvas) -> bool:
+    """Whether a frame in the line, or the nearest on either side, shows text where it is."""
+    near = [t for t, _look in neighbours(seen, cue)] + [t for t in seen
+                                                         if cue.start <= t <= cue.end]
+    return any(hit(seen[t], canvas) for t in near)
+
+
 def wanted(seen: Seen, cues: list[Cue], canvas: Canvas) -> list[float]:
-    """The exact looks the lines need: inside each line, beside a frame showing text there."""
-    looks = {look for cue in cues for near, look in neighbours(seen, cue)
-             if hit(seen[near], canvas)}
+    """The exact looks the lines need: inside both ends of each line beside text."""
+    looks = {look for cue in cues if beside(seen, cue, canvas) for look in ends(cue)}
     return sorted(looks - set(seen))
 
 
@@ -76,11 +93,22 @@ def same_rows(one: Band, other: Band) -> bool:
     return abs(one[0] - other[0]) <= STEADY and abs(one[1] - other[1]) <= STEADY
 
 
-def steady(band: Band, seen: Seen, around: float) -> bool:
-    """Shown at the same rows in looks a second or more apart: burned in, not scene text."""
+def steady(band: Band, seen: Seen, cue: Cue) -> bool:
+    """Shown at the same rows in looks a second or more apart, or from the line's start to its
+    end: burned in, not scene text."""
     times = [t for t, bands in seen.items()
-             if abs(t - around) <= NEAR and any(same_rows(band, b) for b in bands)]
-    return bool(times) and max(times) - min(times) >= APART
+             if abs(t - cue.start) <= NEAR and any(same_rows(band, b) for b in bands)]
+    start, end = ends(cue)
+    return bool(times) and (max(times) - min(times) >= APART
+                            or (min(times) <= start and max(times) >= end))
+
+
+def counts(band: Band, canvas: Canvas) -> bool:
+    """In a video lifted off its own steady text, only that text with a line more: a band
+    standing right on one of the video's own."""
+    reach = (band[1] - band[0]) * NEXT
+    return canvas.margin is None or any(band[0] < own[0] <= band[1] + reach
+                                        for own in canvas.bands)
 
 
 def evidence(seen: Seen, cue: Cue, canvas: Canvas) -> list[Band]:
@@ -89,7 +117,8 @@ def evidence(seen: Seen, cue: Cue, canvas: Canvas) -> list[Band]:
     if not showing:  # a look that could not be had: the frame beside it stands in for it
         showing = [seen[near] for near, look in neighbours(seen, cue)
                    if look not in seen and hit(seen[near], canvas)]
-    return [band for bands in showing for band in bands if steady(band, seen, cue.start)]
+    return [band for bands in showing for band in bands
+            if steady(band, seen, cue) and counts(band, canvas)]
 
 
 def mark_band(mark: Mark | None, canvas: Canvas) -> list[Band]:
@@ -154,8 +183,8 @@ def observed(job: Job, cues: list[Cue], canvas: Canvas) -> Seen:
 def moved(job: Job, cues: list[Cue], canvas: Canvas, mark: Mark | None) -> Canvas:
     """The canvas with the lines that would cover the picture's passing text moved off it."""
     spoken = [cue for cue in cues if cue.text.strip()]
-    if canvas.top or canvas.margin is not None or not spoken:
-        return canvas  # a video with steady text of its own (a news bar) keeps its one place
+    if canvas.top or not spoken:
+        return canvas  # at the top, off the video's own steady text, every line keeps its place
     if canvas.look.position != "auto":
         return canvas  # the person keeps every line in the video's one place (2026-11-09)
     try:
