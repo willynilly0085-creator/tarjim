@@ -25,6 +25,7 @@ GECKO_ID = "tarjim@indicators.sa"  # the name Firefox knows the add-on by (nativ
 FIREFOX_SINCE = "128.0"  # module scripts in the background, and its permissions granted at install
 UPDATES = f"https://raw.githubusercontent.com/{REPO}/master/firefox-updates.json"
 SIGNED = "tarjim-firefox.xpi"  # the signed add-on's name in every release
+INSTALL = f"https://github.com/{REPO}/releases/latest/download/{SIGNED}"  # opened in Firefox
 
 
 def signature(folder: Path) -> set[tuple[str, int, int]]:

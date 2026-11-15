@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.9 (2026-11-15)
+
+- **The Firefox add-on stays.** Firefox keeps for good only an add-on Mozilla has signed, so the
+  one loaded from a folder was gone every time Firefox closed and had to be added again by hand.
+  Each release now carries the add-on signed by Mozilla (`tarjim-firefox.xpi`): open its link in
+  Firefox, press Continue to Installation and Add, once. It stays, and it updates itself with
+  each release. The setup page and the README give the link instead of the temporary way.
+
 ## 1.1.8 (2026-11-15)
 
 - **A link that cannot be read no longer stops every job after it.** tarjim downloads one

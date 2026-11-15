@@ -5,7 +5,7 @@ from tarjim import autostart
 from tarjim.config import save, setting
 from tarjim.engines.choice import LISTENERS, TRANSLATORS, chosen
 from tarjim.engines.subscription import installed
-from tarjim.extension_home import extension_folder, firefox_folder
+from tarjim.extension_home import INSTALL, extension_folder, firefox_folder
 from tarjim.keys import status
 from tarjim.prefs.edit import change
 from tarjim.prefs.store import current
@@ -78,6 +78,7 @@ class SetupRoutes(OnboardRoutes, PhoneRoutes, UpdateRoutes, VoiceRoutes):
         state["video_mark"] = "yes" if current().look.mark else "no"
         state["extension_path"] = extension_folder()
         state["firefox_path"] = firefox_folder()
+        state["firefox_link"] = INSTALL
         state["local_model"] = setting("local_model")
         state["glossary"] = setting("glossary")
         state["subscriptions"] = installed()

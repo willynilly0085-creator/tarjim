@@ -182,10 +182,13 @@ In Chrome, Edge or Brave open `chrome://extensions`, turn on Developer mode, cho
 and pick the `~/.tarjim/extension` folder. The extension pairs itself: press **Allow** on the
 tarjim page.
 
-In Firefox (128 or later) open `about:debugging#/runtime/this-firefox`, press **Load Temporary
-Add-on** and pick `manifest.json` inside `~/.tarjim/extension-firefox`. Firefox installs for good
-only add-ons Mozilla has signed, so one loaded this way stays until Firefox closes; a signed
-build that installs with one click is not published yet.
+In Firefox (128 or later) open
+<https://github.com/willynilly0085-creator/tarjim/releases/latest/download/tarjim-firefox.xpi>
+and press **Continue to Installation**, then **Add**. If Firefox saves the file instead, open
+`about:addons`, press the gear and choose **Install Add-on From File**. The add-on is signed by
+Mozilla, so it stays after Firefox closes, and it updates itself with each release of tarjim.
+(To try the add-on from the source instead, `about:debugging#/runtime/this-firefox` loads
+`manifest.json` inside `~/.tarjim/extension-firefox` until Firefox closes.)
 
 ### Chat
 

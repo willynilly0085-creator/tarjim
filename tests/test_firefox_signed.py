@@ -79,3 +79,14 @@ def test_signing_without_the_keys_says_which_one_is_missing(
     monkeypatch.setattr(signing, "kept", lambda _name: "")
     with pytest.raises(SystemExit, match="AMO_JWT_ISSUER"):
         signing.sign(tmp_path / "addon", tmp_path / "out")
+
+
+def test_the_setup_page_offers_the_signed_add_on_of_the_newest_release() -> None:
+    from tarjim.server import setup_routes
+
+    assert extension_home.INSTALL.startswith("https://github.com/")
+    assert extension_home.INSTALL.endswith("/releases/latest/download/tarjim-firefox.xpi")
+    assert setup_routes.INSTALL is extension_home.INSTALL
+    web = ROOT / "tarjim" / "web"
+    assert 'id="firefox-link"' in (web / "index.html").read_text(encoding="utf-8")
+    assert "state.setup.firefox_link" in (web / "wizard.js").read_text(encoding="utf-8")
