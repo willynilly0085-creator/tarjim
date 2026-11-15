@@ -6,6 +6,10 @@ refreshes the files there; the browser picks them up on its next start or on "Re
 
 Firefox reads the same files with a manifest of its own (2026-11-12): its background is a page's
 script, not a service worker, and an add-on there names itself. That copy is a second folder.
+
+Firefox keeps for good only an add-on Mozilla has signed (2026-11-15). tarjim's is signed outside
+Mozilla's shop (scripts/firefox_addon.py) and handed out in each release, so its manifest names
+the file where Firefox learns of a newer one.
 """
 import json
 import shutil
@@ -13,11 +17,14 @@ from pathlib import Path
 from typing import Any
 
 from tarjim import config
+from tarjim.release_pins import REPO
 
 PACKAGED = Path(__file__).resolve().parent / "extension"
 MANIFEST = "manifest.json"
 GECKO_ID = "tarjim@indicators.sa"  # the name Firefox knows the add-on by (native_setup.py too)
 FIREFOX_SINCE = "128.0"  # module scripts in the background, and its permissions granted at install
+UPDATES = f"https://raw.githubusercontent.com/{REPO}/master/firefox-updates.json"
+SIGNED = "tarjim-firefox.xpi"  # the signed add-on's name in every release
 
 
 def signature(folder: Path) -> set[tuple[str, int, int]]:
@@ -53,9 +60,15 @@ def for_firefox(manifest: dict[str, Any]) -> dict[str, Any]:
     made["background"] = {"scripts": [manifest["background"]["service_worker"]],
                           "type": "module"}
     made["browser_specific_settings"] = {"gecko": {
-        "id": GECKO_ID, "strict_min_version": FIREFOX_SINCE,
+        "id": GECKO_ID, "strict_min_version": FIREFOX_SINCE, "update_url": UPDATES,
         "data_collection_permissions": {"required": ["none"]}}}
     return made
+
+
+def updates(version: str) -> dict[str, Any]:
+    """What Firefox reads at UPDATES: the newest signed add-on and the release that holds it."""
+    link = f"https://github.com/{REPO}/releases/download/v{version}/{SIGNED}"
+    return {"addons": {GECKO_ID: {"updates": [{"version": version, "update_link": link}]}}}
 
 
 def firefox_manifest() -> str:

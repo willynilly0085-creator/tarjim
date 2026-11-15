@@ -1,0 +1,12 @@
+{
+  "addons": {
+    "tarjim@indicators.sa": {
+      "updates": [
+        {
+          "version": "1.1.8",
+          "update_link": "https://github.com/willynilly0085-creator/tarjim/releases/download/v1.1.8/tarjim-firefox.xpi"
+        }
+      ]
+    }
+  }
+}
