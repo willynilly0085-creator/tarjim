@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.6 (2026-11-15)
+
+- **The summary to post writes about a woman as a woman.** A clip in which a woman speaks was
+  summarised "the speaker points out" in the masculine. tarjim had measured her voice and told
+  the summary's writer, by her label; but the lines it was given carried no labels, so it could
+  not know which words were hers, and it was told to follow the voices only where a speaker
+  talks about themself. Now each line goes under its speaker's label when the voices were
+  measured, and the writer is told to write about a speaker in the gender of that speaker's
+  voice. Asked three times of the same clip, it wrote her in the feminine three times, and the
+  man who announces in it in the masculine.
+
 ## 1.1.5 (2026-11-15)
 
 - **A subtitle no longer sits on the video's own captions when they take a second line.** A

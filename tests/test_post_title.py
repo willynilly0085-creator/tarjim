@@ -10,7 +10,7 @@ import pytest
 from tarjim import post
 from tarjim.job import Job
 from tarjim.languages import language
-from tarjim.listen.known import ABOUT
+from tarjim.listen.known import ABOUT, called
 from tarjim.models import Cue
 
 AR = language("ar")
@@ -28,19 +28,19 @@ def test_the_account_that_posted_a_link_is_not_in_what_the_summary_is_told(
         tmp_path: Path) -> None:
     video = linked(tmp_path, "SOME ACCOUNT اسم الحساب - how the plant recycles scrap",
                    "SOME ACCOUNT اسم الحساب")
-    assert post.called(video) == "how the plant recycles scrap"
-    asked = post.prompt(post.called(video), AR, ["المصنع يعيد تدوير الخردة"])
+    assert called(video) == "how the plant recycles scrap"
+    asked = post.prompt(called(video), AR, ["المصنع يعيد تدوير الخردة"])
     assert "SOME ACCOUNT" not in asked and "اسم الحساب" not in asked
     assert "Title: how the plant recycles scrap" in asked
 
 
 def test_a_title_that_does_not_start_with_the_account_is_told_whole(tmp_path: Path) -> None:
     video = linked(tmp_path, "A talk with Jensen Huang - part 2", "Some Channel")
-    assert post.called(video) == "A talk with Jensen Huang - part 2"
+    assert called(video) == "A talk with Jensen Huang - part 2"
 
 
 def test_a_file_the_person_gave_is_called_by_its_own_name(tmp_path: Path) -> None:
-    assert post.called(tmp_path / "interview with the minister.mp4") == \
+    assert called(tmp_path / "interview with the minister.mp4") == \
         "interview with the minister"
 
 

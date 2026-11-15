@@ -63,6 +63,15 @@ def about(video: Path) -> dict[str, str]:
         return {"title": plain(video.stem, TITLE)}
 
 
+def called(video: Path) -> str:
+    """What the video is called, without the account that posted it. A link from X is titled
+    "<account> - <its words>", and the account is whoever shared the clip, seldom anyone in it:
+    a summary said the clip was that account's (2026-11-15)."""
+    kept = about(video)
+    title, by = kept.get("title") or video.stem, kept.get("by")
+    return title.removeprefix(f"{by} - ") if by else title
+
+
 def known(video: Path, glossary: Glossary) -> str:
     """The lines the listener is given: what the clip is called, who posted it, how it is
     described, and the person's own terms."""

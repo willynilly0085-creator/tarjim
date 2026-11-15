@@ -12,11 +12,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from tarjim.asr.voices import Voices, told
+from tarjim.asr.voices import Voices, said_by, told
 from tarjim.config import setting
 from tarjim.job import Job, checkpoint
 from tarjim.languages import Language
-from tarjim.listen.known import about
+from tarjim.listen.known import called
 from tarjim.models import DIALOGUE_SEPARATOR, Cue
 from tarjim.quoted import inert
 
@@ -48,6 +48,9 @@ the title name them; otherwise write "the speaker" in {language}.
 - Write names as the subtitles write them, without quotation marks around them.
 - Never judge whether a person is a man or a woman from a name. Follow the voices given \
 below when there are any, otherwise the subtitles' own wording, otherwise leave it unsaid.
+- When voices are given, each line starts with its speaker's label; never write the labels. \
+When you write about a speaker yourself ("the speaker says"), use the gender of that speaker's \
+voice: for a woman's voice (or a child's) the feminine, unless the subtitles show it is a boy.
 - A line "{gap}" marks a place where some lines were left out."""
 PLAIN = "the plain written form used in news posts"
 STANDARD = "clear Modern Standard Arabic as written in news posts, not a dialect"
@@ -66,9 +69,12 @@ def wanted() -> bool:
     return setting("post_summary") != "no"
 
 
-def spoken(cues: list[Cue]) -> list[str]:
-    lines = (" ".join(cue.text.replace(DIALOGUE_SEPARATOR.strip(), " ").split()) for cue in cues)
-    return [line for line in lines if line]
+def spoken(cues: list[Cue], voices: Voices = ()) -> list[str]:
+    """The translated lines; each under its speaker's label when the voices were measured, so
+    the model knows whose voice says what (2026-11-15: a woman summarised in the masculine)."""
+    lines = ((said_by(cue) if voices else "",
+              " ".join(cue.text.replace(DIALOGUE_SEPARATOR.strip(), " ").split())) for cue in cues)
+    return [name + line for name, line in lines if line]
 
 
 def thinned(lines: list[str], most: int = MOST) -> list[str]:
@@ -141,7 +147,7 @@ def summary(title: str, cues: list[Cue], language: Language,
     """Asked of the engine that translated, then of its backup; None when neither answers."""
     from tarjim.engines.choice import asker, chain
 
-    lines = thinned(spoken(cues))
+    lines = thinned(spoken(cues, voices))
     if not lines:
         return None
     text = prompt(title, language, lines, voices)
@@ -155,15 +161,6 @@ def summary(title: str, cues: list[Cue], language: Language,
         if found is not None:
             return found
     return None
-
-
-def called(video: Path) -> str:
-    """What the video is called, without the account that posted it. A link from X is titled
-    "<account> - <its words>", and the account is whoever shared the clip, seldom anyone in it:
-    a summary said the clip was that account's (2026-11-15)."""
-    known = about(video)
-    title, by = known.get("title") or video.stem, known.get("by")
-    return title.removeprefix(f"{by} - ") if by else title
 
 
 def write(job: Job, cues: list[Cue], voices: Voices = ()) -> Path | None:

@@ -16,7 +16,7 @@ from typing import Any
 
 import numpy as np
 
-from tarjim.models import Word
+from tarjim.models import Cue, Word
 from tarjim.speakers import who
 
 RATE = 16000
@@ -83,6 +83,14 @@ def voices_of(video: Path, words: list[Word]) -> Voices:
         print("voices: " + ", ".join(f"{label or 'the speaker'} {voice}" for label, voice in found),
               flush=True)
     return found
+
+
+def said_by(cue: Cue) -> str:
+    """The line's speaker, or an exchange's speakers, to go before it in a prompt that is
+    told the voices by their labels (post.py)."""
+    parts = cue.parts if cue.is_dialogue else [cue.words]
+    names = "+".join(dict.fromkeys(who(part[0].speaker) for part in parts if part))
+    return f"{names}: " if names.strip("+") else ""
 
 
 def told(voices: Voices, key: str) -> str:
