@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.7 (2026-11-15)
+
+- **A YouTube link no longer stays on "reading the qualities" for good.** On Windows the engine
+  that starts when you sign in was left working in Windows' own system folder, where nothing
+  can be written. YouTube now makes the downloader test some formats before it offers them,
+  the test keeps a small file in the folder the program works in, and there it never
+  returned: the phone bot and the page stayed on "reading the qualities", a download of such
+  a link would have hung the same way, and the engine kept a processor core busy until it was
+  restarted. Now the engine works from tarjim's own folder wherever it was started, the
+  downloader is told to keep its test files in the temporary folder, and reading a link's
+  qualities is given up after 40 seconds whatever keeps it, so the link goes on with the
+  usual quality instead of waiting. Read again from that system folder, the same link gave its
+  six qualities in 3 seconds and downloaded.
+
 ## 1.1.6 (2026-11-15)
 
 - **The summary to post writes about a woman as a woman.** A clip in which a woman speaks was

@@ -1,3 +1,4 @@
+import tempfile
 import threading
 from pathlib import Path
 from typing import Any
@@ -49,13 +50,19 @@ class Budget:
             raise RuntimeError(TOO_BIG)
         self.ffmpeg[1] = str(left)
 
+LOOK_SECONDS = 40.0  # a read takes 3; a format tested on a slow line, a few more
+
 
 def asking() -> dict[str, Any]:
-    """Reading what a link is: one video or a list, live or not, and its qualities."""
+    """Reading what a link is: one video or a list, live or not, and its qualities. yt-dlp
+    tests some formats before it offers them and keeps the test's file in the current folder
+    unless told where: in one that cannot be written, Python's tempfile never returned
+    (2026-11-15), so it is told."""
     from yt_dlp.utils import match_filter_func
 
     return {"noplaylist": True, "quiet": True, "no_warnings": True,
-            "match_filter": match_filter_func("!is_live"), "extract_flat": "in_playlist"}
+            "match_filter": match_filter_func("!is_live"), "extract_flat": "in_playlist",
+            "paths": {"temp": tempfile.gettempdir()}}
 
 
 def options(folder: Path, choice: Any = qualities.FALLBACK) -> dict[str, Any]:
@@ -81,13 +88,35 @@ def clear(folder: Path, name: str, before: set[Path]) -> None:
             path.unlink(missing_ok=True)
 
 
-def look(url: str) -> dict[str, Any]:
-    """The qualities this link offers, read without downloading anything. Not under IN_USE: a
-    download holds it for as long as it runs, and reading must not wait behind one."""
+def looked(url: str) -> dict[str, Any]:
     from yt_dlp import YoutubeDL
 
     with YoutubeDL({**asking(), "socket_timeout": qualities.ASK_SECONDS}) as ydl:
         return {**qualities.offer(ydl, one_video(ydl, url)), "limit": LARGEST}
+
+
+def look(url: str) -> dict[str, Any]:
+    """The qualities this link offers, read without downloading anything. Not under IN_USE: a
+    download holds it for as long as it runs, and reading must not wait behind one. Given up
+    after LOOK_SECONDS whatever keeps it: the person asked is waiting, and the link then goes
+    on with the usual quality."""
+    read: list[dict[str, Any]] = []
+    failed: list[Exception] = []
+
+    def reading() -> None:
+        try:
+            read.append(looked(url))
+        except Exception as error:  # told to the one who asked, as its own reason
+            failed.append(error)
+
+    reader = threading.Thread(target=reading, daemon=True)
+    reader.start()
+    reader.join(LOOK_SECONDS)
+    if failed:
+        raise failed[0]
+    if not read:
+        raise TimeoutError(f"the link's qualities were not read in {LOOK_SECONDS:.0f} s")
+    return read[0]
 
 
 def download(url: str, folder: Path, quality: str = "") -> Path:

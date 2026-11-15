@@ -34,6 +34,18 @@ def open_log() -> None:
         return
 
 
+def settle() -> None:
+    """The engine works from its own folder. Whoever starts it chooses where it starts, and the
+    sign-in script leaves it in Windows' system folder, where nothing can be written: a library
+    that keeps a temporary file "here" then never returned (2026-11-15, fetch.asking)."""
+    home = log_path().parent
+    try:
+        home.mkdir(parents=True, exist_ok=True, mode=OWNER_DIR)
+        os.chdir(home)
+    except OSError:
+        return
+
+
 def note(line: str) -> None:
     stamp = datetime.now().astimezone().isoformat(sep=" ", timespec="seconds")
     print(f"{stamp} engine: {line}", file=sys.stderr, flush=True)

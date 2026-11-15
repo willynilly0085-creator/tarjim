@@ -6,6 +6,7 @@ from tarjim.server import boot
 def main(argv: list[str] | None = None) -> int:
     from tarjim.server.engine import main as engine
 
+    boot.settle()
     return engine(argv)
 
 
