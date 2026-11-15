@@ -49,4 +49,13 @@ out.allowed = [await card.chooseTextMode("card"), kept.textMode, calls.registere
 out.back = [await card.chooseTextMode("menu"), kept.textMode, calls.unregistered];
 out.shown = [await card.showCard({ id: 4 }, 2, "picked"), calls.injected[0], calls.told[0]];
 out.closed = await card.showCard({ id: 9 }, 0, "picked");
+let clock = 1_000_000;
+Date.now = () => clock;
+answers = Array.from({ length: 13 }, () => ({ status: 200, body: { translation: "t" } }));
+const unasked = [];
+for (let i = 0; i < 11; i += 1) unasked.push(await said({ type: "tarjim-text", text: "x", auto: true }));
+out.unasked = [unasked.filter((got) => got.translation).length, unasked[10]];
+out.clicked = await said({ type: "tarjim-text", text: "x" });
+clock += 61_000;
+out.later = await said({ type: "tarjim-text", text: "x", auto: true });
 console.log(JSON.stringify(out));

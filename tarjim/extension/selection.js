@@ -89,14 +89,16 @@
     return row;
   }
 
-  async function translate(text, box) {
+  // `auto` says nobody clicked for this one: the background may answer "ask" instead (textcard.js).
+  async function translate(text, box, auto = false) {
     await worded();
     const mine = ++asked;
     shownFor = text;
     if (text.length > MOST) return show(box, "", [make("p", { className: "quiet", textContent: words.long })]);
     show(box, "", [make("p", { className: "quiet", textContent: words.working })]);
-    const reply = (await send({ type: "tarjim-text", text })) || {};
+    const reply = (await send({ type: "tarjim-text", text, auto })) || {};
     if (mine !== asked) return;
+    if (reply.ask) return offer(text, box);
     if (!reply.translation) return show(box, "", [make("p", { className: "quiet", textContent: reply.message || "" })]);
     show(box, "", [make("p", { dir: "auto", textContent: reply.translation }), copyRow(reply.translation)]);
   }
@@ -105,20 +107,22 @@
     await worded();
     shownFor = text;
     const button = make("button", { type: "button", textContent: words.ask });
-    button.addEventListener("click", () => translate(text, box));
+    button.addEventListener("click", (event) => { if (event.isTrusted) translate(text, box); });
     show(box, "ask", [button]);
   }
 
   const typing = () => document.activeElement?.matches?.("input, textarea, [contenteditable]:not([contenteditable=false])");
 
-  // "As I select": once the selection has settled, and never while the person is typing.
+  // "As I select": once the selection has settled, and never while the person is typing. Only
+  // the person's own mouse and keys count: an event the page made up is ignored.
   function selected(event) {
-    if (mode === "menu" || (host && event.composedPath().includes(host))) return;
+    if (!event.isTrusted || mode === "menu" || (host && event.composedPath().includes(host))) return;
     clearTimeout(settle);
     settle = setTimeout(() => {
       const { text, box } = picked();
       if (text.length < 2 || text === shownFor || typing()) return;
-      (mode === "card" ? translate : offer)(text, box);
+      if (mode === "card") translate(text, box, true);
+      else offer(text, box);
     }, 250);
   }
 

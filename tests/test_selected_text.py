@@ -13,6 +13,7 @@ from tarjim import text
 EXTENSION = Path(tarjim.__file__).resolve().parent / "extension"
 NODE = shutil.which("node")
 CHECK = Path(__file__).with_name("selected_text.mjs")
+PAGE = Path(__file__).with_name("selection_page.mjs")
 
 
 @pytest.fixture(scope="module")
@@ -63,6 +64,37 @@ def test_a_right_click_puts_the_card_in_the_frame_that_was_clicked(seen: dict[st
     assert injected == {"target": {"tabId": 4, "frameIds": [2]}, "files": ["selection.js"]}
     assert told == [4, {"type": "tarjim-selection", "text": "picked"}, {"frameId": 2}]
     assert seen["closed"] is False  # a page the browser keeps extensions out of
+
+
+def test_translations_nobody_clicked_for_are_held_to_a_few_a_minute(seen: dict[str, Any]) -> None:
+    assert seen["unasked"] == [10, {"ask": True}]
+    assert seen["clicked"] == {"translation": "t"}  # a click is never held back
+    assert seen["later"] == {"translation": "t"}
+
+
+@pytest.fixture(scope="module")
+def page() -> dict[str, Any]:
+    if not NODE:
+        pytest.skip("needs node")
+    done = subprocess.run([NODE, str(PAGE), (EXTENSION / "selection.js").as_uri()],
+                          capture_output=True, text=True, check=True, timeout=120, encoding="utf-8")
+    found: dict[str, Any] = json.loads(done.stdout)
+    return found
+
+
+def test_a_page_cannot_make_up_the_persons_selecting(page: dict[str, Any]) -> None:
+    assert page["madeUp"] == [0, 0]
+    assert page["own"] == [[{"type": "tarjim-text", "text": "some text", "auto": True}],
+                           ["done", None]]
+
+
+def test_a_held_translation_waits_for_the_persons_own_click(page: dict[str, Any]) -> None:
+    assert page["held"] == [{"type": "tarjim-text", "text": "other text", "auto": True},
+                            "card ask", "button"]
+    assert page["fakeClick"] == 2
+    assert page["click"] == [{"type": "tarjim-text", "text": "other text", "auto": False},
+                             "clicked"]
+    assert page["button"] == [3, "card ask"]  # "a button by the text" sends nothing by itself
 
 
 def test_the_manifest_asks_for_every_page_only_as_an_option() -> None:

@@ -55,12 +55,25 @@ async function translation(text) {
   }
 }
 
+// "The card right away" asks with no click, and a page can steer what is selected when the
+// person clicks: past a few such translations a minute the card offers its button instead, so
+// no page can spend the person's translations faster than that. A click is never held back.
+const AUTO = { most: 10, within: 60_000 };
+let unasked = [];
+function tooMany() {
+  const now = Date.now();
+  unasked = unasked.filter((at) => now - at < AUTO.within);
+  if (unasked.length >= AUTO.most) return true;
+  unasked.push(now);
+  return false;
+}
+
 const cardWords = () => ({ working: t("textWorking"), copy: t("copy"), copied: t("copied"),
   ask: t("textAsk"), long: t("textLong"), dir: uiDirection() });
 
 export function answer(message, _sender, respond) {
   if (message?.type === "tarjim-words") loadWords().then(() => respond(cardWords()));
-  else if (message?.type === "tarjim-text") loadWords().then(() => translation(String(message.text || ""))).then(respond);
+  else if (message?.type === "tarjim-text") loadWords().then(() => (message.auto && tooMany() ? { ask: true } : translation(String(message.text || "")))).then(respond);
   else return false;
   return true;
 }

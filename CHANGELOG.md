@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.11 (2026-11-15)
+## 1.1.12 (2026-11-15)
 
 - **Translate the text you select on any page.** Select text, right-click and choose
   "Translate the selected text" (or press Alt+Shift+Y): a small card under the selection shows
@@ -11,6 +11,10 @@
 - In the extension's settings, "Translating selected text" can be set to show a small button by
   whatever you select, or the card right away. Either one makes the browser ask you first, since
   tarjim must then be allowed on every page; until you choose it, tarjim reads no page at all.
+- A page cannot spend your translations: only your own mouse and keys count as selecting, and
+  translations nobody clicked for are held to ten a minute. Past that the card shows its
+  Translate button and waits for your click.
+- There is no 1.1.11: it was never released.
 
 ## 1.1.10 (2026-11-15)
 
