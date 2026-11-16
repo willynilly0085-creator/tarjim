@@ -45,11 +45,16 @@ def answer(found: Any) -> str:
 
 
 def asked_of(provider: str, question: str, light: bool) -> Any:
+    from tarjim import text_engine
+    from tarjim.config import using
     from tarjim.engines import waiting
     from tarjim.engines.choice import asker
 
     found = waiting.answer(provider, question, light)
-    return found if found is not None else asker(provider).ask(question, None, SCHEMA)
+    if found is not None:
+        return found
+    with using(text_engine.lighter(provider) if light else {}):
+        return asker(provider).ask(question, None, SCHEMA)
 
 
 def translated(text: str, target: str, other: str = "") -> tuple[str, str]:

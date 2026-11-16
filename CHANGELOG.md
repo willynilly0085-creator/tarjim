@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.14 (2026-11-16)
+
+- **A Google Cloud (Vertex AI) key now reaches Gemini 4.** With such a key, picking Gemini 4
+  Carbon, Argon or Hydrogen translated with Gemini 3.8 Flash instead, and nothing said so.
+  Google answers a Vertex key from the project's own region, and the new models are only at its
+  global location; tarjim now asks there for a model your region lacks. Nothing changes for a
+  Gemini API key from AI Studio.
+- **Automatic selected text stays fast whatever model your videos use.** With "Automatic (the
+  fastest you have)", an AI connected with a key is now asked with its lightest model, not the
+  model you picked for videos (measured on Gemini: 1.5 to 4 seconds against 3.4 to 9). Pick a
+  translator and model for selected text yourself and it is asked exactly as picked.
+
 ## 1.1.13 (2026-11-16)
 
 - **Selected text is translated much sooner.** It used to wait 10 to 12 seconds on a

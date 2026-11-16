@@ -5,7 +5,7 @@ from collections.abc import Iterator
 from typing import Any
 
 from tarjim.config import gemini_key, setting
-from tarjim.google_ai import google_client
+from tarjim.google_ai import elsewhere, google_client, placed
 
 MODELS = ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash",
           "gemini-flash-latest", "gemini-3-flash-preview"]
@@ -110,12 +110,22 @@ class GeminiClient:
             self.wait_for(model)
             started = time.monotonic()
             try:
-                return self.call(model, prompt, audio, schema)
+                return self.reached(model, prompt, audio, schema)
             except Exception as error:
                 failed[model] = USED_UP if used_up_today(error) else str(
                     getattr(error, "code", type(error).__name__))
                 self.note(model, error, time.monotonic() - started)
         raise self.gave_up(failed)
+
+    def reached(self, model: str, prompt: str, audio: bytes | None, schema: dict[str, Any]) -> Any:
+        """The model's answer, asked a second time at the global location when that is where a
+        Vertex key finds it (google_ai.elsewhere)."""
+        try:
+            return self.call(model, prompt, audio, schema)
+        except Exception as error:
+            if not elsewhere(model, error):
+                raise
+        return self.call(model, prompt, audio, schema)
 
     def gave_up(self, failed: dict[str, str]) -> RuntimeError:
         """Seen 2026-10-27: a free key had used up its day on gemini-3.8 to 3.5, and the error
@@ -181,7 +191,7 @@ class GeminiClient:
         sound = [types.Part.from_bytes(data=audio, mime_type="audio/mp3")] if audio else []
         content = types.Content(role="user", parts=[*sound, types.Part.from_text(text=prompt)])
         response = self.client.models.generate_content(
-            model=model, contents=content, config=config)
+            model=placed(model), contents=content, config=config)
         self.model_used = model
         from tarjim.engines.reply_check import checked, gemini_reason
 

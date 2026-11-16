@@ -31,6 +31,7 @@ class Says:
 
 def engines(monkeypatch: pytest.MonkeyPatch, **named: Says) -> None:
     monkeypatch.setattr(text_engine, "over", dict)
+    monkeypatch.setattr(text_engine, "lighter", lambda _provider: {})
     monkeypatch.setattr(choice, "soonest", lambda: list(named))
     monkeypatch.setattr(choice, "backed", iter)
     monkeypatch.setattr(choice, "asker", lambda provider: named[provider])

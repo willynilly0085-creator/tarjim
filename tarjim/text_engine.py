@@ -8,14 +8,17 @@ the engine that answers soonest (choice.soonest). A picked engine is asked as pi
 its model the way it does for a video, with no second code path.
 """
 import re
+import time
 from typing import Any
 
 from tarjim.config import save, setting
-from tarjim.engines.catalog import BY_ID
+from tarjim.engines.catalog import API, BY_ID
 from tarjim.engines.choice import LOCAL
 
 MODEL_NAME = re.compile(r"^[\w.:/@+\[\]-]{1,120}$")
 KEPT = ("text_provider", "text_model", "text_server")
+LIGHT_FOR = 3600.0  # seconds a keyed engine's lightest model is remembered
+LIGHT: dict[str, tuple[float, str]] = {}
 
 
 def server() -> str:
@@ -42,6 +45,31 @@ def over() -> dict[str, str]:
                 **({"local_model": model} if model else {})}
     return {"translate_provider": provider,
             **({BY_ID[provider].model_name: model} if model else {})}
+
+
+def lightest(provider: str) -> str:
+    """The model this engine's own list suggests. The list is a request of its own, so the
+    answer is kept for an hour; an empty one is not, and is asked for again."""
+    from tarjim.engines import provider_models
+
+    kept = LIGHT.get(provider)
+    if kept and time.monotonic() - kept[0] < LIGHT_FOR:
+        return kept[1]
+    found = next((m["id"] for m in provider_models.models_for(provider) if m["suggested"]), "")
+    if found:
+        LIGHT[provider] = (time.monotonic(), found)
+    return found
+
+
+def lighter(provider: str) -> dict[str, str]:
+    """The settings automatic asks an engine with a key under: its lightest model, whatever
+    the videos use (2026-11-16, the owner's key, four texts: Gemini 4 Hydrogen 3.4 to 9.0 s,
+    3.8 Flash 1.5 to 4.0 s). The custom address keeps its model: its list is the person's own."""
+    found = BY_ID.get(provider)
+    if found is None or found.method != API or provider == "custom":
+        return {}
+    model = lightest(provider)
+    return {found.model_name: model} if model else {}
 
 
 def view() -> dict[str, str]:

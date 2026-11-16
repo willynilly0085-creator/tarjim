@@ -9,7 +9,7 @@ from typing import Any
 import pytest
 
 from tarjim import assistant_settings, config, text, text_engine
-from tarjim.engines import choice
+from tarjim.engines import choice, provider_models
 from tarjim.server.app import Handler
 from tarjim.server.jobs import Board
 
@@ -20,6 +20,7 @@ TOKEN = "secret-token"
 def own_settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(config, "CONFIG", tmp_path / "config.json")
     monkeypatch.setattr(text_engine, "works", lambda provider, _server: provider != "grok")
+    monkeypatch.setattr(text_engine, "LIGHT", {})
 
 
 def test_nothing_picked_means_tarjim_picks() -> None:
@@ -84,6 +85,34 @@ def test_the_picked_engine_is_asked_as_picked_and_the_videos_settings_come_back(
     assert asked == ["openai"] and engine.found == [("openai", "gpt-6-luna")]
     assert config.setting("translate_provider") == "claude"
     assert config.setting("openai_model") == ""
+
+
+def test_automatic_asks_an_engine_with_a_key_for_its_lightest_model(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """Measured 2026-11-16 with the owner's key on four texts: Gemini 4 Hydrogen answered in
+    3.4 to 9.0 s and 3.8 Flash in 1.5 to 4.0 s, and automatic asked whichever the videos use."""
+    engine, listed = Reads(), []
+    config.save("translate_provider", "openai")
+    config.save("openai_model", "gpt-6.1-sol")
+    monkeypatch.setattr(provider_models, "models_for", lambda provider: listed.append(provider) or [
+        {"id": "gpt-6.1-sol", "suggested": ""}, {"id": "gpt-6-luna", "suggested": "yes"}])
+    monkeypatch.setattr(choice, "asker", lambda _provider: engine)
+    monkeypatch.setattr(choice, "soonest", lambda: ["openai"])
+    monkeypatch.setattr(choice, "usable", lambda _provider, _role: False)
+    assert text.translated("hello", "ar") == text.translated("again", "ar") == ("done", "openai")
+    assert engine.found == [("openai", "gpt-6-luna")] * 2
+    assert listed == ["openai"]  # the list is a request of its own: asked once, then kept
+    assert config.setting("openai_model") == "gpt-6.1-sol"
+
+
+def test_only_an_engine_with_a_key_and_a_suggested_model_is_asked_for_a_lighter_one(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(provider_models, "models_for", lambda _p: [{"id": "m", "suggested": ""}])
+    assert text_engine.lighter("openai") == {}  # nothing known: the picked model stays
+    monkeypatch.setattr(provider_models, "models_for", lambda _p: [{"id": "m", "suggested": "yes"}])
+    assert text_engine.lighter("openai") == {"openai_model": "m"}  # an empty answer is not kept
+    for other in ("claude", "local", "custom", "nobody"):
+        assert text_engine.lighter(other) == {}
 
 
 def test_settings_held_on_one_thread_are_not_seen_on_another() -> None:
