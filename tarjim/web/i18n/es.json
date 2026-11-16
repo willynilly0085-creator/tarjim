@@ -768,5 +768,9 @@
   "choice_dub.gemini_tone_calm": "Calm",
   "choice_dub.gemini_tone_lively": "Lively",
   "choice_dub.gemini_tone_news": "Newsreader",
-  "choice_text.reading_warning_1": "Early"
+  "choice_text.reading_warning_1": "Early",
+  "textEngineWith": "El texto seleccionado se traduce con",
+  "textEngineAuto": "Automático (el más rápido que tienes)",
+  "textEngineHint": "El texto que seleccionas en el navegador tiene su propio traductor y modelo, aparte de tus vídeos. «Automático» pregunta al más rápido que conectaste.",
+  "textEngineSaved": "Guardado. El próximo texto que selecciones lo usará."
 }

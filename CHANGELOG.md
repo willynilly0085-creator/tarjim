@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.1.13 (2026-11-16)
+
+- **Selected text is translated much sooner.** It used to wait 10 to 12 seconds on a
+  subscription. Now tarjim asks the AI that answers soonest: one you connected with a key (about
+  2 seconds, sometimes more), otherwise your subscription's lighter model. Your videos keep the
+  model you picked for them.
+- **Selected text has its own translator and model.** On tarjim's page, under the line that
+  says who translates your videos, a second line says who translates the text you select:
+  "Automatic (the fastest you have)", or any translator and model you pick, a subscription, a
+  key or an AI on this computer. An assistant can set it too (selected_text_translator).
+- With a Gemini subscription through Antigravity, Google's program is now kept ready for the
+  next selection instead of being started for each one. It answers one text and is closed, so
+  nothing you selected is remembered; it is closed for good after five minutes without use.
+- tarjim no longer spends two seconds of every selected text asking whether the AI on this
+  computer is running: it asks only when the first translator failed.
+- If your videos are translated by an AI on this computer, selected text stays on it too:
+  nothing you select is sent out unless you pick another translator for it yourself.
+
 ## 1.1.12 (2026-11-15)
 
 - **Translate the text you select on any page.** Select text, right-click and choose

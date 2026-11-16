@@ -25,9 +25,11 @@ from tarjim.config import setting
 from tarjim.engines.bounded import bounded
 from tarjim.engines.reply_check import failed, program_reason
 from tarjim.engines.subscription import launcher, run, strict
-from tarjim.engines.web import EngineError, TimedOut, unwrap, wrap
+from tarjim.engines.web import EngineError, TimedOut, parse_json, unwrap, wrap
 
 PLAIN = ("--sandbox", "--disable-slash-commands")
+# Kept running, it reads one question a line and prints its steps as lines (`agy --help`, 1.5.9).
+STREAM = ("--print=", "--input-format", "stream-json", "--output-format", "stream-json")
 # The effort is part of the model's id here. On a 24-line clip Flash (Low) took 10 s, (Medium)
 # 88 s and (High) failed after 209 s, for the same Saudi translation, so the low variant is the
 # one suggested, and the one that answers when a picked higher one fails (as_picked).
@@ -98,6 +100,34 @@ class AntigravityAsker:
                 (Path(folder) / SOUND).write_bytes(audio)
             done = run(command, "", folder)
         return unwrap(answer_of(done.returncode, done.stdout, done.stderr, model))
+
+
+def waiting_command(light: bool) -> list[str]:
+    """The program as it waits for one selected text (waiting.py): the model as the person
+    picked it, or its low variant when they asked for the lighter one. No schema is given: the
+    step that shapes the answer took two seconds, and the task already asks for JSON."""
+    picked = setting("antigravity_model")
+    model = light_variant(picked) if light else picked
+    program = launcher("agy")
+    return [*program, *STREAM, *PLAIN, *(["--model", model] if model else [])] if program else []
+
+
+def question(prompt: str) -> str:
+    return json.dumps({"event": "user", "message": {"content": DIRECT + prompt}})
+
+
+def spoken(line: str) -> Any:
+    """The answer, once the line is the program's result; None for every line before it."""
+    try:
+        event = json.loads(line)
+    except ValueError:
+        return None
+    result = event.get("result") if isinstance(event, dict) else None
+    if not isinstance(result, dict) or event.get("event") != "result":
+        return None
+    if result.get("status") != "SUCCESS":
+        raise EngineError("antigravity", 0, str(result.get("error"))[:200])
+    return parse_json(str(result.get("response") or ""))
 
 
 def known_rows() -> list[tuple[str, str, str]]:

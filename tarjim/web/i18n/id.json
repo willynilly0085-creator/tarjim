@@ -768,5 +768,9 @@
   "choice_dub.gemini_tone_calm": "Calm",
   "choice_dub.gemini_tone_lively": "Lively",
   "choice_dub.gemini_tone_news": "Newsreader",
-  "choice_text.reading_warning_1": "Early"
+  "choice_text.reading_warning_1": "Early",
+  "textEngineWith": "Teks yang dipilih diterjemahkan dengan",
+  "textEngineAuto": "Otomatis (yang tercepat yang Anda punya)",
+  "textEngineHint": "Teks yang Anda pilih di peramban punya penerjemah dan model sendiri, terpisah dari video Anda. «Otomatis» memakai yang tercepat yang Anda hubungkan.",
+  "textEngineSaved": "Tersimpan. Teks berikutnya yang Anda pilih memakainya."
 }

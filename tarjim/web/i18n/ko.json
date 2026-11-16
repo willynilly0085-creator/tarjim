@@ -768,5 +768,9 @@
   "choice_dub.gemini_tone_calm": "Calm",
   "choice_dub.gemini_tone_lively": "Lively",
   "choice_dub.gemini_tone_news": "Newsreader",
-  "choice_text.reading_warning_1": "Early"
+  "choice_text.reading_warning_1": "Early",
+  "textEngineWith": "선택한 텍스트 번역 담당",
+  "textEngineAuto": "자동(연결한 것 중 가장 빠른 것)",
+  "textEngineHint": "브라우저에서 선택한 텍스트는 동영상과 별도로 번역 AI와 모델을 정할 수 있어요. «자동»은 연결한 것 중 가장 빠른 것에 맡겨요.",
+  "textEngineSaved": "저장했어요. 다음에 선택한 텍스트부터 사용해요."
 }

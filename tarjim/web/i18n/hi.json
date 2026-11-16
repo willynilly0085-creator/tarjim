@@ -768,5 +768,9 @@
   "choice_dub.gemini_tone_calm": "Calm",
   "choice_dub.gemini_tone_lively": "Lively",
   "choice_dub.gemini_tone_news": "Newsreader",
-  "choice_text.reading_warning_1": "Early"
+  "choice_text.reading_warning_1": "Early",
+  "textEngineWith": "चुने हुए टेक्स्ट का अनुवाद करता है",
+  "textEngineAuto": "अपने आप (आपके पास सबसे तेज़)",
+  "textEngineHint": "ब्राउज़र में आप जो टेक्स्ट चुनते हैं उसका अपना अनुवादक और मॉडल है, वीडियो से अलग। «अपने आप» आपके जोड़े हुए सबसे तेज़ अनुवादक से पूछता है।",
+  "textEngineSaved": "सहेज लिया। अगला चुना हुआ टेक्स्ट इसी से अनूदित होगा।"
 }

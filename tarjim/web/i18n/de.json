@@ -768,5 +768,9 @@
   "choice_dub.gemini_tone_calm": "Calm",
   "choice_dub.gemini_tone_lively": "Lively",
   "choice_dub.gemini_tone_news": "Newsreader",
-  "choice_text.reading_warning_1": "Early"
+  "choice_text.reading_warning_1": "Early",
+  "textEngineWith": "Markierter Text wird übersetzt mit",
+  "textEngineAuto": "Automatisch (der schnellste, den du hast)",
+  "textEngineHint": "Der Text, den du im Browser markierst, hat seinen eigenen Übersetzer und sein eigenes Modell, getrennt von deinen Videos. „Automatisch“ fragt den schnellsten, den du verbunden hast.",
+  "textEngineSaved": "Gespeichert. Der nächste markierte Text nutzt ihn."
 }

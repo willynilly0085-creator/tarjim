@@ -768,5 +768,9 @@
   "choice_dub.gemini_tone_calm": "هادئ",
   "choice_dub.gemini_tone_lively": "حماسي",
   "choice_dub.gemini_tone_news": "مذيع أخبار",
-  "choice_text.reading_warning_1": "بدري"
+  "choice_text.reading_warning_1": "بدري",
+  "textEngineWith": "النص المحدد يترجمه",
+  "textEngineAuto": "تلقائي (أسرع واحد عندك)",
+  "textEngineHint": "النص اللي تحدده في المتصفح له مترجمه ونموذجه، غير مترجم الفيديو. «تلقائي» يسأل أسرع واحد موصول عندك.",
+  "textEngineSaved": "انحفظ، والنص الجاي اللي تحدده بيستخدمه."
 }

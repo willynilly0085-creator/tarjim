@@ -1,6 +1,8 @@
 """Words someone selected on a page, translated by the engine that translates their videos.
 
-One request to the translating engine (engines/choice.py), the way the post summary asks. The
+One request, the way the post summary asks. A person waits on this one, so it goes to the
+engine that answers soonest (choice.soonest) unless they picked an engine and model for text
+(text_engine.py), and a subscription program is kept waiting for it (engines/waiting.py). The
 text is a stranger's: it goes between tags with no angle bracket left in it (quoted.py), and the
 task says it is material, never an instruction. Nothing is shortened: a selection is translated
 whole, or refused as too long for one request. What was selected is never written to the log.
@@ -42,18 +44,30 @@ def answer(found: Any) -> str:
     return said.strip() if isinstance(said, str) else ""
 
 
-def translated(text: str, target: str, other: str = "") -> tuple[str, str]:
-    """The translation, and the engine that made it."""
-    from tarjim.engines.choice import asker, chain
+def asked_of(provider: str, question: str, light: bool) -> Any:
+    from tarjim.engines import waiting
+    from tarjim.engines.choice import asker
 
-    asked, last = prompt(text, target, other_than(target, other)), None
-    for provider in chain("translate"):
-        try:
-            said = answer(asker(provider).ask(asked, None, SCHEMA))
-        except FAILED as error:
-            print(f"selected text: {provider}: {type(error).__name__}"[:120], flush=True)
-            last = error
-            continue
-        if said:
-            return said, provider
+    found = waiting.answer(provider, question, light)
+    return found if found is not None else asker(provider).ask(question, None, SCHEMA)
+
+
+def translated(text: str, target: str, other: str = "") -> tuple[str, str]:
+    """The translation, and the engine that made it: the engine and model the person picked
+    for text, as picked, or else the soonest one, with a subscription's lighter model."""
+    from tarjim import text_engine
+    from tarjim.config import using
+    from tarjim.engines import choice
+
+    asked, last, own = prompt(text, target, other_than(target, other)), None, text_engine.over()
+    with using(own):
+        for provider in choice.backed([choice.chosen("translate")] if own else choice.soonest()):
+            try:
+                said = answer(asked_of(provider, asked, not own))
+            except FAILED as error:
+                print(f"selected text: {provider}: {type(error).__name__}"[:120], flush=True)
+                last = error
+                continue
+            if said:
+                return said, provider
     raise Untranslated("no engine translated the text") from last

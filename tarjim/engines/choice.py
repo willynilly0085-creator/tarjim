@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from typing import Any, Protocol
 
 from tarjim.config import api_key, setting
@@ -58,6 +59,29 @@ def chain(role: str) -> list[str]:
     first = chosen(role)
     backup = [LOCAL] if first != LOCAL and usable(LOCAL, role) else []
     return [first, *backup]
+
+
+def soonest() -> list[str]:
+    """For a short text a person waits on (text.py). Measured 2026-11-16 on four texts: an
+    engine asked straight over the web with a key answered in 1.3 to 2.5 s, a subscription
+    program in 4.5 to 12 s. So the engines with a key come first: the chosen one when it is one
+    of them, then Gemini, then the rest, and the chosen engine behind them. A person whose
+    translating engine is this computer keeps it: nothing they select is sent out."""
+    usual = chosen("translate")
+    if usual == LOCAL:
+        return [LOCAL]
+    keyed = [p.id for p in PROVIDERS if p.method == API and p.id != "custom" and has_key(p.id)]
+    first = sorted(keyed, key=lambda name: (name != usual, name != "gemini"))
+    return [*first, *([] if usual in first else [usual])]
+
+
+def backed(first: list[str]) -> Iterator[str]:
+    """These engines in turn, then this computer's AI as the backup. Whether that one runs is
+    asked only once the others have failed: asking a program that is not running took two
+    seconds of every selected text (measured on Windows, 2026-11-16)."""
+    yield from first
+    if LOCAL not in first and usable(LOCAL, "translate"):
+        yield LOCAL
 
 
 def tried(role: str, backup: bool) -> list[str]:

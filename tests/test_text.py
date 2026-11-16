@@ -8,7 +8,7 @@ from typing import Any
 
 import pytest
 
-from tarjim import text
+from tarjim import text, text_engine
 from tarjim.engines import choice
 from tarjim.server.app import Handler
 from tarjim.server.jobs import Board
@@ -30,7 +30,9 @@ class Says:
 
 
 def engines(monkeypatch: pytest.MonkeyPatch, **named: Says) -> None:
-    monkeypatch.setattr(choice, "chain", lambda _role: list(named))
+    monkeypatch.setattr(text_engine, "over", dict)
+    monkeypatch.setattr(choice, "soonest", lambda: list(named))
+    monkeypatch.setattr(choice, "backed", iter)
     monkeypatch.setattr(choice, "asker", lambda provider: named[provider])
 
 

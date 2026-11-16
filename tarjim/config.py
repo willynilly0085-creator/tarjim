@@ -1,4 +1,5 @@
 import contextlib
+import contextvars
 import json
 import os
 import secrets
@@ -6,6 +7,7 @@ import sys
 import tempfile
 import threading
 import time
+from collections.abc import Iterator
 from pathlib import Path
 
 from tarjim import vault
@@ -19,6 +21,8 @@ OWNER_FILE = 0o600
 SAVING = threading.Lock()
 TRIES = 5
 PAUSE = 0.2
+OVER: contextvars.ContextVar[dict[str, str] | None] = contextvars.ContextVar(
+    "over", default=None)
 
 
 def settings() -> dict[str, str]:
@@ -29,7 +33,21 @@ def settings() -> dict[str, str]:
     return {k: str(v) for k, v in data.items()} if isinstance(data, dict) else {}
 
 
+@contextlib.contextmanager
+def using(values: dict[str, str]) -> Iterator[None]:
+    """Settings held for the work inside, on this thread only: a selected text is translated
+    under its own engine and model (text_engine.py) while the saved ones stay the videos'."""
+    held = OVER.set({**(OVER.get() or {}), **values})
+    try:
+        yield
+    finally:
+        OVER.reset(held)
+
+
 def setting(name: str) -> str:
+    over = OVER.get()
+    if over and name in over:
+        return over[name]
     from_env = os.environ.get(f"TARJIM_{name.upper()}")
     if from_env:
         return from_env

@@ -1,5 +1,6 @@
 import { $, api, post, upload } from "./api.js";
 import { showEngine } from "./engine.js";
+import { showTextEngine } from "./text_engine.js";
 import { t } from "./i18n.js";
 import { watchJobs } from "./jobs.js";
 import { recalledTarget, recallForm, recallVoice, remember } from "./order_memory.js";
@@ -177,7 +178,7 @@ export async function openWorkspace() {
   state.recalled = true;
   if (first) recallForm();
   sync();
-  await Promise.all([showLinkedVoices(), showEngine()]);
+  await Promise.all([showLinkedVoices(), showEngine(), showTextEngine()]);
   if (first) recallVoice();
   sync();
 }

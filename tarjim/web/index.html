@@ -206,6 +206,14 @@
           <button class="button-quiet engine-retry" id="engine-retry" type="button" data-t="retry" hidden></button>
         </div>
       </details>
+      <details class="engine" id="text-engine">
+        <summary><span class="engine-with" data-t="textEngineWith"></span> <bdi class="engine-now" id="text-engine-now"></bdi><span class="engine-change" data-t="engineChange"></span></summary>
+        <div class="engine-body">
+          <label class="field"><span class="field-label" data-t="engineProvider"></span><select class="select" id="text-engine-provider"></select></label>
+          <label class="field"><span class="field-label" data-t="engineModel"></span><select class="select" id="text-engine-model"></select></label>
+          <p class="meta engine-note" id="text-engine-note" role="status" aria-live="polite"></p>
+        </div>
+      </details>
       <button class="primary" id="go" type="submit" data-t="translate" disabled></button>
       <p class="notice" id="notice" role="status" aria-live="polite"></p>
     </form>

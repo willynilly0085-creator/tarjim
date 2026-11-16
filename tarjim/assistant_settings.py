@@ -154,6 +154,22 @@ def update_tarjim(install: bool = False) -> Any:
     return call("/update/apply", {}) if install else call("/update")
 
 
+def selected_text_translator(provider: str = "show", model: str = "",
+                             local_program: str = "") -> Any:
+    """Who translates the text a person selects in their browser, apart from the translator of
+    their videos (use_connection).
+
+    provider: "show" only reads the choice; "auto" lets tarjim ask the one that answers
+    soonest; or an id from list_connections, or "local". model: a model of that provider
+    (empty for its own). local_program (with "local"): as in use_connection.
+    """
+    if provider == "show":
+        return call("/text")
+    wanted = {"provider": "" if provider == "auto" else provider, "model": model,
+              "server": local_program}
+    return call("/text/use", wanted)
+
+
 def open_tarjim_page(section: str = "") -> str:
     """Open tarjim's page in the browser, where the person adds keys and tokens safely.
     section: "" for the page, "setup" for setup, "phone" for the phone bot."""
@@ -165,7 +181,8 @@ TOOLS = (get_settings, change_settings, show_mark_on_videos, write_post_summarie
          plan_setup, apply_setup,
          install_subscription_app, set_custom_api_address, start_local_ai, find_local_ai,
          list_models, test_setup, list_voice_services,
-         use_voice_service, prefer_elevenlabs_voice, phone_bot, update_tarjim, open_tarjim_page)
+         use_voice_service, prefer_elevenlabs_voice, phone_bot, update_tarjim, open_tarjim_page,
+         selected_text_translator)
 
 
 def attach(server: Any) -> None:

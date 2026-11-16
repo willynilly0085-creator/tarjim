@@ -9,7 +9,7 @@ import { problem } from "./problems.js";
 
 const state = { view: null, wired: false };
 
-function choices(view) {
+export function choices(view) {
   const apps = view.subscription.filter((p) => p.ready && p.signed_in);
   const keyed = view.api.filter((p) => p.ready);
   return [...apps, ...keyed].map((p) => ({ value: p.id, name: p.name, entry: p }))
@@ -24,10 +24,10 @@ function currentValue(view) {
 
 const picked = () => choices(state.view).find((c) => c.value === $("engine-provider").value);
 
-async function modelsOf(choice) {
+export async function modelsOf(view, choice) {
   if (choice.server) {
-    const mine = state.view.local.server === choice.server.id;
-    return { models: choice.server.models, saved: mine ? state.view.local.model : "" };
+    const mine = view.local.server === choice.server.id;
+    return { models: choice.server.models, saved: mine ? view.local.model : "" };
   }
   if ("models" in choice.entry) return { ...choice.entry, saved: choice.entry.model };
   const listed = await post("/connections/models", { provider: choice.value }).catch(() => ({}));
@@ -39,7 +39,7 @@ async function fillModelList(choice) {
   select.disabled = true;
   select.closest(".field").hidden = false;
   select.replaceChildren(new Option(t("engineLoading"), ""));
-  const source = await modelsOf(choice);
+  const source = await modelsOf(state.view, choice);
   if (picked()?.value !== choice.value) return null;  // another translator was picked meanwhile
   const chosen = source.saved || source.suggested || source.models[0] || "";
   const list = chosen && !source.models.includes(chosen) ? [...source.models, chosen] : source.models;
@@ -68,7 +68,7 @@ function fillProviders() {
 }
 
 // "Claude · Opus 5.5", not "Claude · Claude Opus 5.5".
-function lineText(now) {
+export function lineText(now) {
   const model = now.model.startsWith(`${now.name} `) ? now.model.slice(now.name.length + 1) : now.model;
   return model ? `${now.name} · ${model}` : now.name;
 }

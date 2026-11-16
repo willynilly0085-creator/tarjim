@@ -187,6 +187,8 @@ The extension also translates text: select any text on a page, right-click and c
 translation, made by the engine you connected for your videos; no key is kept in the browser. In
 the extension's settings you can have a small button, or the card itself, appear as soon as you
 select; the browser asks you first, because tarjim must then be allowed on every page.
+Selected text has its own translator, apart from your videos': by default the fastest AI you
+connected, or the one you pick on tarjim's page under "Selected text is translated with".
 
 In Firefox (128 or later) open
 <https://github.com/willynilly0085-creator/tarjim/releases/latest/download/tarjim-firefox.xpi>

@@ -768,5 +768,9 @@
   "choice_dub.gemini_tone_calm": "Calm",
   "choice_dub.gemini_tone_lively": "Lively",
   "choice_dub.gemini_tone_news": "Newsreader",
-  "choice_text.reading_warning_1": "Early"
+  "choice_text.reading_warning_1": "Early",
+  "textEngineWith": "選択テキストの翻訳に使用中",
+  "textEngineAuto": "自動（接続済みで最速のもの）",
+  "textEngineHint": "ブラウザーで選択したテキストには、動画とは別の翻訳AIとモデルを使えます。「自動」は接続済みで最も速いものに依頼します。",
+  "textEngineSaved": "保存しました。次に選択したテキストから使います。"
 }
