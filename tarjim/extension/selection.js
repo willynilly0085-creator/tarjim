@@ -2,9 +2,15 @@
 // under it. Put into a page by a right-click on a selection, or into every page once the
 // person chose "as I select" in the settings and allowed it. The text goes to the extension's
 // background, which asks the person's own tarjim; nothing is read until something is selected.
+//
+// When the add-on updates itself or is turned off, a page that stayed open keeps this script with
+// no add-on behind it, and the browser throws "Extension context invalidated" at it (seen
+// 2026-11-19). It then stops listening and makes room for the copy the updated add-on puts in.
 (() => {
-  if (globalThis.tarjimSelection) return;
-  globalThis.tarjimSelection = true;
+  const alive = () => Boolean(globalThis.chrome?.runtime?.id);
+  const before = globalThis.tarjimSelection;
+  if (before && (before === true || before.alive())) return;
+  before?.retire();
   const MOST = 6000;  // the engine's limit (tarjim/text.py): a longer selection is told so
   const GAP = 8;
   const STYLE = `
@@ -39,7 +45,13 @@
   let settle = 0;
 
   const PLAIN = { working: "…", copy: "Copy", copied: "Copied", ask: "tarjim", long: "", dir: "auto" };
-  const send = (message) => chrome.runtime.sendMessage(message).catch(() => null);
+  function send(message) {
+    try {
+      if (alive()) return chrome.runtime.sendMessage(message).catch(() => null);
+    } catch { /* the add-on went away between the check and the call */ }
+    retire();
+    return Promise.resolve(null);
+  }
   const worded = async () => { words ||= (await send({ type: "tarjim-words" })) || PLAIN; };
   const make = (tag, props = {}) => Object.assign(document.createElement(tag), props);
 
@@ -91,6 +103,7 @@
 
   // `auto` says nobody clicked for this one: the background may answer "ask" instead (textcard.js).
   async function translate(text, box, auto = false) {
+    if (!alive()) return retire();
     await worded();
     const mine = ++asked;
     shownFor = text;
@@ -116,6 +129,7 @@
   // "As I select": once the selection has settled, and never while the person is typing. Only
   // the person's own mouse and keys count: an event the page made up is ignored.
   function selected(event) {
+    if (!alive()) return retire();
     if (!event.isTrusted || mode === "menu" || (host && event.composedPath().includes(host))) return;
     clearTimeout(settle);
     settle = setTimeout(() => {
@@ -131,10 +145,22 @@
     const { text, box } = picked();
     if (message.text || text) translate(text || message.text.trim(), box);
   });
-  document.addEventListener("mouseup", selected);
-  document.addEventListener("keyup", (event) => { if (event.shiftKey || event.key === "Shift") selected(event); });
-  document.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
-  document.addEventListener("mousedown", (event) => { if (host && !event.composedPath().includes(host)) close(); });
+  const HEARD = {
+    mouseup: selected,
+    keyup: (event) => { if (event.shiftKey || event.key === "Shift") selected(event); },
+    keydown: (event) => { if (event.key === "Escape") close(); },
+    mousedown: (event) => { if (host && !event.composedPath().includes(host)) close(); },
+  };
+
+  function retire() {
+    close();
+    clearTimeout(settle);
+    for (const [type, handler] of Object.entries(HEARD)) document.removeEventListener(type, handler);
+    if (globalThis.tarjimSelection?.retire === retire) delete globalThis.tarjimSelection;
+  }
+
+  globalThis.tarjimSelection = { alive, retire };
+  for (const [type, handler] of Object.entries(HEARD)) document.addEventListener(type, handler);
   chrome.storage.local.get({ textMode: "menu" }).then((saved) => { mode = saved.textMode; });
   chrome.storage.onChanged.addListener((changes) => { if (changes.textMode) mode = changes.textMode.newValue || "menu"; });
 })();

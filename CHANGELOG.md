@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.17 (2026-11-19)
+
+- **No more "Extension context invalidated" errors on pages left open while the add-on
+  updates.** The part of the add-on that watches what you select stayed in every open page after
+  the add-on updated itself or was turned off, and threw this error the next time you selected
+  something. It now notices it was left behind, stops listening, and makes way for the updated
+  add-on's own copy. Nothing was lost or sent: the error only filled the add-on's error list.
+
 ## 1.1.16 (2026-11-19)
 
 - **A finished job says when the model you picked is not the one that translated it.** If you

@@ -97,6 +97,14 @@ def test_a_held_translation_waits_for_the_persons_own_click(page: dict[str, Any]
     assert page["button"] == [3, "card ask"]  # "a button by the text" sends nothing by itself
 
 
+def test_a_page_left_with_an_updated_add_ons_old_script_stays_quiet(
+        page: dict[str, Any]) -> None:
+    """Seen 2026-11-19 in the owner's Chrome: "Extension context invalidated", thrown by the old
+    copy of selection.js on a page that stayed open while the add-on updated itself."""
+    assert page["orphan"] == [[], 0, [0, 0, 0, 0]]  # no error, no card, nothing listened to
+    assert page["again"] == [[1, 1, 1, 1], "fifth text", []]
+
+
 def test_the_manifest_asks_for_every_page_only_as_an_option() -> None:
     manifest = json.loads((EXTENSION / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["optional_host_permissions"] == ["<all_urls>"]
