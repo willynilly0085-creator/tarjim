@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.16 (2026-11-19)
+
+- **A finished job says when the model you picked is not the one that translated it.** If you
+  picked a Gemini model your key does not offer (Google answers 400, 403 or 404), tarjim
+  translated with Gemini 3.8 Flash or the next model of its list, while the page and the
+  extension kept showing your pick; only the job's log said otherwise. The same happened with an
+  Antigravity effort answered by its lighter variant, a Codex model your account refused, and a
+  job your backup AI translated after your chosen one failed. The job's notes on tarjim's page,
+  and its line in the extension, now name both: the model that translated (or part of the
+  video), and the one you picked. It is a quiet note: the job still reads as done.
+
 ## 1.1.15 (2026-11-19)
 
 - **An assistant's setup test no longer fails without a word.** Asked from chat, test_setup

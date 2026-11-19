@@ -609,6 +609,17 @@
       }
     }
   },
+  "jobOtherModel": {
+    "message": "$USED$ hat dieses Video ganz oder teilweise übersetzt, statt $PICKED$, das du gewählt hast.",
+    "placeholders": {
+      "picked": {
+        "content": "$1"
+      },
+      "used": {
+        "content": "$2"
+      }
+    }
+  },
   "textMenu": {
     "message": "Markierten Text übersetzen"
   },

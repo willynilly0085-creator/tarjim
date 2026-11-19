@@ -609,6 +609,17 @@
       }
     }
   },
+  "jobOtherModel": {
+    "message": "$USED$ translated this video, or part of it, in place of $PICKED$, which you picked.",
+    "placeholders": {
+      "picked": {
+        "content": "$1"
+      },
+      "used": {
+        "content": "$2"
+      }
+    }
+  },
   "textMenu": {
     "message": "Translate the selected text"
   },

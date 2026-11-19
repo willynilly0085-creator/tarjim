@@ -31,8 +31,9 @@ WEB = Path(__file__).resolve().parents[1] / "tarjim" / "web"
 EMOJI = re.compile("[\U0001F300-\U0001FAFF☀-➿]")
 KINDS = ("speech_left", "in_source", "untranslated", "overlap", "readability", "timing",
          "sounds", "engine_stopped", "budget_used", "hearing_doubt", "hearing_unchecked",
-         "meaning_doubt", "timing_doubt")
-UNCOUNTED = ("timing", "engine_stopped", "hearing_unchecked")  # said once, with no "how many"
+         "meaning_doubt", "timing_doubt", "other_model")
+# said once, with no "how many"
+UNCOUNTED = ("timing", "engine_stopped", "hearing_unchecked", "other_model")
 
 
 @pytest.fixture

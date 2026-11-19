@@ -1,4 +1,4 @@
-import { t } from "./shared.js";
+import { t, uiLanguage } from "./shared.js";
 
 // What a finished job carries besides its files, as tarjim's page shows it: a summary ready to
 // post (a short text that fits a tweet, and a longer one kept folded), and a line saying how many
@@ -48,9 +48,21 @@ export function showPost(row, job) {
   box.replaceChildren(title, part(post.short, t("postTitle")), ...(post.long ? [longer(post.long)] : []));
 }
 
+// A model other than the one picked is named here too, not only counted: a person believed the
+// picked model had translated their video (2026-11-19). Names stay left to right inside Arabic.
+const isolate = (text) => `⁦${text}⁩`;
+
+function otherModel(note) {
+  const used = new Intl.ListFormat(uiLanguage(), { type: "conjunction" }).format((note.used || []).map(isolate));
+  return t("jobOtherModel", isolate(note.picked || ""), used);
+}
+
 export function showNotes(row, job) {
-  const found = job.stage === "done" ? (job.notes || []).filter((note) => note.problem).length : 0;
+  const notes = job.stage === "done" ? job.notes || [] : [];
+  const found = notes.filter((note) => note.problem).length;
+  const swapped = notes.find((note) => note.kind === "other_model");
+  const said = [swapped ? otherModel(swapped) : "", found ? t("jobNotes", String(found)) : ""].filter(Boolean);
   const line = row.querySelector(".job-notes");
-  line.textContent = found ? t("jobNotes", String(found)) : "";
-  line.hidden = !found;
+  line.textContent = said.join(" ");
+  line.hidden = !said.length;
 }

@@ -11,6 +11,7 @@ from tarjim.findings import findings
 from tarjim.job import checkpoint
 from tarjim.models import Cue
 from tarjim.rules import Rules
+from tarjim.translate.answered import picked_by_person, said
 from tarjim.translate.clean import over_budget
 from tarjim.translate.gemini import BAD_REPLY, AudioSlice, Translator
 from tarjim.translate.prompt import Brief
@@ -29,6 +30,7 @@ class Rounds:
         # parts of an exchange answered as one sentence
         self.parts = [len(cue.parts) for cue in cues]
         self.stopped: list[Exception] = []  # what the last engine that ran failed on
+        self.chosen = ""  # the model picked for the chosen engine (translate/answered.py)
 
     def pending(self) -> list[Cue]:
         return [cue for cue in self.cues if not cue.text.strip() and has_letters(cue.source)
@@ -42,7 +44,9 @@ class Rounds:
 
         failures: list[Exception] = []
         wanted = [cue for cue in self.cues if not cue.text.strip()]  # a backup never redoes good
-        for turn, provider in enumerate(tried("translate", active().translate.local_backup)):
+        engines = tried("translate", active().translate.local_backup)
+        self.chosen = picked_by_person(engines[0]) if engines else ""
+        for turn, provider in enumerate(engines):
             if not wanted:
                 break
             checkpoint()  # a backup engine is never started for a job that was cancelled
@@ -68,12 +72,7 @@ class Rounds:
             translator.failures.append(error)
         self.sounds |= translator.sounds
         self.stopped = translator.failures
-        # which engine wrote the lines, in the job's log (2026-11-14: it said nothing, and a
-        # translation by a weaker model after a failure looked like the chosen one's)
-        model = str(getattr(translator.client, "model_used", "") or "")
-        done = sum(1 for cue in wanted if cue.text.strip())
-        print(f"translation: {done} of {len(wanted)} line(s) by {provider}"
-              + (f" ({model})" if model else ""), flush=True)
+        said(provider, translator, wanted, self.chosen if whole is None else None)
         return translator.failures
 
     def translated(self) -> bool:

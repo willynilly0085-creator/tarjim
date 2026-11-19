@@ -609,6 +609,17 @@
       }
     }
   },
+  "jobOtherModel": {
+    "message": "選んだ $PICKED$ の代わりに、$USED$ がこの動画（またはその一部）を翻訳しました。",
+    "placeholders": {
+      "picked": {
+        "content": "$1"
+      },
+      "used": {
+        "content": "$2"
+      }
+    }
+  },
   "textMenu": {
     "message": "選択したテキストを翻訳"
   },

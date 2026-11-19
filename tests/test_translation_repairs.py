@@ -128,7 +128,8 @@ def test_a_backup_that_filled_every_line_leaves_no_stop_note(
     engines(monkeypatch, gemini=Answers(QuotaExhausted("quota used up")),
             local=Answers([{"id": 1, "text": "Bonjour."}]))
     done = pipeline.translate(job(tmp_path), lines)
-    assert done[0].text == "Bonjour." and found.notes(done, []) == []
+    kinds = [note["kind"] for note in found.notes(done, [])]
+    assert done[0].text == "Bonjour." and kinds == ["other_model"]  # named, not a stop (11-19)
 
 
 def test_a_kept_transcript_brings_back_its_timing_check(

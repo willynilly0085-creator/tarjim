@@ -609,6 +609,17 @@
       }
     }
   },
+  "jobOtherModel": {
+    "message": "$USED$ menerjemahkan video ini, atau sebagiannya, menggantikan $PICKED$ yang Anda pilih.",
+    "placeholders": {
+      "picked": {
+        "content": "$1"
+      },
+      "used": {
+        "content": "$2"
+      }
+    }
+  },
   "textMenu": {
     "message": "Terjemahkan teks yang dipilih"
   },

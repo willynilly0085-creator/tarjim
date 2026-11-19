@@ -609,6 +609,17 @@
       }
     }
   },
+  "jobOtherModel": {
+    "message": "ترجم $USED$ هالفيديو أو جزء منه، بدال $PICKED$ اللي اخترته.",
+    "placeholders": {
+      "picked": {
+        "content": "$1"
+      },
+      "used": {
+        "content": "$2"
+      }
+    }
+  },
   "textMenu": {
     "message": "ترجم النص المحدد"
   },

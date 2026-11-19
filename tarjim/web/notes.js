@@ -15,6 +15,12 @@ function times(at) {
   return new Intl.ListFormat(document.documentElement.lang || "en", { type: "unit" }).format(at.map(clock));
 }
 
+// Models are named left to right inside any language, so "Gemini 3.8 Flash" keeps its order in
+// Arabic (2026-11-19: a model other than the one picked translated, and only the log said so).
+function models(names) {
+  return new Intl.ListFormat(document.documentElement.lang || "en", { type: "conjunction" }).format(names.map(isolate));
+}
+
 export function troubled(job) {
   return job.stage === "done" && (job.notes || []).some((note) => note.problem);
 }
@@ -28,7 +34,8 @@ export function stageLabel(job) {
 // said, so a used-up quota reads as "come back tomorrow", not as a finished job.
 function words(note) {
   const reason = note.reason ? t(`err_${note.reason}`) : "";
-  const text = t(`note_${note.kind}`, { n: note.count, at: times(note.at || []), share: note.share, reason });
+  const named = { picked: isolate(note.picked || ""), used: models(note.used || []) };
+  const text = t(`note_${note.kind}`, { n: note.count, at: times(note.at || []), share: note.share, reason, ...named });
   return note.detail ? `${text}
 ${t("errorDetail", { detail: note.detail })}` : text;
 }

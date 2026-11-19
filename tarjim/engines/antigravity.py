@@ -52,6 +52,7 @@ LISTED: list[tuple[str, str, str]] = []
 
 class AntigravityAsker:
     hears = False
+    model_used = ""  # the model that last answered: the low variant may answer for a pick
 
     def ask(self, prompt: str, audio: bytes | None, schema: dict[str, Any]) -> Any:
         """With audio, the program is shown the sound as a file: Gemini hears what it opens.
@@ -99,7 +100,9 @@ class AntigravityAsker:
             if audio:
                 (Path(folder) / SOUND).write_bytes(audio)
             done = run(command, "", folder)
-        return unwrap(answer_of(done.returncode, done.stdout, done.stderr, model))
+        answer = unwrap(answer_of(done.returncode, done.stdout, done.stderr, model))
+        self.model_used = model
+        return answer
 
 
 def waiting_command(light: bool) -> list[str]:

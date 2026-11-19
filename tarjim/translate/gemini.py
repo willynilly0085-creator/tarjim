@@ -63,6 +63,9 @@ class Translator:
         self.sounds: set[int] = set()  # the lines (by id) answered empty as only a sound
         self.failures: list[Exception] = []  # the batches that failed twice, and why
         self.row = 0  # the batches that failed one after another, up to the last one asked
+        # the models whose answers gave lines, for an engine that says which answered
+        # (model_used: Gemini, Antigravity, Codex), so the job names one not picked (answered.py)
+        self.answered: list[str] = []
 
     def translate(self, cues: list[Cue], audio: AudioSlice, brief: Brief) -> list[Cue]:
         most = int(getattr(self.client, "most_cues", 0) or 0)
@@ -154,6 +157,9 @@ class Translator:
         results = map_results(items, len(cues), brief.arabic, brief.manner)
         if not results:
             raise RuntimeError(f"empty translation: none of {len(cues)} lines came back")
+        model = str(getattr(self.client, "model_used", "") or "")
+        if model and model not in self.answered:
+            self.answered.append(model)
         for number, cue in enumerate(cues, start=1):
             self.keep(cue, results.get(number))
 

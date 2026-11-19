@@ -47,6 +47,10 @@ class Findings:
     # the lines the job is not sure of, in hearing, meaning and timing (tarjim/doubts.py,
     # 2026-11-14); None: not asked (the command line's own checks, a job before them)
     doubts: Doubts | None = None
+    # the model picked for the chosen engine, and what translated lines in its place, as the
+    # page names them (translate/answered.py, 2026-11-19: only the log said so)
+    picked: str = ""
+    in_place: list[str] = field(default_factory=list)
 
     def heard(self, left: tuple[Span, ...], agreement: float | None,
               given_up: tuple[Span, ...] = ()) -> None:
@@ -71,7 +75,7 @@ class Findings:
                 note("readability", at(readable), problem=False),
                 note("sounds", at(self.sounds), problem=False),
                 note("budget_used", [start for start, _end in self.refused], problem=False),
-                *self.timing(), *self.doubted(cues)]
+                *self.timing(), *self.doubted(cues), *self.swapped()]
         return [row for row in rows if row["count"]]
 
     def doubted(self, cues: list[Cue]) -> list[Note]:
@@ -88,6 +92,14 @@ class Findings:
                 note("meaning_doubt", starts(cues, [n for n in found.meaning if n not in said]),
                      problem=False),
                 note("timing_doubt", starts(cues, list(found.timing)), problem=False)]
+
+    def swapped(self) -> list[Note]:
+        """Said quietly: the subtitles are not wrong for it, but the person believed the model
+        they picked had written them."""
+        if not self.in_place:
+            return []
+        return [{"kind": "other_model", "problem": False, "count": 1, "at": [],
+                 "picked": self.picked, "used": list(self.in_place)}]
 
     def stop(self) -> list[Note]:
         """Why lines are shown as said: a used-up quota or a timed-out subscription said in the

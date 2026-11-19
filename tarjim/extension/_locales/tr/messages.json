@@ -609,6 +609,17 @@
       }
     }
   },
+  "jobOtherModel": {
+    "message": "Seçtiğiniz $PICKED$ yerine bu videoyu ya da bir kısmını $USED$ çevirdi.",
+    "placeholders": {
+      "picked": {
+        "content": "$1"
+      },
+      "used": {
+        "content": "$2"
+      }
+    }
+  },
   "textMenu": {
     "message": "Seçili metni çevir"
   },

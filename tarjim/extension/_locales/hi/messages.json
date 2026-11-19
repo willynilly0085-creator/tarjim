@@ -609,6 +609,17 @@
       }
     }
   },
+  "jobOtherModel": {
+    "message": "आपके चुने हुए $PICKED$ की जगह $USED$ ने यह वीडियो या उसके कुछ हिस्से का अनुवाद किया।",
+    "placeholders": {
+      "picked": {
+        "content": "$1"
+      },
+      "used": {
+        "content": "$2"
+      }
+    }
+  },
   "textMenu": {
     "message": "चुना हुआ टेक्स्ट अनुवाद करें"
   },

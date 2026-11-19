@@ -123,6 +123,7 @@ def outdated(stderr: str) -> str:
 
 class CodexAsker:
     hears = False
+    model_used = ""  # the model that last answered: the next one answers for a refused pick
 
     def ask(self, prompt: str, _audio: bytes | None, schema: dict[str, Any]) -> Any:
         last, tried, code = "", "", 1
@@ -131,6 +132,7 @@ class CodexAsker:
             if done.returncode == 0 and reply:
                 if model and model != setting("codex_model"):
                     save("codex_model", model)
+                self.model_used = model
                 return unwrap(parse_json(reply))
             last, tried, code = outdated(done.stderr), model, done.returncode
             if REFUSED not in done.stderr:

@@ -75,7 +75,7 @@ def test_an_engine_that_cannot_be_built_hands_over_to_the_backup(
     engines(monkeypatch, gemini=RuntimeError("Gemini API key missing"), local=backup)
     done = pipeline.translate(job(tmp_path), [said(0.0, "Hello.")])
     assert done[0].text == "Bonjour." and len(backup.prompts) == 1
-    assert found.notes(done, []) == []
+    assert kinds(found, done) == ["other_model"]  # the backup is named (2026-11-19)
 
 
 def test_a_backup_that_cannot_be_built_keeps_what_the_first_engine_did(
@@ -135,4 +135,4 @@ def test_a_line_the_backup_left_out_is_not_blamed_on_the_first_engines_quota(
     engines(monkeypatch, gemini=chosen, local=backup)
     done = pipeline.translate(job(tmp_path), lines)
     assert [c.text for c in done] == ["Bonjour.", "Au revoir.", "See you."]
-    assert kinds(found, done) == ["in_source"]
+    assert kinds(found, done) == ["in_source", "other_model"]
