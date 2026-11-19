@@ -13,7 +13,9 @@ globalThis.chrome = {
     registerContentScripts: async (scripts) => { calls.registered.push(...scripts); },
     unregisterContentScripts: async () => { calls.unregistered += 1; calls.registered = []; },
     executeScript: async (how) => { if (how.target.tabId === 9) throw new Error("no"); calls.injected.push(how); } },
-  tabs: { sendMessage: async (...sent) => { calls.told.push(sent); } },
+  tabs: { sendMessage: async (...sent) => { calls.told.push(sent); },
+    query: async () => [{ id: 1, url: "https://shop.example/item" }, { id: 2, url: "chrome://extensions/" },
+      { id: 9, url: "https://refused.example/" }, { id: 3, url: "http://plain.example/" }] },
   runtime: { getURL: (path) => path,
     sendNativeMessage: async () => { calls.woken += 1; return { started: true }; } },
 };
@@ -47,6 +49,13 @@ out.refused = [await card.chooseTextMode("card"), kept.textMode, calls.registere
 allow = true;
 out.allowed = [await card.chooseTextMode("card"), kept.textMode, calls.registered.map((s) => [s.js, s.matches])];
 out.back = [await card.chooseTextMode("menu"), kept.textMode, calls.unregistered];
+kept.textMode = "menu";
+out.updatedMenu = [await card.reachOpenPages(), calls.injected.length];
+kept.textMode = "button";
+granted = true;
+out.updated = [await card.reachOpenPages(), calls.injected.map((how) => [how.target, how.files])];
+calls.injected = [];
+granted = false;
 out.shown = [await card.showCard({ id: 4 }, 2, "picked"), calls.injected[0], calls.told[0]];
 out.closed = await card.showCard({ id: 9 }, 0, "picked");
 let clock = 1_000_000;

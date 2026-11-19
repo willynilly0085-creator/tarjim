@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.18 (2026-11-19)
+
+- **Pages already open keep translating what you select after the add-on updates.** With "A
+  button by the text" or "As I select", a page that was open while the add-on updated itself
+  stopped offering a translation until you reloaded it. The updated add-on now puts its own copy
+  into every open page at once. Pages the browser keeps from add-ons are left alone.
+
 ## 1.1.17 (2026-11-19)
 
 - **No more "Extension context invalidated" errors on pages left open while the add-on

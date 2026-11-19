@@ -22,6 +22,18 @@ export async function syncSelection() {
   return wanted;
 }
 
+// After an update the pages already open keep only the old copy, cut off from the add-on (it
+// stops itself, selection.js): each gets the new one, as a page opened now would. Pages the
+// browser keeps from add-ons (its own, the add-ons shop) refuse it, and are left.
+export async function reachOpenPages() {
+  if (!await syncSelection()) return 0;
+  const tabs = await chrome.tabs.query({});
+  const pages = tabs.filter((tab) => /^https?:/.test(tab.url || ""));
+  const put = await Promise.all(pages.map((tab) => chrome.scripting.executeScript(
+    { target: { tabId: tab.id, allFrames: true }, files: [SCRIPT.js[0]] }).then(() => 1, () => 0)));
+  return put.reduce((sum, one) => sum + one, 0);
+}
+
 // From a click in the settings, so the browser may ask the person: nothing is awaited before
 // the asking. Firefox closes the popup while it asks, so the choice is saved first and the
 // background finishes the work when the permission arrives (background.js).

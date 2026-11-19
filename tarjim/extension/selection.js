@@ -8,9 +8,9 @@
 // 2026-11-19). It then stops listening and makes room for the copy the updated add-on puts in.
 (() => {
   const alive = () => Boolean(globalThis.chrome?.runtime?.id);
-  const before = globalThis.tarjimSelection;
-  if (before && (before === true || before.alive())) return;
-  before?.retire();
+  const before = globalThis.tarjimSelection;  // `true` is from 1.1.16, gone once this one runs
+  if (before?.alive?.()) return;
+  before?.retire?.();
   const MOST = 6000;  // the engine's limit (tarjim/text.py): a longer selection is told so
   const GAP = 8;
   const STYLE = `

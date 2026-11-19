@@ -29,6 +29,7 @@ Object.assign(globalThis, { innerWidth: 800, innerHeight: 600, scrollX: 0, scrol
     storage: { local: { get: async () => ({ textMode: stored }) },
       onChanged: { addListener(handler) { heard.changed = handler; } } } } });
 const thrown = [];
+globalThis.tarjimSelection = true;  // the mark 1.1.16 left in a page it was cut off from
 process.on("unhandledRejection", (error) => thrown.push(String(error?.message || error)));
 await import(process.argv[2]);
 const fire = (type, event) => heard[type].forEach((handler) => handler({ composedPath: () => [], ...event }));

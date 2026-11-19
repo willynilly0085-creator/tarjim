@@ -2,7 +2,7 @@ import { buildMenus, isMode, OTHER, refreshMenus } from "./menus.js";
 import { claimPending, sendWaitingJob } from "./pairing.js";
 import { clickedPost, downloadable } from "./posts.js";
 import { ApiError, api, errorLabel, loadWords, remember, t } from "./shared.js";
-import { answer, showCard, syncSelection, TEXT } from "./textcard.js";
+import { answer, reachOpenPages, showCard, syncSelection, TEXT } from "./textcard.js";
 
 const POLL = "poll";
 
@@ -18,6 +18,7 @@ async function start() {
 }
 
 chrome.runtime.onInstalled.addListener(start);
+chrome.runtime.onInstalled.addListener(({ reason }) => { if (reason === "update") reachOpenPages(); });
 chrome.runtime.onStartup.addListener(start);
 chrome.storage.onChanged.addListener((changes) => { if (changes.target || changes.mode) buildMenus(); });
 

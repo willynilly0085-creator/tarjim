@@ -39,6 +39,14 @@ def test_a_failure_is_said_in_the_persons_words(seen: dict[str, Any]) -> None:
     assert seen["unpaired"] == {"message": "[pairTitle]"}
 
 
+def test_after_an_update_the_open_pages_get_the_new_page_script(seen: dict[str, Any]) -> None:
+    """A page open while the add-on updated kept only the old copy, cut off from the add-on,
+    so "as I select" stopped working there until the page was reloaded (2026-11-19)."""
+    assert seen["updatedMenu"] == [0, 0]  # the right-click menu puts the script in itself
+    assert seen["updated"] == [2, [[{"tabId": 1, "allFrames": True}, ["selection.js"]],
+                                   [{"tabId": 3, "allFrames": True}, ["selection.js"]]]]
+
+
 def test_a_stopped_tarjim_is_started_before_the_selection_is_given_up(
         seen: dict[str, Any]) -> None:
     assert seen["woken"] == [{"translation": "woken"}, 1]
