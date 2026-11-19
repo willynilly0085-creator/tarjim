@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.15 (2026-11-19)
+
+- **An assistant's setup test no longer fails without a word.** Asked from chat, test_setup
+  could end with only "Error executing tool test_setup" while the test was still going: it asks
+  your translator to translate one sentence, which can take a minute (measured with Gemini 4
+  Hydrogen by key: 2 to 47 seconds), and the tool gave up at 30. It now waits as long as tarjim
+  itself waits for an AI, and if the AI still has not answered it says so and what to do: ask
+  again in a few minutes, or pick a faster model or another translator.
+- **Other assistant tools wait for slow work too.** Reading a link's qualities, listing
+  connections or a provider's models, choosing a translator, starting or finding an AI on this
+  computer, installing a subscription's program and the setup plan can each ask a program or a
+  site first, and some took longer than 30 seconds. They now wait up to two minutes, and say
+  plainly that tarjim is still working rather than failing.
+
 ## 1.1.14 (2026-11-16)
 
 - **A Google Cloud (Vertex AI) key now reaches Gemini 4.** With such a key, picking Gemini 4

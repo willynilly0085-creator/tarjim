@@ -9,6 +9,8 @@ MB = 1024 * 1024
 ASK = ("Show the person these qualities with their sizes and ask which one to download; the "
        "default is 1080p or the nearest below it, and is what they get if they do not mind. Then "
        "call translate_video again with the same arguments and quality set to their pick.")
+LINK_LATE = ("Nothing was started. To start it at 1080p or the nearest below without "
+             'picking, call translate_video again with quality "default".')
 UNREAD = "The link's qualities could not be read, so it was started at 1080p or the nearest below."
 A_LIST = {"started": False, "error": "list", "detail": "This link is a list of videos (a "
           "playlist, a channel, a feed): ask for the link of one video."}

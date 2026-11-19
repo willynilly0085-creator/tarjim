@@ -4,10 +4,10 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
-from tarjim.assistant_http import call, fetch_text, wait_for
+from tarjim.assistant_http import SLOW, call, fetch_text, wait_for
 from tarjim.assistant_prefs import Output, split_output
 from tarjim.assistant_prefs import attach as attach_prefs
-from tarjim.assistant_quality import answer
+from tarjim.assistant_quality import LINK_LATE, answer
 from tarjim.assistant_settings import attach
 from tarjim.assistant_setup import install, start, status
 
@@ -59,7 +59,7 @@ def translate_video(source: str, language: str = "ar", output: Output = "burned"
         return call("/jobs/local", {"path": source, **order})
     if quality:
         return call("/jobs", {"url": source, **order, "quality": quality})
-    found = call("/links/qualities", {"url": source})
+    found = call("/links/qualities", {"url": source}, SLOW, LINK_LATE)
     return answer(found, lambda: call("/jobs", {"url": source, **order}), order["mode"] == "srt")
 
 
@@ -116,7 +116,7 @@ def list_connections() -> Any:
     """Every way to connect an AI: API providers (key saved or not), subscriptions ("ready" means
     the app is installed, "signed_in" that it can be used now), plans, and AI programs on this
     computer with their models. Also shows which engine listens and which translates now."""
-    return call("/connections")
+    return call("/connections", wait=SLOW)
 
 
 @tarjim.tool()
@@ -128,7 +128,7 @@ def use_connection(provider: str, model: str = "", local_program: str = "") -> A
     local_program (with "local"): ollama, lmstudio, jan, llamacpp or koboldcpp.
     """
     wanted = {"provider": provider, "model": model, "server": local_program}
-    return call("/connections/use", {k: v for k, v in wanted.items() if v})
+    return call("/connections/use", {k: v for k, v in wanted.items() if v}, SLOW)
 
 
 @tarjim.tool()

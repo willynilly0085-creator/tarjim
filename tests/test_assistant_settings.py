@@ -25,7 +25,7 @@ NOT_SETTINGS = {"ping", "home", "asset", "legacy", "upload", "create_local", "se
 def asked(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, Any]]:
     seen: list[tuple[str, Any]] = []
 
-    def call(path: str, body: Any = None) -> Any:
+    def call(path: str, body: Any = None, *_waits: Any) -> Any:
         seen.append((path, body))
         return {"ok": True}
 

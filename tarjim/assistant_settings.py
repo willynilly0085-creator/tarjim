@@ -7,7 +7,7 @@ allowed by the person on the page, because that request must be answered by a hu
 import webbrowser
 from typing import Any
 
-from tarjim.assistant_http import SERVER, call
+from tarjim.assistant_http import AI, SERVER, SLOW, call
 from tarjim.config import setting
 
 SWITCH = {"yes": True, "no": False}
@@ -62,7 +62,7 @@ def set_glossary(terms: str) -> Any:
 def plan_setup() -> Any:
     """Look at this computer (graphics card, tools, AI programs, subscriptions, saved keys) and
     return the setup tarjim suggests for it, with what each choice still needs. Changes nothing."""
-    return call("/setup/plan?fresh=1")
+    return call("/setup/plan?fresh=1", wait=SLOW)
 
 
 def apply_setup(translate: dict[str, Any], listen: dict[str, Any],
@@ -73,13 +73,13 @@ def apply_setup(translate: dict[str, Any], listen: dict[str, Any],
     wants something else). downloads: tool ids from list_tools to fetch now.
     """
     return call("/setup/apply", {"translate": translate, "listen": listen,
-                                 "downloads": downloads or []})
+                                 "downloads": downloads or []}, SLOW)
 
 
 def install_subscription_app(provider: str) -> Any:
     """Install the program a subscription needs (claude, codex, grok, antigravity, copilot),
     in the background. Then call sign_in so the person logs in."""
-    return call("/connections/install-app", {"provider": provider})
+    return call("/connections/install-app", {"provider": provider}, SLOW)
 
 
 def set_custom_api_address(url: str) -> Any:
@@ -90,24 +90,30 @@ def set_custom_api_address(url: str) -> Any:
 
 def start_local_ai(server: str) -> Any:
     """Start an AI program installed on this computer (ollama or lmstudio) without a window."""
-    return call("/connections/start-local", {"server": server})
+    return call("/connections/start-local", {"server": server}, SLOW)
 
 
 def find_local_ai() -> Any:
     """Search this computer for AI programs (Ollama, LM Studio, Jan, llama.cpp, KoboldCpp) that
     are installed but not on the usual paths. Takes up to twenty seconds."""
-    return call("/connections/scan-local", {})
+    return call("/connections/scan-local", {}, SLOW)
 
 
 def list_models(provider: str) -> Any:
     """The models a provider offers this account, with the one tarjim suggests for translation."""
-    return call("/connections/models", {"provider": provider})
+    return call("/connections/models", {"provider": provider}, SLOW)
+
+
+STILL_ASKING = ("The AI that translates for tarjim is still answering the test sentence; AI "
+                "answers sometimes take minutes. Call test_setup again in a few minutes. If it "
+                "is slow again, pick a faster model (list_models, then use_connection) or "
+                "another translator.")
 
 
 def test_setup(language: str = "ar") -> Any:
     """Check that the current setup really works: the engines answer and a short line is
     translated into the language."""
-    return call("/setup/selftest", {"language": language})
+    return call("/setup/selftest", {"language": language}, AI, STILL_ASKING)
 
 
 def list_voice_services() -> Any:

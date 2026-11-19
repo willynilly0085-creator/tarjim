@@ -50,7 +50,7 @@ def chat_engine(monkeypatch: pytest.MonkeyPatch, qualities: object) -> list[tupl
 
     asked: list[tuple[str, object]] = []
 
-    def call(path: str, body: object = None) -> object:
+    def call(path: str, body: object = None, *_waits: object) -> object:
         asked.append((path, body))
         return qualities if path == "/links/qualities" else {"id": "abc", "stage": "queued"}
 
