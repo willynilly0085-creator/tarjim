@@ -6,9 +6,13 @@ NOT_MEDIA = ("not a video or sound file",)
 TOO_LONG = ("longer than six hours of sound",)
 A_LIST = ("this link is a list of videos",)
 IN_USE = ("is open in another program",)
+# Hugging Face's words for a model not on the disk while downloads are off: before
+# "download", which its own sentence also says (2026-11-20)
+MISSING_PART = ("LocalEntryNotFoundError", "cached snapshot folder",
+                "outgoing traffic has been disabled")
 UPDATED = ("from 'tarjim.", "named 'tarjim.")  # its code changed on disk while it ran
 REASONS = [("updated", UPDATED), ("in_use", IN_USE), ("media", NOT_MEDIA), ("long", TOO_LONG),
-           ("list", A_LIST),
+           ("list", A_LIST), ("parts", MISSING_PART),
            ("account", REFUSED_ACCOUNT), ("quota", ("QuotaExhausted", "quota", " 429:")),
            ("signin", SIGNED_OUT),
            ("key", ("API key missing", "API key not valid", " 401:", " 403:")),

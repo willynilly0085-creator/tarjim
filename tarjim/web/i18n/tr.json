@@ -773,5 +773,6 @@
   "textEngineWith": "Seçili metni çeviren",
   "textEngineAuto": "Otomatik (elinizdeki en hızlısı)",
   "textEngineHint": "Tarayıcıda seçtiğiniz metnin, videolarınızdan ayrı kendi çevirmeni ve modeli vardır. «Otomatik», bağladıklarınızın en hızlısına sorar.",
-  "textEngineSaved": "Kaydedildi. Seçtiğiniz sonraki metin bunu kullanır."
+  "textEngineSaved": "Kaydedildi. Seçtiğiniz sonraki metin bunu kullanır.",
+  "err_parts": "tarjim'in ihtiyaç duyduğu bir parça bu bilgisayarda henüz yok. tarjim sayfasını açıp kurulumdan indirin."
 }

@@ -773,5 +773,6 @@
   "textEngineWith": "O texto selecionado é traduzido com",
   "textEngineAuto": "Automático (o mais rápido que você tem)",
   "textEngineHint": "O texto que você seleciona no navegador tem seu próprio tradutor e modelo, à parte dos seus vídeos. «Automático» pergunta ao mais rápido que você conectou.",
-  "textEngineSaved": "Salvo. O próximo texto que você selecionar vai usar."
+  "textEngineSaved": "Salvo. O próximo texto que você selecionar vai usar.",
+  "err_parts": "Falta neste computador uma parte de que o tarjim precisa. Abra a página do tarjim e baixe-a na configuração."
 }

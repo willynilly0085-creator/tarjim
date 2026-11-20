@@ -658,5 +658,8 @@
   },
   "textNoPage": {
     "message": "Der Browser lässt auf dieser Seite keine Erweiterungen zu."
+  },
+  "errParts": {
+    "message": "Ein Teil, den tarjim braucht, fehlt noch auf diesem Computer. Öffne die Seite von tarjim und lade ihn in der Einrichtung herunter."
   }
 }

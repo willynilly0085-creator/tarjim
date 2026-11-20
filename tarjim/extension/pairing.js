@@ -1,4 +1,4 @@
-import { remember, settings } from "./shared.js";
+import { api, carried, post, remember, settings } from "./shared.js";
 
 export async function serverBase() {
   return (await settings()).server.replace(/\/+$/, "");
@@ -26,6 +26,7 @@ export async function claimPending() {
   const state = await reply.json();
   if (state.token) {
     await remember({ token: state.token, pairId: "" });
+    await shareChoices();
     return "paired";
   }
   if (state.state === "pending") return "waiting";
@@ -39,4 +40,17 @@ export async function claimPending() {
 export async function sendWaitingJob() {
   await chrome.storage.local.remove("waitingJob");  // left by an older version, never to be sent
   return false;
+}
+
+// Once per browser, after it is paired: the choices the engine kept from another browser come
+// here, or this browser's go to the engine when it has none yet. Later each saved choice goes to
+// the engine as it is made (shared.js, remember), and this browser's own choices stay its own.
+export async function shareChoices() {
+  const { choicesShared } = await chrome.storage.local.get("choicesShared");
+  if (choicesShared || !(await settings()).token) return;
+  const kept = await api("/browser").catch(() => null);
+  if (kept === null) return;
+  if (Object.keys(kept).length) await chrome.storage.local.set(carried(kept));
+  else await post("/browser", carried(await settings())).catch(() => null);
+  await chrome.storage.local.set({ choicesShared: true });
 }

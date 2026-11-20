@@ -658,5 +658,8 @@
   },
   "textNoPage": {
     "message": "O navegador não deixa as extensões funcionarem nesta página."
+  },
+  "errParts": {
+    "message": "Falta neste computador uma parte de que o tarjim precisa. Abra a página do tarjim e baixe-a na configuração."
   }
 }

@@ -773,5 +773,6 @@
   "textEngineWith": "所选文字的翻译使用",
   "textEngineAuto": "自动（你已连接的最快的）",
   "textEngineHint": "你在浏览器中选中的文字有自己的翻译服务和模型，与视频分开。“自动”会使用你已连接的最快的一个。",
-  "textEngineSaved": "已保存。下次选中的文字将使用它。"
+  "textEngineSaved": "已保存。下次选中的文字将使用它。",
+  "err_parts": "tarjim 需要的一个组件还不在这台电脑上。打开 tarjim 的页面，在设置中下载它。"
 }

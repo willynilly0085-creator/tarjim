@@ -658,5 +658,8 @@
   },
   "textNoPage": {
     "message": "Peramban tidak mengizinkan ekstensi bekerja di halaman ini."
+  },
+  "errParts": {
+    "message": "Bagian yang dibutuhkan tarjim belum ada di komputer ini. Buka halaman tarjim dan unduh di pengaturan."
   }
 }

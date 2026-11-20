@@ -15,7 +15,7 @@ export const watchesPages = (mode) => mode === "button" || mode === "card";
 export async function syncSelection() {
   const { textMode } = await settings();
   const wanted = watchesPages(textMode) && await chrome.permissions.contains(EVERYWHERE);
-  if (watchesPages(textMode) && !wanted) await remember({ textMode: "menu" });
+  if (watchesPages(textMode) && !wanted) await chrome.storage.local.set({ textMode: "menu" });
   const have = await chrome.scripting.getRegisteredContentScripts({ ids: [SCRIPT.id] }).catch(() => []);
   if (wanted && !have.length) await chrome.scripting.registerContentScripts([SCRIPT]);
   if (!wanted && have.length) await chrome.scripting.unregisterContentScripts({ ids: [SCRIPT.id] });

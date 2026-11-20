@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.21 (2026-11-20)
+
+- **A part tarjim needs that is not on the computer is named as such.** When a model tarjim
+  uses for listening or timing had never been downloaded, the job said the video could not be
+  downloaded from its link. It now says a part is missing and where to get it, on the page, in
+  the add-on and on the phone.
+- **Your add-on choices follow you to another browser or computer.** The language, the dialect,
+  what comes out (subtitles on the video, a subtitle file or dubbing), the voice, and how
+  selected text is translated used to stay in the browser where you picked them, so a new
+  browser started from the defaults. tarjim now keeps them too, and a browser you add takes
+  them as soon as it is connected. Each browser can still change its own afterwards.
+
+There is no 1.1.20: its Firefox add-on was signed before the change above was in it.
+
 ## 1.1.19 (2026-11-20)
 
 - **First run on a Mac.** tarjim's whole test suite now passes on macOS (an Apple M5 Ultra).

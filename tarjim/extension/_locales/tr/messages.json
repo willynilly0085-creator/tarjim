@@ -658,5 +658,8 @@
   },
   "textNoPage": {
     "message": "Tarayıcı bu sayfada eklentilerin çalışmasına izin vermiyor."
+  },
+  "errParts": {
+    "message": "tarjim'in ihtiyaç duyduğu bir parça bu bilgisayarda henüz yok. tarjim sayfasını açıp kurulumdan indirin."
   }
 }

@@ -6,7 +6,7 @@ const STAGE_KEYS = {
   translating: "stageTranslating", writing: "stageWriting", burning: "stageBurning", dubbing: "stageDubbing",
   done: "stageDone", failed: "stageFailed", cancelled: "stageCancelled",
 };
-const ERROR_KEYS = { quota: "errQuota", account: "errAccount", media: "errMedia", long: "errLong", list: "errList", signin: "errSignin", key: "errKey", download: "errDownload", tools: "errTools", dub: "errDub", updated: "errUpdated", in_use: "errInUse" };
+const ERROR_KEYS = { quota: "errQuota", account: "errAccount", media: "errMedia", long: "errLong", list: "errList", signin: "errSignin", key: "errKey", download: "errDownload", tools: "errTools", parts: "errParts", dub: "errDub", updated: "errUpdated", in_use: "errInUse" };
 
 const RTL = new Set(["ar", "fa", "ur", "he"]);
 const LOCALES = new Set(["ar", "en", "es", "fr", "pt", "de", "ru", "tr", "hi", "ur", "id", "ja", "zh", "ko"]);
@@ -55,8 +55,15 @@ export async function settings() {
   return { ...DEFAULTS, ...(await chrome.storage.local.get(Object.keys(DEFAULTS))) };
 }
 
+// The choices that follow the person to another browser: the engine keeps them as well
+// (tarjim/browser_choices.py), and a browser that joins takes them (pairing.js, shareChoices).
+export const CARRIED = ["target", "dialect", "mode", "voice", "textMode", "textOther"];
+export const carried = (values) => Object.fromEntries(Object.entries(values).filter(([key]) => CARRIED.includes(key)));
+
 export async function remember(values) {
   await chrome.storage.local.set(values);
+  const shared = carried(values);
+  if (Object.keys(shared).length && (await settings()).token) post("/browser", shared).catch(() => null);
 }
 
 export async function api(path, init = {}) {

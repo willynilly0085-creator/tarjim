@@ -773,5 +773,6 @@
   "textEngineWith": "Teks yang dipilih diterjemahkan dengan",
   "textEngineAuto": "Otomatis (yang tercepat yang Anda punya)",
   "textEngineHint": "Teks yang Anda pilih di peramban punya penerjemah dan model sendiri, terpisah dari video Anda. «Otomatis» memakai yang tercepat yang Anda hubungkan.",
-  "textEngineSaved": "Tersimpan. Teks berikutnya yang Anda pilih memakainya."
+  "textEngineSaved": "Tersimpan. Teks berikutnya yang Anda pilih memakainya.",
+  "err_parts": "Bagian yang dibutuhkan tarjim belum ada di komputer ini. Buka halaman tarjim dan unduh di pengaturan."
 }

@@ -26,7 +26,8 @@ GET_ROUTES = table([
     (r"^/setup/scan/(device|tools|local|subscriptions|keys)$", "scan_part"),
     (r"^/phone$", "phone_state"), (r"^/update$", "update_state"),
     (r"^/voices$", "voices_state"), (r"^/prefs$", "prefs_state"),
-    (r"^/prefs/fonts$", "prefs_fonts"), (r"^/text$", "text_choice")])
+    (r"^/prefs/fonts$", "prefs_fonts"), (r"^/text$", "text_choice"),
+    (r"^/browser$", "browser_choices")])
 POST_ROUTES = table([
     (r"^/jobs$", "create_json"), (r"^/jobs/check$", "check_order"),
     (r"^/links/qualities$", "link_qualities"),
@@ -51,7 +52,8 @@ POST_ROUTES = table([
     (r"^/voices/eleven$", "voices_eleven"), (r"^/voices/speech$", "voices_speech"),
     (r"^/prefs$", "prefs_save"), (r"^/prefs/reset$", "prefs_reset"),
     (r"^/prefs/preset$", "prefs_preset"), (r"^/prefs/preview$", "prefs_preview"),
-    (r"^/text$", "translate_text"), (r"^/text/use$", "use_for_text")])
+    (r"^/text$", "translate_text"), (r"^/text/use$", "use_for_text"),
+    (r"^/browser$", "keep_browser_choices")])
 OPEN = [re.compile(p) for p in (r"^/$", r"^/web/", r"^/ping$", r"^/languages$", r"^/pair$",
                                   rf"^/pair/{PAIR}$", r"^/ui-language$")]
 

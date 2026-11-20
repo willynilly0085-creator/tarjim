@@ -1,8 +1,9 @@
 """The extension asks for the translation of words selected on a page (tarjim/text.py), and the
-page picks the engine and model that make it (tarjim/text_engine.py)."""
+page picks the engine and model that make it (tarjim/text_engine.py). The extension also keeps its
+own choices here, for the next browser the person adds (tarjim/browser_choices.py)."""
 from typing import Any
 
-from tarjim import text_engine
+from tarjim import browser_choices, text_engine
 from tarjim.languages import LANGUAGES
 from tarjim.server.reasons import classify
 from tarjim.text import MOST, Untranslated, translated
@@ -27,6 +28,12 @@ class TextRoutes:
 
     def read_json(self) -> dict[str, Any]:
         raise NotImplementedError
+
+    def browser_choices(self, _query: Query) -> None:
+        self.reply(200, browser_choices.read())
+
+    def keep_browser_choices(self, _query: Query) -> None:
+        self.reply(200, browser_choices.remember(self.read_json()))
 
     def text_choice(self, _query: Query) -> None:
         self.reply(200, text_engine.view())

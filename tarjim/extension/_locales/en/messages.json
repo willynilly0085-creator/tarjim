@@ -658,5 +658,8 @@
   },
   "textNoPage": {
     "message": "The browser does not let extensions work on this page."
+  },
+  "errParts": {
+    "message": "A part tarjim needs is not on this computer yet. Open tarjim's page and get it in setup."
   }
 }

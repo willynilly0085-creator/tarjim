@@ -773,5 +773,6 @@
   "textEngineWith": "Markierter Text wird übersetzt mit",
   "textEngineAuto": "Automatisch (der schnellste, den du hast)",
   "textEngineHint": "Der Text, den du im Browser markierst, hat seinen eigenen Übersetzer und sein eigenes Modell, getrennt von deinen Videos. „Automatisch“ fragt den schnellsten, den du verbunden hast.",
-  "textEngineSaved": "Gespeichert. Der nächste markierte Text nutzt ihn."
+  "textEngineSaved": "Gespeichert. Der nächste markierte Text nutzt ihn.",
+  "err_parts": "Ein Teil, den tarjim braucht, fehlt noch auf diesem Computer. Öffne die Seite von tarjim und lade ihn in der Einrichtung herunter."
 }

@@ -658,5 +658,8 @@
   },
   "textNoPage": {
     "message": "浏览器不允许扩展在此页面上运行。"
+  },
+  "errParts": {
+    "message": "tarjim 需要的一个组件还不在这台电脑上。打开 tarjim 的页面，在设置中下载它。"
   }
 }

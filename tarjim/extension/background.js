@@ -1,5 +1,5 @@
 import { buildMenus, isMode, OTHER, refreshMenus } from "./menus.js";
-import { claimPending, sendWaitingJob } from "./pairing.js";
+import { claimPending, sendWaitingJob, shareChoices } from "./pairing.js";
 import { clickedPost, downloadable } from "./posts.js";
 import { ApiError, api, errorLabel, loadWords, remember, t } from "./shared.js";
 import { answer, reachOpenPages, showCard, syncSelection, TEXT } from "./textcard.js";
@@ -13,6 +13,7 @@ self.addEventListener("unhandledrejection", (event) => {
 async function start() {
   await loadWords();
   buildMenus();
+  await shareChoices().catch(() => null);
   syncSelection();
   chrome.alarms.create(POLL, { periodInMinutes: 0.5 });
 }
