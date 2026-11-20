@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.19 (2026-11-20)
+
+- **First run on a Mac.** tarjim's whole test suite now passes on macOS (an Apple M5 Ultra).
+  Two things were found and fixed: after moving to a newer Python, tarjim crashed on a Mac while
+  checking whether its old environment was still in use (macOS does not show a program's open
+  files the way Windows and Linux do), and a test assumed Linux's place for the Claude app's
+  settings. The installation notes now say where to keep tarjim on a Mac and why.
+
 ## 1.1.18 (2026-11-19)
 
 - **Pages already open keep translating what you select after the add-on updates.** With "A

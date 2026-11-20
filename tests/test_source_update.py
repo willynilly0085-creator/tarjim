@@ -213,6 +213,29 @@ def test_an_old_environment_a_program_still_runs_from_is_kept_for_later(
     assert not old.exists()
 
 
+class Running:
+    """A process as psutil gives it on a Mac: no memory_maps there (seen 2026-11-20)."""
+
+    def __init__(self, command: list[str]) -> None:
+        self.command = command
+
+    def cmdline(self) -> list[str]:
+        return self.command
+
+
+def test_on_a_mac_a_program_is_known_by_the_python_it_was_started_with(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    old = tmp_path / ".venv-3.11"
+    import psutil
+
+    monkeypatch.setattr(old_environment.sys, "platform", "darwin")
+    found = [Running(["/usr/bin/top"]), Running([str(old / "bin" / "python"), "-m", "x"])]
+    monkeypatch.setattr(psutil, "process_iter", lambda: iter(found))
+    assert old_environment.in_use(old)
+    found.pop()
+    assert not old_environment.in_use(old)
+
+
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows locks a running program's file")
 def test_a_running_program_shows_its_environment_is_in_use(tmp_path: Path) -> None:
     scripts = tmp_path / "Scripts"

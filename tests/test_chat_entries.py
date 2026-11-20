@@ -50,7 +50,7 @@ def test_old_claude_code_and_codex_entries_are_replaced(ran: list[list[str]],
 
 
 def test_an_old_claude_app_entry_is_replaced(ran: list[list[str]], tmp_path: Path) -> None:
-    settings = tmp_path / ".config" / "Claude" / "claude_desktop_config.json"
+    settings = assistant_link.desktop_config()  # ~/Library/Application Support on a Mac
     settings.parent.mkdir(parents=True)
     entries = {"tarjim": {"command": "/py/python", "args": OLD}, "other": {"command": "x"}}
     settings.write_text(json.dumps({"mcpServers": entries}))

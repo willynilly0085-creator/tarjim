@@ -63,7 +63,7 @@ The heavy parts are optional. What you need depends on which parts run on your o
 | Translating on this computer (Ollama with aya-expanse 8B) | 8 GB | 16 GB | 5.1 GB more |
 | Dubbing in each speaker's own voice | NVIDIA, 8 GB | 16 GB | 4.7 GB more |
 
-- **System:** Windows 10 or 11, 64-bit. macOS and Linux run the same code but have not been tested yet.
+- **System:** Windows 10 or 11, 64-bit. macOS runs the same code: its tests pass on an Apple M5 Ultra (macOS 27), with subtitles and translation by an AI you connect; listening on the Mac itself still runs on the processor. Linux has not been tested yet.
 - **Internet:** for the downloads and for the AI you connect. With listening and translating on
   this computer, jobs run offline once everything is downloaded.
 - **Without an NVIDIA card** everything still works on the processor, only much slower; dubbing in
@@ -170,7 +170,12 @@ what you need, including ffmpeg (on Windows it is downloaded and checked against
 SHA-256). Without a usable graphics card everything still works on the processor, only slower.
 
 **macOS and Linux** follow the same steps with `.venv/bin/...`, plus `brew install ffmpeg` or
-`sudo apt install ffmpeg`. These platforms have not been tested yet.
+`sudo apt install ffmpeg`. On a Mac, keep the tarjim folder outside Desktop, Documents and
+Downloads (in your home folder, for example): macOS stops a program that starts with the computer
+from reading those folders until you allow it, and tarjim would wait there without a word. The
+first finished video asks once to save into Downloads. A key you keep in your shell (`export
+VERTEX_API_KEY=...`) is not seen by tarjim when it starts with the computer; paste it on tarjim's
+page instead. Linux has not been tested yet.
 
 ### Browser extension
 
