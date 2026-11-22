@@ -3,7 +3,8 @@
 Run by the owner's scheduled task (see scripts/windows/library-report.cmd); nothing here runs for
 people who use tarjim. It reads only public release data and the versions installed here:
 known vulnerabilities in the tested Python libraries, how many of them have newer releases,
-yt-dlp, Node.js, ffmpeg, tarjim's Python, the subscription programs, and the last GitHub check.
+yt-dlp, Node.js, ffmpeg, tarjim's Python, the subscription programs, the last GitHub check, and
+how many take tarjim from GitHub (github_numbers.py).
     python -P scripts/library_report.py            send it
     python -P scripts/library_report.py --print    show it here instead
 """
@@ -19,6 +20,7 @@ import requests
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from scripts import github_numbers  # noqa: E402
 from tarjim.config import setting  # noqa: E402
 from tarjim.pins import python as target_python  # noqa: E402
 
@@ -152,7 +154,7 @@ def compose() -> str:
             *section("مكتبات لها نسخة أحدث (تنحدث مع الإصدار الجاي بعد الاختبار)", behind),
             *section("برامج الاشتراكات", apps)]
     status = [node(), ffmpeg(), python(), checks()]
-    return "\n".join([*head, *verdict, *body, *status])
+    return "\n".join([*head, *verdict, *body, *github_numbers.section(), *status])
 
 
 def send(text: str) -> None:
