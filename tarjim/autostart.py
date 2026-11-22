@@ -119,12 +119,26 @@ def refresh() -> None:
             write(wanted)
 
 
+def mac_path() -> str:
+    """launchd gives a program only /usr/bin:/bin:/usr/sbin:/sbin: the places uv, the subscription
+    programs and ffmpeg are put by their own installers come first (2026-11-20)."""
+    home = Path.home()
+    return ":".join([str(home / ".local" / "bin"), str(HOME / "tools" / "ffmpeg" / "bin"),
+                     "/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin", "/usr/sbin",
+                     "/sbin"])
+
+
 def mac_agent(python: str) -> str:
+    log = escape(str(HOME / "server.log"))
     return ('<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0"><dict>'
             "<key>Label</key><string>com.tarjim.server</string>"
             f"<key>ProgramArguments</key><array><string>{escape(python)}</string>"
             "<string>-P</string><string>-m</string>"
-            "<string>tarjim.server</string></array><key>RunAtLoad</key><true/></dict></plist>\n")
+            "<string>tarjim.server</string></array><key>RunAtLoad</key><true/>"
+            "<key>EnvironmentVariables</key><dict><key>PATH</key>"
+            f"<string>{escape(mac_path())}</string></dict>"
+            f"<key>StandardOutPath</key><string>{log}</string>"
+            f"<key>StandardErrorPath</key><string>{log}</string></dict></plist>\n")
 
 
 def linux_entry(python: str) -> str:

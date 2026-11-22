@@ -21,6 +21,9 @@ LATE_BY = 1.5
 
 class Late(BaseHTTPRequestHandler):
     def answer(self) -> None:
+        # The body read first, as the engine does: a server that closes with it unread sends a
+        # reset, and on macOS the next call then failed now and then as "not running".
+        self.rfile.read(int(self.headers.get("Content-Length") or 0))
         time.sleep(LATE_BY)
         self.send_response(200)
         self.send_header("Content-Type", "application/json")

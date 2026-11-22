@@ -18,7 +18,10 @@ from tarjim.render.mark import Mark
 real_tools = pytest.mark.skipif(not (shutil.which("ffmpeg") and shutil.which("ffprobe")),
                                 reason="needs ffmpeg and ffprobe")
 PICTURE = ["-f", "lavfi", "-i", "testsrc=size=64x36:rate=10:duration=3"]
-BEEP = ["-f", "lavfi", "-i", "sine=frequency=1000:duration=1"]
+# Loud enough to be told from silence by any encoder: lavfi's sine is 1/8 of full scale, and
+# ffmpeg 9.0's AAC overshot it to 0.15 while 9.1's keeps it at 0.13, under 0.1 once made stereo
+# (GitHub's Windows machines moved to 9.1 on 2026-11-22 and this test failed there).
+BEEP = ["-f", "lavfi", "-i", "sine=frequency=1000:duration=1,volume=4"]
 
 
 def make(*args: str) -> None:

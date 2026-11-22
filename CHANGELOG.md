@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.24 (2026-11-22)
+
+- **One line installs tarjim on a Mac or on Linux.** Paste
+  `curl -fsSL https://github.com/willynilly0085-creator/tarjim/releases/latest/download/install.sh | bash`
+  in Terminal: it does what the Windows file does, gets ffmpeg too when the computer has none
+  (without asking for a password), starts tarjim and opens its page.
+- **Windows has its own download:** `tarjim-windows.zip` on the release page, the same folder with
+  `install.cmd` that the green Code button gave. Every release now carries it and `install.sh`,
+  and GitHub counts how many times each is downloaded.
+- **On a Mac, tarjim started with the computer finds its programs and writes its log.** It used
+  to get only the system's own folders, so the subscription programs, uv and ffmpeg in your home
+  folder were not found, and what it printed was lost.
+
 ## 1.1.23 (2026-11-22)
 
 - **A quiet request for a star on GitHub.** After five translations that finished, the add-on

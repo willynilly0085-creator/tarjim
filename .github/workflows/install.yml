@@ -1,0 +1,31 @@
+name: install
+
+# The one line a Mac or Linux user pastes (scripts/unix/install.sh), run as they run it on a
+# computer with nothing installed for tarjim: it must end with the engine answering. On Linux each
+# time the script changes, and on request; macOS runners are often not available for long, so
+# macOS runs on request only.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "scripts/unix/install.sh"
+      - ".github/workflows/install.yml"
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - run: TARJIM_QUIET=1 bash scripts/unix/install.sh
+      - run: curl -fsS http://127.0.0.1:17653/ping | grep -q '"tarjim"'
+      - run: |
+          "$HOME/.tarjim/tools/ffmpeg/bin/ffmpeg" -version | head -n 1 || ffmpeg -version | head -n 1
+  macos:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - run: TARJIM_QUIET=1 bash scripts/unix/install.sh
+      - run: curl -fsS http://127.0.0.1:17653/ping | grep -q '"tarjim"'

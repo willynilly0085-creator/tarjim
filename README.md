@@ -82,7 +82,8 @@ graphics-card build of PyTorch) takes about 4 GB of the disk figures above.
 
 You need nothing installed first: no Python, no AI tool, no terminal.
 
-1. On this page press **Code**, then **Download ZIP**, and unzip it.
+1. Download [tarjim-windows.zip](https://github.com/willynilly0085-creator/tarjim/releases/latest/download/tarjim-windows.zip)
+   (the latest release) and unzip it.
 2. Open the folder and double-click **install** (`install.cmd`). If Windows asks whether to run
    it, allow it (**Run**, or **More info** then **Run anyway**).
 3. Leave the window open until it says "Ready". tarjim's page then opens in your browser, and
@@ -123,6 +124,18 @@ folder and the shortcuts.
 
 Tested by running the file where uv was not installed: it installed uv and tarjim and started the
 engine. Windows 10 was not tested by us.
+
+## Install on macOS or Linux (one line)
+
+Open Terminal and paste:
+
+```bash
+curl -fsSL https://github.com/willynilly0085-creator/tarjim/releases/latest/download/install.sh | bash
+```
+
+It does what the Windows file does: it gets uv, installs tarjim with the library versions tested
+for its release, gets ffmpeg when the computer has none (no password is asked), starts tarjim in
+the background, makes it start with the computer and opens its page, where setup continues.
 
 ## Install with your AI (one step)
 

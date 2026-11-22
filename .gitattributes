@@ -1,3 +1,5 @@
 # Windows scripts keep Windows line endings in every checkout and in the ZIP that GitHub serves.
 *.cmd text eol=crlf
 *.ps1 text eol=crlf
+# Shell scripts keep Unix line endings everywhere: one \r and bash on a Mac or Linux stops.
+*.sh text eol=lf
