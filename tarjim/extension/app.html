@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="app.css">
   <link rel="stylesheet" href="brand.css">
   <link rel="stylesheet" href="controls.css">
+  <link rel="stylesheet" href="star.css">
 </head>
 <body>
   <header class="bar">
@@ -115,6 +116,20 @@
         <button class="primary" id="go" type="submit" data-i18n="translate"></button>
         <p class="notice" id="notice" role="status" aria-live="polite"></p>
       </form>
+
+      <section class="star" id="star" aria-labelledby="star-title" hidden>
+        <svg class="star-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.55 5.17 5.7.83-4.13 4.02.98 5.68L12 16.62 6.9 19.3l.98-5.68L3.75 9.6l5.7-.83z"/></svg>
+        <div class="star-body">
+          <h2 class="star-title" id="star-title" data-i18n="starTitle"></h2>
+          <p class="star-text" data-i18n="starText"></p>
+          <div class="star-actions">
+            <button class="star-yes" id="star-yes" type="button" data-i18n="starYes"></button>
+            <button class="star-other" id="star-later" type="button" data-i18n="starLater"></button>
+            <button class="star-other" id="star-no" type="button" data-i18n="starNo"></button>
+          </div>
+          <p class="star-said" id="star-said" role="status" tabindex="-1"></p>
+        </div>
+      </section>
 
       <section class="recent" aria-labelledby="recent-title">
         <h2 class="section-title" id="recent-title" tabindex="-1" data-i18n="recent"></h2>

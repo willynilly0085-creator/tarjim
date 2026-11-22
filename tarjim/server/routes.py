@@ -27,7 +27,7 @@ GET_ROUTES = table([
     (r"^/phone$", "phone_state"), (r"^/update$", "update_state"),
     (r"^/voices$", "voices_state"), (r"^/prefs$", "prefs_state"),
     (r"^/prefs/fonts$", "prefs_fonts"), (r"^/text$", "text_choice"),
-    (r"^/browser$", "browser_choices")])
+    (r"^/browser$", "browser_choices"), (r"^/star$", "star_state")])
 POST_ROUTES = table([
     (r"^/jobs$", "create_json"), (r"^/jobs/check$", "check_order"),
     (r"^/links/qualities$", "link_qualities"),
@@ -53,7 +53,7 @@ POST_ROUTES = table([
     (r"^/prefs$", "prefs_save"), (r"^/prefs/reset$", "prefs_reset"),
     (r"^/prefs/preset$", "prefs_preset"), (r"^/prefs/preview$", "prefs_preview"),
     (r"^/text$", "translate_text"), (r"^/text/use$", "use_for_text"),
-    (r"^/browser$", "keep_browser_choices")])
+    (r"^/browser$", "keep_browser_choices"), (r"^/star$", "star_answer")])
 OPEN = [re.compile(p) for p in (r"^/$", r"^/web/", r"^/ping$", r"^/languages$", r"^/pair$",
                                   rf"^/pair/{PAIR}$", r"^/ui-language$")]
 

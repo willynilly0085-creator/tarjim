@@ -11,7 +11,8 @@ from tarjim.server.routes import GET_ROUTES, POST_ROUTES
 SECRET_WORDS = ("key", "token", "password", "secret")
 # What only the person does: type a key or a bot token, and answer an extension asking to pair.
 HUMAN_ONLY = {"save_key", "phone_connect", "phone_forget", "ask_pair", "decide_pair", "pair_state",
-              "list_pairs", "phone_large"}
+              "list_pairs", "phone_large",
+              "star_state", "star_answer"}  # a star on GitHub is the person's own press
 # Routes that serve the page itself or act on the person's screen, not settings.
 NOT_SETTINGS = {"ping", "home", "asset", "legacy", "upload", "create_local", "send_output",
                 "system", "ui_language", "local_models", "scan_part", "reveal", "play",

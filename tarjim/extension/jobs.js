@@ -1,4 +1,5 @@
 import { api, failureText, modeLabel, post, sinceText, stageLabel, stepsFor, t } from "./shared.js";
+import { noticeJobs } from "./star.js";
 import { showNotes, showPost } from "./summary.js";
 
 const rows = new Map();
@@ -175,7 +176,9 @@ export function renderJobs(jobs, languages, refresh) {
 export function watchJobs(languages) {
   const refresh = async () => {
     try {
-      renderJobs(await api("/jobs"), languages, refresh);
+      const jobs = await api("/jobs");
+      renderJobs(jobs, languages, refresh);
+      noticeJobs(jobs);
     } catch {
       /* the connection state is shown by the header */
     }

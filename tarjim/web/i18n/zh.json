@@ -774,5 +774,13 @@
   "textEngineAuto": "自动（你已连接的最快的）",
   "textEngineHint": "你在浏览器中选中的文字有自己的翻译服务和模型，与视频分开。“自动”会使用你已连接的最快的一个。",
   "textEngineSaved": "已保存。下次选中的文字将使用它。",
-  "err_parts": "tarjim 需要的一个组件还不在这台电脑上。打开 tarjim 的页面，在设置中下载它。"
+  "err_parts": "tarjim 需要的一个组件还不在这台电脑上。打开 tarjim 的页面，在设置中下载它。",
+  "starTitle": "tarjim 对你有帮助吗？",
+  "starText": "tarjim 免费且开源。在 GitHub 上点个星标，能帮助更多人找到它。",
+  "starYes": "给我们点个星标",
+  "starLater": "以后提醒我",
+  "starNo": "不用了，谢谢",
+  "starWorking": "请稍候…",
+  "starThanks": "星标已点亮。谢谢你，这对我们很重要。",
+  "starOpened": "已在 GitHub 打开 tarjim：点页面上方的 Star 即可。谢谢你。"
 }

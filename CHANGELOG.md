@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.1.23 (2026-11-22)
+
+- **A quiet request for a star on GitHub.** After five translations that finished, the add-on
+  and tarjim's page show a small note between Translate and your recent jobs, asking for a star
+  on GitHub. It offers three choices: give a star, remind me later (it comes back after two
+  weeks), or no thanks (it never comes back). A star is given only when you press the button:
+  if GitHub's own command-line tool (`gh`) is installed and signed in on your computer, tarjim
+  stars with it and says thank you; otherwise it opens tarjim's page on GitHub for you to press
+  Star there. The note never shows while a job is running. Your answer is kept on your computer
+  only, nothing is sent anywhere but GitHub, and nothing is tracked. The number five is set in
+  one place (`tarjim/star.py`), and so is the two-week wait.
+
+There is no 1.1.22: Mozilla already held a Firefox add-on signed under that number without
+the change above.
+
 ## 1.1.21 (2026-11-20)
 
 - **A part tarjim needs that is not on the computer is named as such.** When a model tarjim

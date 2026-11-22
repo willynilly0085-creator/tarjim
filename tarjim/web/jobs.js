@@ -3,6 +3,7 @@ import { t } from "./i18n.js";
 import { showNotes, stageLabel } from "./notes.js";
 import { showPost } from "./post.js";
 import { problem } from "./problems.js";
+import { noticeJobs } from "./star.js";
 
 const STAGES = ["downloading", "hearing", "timing", "translating", "writing", "burning", "dubbing"];
 const ACTION = { gone: "actionGone", job: "actionStale", open: "actionOpen" };
@@ -173,6 +174,7 @@ export function watchJobs(languages) {
     const jobs = await api("/jobs").catch((error) => { failed = error; return null; });
     reachable(failed);
     if (!jobs) return;
+    noticeJobs(jobs);
     $("empty").hidden = jobs.length > 0;
     const list = $("jobs");
     const ordered = jobs.map((job) => {

@@ -1,9 +1,11 @@
 """The extension asks for the translation of words selected on a page (tarjim/text.py), and the
 page picks the engine and model that make it (tarjim/text_engine.py). The extension also keeps its
-own choices here, for the next browser the person adds (tarjim/browser_choices.py)."""
+own choices here, for the next browser the person adds (tarjim/browser_choices.py). Both ask
+here whether to show the request for a star on GitHub, and send the person's answer
+(tarjim/star.py)."""
 from typing import Any
 
-from tarjim import browser_choices, text_engine
+from tarjim import browser_choices, star, text_engine
 from tarjim.languages import LANGUAGES
 from tarjim.server.reasons import classify
 from tarjim.text import MOST, Untranslated, translated
@@ -34,6 +36,15 @@ class TextRoutes:
 
     def keep_browser_choices(self, _query: Query) -> None:
         self.reply(200, browser_choices.remember(self.read_json()))
+
+    def star_state(self, _query: Query) -> None:
+        self.reply(200, star.view())
+
+    def star_answer(self, _query: Query) -> None:
+        choice = str(self.read_json().get("choice", ""))
+        if choice not in star.CHOICES:
+            return self.reply(400, {"error": "choice"})
+        self.reply(200, star.answer(choice))
 
     def text_choice(self, _query: Query) -> None:
         self.reply(200, text_engine.view())

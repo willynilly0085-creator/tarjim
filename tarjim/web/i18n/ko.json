@@ -774,5 +774,13 @@
   "textEngineAuto": "자동(연결한 것 중 가장 빠른 것)",
   "textEngineHint": "브라우저에서 선택한 텍스트는 동영상과 별도로 번역 AI와 모델을 정할 수 있어요. «자동»은 연결한 것 중 가장 빠른 것에 맡겨요.",
   "textEngineSaved": "저장했어요. 다음에 선택한 텍스트부터 사용해요.",
-  "err_parts": "tarjim에 필요한 구성 요소가 아직 이 컴퓨터에 없습니다. tarjim 페이지를 열고 설정에서 받으세요."
+  "err_parts": "tarjim에 필요한 구성 요소가 아직 이 컴퓨터에 없습니다. tarjim 페이지를 열고 설정에서 받으세요.",
+  "starTitle": "tarjim이 도움이 되고 있나요?",
+  "starText": "tarjim은 무료 오픈 소스입니다. GitHub에서 별을 눌러 주시면 다른 분들이 찾기 쉬워집니다.",
+  "starYes": "별로 응원하기",
+  "starLater": "나중에 알림",
+  "starNo": "괜찮아요",
+  "starWorking": "잠시만요…",
+  "starThanks": "별이 등록됐어요. 정말 감사합니다.",
+  "starOpened": "GitHub에서 tarjim을 열었어요. 페이지 위쪽의 Star를 눌러 주세요. 감사합니다."
 }

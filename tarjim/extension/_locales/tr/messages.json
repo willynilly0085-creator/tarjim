@@ -661,5 +661,29 @@
   },
   "errParts": {
     "message": "tarjim'in ihtiyaç duyduğu bir parça bu bilgisayarda henüz yok. tarjim sayfasını açıp kurulumdan indirin."
+  },
+  "starTitle": {
+    "message": "tarjim işine yarıyor mu?"
+  },
+  "starText": {
+    "message": "tarjim ücretsiz ve açık kaynak. GitHub'da bir yıldız, başkalarının da onu bulmasına yardım eder."
+  },
+  "starYes": {
+    "message": "Yıldız ver"
+  },
+  "starLater": {
+    "message": "Sonra hatırlat"
+  },
+  "starNo": {
+    "message": "Hayır, teşekkürler"
+  },
+  "starWorking": {
+    "message": "Bir saniye…"
+  },
+  "starThanks": {
+    "message": "Yıldızın ulaştı. Teşekkürler, bizim için çok değerli."
+  },
+  "starOpened": {
+    "message": "tarjim'i GitHub'da açtık: sayfanın üstündeki Star'a bas. Teşekkürler."
   }
 }

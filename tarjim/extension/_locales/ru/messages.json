@@ -661,5 +661,29 @@
   },
   "errParts": {
     "message": "На этом компьютере ещё нет части, нужной tarjim. Откройте страницу tarjim и скачайте её в настройке."
+  },
+  "starTitle": {
+    "message": "tarjim вам помогает?"
+  },
+  "starText": {
+    "message": "tarjim бесплатный и с открытым кодом. Звезда на GitHub помогает другим его найти."
+  },
+  "starYes": {
+    "message": "Поставить звезду"
+  },
+  "starLater": {
+    "message": "Напомнить позже"
+  },
+  "starNo": {
+    "message": "Нет, спасибо"
+  },
+  "starWorking": {
+    "message": "Минутку…"
+  },
+  "starThanks": {
+    "message": "Звезда поставлена. Спасибо, это много для нас значит."
+  },
+  "starOpened": {
+    "message": "Мы открыли tarjim на GitHub: нажмите Star вверху страницы. Спасибо."
   }
 }

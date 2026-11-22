@@ -661,5 +661,29 @@
   },
   "errParts": {
     "message": "tarjim को जिस हिस्से की ज़रूरत है, वह अभी इस कंप्यूटर पर नहीं है। tarjim का पेज खोलें और सेटअप से उसे डाउनलोड करें।"
+  },
+  "starTitle": {
+    "message": "क्या tarjim आपके काम आ रहा है?"
+  },
+  "starText": {
+    "message": "tarjim मुफ़्त और ओपन सोर्स है। GitHub पर एक स्टार दूसरों को इसे ढूँढने में मदद करता है।"
+  },
+  "starYes": {
+    "message": "हमें स्टार दें"
+  },
+  "starLater": {
+    "message": "बाद में याद दिलाएँ"
+  },
+  "starNo": {
+    "message": "नहीं, धन्यवाद"
+  },
+  "starWorking": {
+    "message": "एक पल…"
+  },
+  "starThanks": {
+    "message": "आपका स्टार मिल गया। धन्यवाद, यह हमारे लिए बहुत मायने रखता है।"
+  },
+  "starOpened": {
+    "message": "हमने GitHub पर tarjim खोल दिया है: पेज के ऊपर Star दबाएँ। धन्यवाद।"
   }
 }

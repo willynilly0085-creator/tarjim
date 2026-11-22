@@ -774,5 +774,13 @@
   "textEngineAuto": "Automatic (the fastest you have)",
   "textEngineHint": "The text you select in the browser has its own translator and model, apart from your videos. Automatic asks the fastest one you connected.",
   "textEngineSaved": "Saved. The next text you select uses it.",
-  "err_parts": "A part tarjim needs is not on this computer yet. Open tarjim's page and get it in setup."
+  "err_parts": "A part tarjim needs is not on this computer yet. Open tarjim's page and get it in setup.",
+  "starTitle": "Is tarjim helping you?",
+  "starText": "tarjim is free and open source. A star on GitHub helps others find it.",
+  "starYes": "Give us a star",
+  "starLater": "Remind me later",
+  "starNo": "No thanks",
+  "starWorking": "One moment…",
+  "starThanks": "Your star is in. Thank you, it means a lot.",
+  "starOpened": "We opened tarjim on GitHub: press Star at the top of the page. Thank you."
 }

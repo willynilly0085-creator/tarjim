@@ -661,5 +661,29 @@
   },
   "errParts": {
     "message": "tarjim에 필요한 구성 요소가 아직 이 컴퓨터에 없습니다. tarjim 페이지를 열고 설정에서 받으세요."
+  },
+  "starTitle": {
+    "message": "tarjim이 도움이 되고 있나요?"
+  },
+  "starText": {
+    "message": "tarjim은 무료 오픈 소스입니다. GitHub에서 별을 눌러 주시면 다른 분들이 찾기 쉬워집니다."
+  },
+  "starYes": {
+    "message": "별로 응원하기"
+  },
+  "starLater": {
+    "message": "나중에 알림"
+  },
+  "starNo": {
+    "message": "괜찮아요"
+  },
+  "starWorking": {
+    "message": "잠시만요…"
+  },
+  "starThanks": {
+    "message": "별이 등록됐어요. 정말 감사합니다."
+  },
+  "starOpened": {
+    "message": "GitHub에서 tarjim을 열었어요. 페이지 위쪽의 Star를 눌러 주세요. 감사합니다."
   }
 }

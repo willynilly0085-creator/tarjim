@@ -661,5 +661,29 @@
   },
   "errParts": {
     "message": "tarjim に必要な部品がまだこのコンピューターにありません。tarjim のページを開き、セットアップから入手してください。"
+  },
+  "starTitle": {
+    "message": "tarjim はお役に立っていますか？"
+  },
+  "starText": {
+    "message": "tarjim は無料のオープンソースです。GitHub でスターを付けると、ほかの人が見つけやすくなります。"
+  },
+  "starYes": {
+    "message": "スターで応援する"
+  },
+  "starLater": {
+    "message": "あとで通知"
+  },
+  "starNo": {
+    "message": "今はしない"
+  },
+  "starWorking": {
+    "message": "少々お待ちください…"
+  },
+  "starThanks": {
+    "message": "スターが付きました。ありがとうございます、とても励みになります。"
+  },
+  "starOpened": {
+    "message": "GitHub で tarjim を開きました。ページ上部の Star を押してください。ありがとうございます。"
   }
 }

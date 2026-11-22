@@ -774,5 +774,13 @@
   "textEngineAuto": "Otomatis (yang tercepat yang Anda punya)",
   "textEngineHint": "Teks yang Anda pilih di peramban punya penerjemah dan model sendiri, terpisah dari video Anda. «Otomatis» memakai yang tercepat yang Anda hubungkan.",
   "textEngineSaved": "Tersimpan. Teks berikutnya yang Anda pilih memakainya.",
-  "err_parts": "Bagian yang dibutuhkan tarjim belum ada di komputer ini. Buka halaman tarjim dan unduh di pengaturan."
+  "err_parts": "Bagian yang dibutuhkan tarjim belum ada di komputer ini. Buka halaman tarjim dan unduh di pengaturan.",
+  "starTitle": "Apakah tarjim membantu Anda?",
+  "starText": "tarjim gratis dan open source. Bintang di GitHub membantu orang lain menemukannya.",
+  "starYes": "Beri kami bintang",
+  "starLater": "Ingatkan nanti",
+  "starNo": "Tidak, terima kasih",
+  "starWorking": "Sebentar…",
+  "starThanks": "Bintang Anda sudah masuk. Terima kasih, ini sangat berarti.",
+  "starOpened": "Kami membuka tarjim di GitHub: tekan Star di bagian atas halaman. Terima kasih."
 }

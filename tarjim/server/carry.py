@@ -10,6 +10,7 @@ its next step, changes nothing the person sees, and takes back what it wrote lat
 import threading
 from collections.abc import Callable
 
+from tarjim import star
 from tarjim.children import FAMILY, Family
 from tarjim.job import CHECKPOINT
 from tarjim.server.jobs import Stopped, Task, Worker, classify
@@ -95,5 +96,6 @@ def carry(task: Task, work: Worker, may_undo: MayUndo) -> None:
         cancel(task, run)
     elif run.ok:
         task.stage = "done"
+        star.counted()
     else:
         fail(task, run.error or RuntimeError("the job stopped unexpectedly"))

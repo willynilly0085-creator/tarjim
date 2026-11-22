@@ -661,5 +661,29 @@
   },
   "errParts": {
     "message": "Bagian yang dibutuhkan tarjim belum ada di komputer ini. Buka halaman tarjim dan unduh di pengaturan."
+  },
+  "starTitle": {
+    "message": "Apakah tarjim membantu Anda?"
+  },
+  "starText": {
+    "message": "tarjim gratis dan open source. Bintang di GitHub membantu orang lain menemukannya."
+  },
+  "starYes": {
+    "message": "Beri kami bintang"
+  },
+  "starLater": {
+    "message": "Ingatkan nanti"
+  },
+  "starNo": {
+    "message": "Tidak, terima kasih"
+  },
+  "starWorking": {
+    "message": "Sebentar…"
+  },
+  "starThanks": {
+    "message": "Bintang Anda sudah masuk. Terima kasih, ini sangat berarti."
+  },
+  "starOpened": {
+    "message": "Kami membuka tarjim di GitHub: tekan Star di bagian atas halaman. Terima kasih."
   }
 }

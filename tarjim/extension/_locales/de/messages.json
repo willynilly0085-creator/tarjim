@@ -661,5 +661,29 @@
   },
   "errParts": {
     "message": "Ein Teil, den tarjim braucht, fehlt noch auf diesem Computer. Öffne die Seite von tarjim und lade ihn in der Einrichtung herunter."
+  },
+  "starTitle": {
+    "message": "Hilft dir tarjim?"
+  },
+  "starText": {
+    "message": "tarjim ist kostenlos und Open Source. Ein Stern auf GitHub hilft anderen, es zu finden."
+  },
+  "starYes": {
+    "message": "Stern vergeben"
+  },
+  "starLater": {
+    "message": "Später erinnern"
+  },
+  "starNo": {
+    "message": "Nein danke"
+  },
+  "starWorking": {
+    "message": "Einen Moment…"
+  },
+  "starThanks": {
+    "message": "Dein Stern ist da. Danke, das bedeutet uns viel."
+  },
+  "starOpened": {
+    "message": "Wir haben tarjim auf GitHub geöffnet: Drück oben auf der Seite auf Star. Danke."
   }
 }

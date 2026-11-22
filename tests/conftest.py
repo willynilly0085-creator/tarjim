@@ -82,3 +82,14 @@ def prefs_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         monkeypatch.delenv(f"TARJIM_{name.upper()}", raising=False)
     monkeypatch.setattr(store, "SAID", set())
     return home
+
+
+@pytest.fixture(autouse=True)
+def own_star_file(monkeypatch: pytest.MonkeyPatch, tmp_path_factory: pytest.TempPathFactory) -> Any:
+    """No finished test job counts toward the person's own request for a star (tarjim/star.py)."""
+    from tarjim import star
+
+    kept = tmp_path_factory.mktemp("star") / star.FILE
+    monkeypatch.setattr(star, "path", lambda: kept)
+    monkeypatch.setattr(star, "star_with_gh", lambda: False)
+    return kept
