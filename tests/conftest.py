@@ -84,8 +84,23 @@ def prefs_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     return home
 
 
+@pytest.fixture(autouse=True, scope="session")
+def no_star_file_at_home(tmp_path_factory: pytest.TempPathFactory) -> Any:
+    """For the whole run, not one test: a job thread a test leaves running can finish after that
+    test, and on 2026-11-22 such late jobs counted 12 translations in the person's own
+    ~/.tarjim/star.json."""
+    from tarjim import star
+
+    with pytest.MonkeyPatch.context() as patch:
+        kept = tmp_path_factory.mktemp("star-run") / star.FILE
+        patch.setattr(star, "path", lambda: kept)
+        patch.setattr(star, "star_with_gh", lambda: False)
+        yield kept
+
+
 @pytest.fixture(autouse=True)
-def own_star_file(monkeypatch: pytest.MonkeyPatch, tmp_path_factory: pytest.TempPathFactory) -> Any:
+def own_star_file(no_star_file_at_home: Path, monkeypatch: pytest.MonkeyPatch,
+                  tmp_path_factory: pytest.TempPathFactory) -> Any:
     """No finished test job counts toward the person's own request for a star (tarjim/star.py)."""
     from tarjim import star
 
