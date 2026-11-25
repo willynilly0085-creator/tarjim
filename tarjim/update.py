@@ -1,10 +1,13 @@
 """Know when a newer tarjim has been released, and replace this one with it.
 
 Once a day the engine asks GitHub for the number of the latest release: one request that carries
-nothing about the person or their videos. With automatic updates on (the person's choice), a newer
-release is installed when no job is running; otherwise the page offers a button. The copy uv
-installed is replaced by the installer; a copy run from source (a git clone with uv beside it) is
-moved to the release's tag by source_updater.py, which also brings its libraries along. Either way
+nothing about the person or their videos. When a person looks (tarjim's page opens, or their
+assistant asks), it asks again if the last answer is over ten minutes old: a release made since
+the morning stayed unseen until the next day (2026-11-25, 1.1.29 hidden behind 1.1.24 for hours).
+With automatic updates on (the person's choice), a newer release is installed when no job is
+running; otherwise the page offers a button. The copy uv installed is replaced by the installer;
+a copy run from source (a git clone with uv beside it) is moved to the release's tag by
+source_updater.py, which also brings its libraries along. Either way
 only what the owner signed is taken (signed_release.py): the installer gets the release's zip once
 its signature is checked, and a clone the commit the release was signed for.
 """
@@ -22,6 +25,7 @@ from tarjim.release_pins import REPO
 
 RELEASES = os.environ.get("TARJIM_RELEASES", f"https://api.github.com/repos/{REPO}/releases/latest")
 CHECK_EVERY = 24 * 3600
+LOOKED_EVERY = 10 * 60  # someone is looking: the answer may be this old at most
 RETRY_FAILED_AFTER = 24 * 3600  # seconds before a failed update is tried again by itself
 TAG = re.compile(r"^v?(\d+)\.(\d+)\.(\d+)$")
 ASK_SECONDS = 15
@@ -49,10 +53,10 @@ def ask_latest() -> str:
     return tag if number(tag) else ""
 
 
-def latest(now: float | None = None) -> str:
-    """The latest known release, asking GitHub at most once a day."""
+def latest(now: float | None = None, every: float = CHECK_EVERY) -> str:
+    """The latest known release, asking GitHub when the last answer is `every` seconds old."""
     now = time.time() if now is None else now
-    if now - float(config.setting("update_checked") or 0) >= CHECK_EVERY:
+    if now - float(config.setting("update_checked") or 0) >= every:
         found = ask_latest()
         config.save("update_checked", str(now))
         if found:
@@ -109,8 +113,8 @@ def extension_version() -> str:
         return ""
 
 
-def view() -> dict[str, Any]:
-    found = latest()
+def view(looking: bool = False) -> dict[str, Any]:
+    found = latest(every=LOOKED_EVERY) if looking else latest()
     from tarjim import downloader, ffmpeg_update, known_issues, node_update, python_update
 
     return {"current": __version__, "latest": found.lstrip("v"), "available": newer(found),

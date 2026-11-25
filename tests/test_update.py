@@ -39,6 +39,19 @@ def test_github_is_asked_at_most_once_a_day_and_an_outage_keeps_the_last_answer(
     assert update.latest(now=1_000_000.0 + 50 * 3600) == "v1.4.0" and len(asked) == 3
 
 
+def test_someone_looking_gets_an_answer_at_most_ten_minutes_old(
+        home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """2026-11-25: 1.1.29 was out and the owner pressed update, but the engine had asked in the
+    morning and knew of 1.1.24 only, for the rest of the day."""
+    answers = iter(["v1.1.24", "v1.1.29"])
+    monkeypatch.setattr(update, "ask_latest", lambda: next(answers))
+    start = 1_000_000.0
+    assert update.latest(now=start) == "v1.1.24"
+    assert update.latest(now=start + 300, every=update.LOOKED_EVERY) == "v1.1.24"
+    assert update.latest(now=start + 3600) == "v1.1.24"  # the daily check: not asked
+    assert update.latest(now=start + 3600, every=update.LOOKED_EVERY) == "v1.1.29"
+
+
 def test_the_page_is_told_what_is_out_and_whether_this_copy_can_install_it(
         home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(update, "ask_latest", lambda: "v1.3.0")

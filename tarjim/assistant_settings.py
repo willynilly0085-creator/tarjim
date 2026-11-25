@@ -157,7 +157,7 @@ def phone_bot(language: str = "", result: str = "", dialect: str = "") -> Any:
 
 def update_tarjim(install: bool = False) -> Any:
     """Is a newer tarjim out? With install=True, install it now (only when no job is running)."""
-    return call("/update/apply", {}) if install else call("/update")
+    return call("/update/apply", {}) if install else call("/update?looking=1")
 
 
 def selected_text_translator(provider: str = "show", model: str = "",

@@ -24,7 +24,7 @@ async function apply(state, box) {
 }
 
 export async function showUpdate() {
-  const state = await api("/update").catch(() => null);
+  const state = await api("/update?looking=1").catch(() => null);
   const box = $("update-banner");
   box.hidden = !state?.available;
   if (box.hidden) return;
