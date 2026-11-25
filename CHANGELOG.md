@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.28 (2026-11-25)
+
+- **tarjim updates itself only with code signed on its maker's computer.** Each release now
+  carries its code with a signature made by a key that never leaves that computer, and tarjim
+  checks the signature before installing anything. A release changed on GitHub, or a tag moved to
+  other code, is refused: tarjim stays on the version it has and the update says why. This
+  update itself still arrives the old way; every one after it is checked.
+
 ## 1.1.27 (2026-11-25)
 
 - **The add-on's box no longer slides left and right.** At 125-150% zoom, or when the list of
