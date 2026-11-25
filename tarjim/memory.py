@@ -14,6 +14,7 @@ import sys
 import threading
 from collections.abc import Iterator
 from contextlib import contextmanager, suppress
+from typing import Any
 
 UNLOAD_SECONDS = 5
 WAIT_SECONDS = 0.25
@@ -42,8 +43,16 @@ def empty_card() -> None:
         return
     # A card whose state broke (2026-11-10, tarjim/card.py) fails here too: freeing goes on.
     with suppress(RuntimeError):
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
+        give_back(torch)
+
+
+def give_back(torch: Any) -> None:
+    """What PyTorch holds aside on the card goes back: Nvidia's, or an Apple chip's."""
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    metal = getattr(torch, "mps", None)
+    if metal is not None and torch.backends.mps.is_available():
+        metal.empty_cache()
 
 
 def trim_card() -> None:
@@ -54,8 +63,7 @@ def trim_card() -> None:
     if torch is None:
         return
     with suppress(RuntimeError):
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
+        give_back(torch)
 
 
 def release_listening() -> None:

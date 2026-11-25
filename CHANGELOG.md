@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.1.26 (2026-11-25)
+
+- **On a Mac with an Apple chip, tarjim uses the chip's graphics.** Timing is about 6 times
+  faster, listening on your computer about 4 times, and separating voices for dubbing about 7
+  times, with the same result as before: same words, same times.
+- **The next link downloads while the job before it is still working.** It used to wait until
+  that job finished. Pausing or cancelling a job that is waiting stops its download at once.
+- **On a Mac, each line stays with the speaker who said it.** The check that puts a line back
+  with its speaker when the listener mixed two people up never ran on a Mac. It runs now.
+- **Fewer "she" for a man.** A speaker whose voice could not be told from the sound used to be
+  left to the translator's guess. Now the translator goes by what the lines say, and otherwise
+  uses the usual form for someone not known (in Arabic, the masculine).
+- **GitHub Copilot gets no tools when it translates.** It could run commands while reading a
+  video's words; now it only answers. An older Copilot is asked to update instead.
+- **Safer setup and links:** the Mac and Linux installer checks the file it downloads before
+  using it, links that point inside your own network are refused, and the update's state shows
+  any library that is not at the version tested with the release.
+
 ## 1.1.25 (2026-11-25)
 
 - **Settings in one place, in clear groups.** tarjim's page had two settings screens: the tabs,

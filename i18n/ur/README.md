@@ -259,6 +259,7 @@ tarjim کے کوڈ میں ماڈل ویٹس شامل نہیں ہیں؛ آپ ان
 | مقامی ترجمہ `aya-expanse:8b` (اختیاری) | CC-BY-NC-4.0 | نہیں |
 | مقامی سماعت Qwen3-ASR-1.7B اور Qwen3-ForcedAligner | Apache-2.0 | ہاں |
 | ffmpeg (LGPL بلڈ) | LGPL-2.1 | ہاں |
+| macOS اور Linux پر ffmpeg (conda-forge بلڈ) | GPL-2.0-or-later | ہاں |
 
 سیٹ اپ صفحہ ہر ڈاؤن لوڈ کے ساتھ اس کا لائسنس دکھاتا ہے۔
 

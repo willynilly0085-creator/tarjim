@@ -40,6 +40,7 @@ def test_a_card_torch_cannot_use_is_reported_with_the_fix(monkeypatch: pytest.Mo
     import torch
 
     monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
+    monkeypatch.setattr(torch.backends.mps, "is_available", lambda: False)  # not on a Mac
     monkeypatch.setattr(system, "nvidia_card", lambda: {"name": "RTX", "memory_gb": 16.0})
     system.graphics.cache_clear()
     try:
@@ -66,6 +67,7 @@ def test_models_fall_back_to_the_processor_without_a_usable_card(
     from tarjim.device import best_device, precision
 
     monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
+    monkeypatch.setattr(torch.backends.mps, "is_available", lambda: False)  # no Apple chip either
     assert best_device() == "cpu"
     assert precision("cpu", torch.float16) is torch.float32
     assert precision("cuda:0", torch.float16) is torch.float16

@@ -9,7 +9,7 @@ from typing import Any
 from tarjim.config import save, setting
 from tarjim.engines import own_node, programs
 from tarjim.engines.bounded import bounded
-from tarjim.engines.catalog import BY_ID, SUBSCRIPTION, of_method
+from tarjim.engines.catalog import SUBSCRIPTION, of_method
 from tarjim.engines.reply_check import Reason, failed, program_reason
 from tarjim.engines.web import EngineError, TimedOut, parse_json, unwrap, wrap
 
@@ -153,35 +153,6 @@ class CodexAsker:
             return done, reply.read_text(encoding="utf-8") if reply.exists() else ""
 
 
-class PromptAsker:
-    """Subscriptions whose program takes the prompt as an argument and answers in text."""
-
-    hears = False
-
-    def __init__(self, provider: str) -> None:
-        self.provider = BY_ID[provider]
-
-    def command(self, prompt: str) -> list[str]:
-        model = setting(self.provider.model_name)
-        chosen = [f"--model={model}"] if model else []
-        quiet = ["-s"] if self.provider.id == "copilot" else []
-        return [*launcher(self.provider.program), "-p", prompt, *quiet, *chosen]
-
-    def ask(self, prompt: str, _audio: bytes | None, schema: dict[str, Any]) -> Any:
-        shape = json.dumps(wrap(schema), ensure_ascii=False)
-        full = f"{prompt}\n\nReply with only one JSON object matching this schema: {shape}"
-        if len(full) > LONGEST_ARGUMENT:
-            raise EngineError(self.provider.id, 0, "request too long for this program")
-        with tempfile.TemporaryDirectory() as folder:
-            done = run(self.command(full), "", folder)
-        text = done.stdout.strip()
-        start, end = text.find("{"), text.rfind("}")
-        if done.returncode != 0 or start < 0:
-            raise failed(self.provider.id, setting(self.provider.model_name), "no answer",
-                         program_reason(done.returncode, done.stderr or text))
-        return unwrap(parse_json(text[start:end + 1]))
-
-
 def subscription_asker(provider: str) -> Any:
     if provider == "claude":
         return ClaudeAsker()
@@ -193,4 +164,8 @@ def subscription_asker(provider: str) -> Any:
         from tarjim.engines.antigravity import AntigravityAsker
 
         return AntigravityAsker()
-    return CodexAsker() if provider == "codex" else PromptAsker(provider)
+    if provider == "copilot":
+        from tarjim.engines.copilot import CopilotAsker
+
+        return CopilotAsker()
+    return CodexAsker()

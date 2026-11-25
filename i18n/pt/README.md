@@ -270,6 +270,7 @@ deles **não são licenciados para uso comercial**:
 | Tradução local `aya-expanse:8b` (opcional) | CC-BY-NC-4.0 | Não |
 | Escuta local Qwen3-ASR-1.7B e Qwen3-ForcedAligner | Apache-2.0 | Sim |
 | ffmpeg (build LGPL) | LGPL-2.1 | Sim |
+| ffmpeg no macOS e Linux (build conda-forge) | GPL-2.0-or-later | Sim |
 
 A página de configuração mostra cada licença ao lado do respectivo download.
 

@@ -53,3 +53,24 @@ def candidates(message: dict[str, Any]) -> list[str]:
 
 def first_link(message: dict[str, Any]) -> str:
     return next((url for url in candidates(message) if public(url)), "")
+
+
+def inside(url: str) -> bool:
+    """Whether a link points into this computer or its network, as far as can be told: a local
+    name, a private address, or a name that resolves to one. A name that does not resolve now is
+    not called inside: the download then says why it failed, and a moment without DNS does not
+    refuse every link."""
+    try:
+        host = (urlsplit(url).hostname or "").rstrip(".").lower()
+    except ValueError:
+        return True
+    if not host or host == "localhost" or host.endswith(LOCAL_NAMES):
+        return True
+    return any(not outside(address) for address in addresses(host))
+
+
+def linkable(url: str) -> bool:
+    """A link the local server may download (server/app.py, 2026-11-25): http(s), and not inside.
+    The page and the extension filtered private addresses already; a request from anywhere else
+    with the token (the chat tools, steered by a stranger's text) was taken as it came."""
+    return url.lower().startswith(("http://", "https://")) and not inside(url)

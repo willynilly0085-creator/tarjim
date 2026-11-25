@@ -163,7 +163,9 @@ def test_the_page_asks_the_engine_for_a_links_qualities(
 @pytest.mark.parametrize(("body", "code", "error"), [
     ({"url": "file:///etc/passwd"}, 400, "bad url"),
     ({"url": "https://www.youtube.com/playlist?list=PLx"}, 422, "list"),
-    ({"url": "http://127.0.0.1:9/nothing.mp4"}, 422, "download"),
+    ({"url": "http://127.0.0.1:9/nothing.mp4"}, 400, "bad url"),  # inside: never looked at
+    ({"url": "https://192.168.1.7/a.mp4"}, 400, "bad url"),
+    ({"url": "http://nas.local/a.mp4"}, 400, "bad url"),
 ])
 def test_a_link_without_qualities_says_why(
         monkeypatch: pytest.MonkeyPatch, body: dict[str, str], code: int, error: str) -> None:

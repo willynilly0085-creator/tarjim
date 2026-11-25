@@ -6,7 +6,8 @@ the link without a quality and tarjim takes 1080p or the nearest below it.
 """
 from typing import Any
 
-from tarjim.fetch import is_url, look
+from tarjim.fetch import look
+from tarjim.phone.links import linkable
 from tarjim.server.jobs import classify
 
 Query = dict[str, list[str]]
@@ -21,7 +22,7 @@ class QualityRoutes:
 
     def link_qualities(self, _query: Query) -> None:
         url = str(self.read_json().get("url", "")).strip()
-        if not is_url(url):
+        if not linkable(url):  # never a look into this computer's network
             return self.reply(400, {"error": "bad url"})
         try:
             found = look(url)

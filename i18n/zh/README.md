@@ -182,6 +182,7 @@ tarjim 的代码不包含模型权重；模型需从其所有者处下载。其�
 | 本地翻译 `aya-expanse:8b`（可选） | CC-BY-NC-4.0 | 否 |
 | 本地聆听 Qwen3-ASR-1.7B 和 Qwen3-ForcedAligner | Apache-2.0 | 是 |
 | ffmpeg（LGPL 构建） | LGPL-2.1 | 是 |
+| macOS 和 Linux 上的 ffmpeg（conda-forge 构建） | GPL-2.0-or-later | 是 |
 
 设置页面会在每个下载项旁边显示其许可证。
 

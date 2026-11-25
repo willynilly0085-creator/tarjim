@@ -267,6 +267,7 @@ kullanım için lisanslı değildir**:
 | Yerel çeviri `aya-expanse:8b` (isteğe bağlı) | CC-BY-NC-4.0 | Hayır |
 | Yerel dinleme Qwen3-ASR-1.7B ve Qwen3-ForcedAligner | Apache-2.0 | Evet |
 | ffmpeg (LGPL derlemesi) | LGPL-2.1 | Evet |
+| macOS ve Linux'ta ffmpeg (conda-forge derlemesi) | GPL-2.0-or-later | Evet |
 
 Kurulum sayfası her lisansı ilgili indirmenin yanında gösterir.
 

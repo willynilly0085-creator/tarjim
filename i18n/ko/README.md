@@ -182,6 +182,7 @@ tarjim의 코드에는 모델 가중치가 포함되어 있지 않으며, 모델
 | 로컬 번역 `aya-expanse:8b`(선택) | CC-BY-NC-4.0 | 불가 |
 | 로컬 음성 인식 Qwen3-ASR-1.7B 및 Qwen3-ForcedAligner | Apache-2.0 | 가능 |
 | ffmpeg(LGPL 빌드) | LGPL-2.1 | 가능 |
+| macOS·Linux의 ffmpeg(conda-forge 빌드) | GPL-2.0-or-later | 가능 |
 
 설정 페이지는 각 다운로드 항목 옆에 해당 라이선스를 표시합니다.
 

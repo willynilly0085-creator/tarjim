@@ -80,14 +80,35 @@ install_engine() {
     return 1
 }
 
+# micromamba, which fetches ffmpeg, is one version known here, and its file is refused unless its
+# SHA-256 is the one published with that release (mamba-org/micromamba-releases, checked by hand
+# on 2026-11-25 for osx-arm64); "latest" was taken unchecked before.
+MICROMAMBA="2.10.0-0"
+micromamba_sum() {
+    case "$1" in
+        osx-arm64) echo c547639f5caf742236641c362746abb4a3505774753ecd08fe341643670c4c01 ;;
+        osx-64) echo 8421462a1ef1df9f7acd114f9e2a24c1332ce4f4e29f44465b4acb44e2755172 ;;
+        linux-64) echo 701f39c06f8e6a670a0e186c8479b9e5c0502a2f0cda6cef65d83bdd2875e8bd ;;
+        linux-aarch64) echo 3bb56786e21b9b24024f599fe9185b4a59dc3f9f59937a42311ee583adbbb23c ;;
+    esac
+}
+sum_of() { { shasum -a 256 "$1" 2>/dev/null || sha256sum "$1"; } | awk '{print $1}'; }
+
 # ffmpeg from conda-forge into tarjim's own folder, when the computer has none.
 get_ffmpeg() {
     command -v ffmpeg >/dev/null 2>&1 && command -v ffprobe >/dev/null 2>&1 && return 0
-    local system arch tools="$HOME_DIR/tools"
+    local system arch tools="$HOME_DIR/tools" got
     case "$(uname -s)" in Darwin) system=osx ;; Linux) system=linux ;; *) return 1 ;; esac
     case "$(uname -m)" in arm64|aarch64) arch=$([ "$system" = osx ] && echo arm64 || echo aarch64) ;; *) arch=64 ;; esac
-    mkdir -p "$tools/micromamba" && curl -fsSL "https://micro.mamba.pm/api/micromamba/$system-$arch/latest" \
-        | tar -xj -C "$tools/micromamba" bin/micromamba || return 1
+    got="$SCRATCH/micromamba"
+    curl -fsSL "https://github.com/mamba-org/micromamba-releases/releases/download/$MICROMAMBA/micromamba-$system-$arch" \
+        -o "$got" || return 1
+    if [ "$(sum_of "$got")" != "$(micromamba_sum "$system-$arch")" ]; then
+        say "micromamba did not match its published SHA-256; it was not used"
+        return 1
+    fi
+    mkdir -p "$tools/micromamba/bin" && mv "$got" "$tools/micromamba/bin/micromamba" \
+        && chmod +x "$tools/micromamba/bin/micromamba" || return 1
     "$tools/micromamba/bin/micromamba" create -q -y -r "$tools/mamba" -p "$tools/ffmpeg" -c conda-forge ffmpeg \
         >/dev/null || return 1
     FFMPEG="$tools/ffmpeg/bin/ffmpeg"

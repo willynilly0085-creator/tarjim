@@ -269,6 +269,7 @@ El código de tarjim no incluye los pesos de los modelos; los descargas de sus p
 | Traducción local `aya-expanse:8b` (opcional) | CC-BY-NC-4.0 | No |
 | Escucha local Qwen3-ASR-1.7B y Qwen3-ForcedAligner | Apache-2.0 | Sí |
 | ffmpeg (compilación LGPL) | LGPL-2.1 | Sí |
+| ffmpeg en macOS y Linux (compilación de conda-forge) | GPL-2.0-or-later | Sí |
 
 La página de configuración muestra cada licencia junto a su descarga.
 
