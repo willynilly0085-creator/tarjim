@@ -271,6 +271,7 @@ propriétaires. Certains **ne sont pas autorisés pour un usage commercial** :
 | Traduction locale `aya-expanse:8b` (facultatif) | CC-BY-NC-4.0 | Non |
 | Écoute locale Qwen3-ASR-1.7B et Qwen3-ForcedAligner | Apache-2.0 | Oui |
 | ffmpeg (version LGPL) | LGPL-2.1 | Oui |
+| ffmpeg sur macOS et Linux (version conda-forge) | GPL-2.0-or-later | Oui |
 
 La page de configuration affiche chaque licence à côté du téléchargement correspondant.
 

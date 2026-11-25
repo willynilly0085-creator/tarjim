@@ -10,6 +10,7 @@ from tarjim.fetch import is_url, resolve
 from tarjim.installer import module_command, wait_for_exit
 from tarjim.job import CHECKPOINT, PROGRESS, Job
 from tarjim.prefs.model import Prefs
+from tarjim.server.ahead import Ahead
 from tarjim.server.app import PORT, Handler, serve
 from tarjim.server.housekeeping import Undo
 from tarjim.server.jobs import DUBBING, Board, Order, Task
@@ -63,13 +64,14 @@ def job_for(task: Task, video: Path, downloads: Path) -> Job:
                cache_dir=HOME / "cache", relisten=order.relisten, prefs=prefs)
 
 
-def perform(task: Task, downloads: Path) -> None:
+def perform(task: Task, downloads: Path, ahead: Ahead | None = None) -> None:
     order = task.order
     CHECKPOINT.set(task.checkpoint)
     PROGRESS.set(lambda done, total: setattr(task, "moved", (done, total)))
     task.stage = "downloading" if is_url(order.source) else "hearing"
     task.undo.append(Undo(HOME / "sources", keep=lambda: task.video))
-    task.video = resolve(order.source, HOME / "sources", order.quality)
+    early = ahead.take(task) if ahead else None  # downloaded while the job before ran
+    task.video = early or resolve(order.source, HOME / "sources", order.quality)
     task.checkpoint()
     task.moved = (0, 0)
     job = job_for(task, task.video, downloads)
@@ -133,7 +135,9 @@ def run_alongside(port: int) -> Board:
     from tarjim.server.update_routes import watch
 
     # the person's own folder comes with each order since 2026-11-09 (prefs output.folder)
-    board = Board(lambda task: perform(task, DOWNLOADS), idle=release_models)
+    ahead = Ahead(HOME / "sources")
+    board = Board(lambda task: perform(task, DOWNLOADS, ahead), idle=release_models)
+    ahead.watch(board)
     keep(board)
     sweep([HOME / "uploads", HOME / "sources", HOME / "cache"])
     service.begin(board, HOME / "uploads")

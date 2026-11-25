@@ -4,6 +4,7 @@ import shutil
 import sys
 from functools import lru_cache
 from pathlib import Path
+from typing import Any
 
 from tarjim.config import HOME, setting
 
@@ -36,10 +37,27 @@ def graphics() -> dict[str, object] | None:
             props = torch.cuda.get_device_properties(0)
             return {"name": props.name, "memory_gb": round(props.total_memory / GIB, 1),
                     "usable": True}
+        if torch.backends.mps.is_available():
+            return apple_graphics(torch)
     except ImportError:
         pass
     card = nvidia_card()
     return {**card, "usable": False, "fix": gpu_fix()} if card else None
+
+
+def apple_graphics(torch: Any) -> dict[str, object]:
+    """An Apple chip's graphics (tarjim/device.py). Its memory is the computer's own, shared:
+    what macOS lets the graphics use is counted, not all of it, so an 8 GB Mac is not told that
+    the local models fit (about 5.3 GB of 8 there; 84 of 96 GB on an M5 Ultra)."""
+    import subprocess
+
+    try:
+        chip = subprocess.run(["sysctl", "-n", "machdep.cpu.brand_string"], capture_output=True,
+                              text=True, timeout=10, check=True).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        chip = ""
+    room = float(torch.mps.recommended_max_memory())
+    return {"name": f"{chip or 'Apple'} GPU", "memory_gb": round(room / GIB, 1), "usable": True}
 
 
 def gpu_fix() -> str:

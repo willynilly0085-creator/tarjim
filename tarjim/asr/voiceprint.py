@@ -69,7 +69,9 @@ def on_card(onnxruntime: Any) -> bool:
     """Whether to try the card: tarjim uses it now (tarjim/device.py) and onnxruntime can."""
     from tarjim.device import best_device
 
-    if NO_CARD or best_device() != "cuda" or CARD not in onnxruntime.get_available_providers():
+    # "cuda:0", never plain "cuda": until 2026-11-25 this asked for "cuda", and no card was used
+    nvidia = best_device().startswith("cuda")
+    if NO_CARD or not nvidia or CARD not in onnxruntime.get_available_providers():
         return False
     import torch  # noqa: F401  its CUDA libraries are the ones onnxruntime borrows
 

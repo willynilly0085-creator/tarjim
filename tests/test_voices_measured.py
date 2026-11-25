@@ -65,3 +65,11 @@ def test_the_summary_is_told_the_voices_and_never_to_judge_from_a_name() -> None
     asked = post.prompt("clip", language("ar"), ["أنا أندريا"], (("", "low"),))
     assert "the speaker: a man's voice" in asked and "from a name" in asked
     assert "a man's voice" not in post.prompt("clip", language("ar"), ["أنا أندريا"])
+
+
+def test_a_speaker_whose_voice_was_not_measured_gets_the_usual_form_not_a_guess() -> None:
+    from tarjim.asr.voices import told
+
+    arabic, other = told((("S1", "low"),), "ar"), told((("S1", "low"),), "any")
+    assert "صيغة المذكر العامة" in arabic and "لا تأنّث أحد بالتخمين" in arabic
+    assert "person of unknown gender" in other and "never a guess" in other

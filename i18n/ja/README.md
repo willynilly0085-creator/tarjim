@@ -182,6 +182,7 @@ tarjim のコードにはモデルの重みは含まれていません。モデ�
 | ローカル翻訳 `aya-expanse:8b`（任意） | CC-BY-NC-4.0 | 不可 |
 | ローカル聞き取り Qwen3-ASR-1.7B と Qwen3-ForcedAligner | Apache-2.0 | 可 |
 | ffmpeg（LGPL ビルド） | LGPL-2.1 | 可 |
+| macOS と Linux の ffmpeg（conda-forge ビルド） | GPL-2.0-or-later | 可 |
 
 セットアップページでは、各ダウンロードの横にそのライセンスが表示されます。
 

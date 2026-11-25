@@ -111,3 +111,54 @@ def test_grok_gets_turns_to_answer_after_a_refused_tool() -> None:
 
     turns = grok.PLAIN[grok.PLAIN.index("--max-turns") + 1]
     assert int(turns) >= 2 and grok.PLAIN[grok.PLAIN.index("--deny") + 1] == "MCPTool"
+
+
+def copilot_said(content: str) -> str:
+    events = [{"type": "session.start", "data": {}},
+              {"type": "assistant.message", "data": {"content": content}},
+              {"type": "result", "exitCode": 0}]
+    return "\n".join(json.dumps(event) for event in events)
+
+
+def copilot_command(monkeypatch: pytest.MonkeyPatch, stdout: str, stderr: str = "",
+                    code: int = 0) -> tuple[Any, list[list[str]]]:
+    from tarjim.engines import copilot
+
+    seen: list[list[str]] = []
+
+    def fake_run(command: list[str], _prompt: str, _folder: str) -> Any:
+        seen.append(command)
+        return subprocess.CompletedProcess(command, code, stdout, stderr)
+
+    monkeypatch.setattr(copilot, "launcher", lambda _name: ["copilot"])
+    monkeypatch.setattr(copilot, "run", fake_run)
+    monkeypatch.setattr(copilot, "setting", lambda _name: "")
+    return copilot.CopilotAsker(), seen
+
+
+def test_copilot_shows_the_model_no_tool_at_all(monkeypatch: pytest.MonkeyPatch) -> None:
+    reply = json.dumps({RESULT: [{"id": 1, "text": "مرحبا"}]})
+    asker, seen = copilot_command(monkeypatch, copilot_said(reply))
+    assert asker.ask(STRANGER, None, SCHEMA) == [{"id": 1, "text": "مرحبا"}]
+    command = seen[0]
+    assert "--available-tools=" in command  # the bare flag is ignored by Copilot 1.0.115
+    assert "--available-tools" not in command
+    denied = {value for flag, value in pairwise(command) if flag == "--deny-tool"}
+    assert {"shell", "write", "read", "url", "memory"} <= denied
+    assert {"--disable-builtin-mcps", "--no-custom-instructions"} <= set(command)
+
+
+def test_copilot_reads_the_last_whole_message_not_the_first_brace(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    reply = "Here it is: " + json.dumps({RESULT: [{"id": 2, "text": "{x}"}]})
+    asker, _seen = copilot_command(monkeypatch, "noise {\n" + copilot_said(reply))
+    assert asker.ask(STRANGER, None, SCHEMA) == [{"id": 2, "text": "{x}"}]
+
+
+def test_a_copilot_too_old_to_switch_its_tools_off_is_told_to_update(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    clap = "error: unexpected argument '--available-tools' found"
+    asker, seen = copilot_command(monkeypatch, "", clap, code=2)
+    with pytest.raises(EngineError, match="update it"):
+        asker.ask(STRANGER, None, SCHEMA)
+    assert len(seen) == 1

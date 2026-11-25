@@ -1,4 +1,5 @@
 """What tarjim can download or set up: each tool, where it comes from, its size and licence."""
+import sys
 from dataclasses import dataclass
 
 VOICE_REPO = "openbmb/VoxCPM2"
@@ -29,8 +30,12 @@ QWEN = License("Apache-2.0", "https://huggingface.co/Qwen/Qwen3-ASR-1.7B-hf", co
 APACHE = License("Apache-2.0", "https://huggingface.co/openbmb/VoxCPM2", commercial=True)
 AYA = License("CC-BY-NC-4.0", "https://ollama.com/library/aya-expanse", commercial=False)
 LGPL = License("LGPL-2.1", "https://ffmpeg.org/legal.html", commercial=True)
+# On macOS and Linux tarjim takes conda-forge's ffmpeg, a GPL build (it has x264, which the burn
+# uses there); running it binds no one, passing the folder on means offering its source.
+GPL = License("GPL-2.0-or-later", "https://ffmpeg.org/legal.html", commercial=True)
+FFMPEG = LGPL if sys.platform == "win32" else GPL
 TOOLS = [
-    Tool("ffmpeg", ("BtbN/FFmpeg-Builds",), 0.08, True, "ffmpeg", LGPL),
+    Tool("ffmpeg", ("BtbN/FFmpeg-Builds",), 0.08, True, "ffmpeg", FFMPEG),
     Tool("timing", ("MahmoudAshraf/mms-300m-1130-forced-aligner", VOICEPRINT_REPO), 1.23, True,
          "hub", MMS),
     Tool("accuracy", ("Qwen/Qwen3-ASR-1.7B-hf", "Qwen/Qwen3-ForcedAligner-0.6B-hf"), 5.9, False,

@@ -117,7 +117,14 @@ def view() -> dict[str, Any]:
             "failed": newer(found) and progress().get("state") == "failed",
             "extension": extension_version(), "downloader": downloader.view(),
             "node": node_update.view(), "ffmpeg": ffmpeg_update.view(),
-            "python": python_update.view(), **known_issues.view()}
+            "python": python_update.view(), "untested": untested(), **known_issues.view()}
+
+
+def untested() -> list[str]:
+    """Libraries at another version than the one tested with this release: what a computer that
+    could not take the tested versions installed instead (installer.py notes why in install.log),
+    said where the person and the assistant read the update's state, not only in that log."""
+    return [f"{name} {pins.installed(name)}" for name in pins.drift()]
 
 
 def archive(tag: str) -> str:

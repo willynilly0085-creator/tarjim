@@ -245,6 +245,7 @@ tarjim video.mp4 --no-burn       # .srt and .ass only
 | الترجمة المحلية `aya-expanse:8b` (اختياري) | CC-BY-NC-4.0 | لا |
 | السماع المحلي Qwen3-ASR-1.7B و Qwen3-ForcedAligner | Apache-2.0 | نعم |
 | ffmpeg (نسخة LGPL) | LGPL-2.1 | نعم |
+| ffmpeg على ماك ولينكس (نسخة conda-forge) | GPL-2.0-or-later | نعم |
 
 صفحة الإعداد تعرض رخصة كل أداة جنب تنزيلها.
 

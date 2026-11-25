@@ -7,7 +7,11 @@ summary made from them. The voice is measured here, on this computer, for every 
 pitch of what each speaker said, the same measure the dubbing voices are cast by.
 
 A pitch between the two bands says nothing and nothing is claimed for it; a high voice may be a
-child's, so it is given as such. No failure here fails a job: without it the lines are translated
+child's, so it is given as such. A language that marks gender still makes the translator choose
+for such a speaker, and told only not to assume, it chose: the owner (2026-11-25) saw the other
+person of a conversation spoken to as a woman now and then. Such a speaker now gets what the
+lines show, or the form the language uses for a person not known (in Arabic the masculine),
+never a guess. No failure here fails a job: without it the lines are translated
 as they were before.
 """
 import tempfile
@@ -106,10 +110,14 @@ PHRASES: dict[str, dict[str, str]] = {
     "ar": {"alone": "المتكلم", LOW: "صوت رجل", HIGH: "صوت امرأة (أو طفل)",
            "lead": "\n\nأصوات المتكلمين، مقاسة من صوت المقطع نفسه: {voices}. اعتمد عليها في "
                    "التذكير والتأنيث لما المتكلم يتكلم عن نفسه أو يخاطبه أحد، ولا تحكم على جنس "
-                   "أحد من اسمه أبداً. المتكلم اللي ما انذكر صوته هنا لا تفترض جنسه."},
+                   "أحد من اسمه أبداً. المتكلم اللي ما انذكر صوته هنا: اعتمد على اللي تبيّنه "
+                   "السطور نفسها، وإذا ما بيّنت شيء فاستعمل صيغة المذكر العامة زي ما تسوي "
+                   "العربية مع المجهول، ولا تأنّث أحد بالتخمين."},
     "any": {"alone": "the speaker", LOW: "a man's voice", HIGH: "a woman's voice (or a child's)",
             "lead": "\n\nThe speakers' voices, measured from the clip's own sound: {voices}. Use "
                     "them for grammatical gender when a speaker talks about themself or is "
-                    "spoken to, and never judge anyone's gender from a name. Assume no gender "
-                    "for a speaker whose voice is not listed here."},
+                    "spoken to, and never judge anyone's gender from a name. For a speaker whose "
+                    "voice is not listed here, go by what the lines themselves show; when they "
+                    "show nothing, use the form the language uses for a person of unknown gender "
+                    "(the masculine, where it marks gender), never a guess."},
 }

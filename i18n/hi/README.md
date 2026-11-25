@@ -260,6 +260,7 @@ tarjim के कोड में मॉडल वेट शामिल नह�
 | लोकल अनुवाद `aya-expanse:8b` (वैकल्पिक) | CC-BY-NC-4.0 | नहीं |
 | लोकल सुनना Qwen3-ASR-1.7B और Qwen3-ForcedAligner | Apache-2.0 | हाँ |
 | ffmpeg (LGPL बिल्ड) | LGPL-2.1 | हाँ |
+| macOS और Linux पर ffmpeg (conda-forge बिल्ड) | GPL-2.0-or-later | हाँ |
 
 सेटअप पेज हर डाउनलोड के आगे उसका लाइसेंस दिखाता है।
 

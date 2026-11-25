@@ -22,7 +22,7 @@ from tarjim.job import checkpoint
 
 Made = TypeVar("Made")
 CARD_ERRORS = {"OutOfMemoryError", "AcceleratorError"}  # torch's own, by name: no import here
-CARD_WORDS = re.compile(r"CUDA|cuDNN|device-side|unknown error", re.IGNORECASE)
+CARD_WORDS = re.compile(r"CUDA|cuDNN|device-side|unknown error|\bMPS\b", re.IGNORECASE)
 SHOWN = 160
 AGAIN = "{name}: the graphics card did not answer ({why}); models freed, trying it once more"
 PROCESSOR = ("{name}: the graphics card failed again ({why}); this step runs on the processor "
@@ -30,7 +30,7 @@ PROCESSOR = ("{name}: the graphics card failed again ({why}); this step runs on 
 
 
 def card_failure(error: BaseException) -> bool:
-    """Out of memory on the card, or a CUDA / cuDNN error; nothing else."""
+    """Out of memory on the card, or a CUDA / cuDNN / Metal (MPS) error; nothing else."""
     if not isinstance(error, RuntimeError):
         return False
     names = {kind.__name__ for kind in type(error).__mro__}

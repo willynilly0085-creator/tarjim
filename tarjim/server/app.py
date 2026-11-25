@@ -6,6 +6,7 @@ from typing import Any, ClassVar
 
 from tarjim import native_setup
 from tarjim.languages import LANGUAGES
+from tarjim.phone.links import linkable
 from tarjim.post import shown
 from tarjim.server.connections import ConnectionRoutes
 from tarjim.server.guard import (
@@ -133,7 +134,7 @@ class Handler(KeyRoutes, SetupRoutes, ConnectionRoutes, PageRoutes, QualityRoute
 
     def create(self, data: dict[str, Any]) -> None:
         source = str(data.get("url", "")).strip()
-        if not source.lower().startswith(("http://", "https://")):
+        if not linkable(source):  # http(s) only, never into this computer's network
             return self.reply(400, {"error": "bad url"})
         self.accept(order_from(source, data))
 

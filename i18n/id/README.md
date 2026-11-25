@@ -263,6 +263,7 @@ Kode tarjim tidak menyertakan bobot model; Anda mengunduhnya dari pemiliknya. Se
 | Terjemahan lokal `aya-expanse:8b` (opsional) | CC-BY-NC-4.0 | Tidak |
 | Pendengaran lokal Qwen3-ASR-1.7B dan Qwen3-ForcedAligner | Apache-2.0 | Ya |
 | ffmpeg (versi LGPL) | LGPL-2.1 | Ya |
+| ffmpeg di macOS dan Linux (versi conda-forge) | GPL-2.0-or-later | Ya |
 
 Halaman penyiapan menampilkan setiap lisensi di samping unduhannya.
 

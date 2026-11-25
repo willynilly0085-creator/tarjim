@@ -282,6 +282,7 @@ Einige davon sind **nicht für die kommerzielle Nutzung lizenziert**:
 | Lokale Übersetzung `aya-expanse:8b` (optional) | CC-BY-NC-4.0 | Nein |
 | Lokale Spracherkennung Qwen3-ASR-1.7B und Qwen3-ForcedAligner | Apache-2.0 | Ja |
 | ffmpeg (LGPL-Build) | LGPL-2.1 | Ja |
+| ffmpeg auf macOS und Linux (conda-forge-Build) | GPL-2.0-or-later | Ja |
 
 Die Einrichtungsseite zeigt jede Lizenz neben dem zugehörigen Download an.
 

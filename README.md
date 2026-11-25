@@ -313,6 +313,7 @@ are **not licensed for commercial use**:
 | Local translation `aya-expanse:8b` (optional) | CC-BY-NC-4.0 | No |
 | Local listening Qwen3-ASR-1.7B and Qwen3-ForcedAligner | Apache-2.0 | Yes |
 | ffmpeg (LGPL build) | LGPL-2.1 | Yes |
+| ffmpeg on macOS and Linux (conda-forge build) | GPL-2.0-or-later | Yes |
 
 The setup page shows each license next to its download.
 

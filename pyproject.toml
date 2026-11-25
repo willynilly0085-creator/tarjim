@@ -26,6 +26,11 @@ dependencies = [
     "telethon",
     "cryptg",
     "psutil",
+    # whose voice each line is (asr/voiceprint.py); elsewhere onnxruntime-gpu comes with the dub
+    # extra (catt-tashkeel), which has no macOS build, so a Mac never had it (2026-11-25). Its
+    # Mac builds are for Apple chips only (macOS 14 and later for the tested version; an older
+    # macOS installs the newest that fits, tarjim/installer.py)
+    "onnxruntime; sys_platform == 'darwin' and platform_machine == 'arm64'",
 ]
 
 [project.urls]
