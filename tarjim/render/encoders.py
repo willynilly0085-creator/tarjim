@@ -5,6 +5,11 @@ then OpenH264 and Windows' Media Foundation. tarjim's own ffmpeg is an LGPL buil
 so a computer with no NVIDIA card used to fail at the burn and at the phone copy; OpenH264 is
 in that build on every computer. An encoder the computer lacks fails at once and the next is
 tried.
+
+A Mac's own encoder (h264_videotoolbox) is left out on purpose (measured 2026-11-25, six real
+burns): under the burn's ceiling it spent two thirds of it and the letters' pixels lost 6 to 9
+dB against x264 at CRF 19; without the ceiling it matched x264 only at 1.5 to 3.6 times the
+size. At a set rate (the phone copy) it lost 3.5 to 7 dB on the letters, and was slower.
 """
 FALLBACK_KBPS = 4000
 # The quality aimed at, by the person's output.quality (2026-11-09): the card encoders' CQ and
