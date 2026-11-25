@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.29 (2026-11-25)
+
+- **A post X hides from people who are not signed in now says so.** X answers tarjim, which
+  downloads without an account, with an empty placeholder for such a post, and the download used
+  to fail as "check that the link works". tarjim now reads X's answer and says what X did, and
+  never a reason X did not give.
+- **Download such a post with your own X sign-in, if you choose to.** On the failed job, the
+  add-on shows "Download with my X sign-in". The first press asks your browser's permission to
+  read x.com's cookies; each press then hands only those to your own tarjim for that one download.
+  They are kept in memory only, never saved or logged, and sent to no one but X. The add-on's
+  settings let you stop it at any time.
+
 ## 1.1.28 (2026-11-25)
 
 - **tarjim updates itself only with code signed on its maker's computer.** Each release now
