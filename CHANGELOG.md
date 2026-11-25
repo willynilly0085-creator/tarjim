@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.25 (2026-11-25)
+
+- **Settings in one place, in clear groups.** tarjim's page had two settings screens: the tabs,
+  and a long page of engines, keys and tools you reached from a link inside "General". Both now
+  share one list at the side, in three groups: subtitles on the video, how it works, and tarjim
+  and your computer. Engines, keys, tools, voices, the add-on and the phone open one section at a
+  time and save exactly as before; "Save changes" shows only where it saves something.
+- **The subtitle look in titled parts:** text, background and outline, position and fade,
+  speakers, and the tarjim mark, each with its finer options folded under it. Timing and reading
+  is in reading, line duration and shot changes. Ready sets show on these two tabs only, the ones
+  they change; "Reset everything" moved up beside Back. No setting was removed.
+- **The add-on's settings under headings** (tarjim on your computer, selected text, advanced),
+  with a new button that opens all of tarjim's settings.
+
 ## 1.1.24 (2026-11-22)
 
 - **One line installs tarjim on a Mac or on Linux.** Paste
