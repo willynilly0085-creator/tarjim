@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="/web/phone.css">
   <link rel="stylesheet" href="/web/controls.css">
   <link rel="stylesheet" href="/web/prefs.css">
+  <link rel="stylesheet" href="/web/settings.css">
   <link rel="stylesheet" href="/web/star.css">
 </head>
 <body>
@@ -38,10 +39,14 @@
   <main id="assistant" class="assistant" hidden></main>
 
   <main id="wizard" hidden>
+    <div class="prefs-head setup-head" id="setup-head"></div>
     <div class="progress">
       <p class="meta" id="step-count"></p>
       <ol class="track" id="step-track" aria-hidden="true"></ol>
     </div>
+    <div class="setup-shell">
+    <div class="setup-side" id="setup-side"></div>
+    <div class="setup-body">
 
     <section class="step" data-step="language">
       <h1 data-t="langTitle"></h1>
@@ -151,6 +156,8 @@
       <button class="button-quiet" id="step-back" type="button" data-t="back"></button>
       <button class="primary" id="step-next" type="button" data-t="next"></button>
     </nav>
+    </div>
+    </div>
   </main>
 
   <main id="prefs" class="prefs" hidden></main>

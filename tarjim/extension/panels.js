@@ -146,6 +146,7 @@ export function wirePanels({ ready, back, leave }) {
   $("pair-auto").addEventListener("click", () => autoPair(ready));
   $("open-tarjim").addEventListener("click", showPage);
   $("open-setup").addEventListener("click", openSetup);
+  $("open-all-settings").addEventListener("click", () => openPage("#prefs"));
   $("open-keys-settings").addEventListener("click", () => openPage("#connect"));
   $("open-phone").addEventListener("click", () => openPage("#phone"));
   $("open-full-setup").addEventListener("click", openSetup);

@@ -97,7 +97,9 @@ export function makePresets(hooks) {
   const current = el("span", { className: "meta preset-mix" });
   const node = el("section", { className: "presets" },
     el("div", { className: "presets-head" }, el("h2", { className: "section-title", textContent: t("prefsPresets") }), current),
-    row, el("div", { className: "row presets-actions" }, button(t("prefsSaveAs"), saveAs), all),
-    naming, sure, own);
-  return { node, draw };
+    row, el("div", { className: "row presets-actions" }, button(t("prefsSaveAs"), saveAs)),
+    naming, own);
+  // Going back for everything covers every tab, so it sits in the page's head (2026-11-25).
+  const whole = el("div", { className: "reset-whole" }, all, sure);
+  return { node, draw, whole };
 }

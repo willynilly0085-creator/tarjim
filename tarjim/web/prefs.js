@@ -1,6 +1,8 @@
-// The settings page, #prefs (2026-11-09), apart from the setup: seven tabs of the engine's own
-// settings table, each saved on its own 400 ms after a change, refused inline with the engine's
-// Arabic reason, and greyed with the reason when it does nothing with the others as they are.
+// The settings page, #prefs (2026-11-09): seven tabs of the engine's own settings table, each
+// saved on its own 400 ms after a change, refused inline with the engine's Arabic reason, and
+// greyed with the reason when it does nothing with the others as they are. Since 2026-11-25 the
+// tabs sit in the grouped list both settings pages share (settings_nav.js), the subtitle tabs
+// in titled parts, and the ready sets only on the two tabs they change.
 import { $, api, post } from "./api.js";
 import { t } from "./i18n.js";
 import { button, el } from "./ui.js";
@@ -10,7 +12,8 @@ import { makePresets, resetGroups, resetKeys } from "./prefs_presets.js";
 import { makePreview } from "./prefs_preview.js";
 import { autosaver, failedWords, savedWords } from "./prefs_save.js";
 import { TABS } from "./prefs_words.js";
-import { tabList } from "./prefs_tabs.js";
+import { hasParts, parts } from "./prefs_parts.js";
+import { isSetup, markCurrent, navName, settingsNav } from "./settings_nav.js";
 
 const page = { state: null, language: "ar", tab: "look", fields: new Map(), local: {}, refused: {},
   fonts: [], languages: [], hooks: {} };
@@ -28,9 +31,10 @@ const saver = autosaver({
   failed: async (error) => { say(failedWords(error, t)); await reload().catch(() => {}); },
 });
 
-// Both are drawn again in the page's language whenever it changes (frame).
+// All three are drawn again in the page's language whenever it changes (frame).
 let preview = null;
 let presets = null;
+let nav = null;
 
 function change(key, value) {
   page.local[key] = value;
@@ -75,15 +79,24 @@ export async function reload() {
 
 const place = () => page.languages.find((l) => l.code === page.language)?.native || page.language;
 
-function fieldsOf(tab, tier) {
-  return page.state.specs.filter((spec) => tab.groups.includes(spec.group) && spec.tier === tier)
-    .map((spec) => {
-      const one = field(spec, page.local[spec.key], { change, reset: resetOne, fonts: page.fonts,
-        place: place(), language: page.language });
-      one.mark(markOf(spec.key));
-      page.fields.set(spec.key, one);
-      return one.node;
-    });
+function make(spec) {
+  const one = field(spec, page.local[spec.key], { change, reset: resetOne, fonts: page.fonts,
+    place: place(), language: page.language });
+  one.mark(markOf(spec.key));
+  page.fields.set(spec.key, one);
+  return one.node;
+}
+
+const specsOf = (tab) => page.state.specs.filter((spec) => tab.groups.includes(spec.group));
+
+// A tab in parts (prefs_parts.js), or one list with its finer settings in one fold.
+function fieldsOf(tab) {
+  const specs = specsOf(tab);
+  if (hasParts(tab.id)) return parts(tab.id, specs, make);
+  const advanced = specs.filter((spec) => spec.tier === "advanced").map(make);
+  const more = el("details", { className: "prefs-advanced", hidden: !advanced.length },
+    el("summary", { textContent: t("prefsAdvanced") }), el("div", { className: "pref-list" }, advanced));
+  return [el("div", { className: "pref-list" }, specs.filter((spec) => spec.tier === "basic").map(make)), more];
 }
 
 function languagePicker() {
@@ -102,36 +115,31 @@ function languagePicker() {
 
 function settingsPanel(tab) {
   page.fields.clear();
-  const local = page.state.specs.some((s) => tab.groups.includes(s.group) && s.per_language);
-  const advanced = fieldsOf(tab, "advanced");
-  const more = el("details", { className: "prefs-advanced", hidden: !advanced.length },
-    el("summary", { textContent: t("prefsAdvanced") }), el("div", { className: "pref-list" }, advanced));
+  const local = specsOf(tab).some((s) => s.per_language);
   const again = button(t("prefsResetTab"), () => goBack(() => resetGroups(tab.groups, page.language)),
     "text-link reset-tab");
-  const column = el("div", { className: "prefs-fields" }, local ? languagePicker() : "",
-    el("div", { className: "pref-list" }, fieldsOf(tab, "basic")), more, again);
+  const column = el("div", { className: "prefs-fields" }, tab.preview ? presets.node : "",
+    local ? languagePicker() : "", fieldsOf(tab), again);
   const body = el("div", { className: "prefs-body" }, column);
   if (tab.preview) body.prepend(preview.node);
   body.classList.toggle("with-preview", Boolean(tab.preview));
   return body;
 }
 
-async function showTab(id) {
+const panelTitle = (id) => el("h2", { className: "panel-heading", id: "prefs-panel-title", textContent: navName(id), tabIndex: -1 });
+
+// A setup section leaves this page for the setup's own (main.js); a tab is drawn here.
+async function showTab(id, byKey = false) {
+  if (isSetup(id)) return page.hooks.open(id, byKey);
   page.tab = id;
-  const tab = TABS.find((one) => one.id === id);
-  document.querySelectorAll(".prefs-tab").forEach((one) => {
-    one.setAttribute("aria-selected", String(one.dataset.tab === id));
-    one.tabIndex = one.dataset.tab === id ? 0 : -1;
-  });
-  $(`prefs-tab-${id}`)?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+  markCurrent(nav, id, byKey);
   const panel = $("prefs-panel");
-  panel.setAttribute("aria-labelledby", `prefs-tab-${id}`);
   if (id === "general") {
     page.fields.clear();
-    panel.replaceChildren(await generalTab({ ...page.hooks, say }));
+    panel.replaceChildren(panelTitle(id), await generalTab({ ...page.hooks, say }));
     return;
   }
-  panel.replaceChildren(settingsPanel(tab));
+  panel.replaceChildren(panelTitle(id), settingsPanel(TABS.find((one) => one.id === id)));
   preview.draw(page.local, page.language);
 }
 
@@ -144,18 +152,21 @@ function frame() {
   preview = makePreview({ real: (portrait) => post("/prefs/preview",
     { values: page.local, language: page.language, portrait }) });
   presets = makePresets({ state: () => page.state, reload: () => reload(), say });
+  nav = settingsNav(() => page.tab, showTab, "prefs");
   const back = button(t("back"), () => page.hooks.close?.(), "button-quiet prefs-back");
   const panel = el("section", { id: "prefs-panel", className: "prefs-panel" });
-  panel.setAttribute("role", "tabpanel");
+  panel.setAttribute("aria-labelledby", "prefs-panel-title");
   $("prefs").replaceChildren(
-    el("div", { className: "prefs-head" }, el("h1", { textContent: t("prefsTitle"), tabIndex: -1 }), back),
-    presets.node, tabList(showTab, () => page.tab), panel, el("div", { className: "prefs-foot" }, status));
+    el("div", { className: "prefs-head" }, el("h1", { textContent: t("prefsTitle"), tabIndex: -1 }), presets.whole, back),
+    el("div", { className: "settings-shell" }, nav, panel), el("div", { className: "prefs-foot" }, status));
 }
 
-// hooks: { close(), engines(setup), language(code) }; language: the target to start with.
-export async function openPrefs(hooks, language = "ar") {
+// hooks: { close(), open(section, byKey), language(code) }; language: the target to start with;
+// tab: the tab to open on, else the last one shown.
+export async function openPrefs(hooks, language = "ar", tab = page.tab) {
   page.hooks = { ...hooks, language: async (code) => { await hooks.language(code); followLanguage(code); } };
   page.language = language;
+  page.tab = tab;
   ["wizard", "assistant", "workspace"].forEach((id) => { $(id).hidden = true; });
   $("prefs").hidden = false;
   page.languages = await api("/languages").catch(() => []);

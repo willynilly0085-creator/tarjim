@@ -351,6 +351,12 @@
   "setupFull": {
     "message": "Adım adım tam kurulum"
   },
+  "settingsGroupLink": {
+    "message": "Bilgisayarındaki tarjim"
+  },
+  "settingsAll": {
+    "message": "Tüm tarjim ayarları"
+  },
   "advanced": {
     "message": "Gelişmiş"
   },

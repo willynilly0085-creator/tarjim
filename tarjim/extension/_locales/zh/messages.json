@@ -351,6 +351,12 @@
   "setupFull": {
     "message": "完整设置，逐步进行"
   },
+  "settingsGroupLink": {
+    "message": "你电脑上的 tarjim"
+  },
+  "settingsAll": {
+    "message": "tarjim 全部设置"
+  },
   "advanced": {
     "message": "高级"
   },

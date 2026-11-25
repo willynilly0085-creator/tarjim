@@ -351,6 +351,12 @@
   "setupFull": {
     "message": "Configuración completa, paso a paso"
   },
+  "settingsGroupLink": {
+    "message": "tarjim en tu equipo"
+  },
+  "settingsAll": {
+    "message": "Todos los ajustes de tarjim"
+  },
   "advanced": {
     "message": "Avanzado"
   },

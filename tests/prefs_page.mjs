@@ -37,7 +37,8 @@ globalThis.fetch = async (path, init = {}) => {
 
 await (await import(`${web}/i18n.js`)).load("ar");
 const { openPrefs } = await import(`${web}/prefs.js`);
-await openPrefs({ close() {}, engines() {}, language: async () => {} }, "ar");
+const opened = [];
+await openPrefs({ close() {}, open: (id) => opened.push(id), language: async () => {} }, "ar");
 const $ = (selector) => document.querySelector(selector);
 const posts = () => sent.filter(([method]) => method === "POST");
 const field = (key) => $(`.pref[data-key="${key}"]`);
@@ -130,5 +131,23 @@ async function resetElsewhere() {
   return { only, more, posts: posts() };
 }
 
-const SCENARIOS = { autosave, refusal, presets, reset, decimals, resetElsewhere };
+// The grouped list (2026-11-25): each tab shows every one of its settings, the subtitle tabs in
+// titled parts with the ready sets, the others without; a setup section leaves for the setup.
+async function layout() {
+  const tab = async (id) => {
+    $(`.prefs-tab[data-tab="${id}"]`).click();
+    await wait(50);
+    const panel = $("#prefs-panel");
+    return { keys: panel.querySelectorAll(".pref").map((n) => n.dataset.key),
+      parts: panel.querySelectorAll(".part-title").map((n) => n.textContent),
+      folds: panel.querySelectorAll(".only-fold").map((n) => n.querySelector("summary").textContent),
+      presets: Boolean(panel.querySelector(".presets")), heading: panel.querySelector("h2").textContent };
+  };
+  const shown = { look: await tab("look"), timing: await tab("timing"), listen: await tab("listen") };
+  $('.prefs-tab[data-tab="connect"]').click();
+  await wait(50);
+  return { shown, opened, groups: document.querySelectorAll(".nav-group-title").map((n) => n.textContent) };
+}
+
+const SCENARIOS = { autosave, refusal, presets, reset, decimals, resetElsewhere, layout };
 console.log(JSON.stringify(await SCENARIOS[scenario]()));

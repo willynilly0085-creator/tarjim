@@ -351,6 +351,12 @@
   "setupFull": {
     "message": "Penyiapan lengkap, langkah demi langkah"
   },
+  "settingsGroupLink": {
+    "message": "tarjim di komputermu"
+  },
+  "settingsAll": {
+    "message": "Semua pengaturan tarjim"
+  },
   "advanced": {
     "message": "Lanjutan"
   },

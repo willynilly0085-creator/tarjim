@@ -351,6 +351,12 @@
   "setupFull": {
     "message": "Полная настройка по шагам"
   },
+  "settingsGroupLink": {
+    "message": "tarjim на вашем компьютере"
+  },
+  "settingsAll": {
+    "message": "Все настройки tarjim"
+  },
   "advanced": {
     "message": "Дополнительно"
   },

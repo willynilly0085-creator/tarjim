@@ -351,6 +351,12 @@
   "setupFull": {
     "message": "단계별 전체 설정"
   },
+  "settingsGroupLink": {
+    "message": "내 컴퓨터의 tarjim"
+  },
+  "settingsAll": {
+    "message": "tarjim 전체 설정"
+  },
   "advanced": {
     "message": "고급"
   },

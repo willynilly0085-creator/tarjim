@@ -173,14 +173,23 @@
       <p class="notice" id="setup-note" role="status" aria-live="polite"></p>
     </section>
 
-    <section class="view panel" id="view-settings" hidden>
-      <h2 class="panel-title" data-i18n="settings"></h2>
-      <dl class="summary" id="connection-summary"></dl>
-      <button class="button-quiet wide" id="open-keys-settings" type="button" data-i18n="keysButton"></button>
-      <button class="button-quiet wide" id="open-phone" type="button" data-i18n="phoneLinkButton"></button>
-      <button class="primary wide" id="open-full-setup" type="button" data-i18n="setupFull"></button>
-      <fieldset class="field" id="text-mode">
-        <legend class="field-label" data-i18n="textModeLabel"></legend>
+    <section class="view panel settings-view" id="view-settings" hidden>
+      <div class="settings-head">
+        <h2 class="panel-title" data-i18n="settings"></h2>
+        <button class="button-quiet" id="close-settings" type="button" data-i18n="back"></button>
+      </div>
+      <section class="settings-group" aria-labelledby="group-link">
+        <h3 class="group-title" id="group-link" data-i18n="settingsGroupLink"></h3>
+        <dl class="summary" id="connection-summary"></dl>
+        <div class="group-buttons">
+          <button class="button-quiet wide" id="open-all-settings" type="button" data-i18n="settingsAll"></button>
+          <button class="button-quiet wide" id="open-keys-settings" type="button" data-i18n="keysButton"></button>
+          <button class="button-quiet wide" id="open-phone" type="button" data-i18n="phoneLinkButton"></button>
+        </div>
+        <button class="text-button" id="open-full-setup" type="button" data-i18n="setupFull"></button>
+      </section>
+      <fieldset class="settings-group" id="text-mode">
+        <legend class="group-title" data-i18n="textModeLabel"></legend>
         <div class="segments">
           <label><input type="radio" name="textMode" value="menu"><span data-i18n="textModeMenu"></span></label>
           <label><input type="radio" name="textMode" value="button"><span data-i18n="textModeButton"></span></label>
@@ -188,8 +197,8 @@
         </div>
         <p class="notice" id="text-mode-note" role="status" aria-live="polite"></p>
       </fieldset>
-      <details class="advanced">
-        <summary data-i18n="advanced"></summary>
+      <details class="advanced settings-group">
+        <summary class="group-title" data-i18n="advanced"></summary>
         <form id="settings-form" class="stack" novalidate>
           <label class="field-label" for="server" data-i18n="serverLabel"></label>
           <input class="text-input" id="server" dir="ltr" type="url" required>
@@ -201,7 +210,6 @@
           <button class="button-quiet" type="submit" data-i18n="save"></button>
         </form>
       </details>
-      <button class="button-quiet" id="close-settings" type="button" data-i18n="back"></button>
     </section>
   </main>
   <footer class="made-by">

@@ -351,6 +351,12 @@
   "setupFull": {
     "message": "पूरी सेटअप, कदम दर कदम"
   },
+  "settingsGroupLink": {
+    "message": "आपके कंप्यूटर पर tarjim"
+  },
+  "settingsAll": {
+    "message": "tarjim की सारी सेटिंग"
+  },
   "advanced": {
     "message": "उन्नत"
   },

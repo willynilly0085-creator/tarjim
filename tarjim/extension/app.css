@@ -438,3 +438,15 @@ body:not(.windows) .windows-only,
 body.windows .not-windows {
   display: none;
 }
+
+/* Settings in three named groups (2026-11-25): what tarjim runs with and where to change it,
+   how selected text is translated, and the advanced connection. Back sits beside the title. */
+.settings-view { gap: var(--space-md); }
+.settings-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); }
+.settings-group { display: grid; gap: var(--space-sm); min-width: 0; margin: 0; padding: 0; border: 0; }
+.settings-group + .settings-group { padding-top: var(--space-md); border-top: 1px solid var(--line); }
+.group-title { margin: 0; padding: 0; color: var(--muted); font-size: var(--text-meta); font-weight: 650; }
+fieldset.settings-group > legend.group-title { float: left; width: 100%; }
+.group-buttons { display: grid; gap: var(--space-xs); }
+.settings-group .text-button { justify-self: start; }
+details.settings-group > summary.group-title { padding-block: var(--space-2xs); cursor: pointer; }

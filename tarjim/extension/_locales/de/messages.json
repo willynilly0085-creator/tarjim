@@ -351,6 +351,12 @@
   "setupFull": {
     "message": "Komplette Einrichtung, Schritt für Schritt"
   },
+  "settingsGroupLink": {
+    "message": "tarjim auf deinem Computer"
+  },
+  "settingsAll": {
+    "message": "Alle tarjim-Einstellungen"
+  },
   "advanced": {
     "message": "Erweitert"
   },

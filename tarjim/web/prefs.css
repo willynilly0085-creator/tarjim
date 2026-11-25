@@ -1,4 +1,4 @@
-/* The settings page (2026-11-09): tabs, one quiet row per setting, a sticky preview drawn from
+/* The settings page (2026-11-09): tabs (settings.css since 2026-11-25), one quiet row per setting, a sticky preview drawn from
    the same values the burn uses, and a status line that says when a change is saved. */
 body:has(#prefs:not([hidden])) .bar, main.prefs { width: min(1040px, 100% - 32px); }
 .prefs { gap: var(--space-lg); }
@@ -24,12 +24,6 @@ body:has(#prefs:not([hidden])) .bar, main.prefs { width: min(1040px, 100% - 32px
 .preset-own ul { display: grid; gap: var(--space-xs); margin: var(--space-xs) 0 0; padding: 0; list-style: none; }
 .preset-own li { display: flex; align-items: center; gap: var(--space-xs); }
 .preset-own-name { flex: 1; min-width: 0; overflow-wrap: anywhere; font-weight: 550; }
-
-.prefs-tabs { display: flex; gap: var(--space-md); overflow-x: auto; border-bottom: 1px solid var(--line); scrollbar-width: none; }
-.prefs-tab { flex: none; min-height: 44px; padding: 0 2px; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px;
-  background: none; color: var(--muted); font-weight: 550; cursor: pointer; transition: color 160ms var(--ease), border-color 160ms var(--ease); }
-.prefs-tab:hover { color: var(--text); }
-.prefs-tab[aria-selected="true"] { border-bottom-color: var(--accent-line); color: var(--text); font-weight: 650; }
 
 .prefs-body { display: grid; gap: var(--space-lg); }
 .prefs-fields { display: grid; gap: var(--space-md); align-content: start; min-width: 0; }
@@ -82,7 +76,6 @@ body:has(#prefs:not([hidden])) .bar, main.prefs { width: min(1040px, 100% - 32px
 .prefs-advanced > summary { min-height: 48px; padding-block: var(--space-sm); font-weight: 600; cursor: pointer; }
 .prefs-advanced > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
 .reset-tab { justify-self: start; padding: 0; border: 0; background: none; cursor: pointer; }
-.engines-link .button-quiet { justify-self: start; }
 
 .preview { display: grid; gap: var(--space-xs); align-content: start; }
 .preview-stage { display: grid; place-items: center; }

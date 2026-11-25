@@ -351,6 +351,12 @@
   "setupFull": {
     "message": "ステップごとの完全な設定"
   },
+  "settingsGroupLink": {
+    "message": "パソコンの tarjim"
+  },
+  "settingsAll": {
+    "message": "tarjim のすべての設定"
+  },
   "advanced": {
     "message": "詳細設定"
   },

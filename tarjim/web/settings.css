@@ -1,0 +1,68 @@
+/* One settings place (2026-11-25): the grouped list both settings pages share, the subtitle
+   tabs' titled parts, and the setup's sections shown one at a time beside the same list. */
+
+/* The two pages are wide; the list sits at the start, the open tab or section beside it. */
+body:has(#wizard.settings:not([hidden])) .bar, main#wizard.settings { width: min(1040px, 100% - 32px); }
+.settings-shell { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-lg); }
+.settings-nav, .setup-side { min-width: 0; }
+.panel-heading { margin: 0; font-size: 1.25rem; font-weight: 650; line-height: 1.3; }
+.panel-heading:focus { outline: none; }
+.prefs-panel { display: grid; gap: var(--space-md); align-content: start; min-width: 0; }
+
+.settings-nav { display: grid; gap: var(--space-lg); }
+.settings-nav ul { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.nav-group-title { margin-bottom: 6px; padding-inline: 12px; color: var(--muted); font-size: 0.75rem; font-weight: 600; }
+.settings-nav .prefs-tab { display: flex; align-items: center; width: 100%; min-height: 36px; padding: 6px 12px; border: 0; border-radius: 8px;
+  background: none; color: var(--muted); font-weight: 550; text-align: start; cursor: pointer;
+  transition: background-color 160ms var(--ease), color 160ms var(--ease); }
+.settings-nav .prefs-tab:hover { background: var(--raised); color: var(--text); }
+.settings-nav .prefs-tab[aria-current="page"] { background: var(--raised); color: var(--text); font-weight: 650; }
+.settings-nav .prefs-tab[aria-current="page"]::after { content: ""; flex: none; width: 6px; height: 6px; margin-inline-start: auto;
+  border-radius: 50%; background: var(--accent-line); }
+.settings-nav .prefs-tab:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+
+@media (min-width: 900px) {
+  .settings-shell, #wizard.settings .setup-shell { grid-template-columns: 200px minmax(0, 1fr); gap: var(--space-xl); align-items: start; }
+  .settings-nav { position: sticky; top: var(--space-md); }
+}
+
+/* Narrow screens: the list is one row that scrolls, its group names left to the screen reader. */
+@media (max-width: 899px) {
+  .settings-nav { position: relative; display: flex; gap: var(--space-md); overflow-x: auto; border-bottom: 1px solid var(--line); scrollbar-width: none; }
+  .settings-nav .nav-group-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .settings-nav ul { display: flex; gap: var(--space-md); }
+  .settings-nav .prefs-tab { width: auto; min-height: 44px; padding: 0 2px; border-radius: 0; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .settings-nav .prefs-tab:hover { background: none; }
+  .settings-nav .prefs-tab[aria-current="page"] { border-bottom-color: var(--accent-line); background: none; }
+  .settings-nav .prefs-tab[aria-current="page"]::after { content: none; }
+}
+
+/* The head: the page's name, going back for everything, and back. */
+.prefs-head { flex-wrap: wrap; }
+.reset-whole { display: contents; }
+.reset-whole .reset-sure { flex-basis: 100%; }
+.page-title { margin-inline-end: auto; font-size: var(--text-title); font-weight: 650; line-height: 1.25; }
+
+/* Titled parts: a part's main settings, then its finer ones folded under it. */
+.pref-part { display: grid; }
+.pref-part + .pref-part { margin-top: var(--space-xl); }
+.part-title { margin: 0; padding-bottom: var(--space-xs); border-bottom: 1px solid var(--line); color: var(--muted); font-size: var(--text-meta); font-weight: 650; }
+.part-fold > summary { min-height: 40px; padding-block: var(--space-xs); color: var(--muted); font-size: var(--text-meta); font-weight: 550; }
+.part-fold[open] > summary { color: var(--text); }
+.only-fold .part-fold { border-top: 0; border-bottom: 1px solid var(--line); }
+.only-fold .part-fold > summary { min-height: 40px; color: var(--muted); font-weight: 650; }
+.prefs-fields > .presets { padding-bottom: var(--space-md); border-bottom: 1px solid var(--line); }
+
+/* The setup in settings mode: one section at a time, under the same head and beside the list. */
+#wizard:not(.settings) :is(.setup-head, .setup-side) { display: none; }
+#wizard:not(.settings) :is(.setup-shell, .setup-body) { display: contents; }
+#wizard.settings .setup-shell { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-lg); }
+#wizard.settings .setup-body { display: grid; gap: var(--space-lg); align-content: start; min-width: 0; }
+#wizard.settings .step { padding-bottom: 0; border-bottom: 0; }
+#wizard.settings .step.current:not(.only) { display: none; }
+#wizard.settings .step h1 { font-size: 1.25rem; line-height: 1.3; }
+#wizard.settings .step h1:focus { outline: none; }
+#wizard.settings #settings-close,
+#wizard.settings:not([data-only="connect"]) #settings-save,
+#wizard.settings:not([data-only="device"]) #settings-rescan,
+#wizard.settings:not([data-only="connect"]):not([data-only="device"]) .settings-bar { display: none; }

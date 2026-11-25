@@ -351,6 +351,12 @@
   "setupFull": {
     "message": "الإعداد الكامل خطوة بخطوة"
   },
+  "settingsGroupLink": {
+    "message": "ترجم على جهازك"
+  },
+  "settingsAll": {
+    "message": "كل إعدادات ترجم"
+  },
   "advanced": {
     "message": "متقدم"
   },

@@ -1,9 +1,10 @@
 // The "عام" tab (2026-11-09): the page's language, starting with the computer and updating on
-// its own, each through the route the setup already uses, and a way into engines, keys, voices
-// and tools, which stay in setup and are never part of the settings or of a preset.
+// its own, each through the route the setup already uses. Engines, keys, voices and tools stay
+// in setup and are never part of the settings or of a preset; since 2026-11-25 they are reached
+// from the settings list itself (settings_nav.js), not from a link here.
 import { $, api, post } from "./api.js";
 import { t } from "./i18n.js";
-import { button, el } from "./ui.js";
+import { el } from "./ui.js";
 
 function check(id, words, checked, save) {
   const input = el("input", { type: "checkbox", id, className: "switch-input", checked });
@@ -23,7 +24,7 @@ function language(setup, changed) {
     el("div", { className: "pref-control" }, menu));
 }
 
-// hooks: { language(code), engines(setup), say(text) }
+// hooks: { language(code), say(text) }
 export async function generalTab(hooks) {
   const setup = await api("/setup");
   const saved = (work) => async (value) => {
@@ -34,16 +35,11 @@ export async function generalTab(hooks) {
       hooks.say(t("prefsFailed"));
     }
   };
-  const engines = el("div", { className: "pref engines-link" },
-    el("div", { className: "pref-head" }, el("span", { className: "pref-label", textContent: t("prefsEngines") })),
-    el("p", { className: "pref-hint", textContent: t("prefsEnginesHint") }),
-    button(t("prefsOpenEngines"), () => hooks.engines(setup)));
   return el("div", { className: "pref-list" },
     language(setup, saved(hooks.language)),
     check("prefs-autostart", t("autostart"), Boolean(setup.autostart), saved((on) => post("/setup", { autostart: on }))),
     check("prefs-auto-update", t("autoUpdate"), setup.auto_update !== false,
-      saved((on) => post("/setup", { auto_update: on }))),
-    engines);
+      saved((on) => post("/setup", { auto_update: on }))));
 }
 
 // The header's language menu follows a change made here.

@@ -108,6 +108,27 @@ def test_everything_counts_and_names_other_languages_values(tmp_path: Path) -> N
     assert [p[1:] for p in seen["posts"]] == [["/prefs/reset", {"all": True}]]
 
 
+@needs_node
+@pytest.mark.usefixtures("prefs_home")
+def test_the_grouped_list_keeps_every_setting_and_sends_setup_sections_away(tmp_path: Path) -> None:
+    """2026-11-25: the subtitle tabs in titled parts, nothing dropped, ready sets only there."""
+    seen = run_page("layout", tmp_path)
+    of = {tab: sorted(k for k, s in SPECS.items() if s.group in groups)
+          for tab, groups in {"look": ["look"], "timing": ["text", "timing"],
+                              "listen": ["listen"]}.items()}
+    for tab, keys in of.items():
+        assert sorted(seen["shown"][tab]["keys"]) == keys, tab
+        assert seen["shown"][tab]["heading"] == AR[f"tab_{tab}"]
+    assert seen["shown"]["look"]["parts"] == [AR[f"part_look_{p}"] for p in
+                                              ("text", "box", "place", "speakers", "mark")]
+    assert seen["shown"]["timing"]["parts"] == [AR["part_timing_reading"], AR["part_timing_lines"]]
+    assert seen["shown"]["timing"]["folds"] == [AR["part_timing_cuts"]]
+    assert seen["shown"]["look"]["presets"] and seen["shown"]["timing"]["presets"]
+    assert not seen["shown"]["listen"]["presets"]
+    assert seen["opened"] == ["connect"]
+    assert seen["groups"] == [AR[f"navGroup_{g}"] for g in ("video", "work", "app")]
+
+
 def test_every_setting_has_words_in_every_interface_language() -> None:
     for code in codes():
         words = json.loads((FOLDER / f"{code}.json").read_text(encoding="utf-8"))
