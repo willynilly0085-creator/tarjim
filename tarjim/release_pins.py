@@ -2,14 +2,17 @@
 
 Standard library only, like the installer: a copy of this file sits beside the installer's copy
 in ~/.tarjim while an update replaces the engine's folder. The files come only from the release
-being installed (GitHub, over HTTPS, for its tag; or beside a local copy) and are used only when
+being installed (inside its signed zip, which the engine checked before an update; GitHub, over
+HTTPS, for its tag, for older engines' updates; or beside a local copy) and are used only when
 every line is an exact version, so they cannot point uv at another index or file.
 constraints.txt holds every tested version; overrides.txt the few that replace another
 package's exact pin (a release older than that file has none, and installs without it).
 python.txt names the Python the release runs on (a release older than that file runs on 3.11).
 """
 import re
+import urllib.parse
 import urllib.request
+import zipfile
 from pathlib import Path
 from typing import NamedTuple
 
@@ -23,6 +26,7 @@ PYTHON = "python.txt"
 EARLIER_PYTHON = "3.11"
 MINOR = re.compile(r"3\.\d{1,2}")
 MOST = 1 << 20
+TOP = "tarjim/"  # the folder a release's zip holds (git archive --prefix, release_files.py)
 WAIT = 60
 
 
@@ -48,11 +52,28 @@ def plain_pins(text: str) -> bool:
     return bool(pinned) and all(PIN.fullmatch(line) for line in pinned)
 
 
+def from_zip(source: str, name: str, most: int) -> bytes:
+    """A file of the release inside its zip on this computer."""
+    path = Path(urllib.request.url2pathname(urllib.parse.urlparse(source).path))
+    try:
+        with zipfile.ZipFile(path) as bundle:
+            return bundle.read(f"{TOP}tarjim/{name}")[:most]
+    except (KeyError, zipfile.BadZipFile) as error:
+        raise OSError(f"{name} is not in {path.name}") from error
+
+
+def read(source: str, name: str, most: int) -> bytes:
+    """A file of the release being installed, from its zip or from its address."""
+    if source.startswith("file:") and source.endswith(".zip"):
+        return from_zip(source, name, most)
+    with urllib.request.urlopen(pins_address(source, name), timeout=WAIT) as reply:
+        return bytes(reply.read(most))
+
+
 def tested_versions(source: str, home: Path, name: str = CONSTRAINTS) -> Path | None:
     """The release's file saved for uv, or nothing (noted in the install log)."""
     try:
-        with urllib.request.urlopen(pins_address(source, name), timeout=WAIT) as reply:
-            text = reply.read(MOST).decode("utf-8")
+        text = read(source, name, MOST).decode("utf-8")
     except (OSError, ValueError) as error:
         note(home, f"{name} unavailable ({error}); installing without it")
         return None
@@ -69,8 +90,7 @@ def tested_versions(source: str, home: Path, name: str = CONSTRAINTS) -> Path | 
 def python_for(source: str, home: Path) -> str:
     """The Python this release runs on, such as "3.12"; 3.11 when the release does not say."""
     try:
-        with urllib.request.urlopen(pins_address(source, PYTHON), timeout=WAIT) as reply:
-            text = reply.read(64).decode("utf-8").strip()
+        text = read(source, PYTHON, 64).decode("utf-8").strip()
     except (OSError, ValueError, UnicodeDecodeError):
         return EARLIER_PYTHON
     if MINOR.fullmatch(text):

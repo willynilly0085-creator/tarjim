@@ -3,7 +3,9 @@
 It used to say "updated with git" and wait for the person (the owner, 2026-10-26: "we do not want
 to pull updates; we want it to update directly"). Now it updates the way an installed copy does:
 the engine starts this file, copied outside its folder, and closes; this waits for it to close,
-fast-forwards the clone to the release's tag (never a merge: a clone with commits of its own is
+fast-forwards the clone to the release's tag, only when the tag names the commit the release was
+signed for (the engine checked the signature, signed_release.py; a tag moved on GitHub is
+refused), and never as a merge: a clone with commits of its own is
 left as it is and the update is reported as failed), installs the engine and every library onto
 the versions tested with that release, and starts the engine again. When the libraries cannot be
 installed, the code goes back to where it was, so code and libraries still match.
@@ -31,6 +33,7 @@ else:  # the copy in ~/.tarjim, beside its own copy of installer.py
 PIN = re.compile(r"([A-Za-z0-9][A-Za-z0-9._-]*)==([A-Za-z0-9.+!_-]+)\s*(;.*)?")
 MINOR = re.compile(r"3\.\d{1,2}")
 VERSION = re.compile(r"^\s*version(?:_info)?\s*=\s*(3\.\d{1,2})", re.M)
+COMMIT = re.compile(r"[0-9a-f]{40}")
 
 
 def canonical(name: str) -> str:
@@ -41,10 +44,24 @@ def git(root: Path, *args: str) -> int:
     return installer.run_install(["git", "-C", str(root), *args])
 
 
-def move(root: Path, tag: str) -> bool:
-    """The clone to the release's tag, only when that is a fast-forward."""
-    fetched = git(root, "fetch", "--quiet", "origin", f"refs/tags/{tag}:refs/tags/{tag}") == 0
-    return fetched and git(root, "merge", "--ff-only", "--quiet", tag) == 0
+def named(root: Path, tag: str) -> str:
+    """The commit the clone's tag names."""
+    return subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet",
+                           f"refs/tags/{tag}^{{commit}}"], capture_output=True, text=True,
+                          creationflags=installer.NO_WINDOW, check=False).stdout.strip()
+
+
+def move(root: Path, tag: str, commit: str) -> str:
+    """Nothing once the clone is at the signed commit, or why it is not: the tag must name that
+    commit, and the move must be a fast-forward."""
+    if not COMMIT.fullmatch(commit) or git(
+            root, "fetch", "--quiet", "origin", f"refs/tags/{tag}:refs/tags/{tag}") != 0:
+        return f"{tag} could not be fetched (git says why in {installer.LOG})"
+    if named(root, tag) != commit:
+        return f"update refused: {tag} is not the commit its release was signed for"
+    if git(root, "merge", "--ff-only", "--quiet", commit) != 0:
+        return f"the clone could not move to {tag} by itself (git says why in {installer.LOG})"
+    return ""
 
 
 def pinned(constraints: Path) -> dict[str, set[str]]:
@@ -136,13 +153,14 @@ def settle(uv: str, root: Path, prefix: str) -> int:
     return libraries(uv, root, prefix)
 
 
-def update(root: Path, tag: str, prefix: str) -> str:
+def update(root: Path, tag: str, prefix: str, commit: str) -> str:
     """Nothing when it is done, or why it is not."""
     uv = shutil.which("uv")
     if not uv:
         return "uv is missing: install it from https://docs.astral.sh/uv/"
-    if not move(root, tag):
-        return f"the clone could not move to {tag} by itself (git says why in {installer.LOG})"
+    moved = move(root, tag, commit)
+    if moved:
+        return moved
     if settle(uv, root, prefix) != 0:
         git(root, "reset", "--keep", "ORIG_HEAD")
         return f"the libraries for {tag} could not be installed, see {installer.LOG}"
@@ -150,11 +168,12 @@ def update(root: Path, tag: str, prefix: str) -> str:
 
 
 def main(chosen: argparse.Namespace) -> int:
-    """chosen: the clone, the tag, the environment, the engine's start command and its process."""
+    """chosen: the clone, the tag, the environment, the engine's start command, the signed commit
+    and the engine's process."""
     state = installer.UPDATE_STATE
     installer.wait_for_exit(chosen.after)
     installer.record("installing", f"moving the clone to {chosen.tag} and its libraries", state)
-    failure = update(chosen.root, chosen.tag, chosen.prefix)
+    failure = update(chosen.root, chosen.tag, chosen.prefix, chosen.commit)
     installer.start_detached(json.loads(chosen.engine), installer.HOME / "server.log")
     installer.record("failed" if failure else "done",
                      failure or "the engine is updated and starting", state)
@@ -167,5 +186,6 @@ if __name__ == "__main__":
     options.add_argument("tag")
     options.add_argument("prefix")
     options.add_argument("engine", help="the engine's start command, as JSON")
+    options.add_argument("--commit", required=True, help="the commit the release was signed for")
     options.add_argument("--after", type=int, default=0)
     raise SystemExit(main(options.parse_args()))

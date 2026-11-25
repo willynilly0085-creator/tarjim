@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from tarjim import config, installer, release_pins, update
+from tarjim import config, installer, release_pins, signed_release, update
 
 
 @pytest.fixture
@@ -69,9 +69,11 @@ def test_the_installer_is_handed_the_release_archive_and_this_engines_process(
     monkeypatch.setattr(installer, "HOME", home)
     monkeypatch.setattr(update, "installed_by_uv", lambda: True)
     monkeypatch.setattr(update.shutil, "which", lambda _name: "uv")
+    checked = (home / "updates" / "tarjim-v1.3.0.zip").as_uri()  # test_signed_release.py
+    monkeypatch.setattr(signed_release, "saved_archive", lambda tag, _folder: checked)
     assert update.start("v1.3.0", 17700)
     command = started[0]
-    assert command[-5:-4] == [update.archive("v1.3.0")] and command[-2:] == ["--port", "17700"]
+    assert command[-5:-4] == [checked] and command[-2:] == ["--port", "17700"]
     copy = Path(command[command.index("python") + 1])
     assert copy.read_bytes() == Path(installer.__file__).read_bytes()
     assert (copy.parent / "release_pins.py").read_bytes() == Path(

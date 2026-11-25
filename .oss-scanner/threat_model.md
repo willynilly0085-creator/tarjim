@@ -28,7 +28,8 @@ Untrusted input, most exposed first:
    (`tarjim/render/ass.py`), where ASS override tags are a way to inject.
 5. **Downloads tarjim makes for itself.** ffmpeg (`tarjim/ffmpeg_setup.py`), vendor programs
    (`tarjim/engines/app_install.py`, `tarjim/installer.py`), model weights, and its own updates
-   (`tarjim/update.py`, `server/update_routes.py`). An update replaces the running code.
+   (`tarjim/update.py`, `server/update_routes.py`). An update replaces the running code; it is
+   taken only when signed with the owner's release key (`tarjim/signed_release.py`).
 6. **A chat assistant using the MCP tools.** The assistant may be steered by text it read
    elsewhere. The tools must never return a key or a token, never take one, and must not reach
    files outside tarjim's own folders.

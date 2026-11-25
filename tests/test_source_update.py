@@ -11,7 +11,7 @@ from typing import Any
 
 import pytest
 
-from tarjim import config, installer, old_environment, source_updater, update
+from tarjim import config, installer, old_environment, signed_release, source_updater, update
 
 pytestmark = pytest.mark.skipif(not shutil.which("git"), reason="needs git")
 
@@ -45,28 +45,41 @@ def clone(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[Path, Path]:
 
 def test_the_clone_moves_to_the_release_and_keeps_its_own_changes(clone: Any) -> None:
     origin, here = clone
+    signed = run(origin, "rev-parse", "v1.0.1")
     (here / "notes.txt").write_text("mine", encoding="utf-8")  # not tracked: left alone
-    assert source_updater.move(here, "v1.0.1")
+    assert source_updater.move(here, "v1.0.1", signed) == ""
     assert (here / "app.txt").read_text(encoding="utf-8") == "1.0.1"
-    assert run(here, "rev-parse", "HEAD") == run(origin, "rev-parse", "v1.0.1")
+    assert run(here, "rev-parse", "HEAD") == signed
     assert (here / "notes.txt").read_text(encoding="utf-8") == "mine"
-    assert source_updater.move(here, "v1.0.1")  # already there: nothing to do
+    assert source_updater.move(here, "v1.0.1", signed) == ""  # already there: nothing to do
+
+
+def test_a_tag_moved_off_the_signed_commit_is_refused(clone: Any) -> None:
+    """Whoever moves a tag on GitHub cannot move a clone with it (signed_release.py)."""
+    origin, here = clone
+    signed, before = run(origin, "rev-parse", "v1.0.1"), run(here, "rev-parse", "HEAD")
+    commit(origin, "app.txt", "not what the owner released")
+    run(origin, "tag", "-f", "v1.0.1")
+    assert "refused" in source_updater.move(here, "v1.0.1", signed)
+    assert run(here, "rev-parse", "HEAD") == before
+    assert "could not be fetched" in source_updater.move(here, "v1.0.1", "--upload-pack=x")
 
 
 def test_a_clone_with_commits_of_its_own_is_left_as_it_is(clone: Any) -> None:
-    _origin, here = clone
+    origin, here = clone
     mine = commit(here, "mine.txt", "a change of my own")
-    assert not source_updater.move(here, "v1.0.1")
+    assert source_updater.move(here, "v1.0.1", run(origin, "rev-parse", "v1.0.1"))
     assert run(here, "rev-parse", "HEAD") == mine
 
 
 def test_libraries_that_fail_put_the_code_back(
         clone: Any, monkeypatch: pytest.MonkeyPatch) -> None:
-    _origin, here = clone
+    origin, here = clone
     before = run(here, "rev-parse", "HEAD")
     monkeypatch.setattr(source_updater.shutil, "which", lambda _name: "uv")
     monkeypatch.setattr(source_updater, "libraries", lambda *_args: 1)
-    assert "could not be installed" in source_updater.update(here, "v1.0.1", "env")
+    signed = run(origin, "rev-parse", "v1.0.1")
+    assert "could not be installed" in source_updater.update(here, "v1.0.1", "env", signed)
     assert run(here, "rev-parse", "HEAD") == before
 
 
@@ -107,6 +120,7 @@ def test_a_clone_offers_the_update_and_hands_over_to_its_updater(
     monkeypatch.setattr(update.shutil, "which", lambda name: name)
     started: list[list[str]] = []
     monkeypatch.setattr(installer, "start_detached", lambda c, _log: started.append(c) or True)
+    monkeypatch.setattr(signed_release, "signed_commit", lambda _tag: "b" * 40)
     assert update.from_source() and update.can_install()  # this test runs in a clone
     assert update.start("v1.0.99", 17999)
     command = started[0]
@@ -115,6 +129,7 @@ def test_a_clone_offers_the_update_and_hands_over_to_its_updater(
                             str(tmp_path / "source_updater.py")]
     assert command[8:10] == [str(update.SOURCE), "v1.0.99"]
     assert json.loads(command[11])[-2:] == ["--port", "17999"]
+    assert command[12:14] == ["--commit", "b" * 40]
     assert (tmp_path / "installer.py").is_file() and (tmp_path / "release_pins.py").is_file()
 
 

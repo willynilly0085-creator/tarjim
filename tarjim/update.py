@@ -4,7 +4,9 @@ Once a day the engine asks GitHub for the number of the latest release: one requ
 nothing about the person or their videos. With automatic updates on (the person's choice), a newer
 release is installed when no job is running; otherwise the page offers a button. The copy uv
 installed is replaced by the installer; a copy run from source (a git clone with uv beside it) is
-moved to the release's tag by source_updater.py, which also brings its libraries along.
+moved to the release's tag by source_updater.py, which also brings its libraries along. Either way
+only what the owner signed is taken (signed_release.py): the installer gets the release's zip once
+its signature is checked, and a clone the commit the release was signed for.
 """
 import json
 import os
@@ -19,7 +21,6 @@ from tarjim import __version__, config, pins
 from tarjim.release_pins import REPO
 
 RELEASES = os.environ.get("TARJIM_RELEASES", f"https://api.github.com/repos/{REPO}/releases/latest")
-ARCHIVE = os.environ.get("TARJIM_ARCHIVE", f"https://github.com/{REPO}/archive/refs/tags/{{tag}}.zip")
 CHECK_EVERY = 24 * 3600
 RETRY_FAILED_AFTER = 24 * 3600  # seconds before a failed update is tried again by itself
 TAG = re.compile(r"^v?(\d+)\.(\d+)\.(\d+)$")
@@ -127,26 +128,25 @@ def untested() -> list[str]:
     return [f"{name} {pins.installed(name)}" for name in pins.drift()]
 
 
-def archive(tag: str) -> str:
-    return ARCHIVE.format(tag=tag)
-
-
 def start(tag: str, port: int) -> bool:
     """Hand over to a copy of the installer that runs outside this engine's folder. The caller
     must then close the engine: the installer waits for that before replacing its files."""
-    from tarjim import installer, release_pins
+    from tarjim import installer, release_pins, signed_release
 
     uv = shutil.which("uv")
     if not uv or not number(tag):
         return False
     if not installed_by_uv():
         return from_source() and start_from_source(tag, port)
+    source = signed_release.saved_archive(tag, config.HOME / "updates")
+    if not source:
+        return False
     copy = config.HOME / "updater.py"
     shutil.copyfile(release_pins.__file__, config.HOME / "release_pins.py")
     shutil.copyfile(installer.__file__, copy)
     installer.record("starting", tag, installer.UPDATE_STATE)
     command = [uv, "run", "--quiet", "--no-project", "--python", running_minor(), "python",
-               str(copy), archive(tag), "--after", str(os.getpid()), "--port", str(port)]
+               str(copy), source, "--after", str(os.getpid()), "--port", str(port)]
     installer.start_detached(command, config.HOME / "update.log")
     return True
 
@@ -160,16 +160,19 @@ def start_from_source(tag: str, port: int) -> bool:
     """The same hand-over for a clone, beside copies of what its updater imports. It runs on the
     Python uv manages, not the environment's: a release on another Python replaces the
     environment, which cannot be renamed while a program runs from it."""
-    from tarjim import installer, release_pins, source_updater
+    from tarjim import installer, release_pins, signed_release, source_updater
     from tarjim.autostart import quiet_python
 
+    commit = signed_release.signed_commit(tag)
+    if not commit:
+        return False
     for module in (installer, release_pins, source_updater):
         shutil.copyfile(str(module.__file__), config.HOME / Path(str(module.__file__)).name)
     engine = [*installer.module_command("tarjim.server", quiet_python()), "--port", str(port)]
     installer.record("starting", tag, installer.UPDATE_STATE)
     command = [str(shutil.which("uv")), "run", "--quiet", "--no-project", "--python",
                running_minor(), "python", str(config.HOME / "source_updater.py"), str(SOURCE),
-               tag, sys.prefix, json.dumps(engine), "--after", str(os.getpid())]
+               tag, sys.prefix, json.dumps(engine), "--commit", commit, "--after", str(os.getpid())]
     return installer.start_detached(command, config.HOME / "update.log")
 
 

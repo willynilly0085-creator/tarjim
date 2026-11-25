@@ -5,8 +5,8 @@ GitHub keeps a repository's traffic for 14 days only, so each day's numbers are 
 Clones made by tarjim's own checks on GitHub (each job of a workflow run checks the code out) are
 told apart: on 2026-11-22 they were 158 of the fortnight's 405 clones. The install files attached
 to each release (scripts/release_files.py: tarjim-windows.zip, and install.sh for macOS and
-Linux) count new installs alone: updates come from the tag's archive, which GitHub does not
-count. Read with the owner's gh.
+Linux) count new installs alone: updates come from tarjim-update.zip (signed_release.py), or the
+tag's archive for engines older than it, and are not counted with them. Read with the owner's gh.
 """
 import json
 import shutil
