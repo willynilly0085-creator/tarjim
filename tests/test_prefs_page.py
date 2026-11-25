@@ -149,3 +149,12 @@ def test_the_page_loads_all_its_scripts_without_being_turned_away() -> None:
     """Forty-odd scripts ask at once; the default queue of 5 refused some on Windows."""
     assert len(list(WEB.glob("*.js"))) > OnlyListener.request_queue_size // 2
     assert OnlyListener.request_queue_size >= 64
+
+
+def test_wide_screens_keep_the_list_beside_the_setup_sections() -> None:
+    """1.1.25 put the one-column rule after the two-column one, so it won on every screen."""
+    css = (WEB / "settings.css").read_text(encoding="utf-8")
+    wide = css.index("@media (min-width: 900px)")
+    one_column = "#wizard.settings .setup-shell { grid-template-columns: minmax(0, 1fr); }"
+    assert css.index(one_column) < wide
+    assert "grid-template-columns" not in css[wide:].split("@media (max-width: 899px)")[1]

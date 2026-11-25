@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.27 (2026-11-25)
+
+- **The add-on's box no longer slides left and right.** At 125-150% zoom, or when the list of
+  jobs grew long enough to scroll, the box came out a little narrower than the 380 pixels it
+  asked for and the whole thing could be dragged sideways. It now fits whatever width it gets,
+  and the three-way choices (in the video / file / dubbing) break a long word inside their part
+  instead of pushing past the edge, in every language.
+- **Chrome and Firefox are two equal choices on the add-on's page.** "Browser add-on" in the
+  settings asks which browser you use, starting on the one you are reading it in, and shows only
+  that browser's steps. In Firefox it is one press on "Install the add-on in Firefox"; Firefox
+  used to sit folded under Chrome's steps.
+- **The setup sections keep the settings list beside them on wide screens again.** 1.1.25 showed
+  engines, keys, tools and the rest in one column with the list above them.
+
 ## 1.1.26 (2026-11-25)
 
 - **On a Mac with an Apple chip, tarjim uses the chip's graphics.** Timing is about 6 times

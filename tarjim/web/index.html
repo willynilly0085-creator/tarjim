@@ -108,24 +108,33 @@
     <section class="step" data-step="extension">
       <h1 data-t="extTitle"></h1>
       <p class="lede" data-t="extHint"></p>
-      <ol class="how">
-        <li data-t="extStep1"></li>
-        <li><span data-t="extStep2"></span>
-          <span class="path-row"><code class="command" id="extension-path" dir="ltr"></code><button class="button-quiet" id="copy-path" type="button" data-t="copy"></button></span>
-        </li>
-        <li data-t="extStep3"></li>
-      </ol>
-      <details class="other-browser">
-        <summary data-t="extFoxTitle"></summary>
+      <fieldset class="field browser-pick"><legend class="field-label" data-t="extWhich"></legend>
+        <div class="segments">
+          <label><input type="radio" name="browser" value="chrome" checked><span data-t="extChrome"></span></label>
+          <label><input type="radio" name="browser" value="firefox"><span data-t="extFirefox"></span></label>
+        </div>
+      </fieldset>
+      <div class="browser-steps" id="steps-chrome">
         <ol class="how">
-          <li><span data-t="extFox1"></span>
+          <li data-t="extStep1"></li>
+          <li><span data-t="extStep2"></span>
+            <span class="path-row"><code class="command" id="extension-path" dir="ltr"></code><button class="button-quiet" id="copy-path" type="button" data-t="copy"></button></span>
+          </li>
+          <li data-t="extStep3"></li>
+        </ol>
+        <p class="meta" data-t="extChromeNote"></p>
+      </div>
+      <div class="browser-steps" id="steps-firefox" hidden>
+        <ol class="how">
+          <li class="in-firefox"><a class="primary install-firefox" id="firefox-install" data-t="extFoxInstall"></a></li>
+          <li class="not-firefox"><span data-t="extFox1"></span>
             <span class="path-row"><code class="command" id="firefox-link" dir="ltr"></code><button class="button-quiet" id="copy-firefox" type="button" data-t="copy"></button></span>
           </li>
           <li data-t="extFox2"></li>
           <li data-t="extStep3"></li>
         </ol>
         <p class="meta" data-t="extFoxNote"></p>
-      </details>
+      </div>
     </section>
 
     <section class="step" data-step="chat">

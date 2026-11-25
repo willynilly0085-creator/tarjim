@@ -1,5 +1,6 @@
 import { $, post } from "./api.js";
 import { load, t } from "./i18n.js";
+import { fillBrowserSteps } from "./browser_pick.js";
 import { renderChat } from "./chat.js";
 import { renderConnect, saveConnect, wireConnect } from "./connect.js";
 import { fillLanguageChoices } from "./languages.js";
@@ -25,6 +26,7 @@ const ENTER = {
     $("copy-path").textContent = t("copy");
     $("firefox-link").textContent = state.setup.firefox_link;
     $("copy-firefox").textContent = t("copy");
+    fillBrowserSteps(state.setup.firefox_link);
   },
   chat: () => renderChat(),
 };

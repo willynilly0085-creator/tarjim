@@ -5,6 +5,9 @@
 body:has(#wizard.settings:not([hidden])) .bar, main#wizard.settings { width: min(1040px, 100% - 32px); }
 .settings-shell { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-lg); }
 .settings-nav, .setup-side { min-width: 0; }
+/* One column by default for both pages; the wide screens' two columns below must come after this,
+   or they lose to it (1.1.25 shipped the setup sections in one column on every screen). */
+#wizard.settings .setup-shell { grid-template-columns: minmax(0, 1fr); }
 .panel-heading { margin: 0; font-size: 1.25rem; font-weight: 650; line-height: 1.3; }
 .panel-heading:focus { outline: none; }
 .prefs-panel { display: grid; gap: var(--space-md); align-content: start; min-width: 0; }
@@ -56,7 +59,7 @@ body:has(#wizard.settings:not([hidden])) .bar, main#wizard.settings { width: min
 /* The setup in settings mode: one section at a time, under the same head and beside the list. */
 #wizard:not(.settings) :is(.setup-head, .setup-side) { display: none; }
 #wizard:not(.settings) :is(.setup-shell, .setup-body) { display: contents; }
-#wizard.settings .setup-shell { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-lg); }
+#wizard.settings .setup-shell { display: grid; gap: var(--space-lg); }
 #wizard.settings .setup-body { display: grid; gap: var(--space-lg); align-content: start; min-width: 0; }
 #wizard.settings .step { padding-bottom: 0; border-bottom: 0; }
 #wizard.settings .step.current:not(.only) { display: none; }

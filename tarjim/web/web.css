@@ -117,10 +117,10 @@ h1 { margin: 0; font-size: var(--text-title); font-weight: 650; line-height: 1.2
 .select:hover, .text-input:hover { border-color: var(--muted); }
 .pair-fields, .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-md); }
 
-.segments { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 3px; border-radius: 9px; background: var(--raised); }
+.segments { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); padding: 3px; border-radius: 9px; background: var(--raised); }
 .segments label { position: relative; }
 .segments input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
-.segments span { display: grid; place-items: center; min-height: 36px; padding-inline: var(--space-xs); border-radius: 7px; color: var(--muted); font-size: var(--text-meta); font-weight: 550; text-align: center; transition: background-color 180ms var(--ease), color 180ms var(--ease); }
+.segments span { display: grid; place-items: center; min-height: 36px; padding-inline: var(--space-xs); border-radius: 7px; color: var(--muted); font-size: var(--text-meta); font-weight: 550; text-align: center; overflow-wrap: anywhere; hyphens: auto; transition: background-color 180ms var(--ease), color 180ms var(--ease); }
 .segments input:checked + span { background: var(--selected); color: var(--text); box-shadow: 0 1px 2px oklch(0.2 0.01 var(--hue) / 0.14); }
 .segments input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 1px; }
 
