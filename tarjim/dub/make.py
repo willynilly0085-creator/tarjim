@@ -1,4 +1,5 @@
 import re
+from functools import partial
 from pathlib import Path
 from typing import Protocol
 
@@ -6,10 +7,13 @@ import numpy as np
 
 from tarjim import media
 from tarjim.config import SPOKEN, api_key, setting
-from tarjim.dub.audio import cut, write_wav
+from tarjim.dub.audio import REFITTED_PACE, USUAL_PACE, cut, write_wav
 from tarjim.dub.clone import LANGUAGES as CLONE_LANGUAGES
+from tarjim.dub.duck import under_voices
 from tarjim.dub.lines import Line, lines_from
+from tarjim.dub.merge import merged
 from tarjim.dub.mix import mix, mux
+from tarjim.dub.refit import refit
 from tarjim.dub.separate import Stems, separate
 from tarjim.dub.studio import VOICES
 from tarjim.dub.voices import one_voice_each, reference_spans
@@ -23,6 +27,7 @@ SAFE = re.compile(r"[^\w.-]")
 NUMBER = re.compile(r"\d+")
 PLAIN_TEXT = ("gemini", "clone", "eleven", "speech")
 KEYS = {"gemini": SPOKEN, "fish": "fish_api_key"}
+AGAIN = ("clone", "studio")  # free to ask again, and with no other voice to fall back on
 LINKED = {"eleven": ("eleven_api_key", "ElevenLabs"), "speech": ("speech_api_key", "voice service")}
 
 
@@ -133,7 +138,7 @@ def fallback_spoken(lines: list[Line], engine: str, language: str) -> list[Line]
         from tarjim.dub.tashkeel import add_vowels
 
         texts = add_vowels(texts)
-    return [Line(line.start, line.until, line.speaker, text, line.source)
+    return [Line(line.start, line.until, line.speaker, text, line.source, line.end)
             for line, text in zip(lines, texts, strict=True)]
 
 
@@ -148,6 +153,14 @@ def speak(engine: str, job: Job, samples: dict[str, Path], lines: list[Line]) ->
         if engine != "gemini" or job.target not in CLONE_LANGUAGES or not clone_installed():
             raise
     return own_voice(job, samples, fallback_spoken(lines, "clone", job.target))
+
+
+def said_again(engine: str, job: Job, samples: dict[str, Path],
+               lines: list[Line]) -> list[np.ndarray]:
+    """Lines rewritten to fit (refit.py), said by the same voice; the translator on this
+    computer that rewrote them leaves the card first, as it did before the voice loaded."""
+    free_for_voice()
+    return speak(engine, job, samples, lines)
 
 
 def own_voice(job: Job, samples: dict[str, Path], lines: list[Line]) -> list[np.ndarray]:
@@ -169,9 +182,13 @@ def dub_video(job: Job, cues: list[Cue], words: list[Word], picture: Path | None
     checkpoint()
     free_for_voice()
     stems = separate(job.video)
-    samples = references(stems, words, job.cache / "voices")
+    samples, lines = merged(references(stems, words, job.cache / "voices"), lines)
     checkpoint()
     speech = speak(engine, job, samples, lines)
+    pace = REFITTED_PACE if engine in AGAIN else USUAL_PACE
+    if engine in AGAIN:
+        lines, speech = refit(partial(said_again, engine, job, samples), lines, speech, job)
     checkpoint()
-    sound = write_wav(job.cache / f"dub.{job.target}.wav", mix(lines, speech, stems.background))
+    sound = write_wav(job.cache / f"dub.{job.target}.wav",
+                      mix(lines, speech, under_voices(stems, lines), pace))
     return mux(picture, sound, job.output(".dub.mp4"))

@@ -8,7 +8,10 @@ from tarjim.media import ON_THE_CLOCK, sound_cap, tool
 from tarjim.media import source as opened
 
 RATE = 44100
-MAX_SPEEDUP = 1.8
+Pace = tuple[float, float]  # the slowest and the fastest a voice may be played
+USUAL_PACE: Pace = (1.0, 1.8)
+REFITTED_PACE: Pace = (0.85, 1.3)  # refit.py shortens a long line and never lengthens a short
+# one, so a short voice is slowed a little instead; 1.8 rushed the owner's dub (2026-11-25)
 GENTLE = 1.02
 QUIET = 0.01
 EDGE_PAD = 0.04
@@ -45,10 +48,11 @@ def resample(wav: np.ndarray, source: int, rate: int = RATE) -> np.ndarray:
     return stretched
 
 
-def speed_up(wav: np.ndarray, factor: float, rate: int = RATE) -> np.ndarray:
-    if factor <= GENTLE:
+def speed_up(wav: np.ndarray, factor: float, rate: int = RATE,
+             pace: Pace = USUAL_PACE) -> np.ndarray:
+    tempo = min(max(factor, pace[0]), pace[1])
+    if 1 / GENTLE <= tempo <= GENTLE:
         return wav
-    tempo = min(factor, MAX_SPEEDUP)
     raw = ffmpeg(["-f", "f32le", "-ar", str(rate), "-ac", "1", "-i", "-",
                   "-filter:a", f"atempo={tempo:.3f}", "-f", "f32le", "-"], wav.tobytes())
     return np.frombuffer(raw, dtype=np.float32).copy() if raw else wav

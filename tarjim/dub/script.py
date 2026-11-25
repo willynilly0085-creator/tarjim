@@ -48,18 +48,26 @@ def prompt(lines: list[Line], language: str, dialect: str, full_vowels: bool) ->
     return f"{head}{instructions(current(language))}\n{body}"
 
 
-def spoken_lines(lines: list[Line], language: str, dialect: str,
-                 full_vowels: bool = True) -> list[Line] | None:
-    if not lines:
-        return lines
+def asked(text: str, count: int) -> list[str] | None:
+    """What to say for each of the count numbered lines the text asks about, from the first
+    translator that answers every one of them."""
     for provider in chain("translate"):
         try:
-            answer = asker(provider).ask(prompt(lines, language, dialect, full_vowels), None,
-                                         SCHEMA)
+            answer = asker(provider).ask(text, None, SCHEMA)
         except Exception:
             continue
         said = {line_number(item.get("id")): str(item.get("say", "")).strip()
                 for item in answer or [] if isinstance(item, dict)}
-        if all(said.get(n) for n in range(1, len(lines) + 1)):
-            return [replace(line, text=said[n]) for n, line in enumerate(lines, start=1)]
+        if all(said.get(n) for n in range(1, count + 1)):
+            return [said[n] for n in range(1, count + 1)]
     return None
+
+
+def spoken_lines(lines: list[Line], language: str, dialect: str,
+                 full_vowels: bool = True) -> list[Line] | None:
+    if not lines:
+        return lines
+    said = asked(prompt(lines, language, dialect, full_vowels), len(lines))
+    if said is None:
+        return None
+    return [replace(line, text=text) for line, text in zip(lines, said, strict=True)]
