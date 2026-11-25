@@ -31,7 +31,7 @@ import numpy as np
 from tarjim.asr.voiceprint import RATE
 from tarjim.listen.follow import NEAREST, adopted, followed
 from tarjim.models import Word
-from tarjim.speakers import Line, lines, span, who
+from tarjim.speakers import Line, lines, span, unlinked, who
 
 SHORTEST = 0.8  # seconds: a shorter line says too little to know the voice by
 STEADY = 1.5  # seconds: lines this long make up a speaker's average print
@@ -159,6 +159,14 @@ def printed(words: list[Word], wav: Any) -> Prints:
                                    if end - start >= STEADY))
 
 
+def placed(prints: Prints, heard: Labels, names: dict[str, str]) -> tuple[Prints, Labels]:
+    """Without the lines still unlinked after adopted (a stretch heard again alone, 2026-11-25):
+    they are no one's voice to judge by and no speaker to give a line to, and go by their turn."""
+    kept = {line: name for line, name in heard.items() if not unlinked(names.get(name, name))}
+    voices = {line: voice for line, voice in prints.voices.items() if line in kept}
+    return Prints(voices, prints.steady & frozenset(kept)), kept
+
+
 def checked(words: list[Word], wav: Any) -> list[Word]:
     """The words with each line given to the speaker whose voice it is."""
     prints = printed(words, wav)
@@ -167,6 +175,7 @@ def checked(words: list[Word], wav: Any) -> list[Word]:
         return words
     # 2026-11-08: unlinked "S2~p3" by voice first, a voice near no base speaker's its own speaker
     names = adopted(averages(prints, heard), {who(w.speaker) for w in words if w.speaker})
+    prints, heard = placed(prints, heard, names)
     labels = refined(prints, {line: names.get(name, name) for line, name in heard.items()})
     why = unreliable(prints, labels)
     if why:

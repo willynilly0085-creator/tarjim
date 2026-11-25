@@ -16,13 +16,20 @@ had no average to leave it out of, so it was never moved and stayed a third spea
 pass can miss a person altogether (it heard only the host; other passes heard the guest), so a
 label whose voice is near no base speaker's (under NEAREST) is a speaker of its own, named so it
 never clashes with one of the base's, and unlinked labels in one such new voice are one speaker.
+
+That is for a pass's speaker, never for a stretch heard again by a request of its own ("S2~x790",
+listen/check.relistener): on 2026-11-25 such a stretch of moans and a few words, in the owner's
+clip of two people, printed near no one's voice and became a third person, who then took two of
+the guest's own short lines. One request's stretch is too little to know a person by, and a voice
+there unlike the speakers' own is the same person sounding otherwise far more often than someone
+new; it is left to the turn it is said in (speakers.linked_by_time).
 """
 from bisect import bisect
 
 import numpy as np
 
 from tarjim.models import Word
-from tarjim.speakers import Line, lines, own_name, unlinked, who
+from tarjim.speakers import REQUEST, Line, lines, own_name, unlinked, who
 
 NEAREST = 0.4  # how alike two voices must be at least to be one speaker
 
@@ -68,10 +75,17 @@ def adopted(voices: dict[str, np.ndarray], taken: set[str]) -> dict[str, str]:
     found: dict[str, str] = {}
     for name in sorted(n for n in voices if unlinked(n) and known):
         voice = unit(voices[name])
-        if voice is None:
-            continue
-        best = max(known, key=lambda other: float(known[other] @ voice))
-        found[name] = best if float(known[best] @ voice) >= NEAREST else fresh(
-            name, taken | set(known))
-        known.setdefault(found[name], voice)
+        named = None if voice is None else adoptive(name, voice, known, taken)
+        if voice is not None and named:
+            found[name] = named
+            known.setdefault(named, voice)
     return found
+
+
+def adoptive(name: str, voice: np.ndarray, known: dict[str, np.ndarray], taken: set[str]) -> str:
+    """The base speaker nearest to the voice; else a speaker of its own for a pass's label, and
+    nothing for a stretch heard again alone, which goes by its turn."""
+    best = max(known, key=lambda other: float(known[other] @ voice))
+    if float(known[best] @ voice) >= NEAREST:
+        return best
+    return "" if REQUEST.search(name) else fresh(name, taken | set(known))

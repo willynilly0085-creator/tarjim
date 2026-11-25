@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- **No third colour for two people.** When a short stretch was heard again on its own and the
+  voice in it sounded unlike the person's usual voice (a laugh, a moan, a shout), tarjim made it
+  a new person with a colour of its own, and could move a few of that person's other short lines
+  to it. Such a stretch now goes with whoever is speaking at that moment.
+
 ## 1.1.29 (2026-11-25)
 
 - **A post X hides from people who are not signed in now says so.** X answers tarjim, which

@@ -116,3 +116,30 @@ def test_two_unlinked_labels_in_one_new_voice_are_one_speaker() -> None:
     voices = {"S1": HOST, "S1~p2": np.array([0.0, 1.0, 0.0]), "S3~p3": np.array([0.1, 1.0, 0.0])}
     names = adopted(voices, {"S1"})
     assert names["S1~p2"] == names["S3~p3"] not in {"S1", ""}
+
+
+def test_a_stretch_heard_again_alone_in_an_odd_voice_never_makes_a_new_person(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    # 2026-11-25, the owner's clip of two people: a stretch heard again by its own request
+    # ("S2~x790": moans and a few words) printed near no one's voice and became a third speaker,
+    # S3, which then drew two of the guest's own short lines; the clip showed three colours
+    odd = np.array([0.0, 0.0, 1.0])
+    near_odd = np.array([0.0, 0.5, 0.86])
+    words = [*said(0, "S1"), *said(4, "S2"), *said(8, "S1"), *said(12, "S2"), *said(16, "S2"),
+             *said(20, "S2~x210"), *said(24, "S1")]
+    timeline = {0.0: HOST, 4.0: GUEST, 8.0: HOST, 12.0: GUEST, 16.0: near_odd, 20.0: odd,
+                24.0: HOST}
+    monkeypatch.setattr(voiceprint, "print_of", voices_at(timeline))
+    monkeypatch.setattr(voiceprint, "fetched", lambda: True)
+    after = whose.by_voice(words, sound(28))
+    assert {w.speaker for w in after} == {"S1", "S2"}
+    assert [w.speaker for w in after[8:10]] == ["S2", "S2"]  # the guest's own line stays hers
+
+
+def test_a_person_only_other_passes_heard_still_stays_their_own(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    # the rule above is for one request's stretch; a whole pass's speaker the base missed
+    # (test_a_distinct_voice_the_base_missed_stays_a_speaker_of_its_own) keeps their own colour
+    third = np.array([0.0, 0.0, 1.0])
+    heard = interview(monkeypatch, third)
+    assert whose.by_voice(heard, sound(24))[-1].speaker not in {"S1", "S2"}
