@@ -3,6 +3,7 @@ import { claimPending, sendWaitingJob, shareChoices } from "./pairing.js";
 import { clickedPost, downloadable } from "./posts.js";
 import { ApiError, api, errorLabel, loadWords, remember, t } from "./shared.js";
 import { answer, reachOpenPages, showCard, syncSelection, TEXT } from "./textcard.js";
+import { finishPending, xSaid } from "./xsignin.js";
 
 const POLL = "poll";
 
@@ -42,6 +43,18 @@ async function translateSelection(tab, frameId, text) {
 chrome.runtime.onMessage.addListener(answer);
 chrome.permissions.onAdded.addListener(syncSelection);
 chrome.permissions.onRemoved.addListener(syncSelection);
+
+// Firefox closes the window while it asks for the X sign-in: the job it was asked for is sent
+// from here, after a moment that lets a window still open send it itself (xsignin.js).
+chrome.permissions.onAdded.addListener(async ({ permissions = [] }) => {
+  if (!permissions.includes("cookies")) return;
+  await new Promise((done) => setTimeout(done, 1500));
+  const outcome = await finishPending();
+  if (!outcome) return;
+  await loadWords();
+  notify(`x-signin-${Date.now()}`, t("appName"), t(xSaid(outcome)));
+  refresh();
+});
 chrome.commands?.onCommand.addListener((command, tab) => {
   if (command === "translate-selection") translateSelection(tab);
 });

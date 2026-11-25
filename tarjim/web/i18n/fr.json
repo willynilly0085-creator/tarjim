@@ -804,5 +804,7 @@
   "starNo": "Non merci",
   "starWorking": "Un instant…",
   "starThanks": "Votre étoile est bien là. Merci, cela compte beaucoup.",
-  "starOpened": "Nous avons ouvert tarjim sur GitHub : appuyez sur Star en haut de la page. Merci."
+  "starOpened": "Nous avons ouvert tarjim sur GitHub : appuyez sur Star en haut de la page. Merci.",
+  "err_x_signin": "X ne montre pas cette publication aux personnes non connectées, et tarjim télécharge depuis X sans compte : il n'a donc pas pu l'obtenir. Vous pouvez la télécharger avec votre propre connexion : ouvrez le module tarjim dans le navigateur où vous êtes connecté à X, puis appuyez sur « Télécharger avec ma connexion X » sous cette traduction.",
+  "err_x_account": "Même avec votre connexion, X n'a pas montré cette publication à tarjim, sans dire pourquoi. Ouvrez-la sur X avec le même compte : si la vidéo n'y apparaît pas non plus, ce compte ne peut pas la voir."
 }

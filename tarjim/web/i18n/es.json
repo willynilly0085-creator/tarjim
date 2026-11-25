@@ -804,5 +804,7 @@
   "starNo": "No, gracias",
   "starWorking": "Un momento…",
   "starThanks": "Tu estrella ya está. Gracias, significa mucho.",
-  "starOpened": "Abrimos tarjim en GitHub: pulsa Star arriba en la página. Gracias."
+  "starOpened": "Abrimos tarjim en GitHub: pulsa Star arriba en la página. Gracias.",
+  "err_x_signin": "X no muestra esta publicación a quien no ha iniciado sesión, y tarjim descarga de X sin cuenta, así que no pudo obtenerla. Puedes descargarla con tu propia sesión: abre el complemento de tarjim en el navegador donde tienes la sesión de X iniciada y pulsa «Descargar con mi sesión de X» debajo de esta traducción.",
+  "err_x_account": "Ni con tu sesión X mostró esta publicación a tarjim, y no dijo por qué. Ábrela en X con la misma cuenta: si allí tampoco aparece el video, esta cuenta no puede verlo."
 }

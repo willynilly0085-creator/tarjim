@@ -5,7 +5,7 @@ from contextvars import copy_context
 from pathlib import Path
 from typing import Any, TypeVar
 
-from tarjim import qualities
+from tarjim import qualities, x_posts
 from tarjim.job import checkpoint, progress
 from tarjim.listen.known import note
 from tarjim.media import tool
@@ -95,6 +95,7 @@ def clear(folder: Path, name: str, before: set[Path]) -> None:
 def looked(url: str) -> dict[str, Any]:
     from yt_dlp import YoutubeDL
 
+    x_posts.watch()
     with YoutubeDL({**asking(), "socket_timeout": qualities.ASK_SECONDS}) as ydl:
         return {**qualities.offer(ydl, one_video(ydl, url)), "limit": LARGEST}
 
@@ -146,7 +147,8 @@ def download_now(url: str, folder: Path, quality: str = "") -> Path:
     choice = qualities.Choice(quality)
     with YoutubeDL(options(folder, choice)) as ydl:
         choice.ydl = ydl
-        read = within(READ_SECONDS, lambda: one_video(ydl, url), "reading the link to download")
+        read = within(READ_SECONDS, lambda: x_posts.read(ydl, url, lambda: one_video(ydl, url)),
+                      "reading the link to download")
         info = {**read, "tarjim_quality": choice.named}
         path = Path(ydl.prepare_filename(info))
         try:

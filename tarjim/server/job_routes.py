@@ -4,11 +4,13 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any, ClassVar
 
+from tarjim import x_posts
 from tarjim.server import desktop
 from tarjim.server.jobs import DUBBING, MODES, Board, Order
 from tarjim.server.orders import order_from
 
 Query = dict[str, list[str]]
+X_REFUSED = ("x_signin", "x_account")
 
 
 def refusal(order: Order) -> str:
@@ -95,6 +97,21 @@ class JobRoutes:
     def retry(self, _query: Query, task_id: str) -> None:
         task = self.board.retry(task_id)
         self.reply(200, task.view()) if task else self.reply(404, {"error": "job"})
+
+    def retry_signed_in(self, _query: Query, task_id: str) -> None:
+        """Again, with the person's own X sign-in for this one download (x_posts.py). Only a
+        job X refused, and only X's cookies: none is kept when none of them signs anyone in."""
+        task = self.board.get(task_id)
+        source = task.order.source if task else ""
+        if not task or task.error_code not in X_REFUSED or not x_posts.is_x(source):
+            return self.reply(409, {"error": "job"})
+        if not x_posts.hold(source, self.read_json().get("cookies")):
+            return self.reply(422, {"error": "x_none"})
+        again = self.board.retry(task_id)
+        if again is None:
+            x_posts.take(source)  # not used: forgotten now
+            return self.reply(409, {"error": "job"})
+        self.reply(200, again.view())
 
     def relisten(self, _query: Query, task_id: str) -> None:
         task = self.board.relisten(task_id)

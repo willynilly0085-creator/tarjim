@@ -691,5 +691,35 @@
   },
   "starOpened": {
     "message": "Abrimos tarjim en GitHub: pulsa Star arriba en la página. Gracias."
+  },
+  "errXSignin": {
+    "message": "X no muestra esta publicación a quien no ha iniciado sesión, y tarjim descarga de X sin cuenta, así que no pudo obtenerla. Si tienes la sesión de X iniciada en este navegador, pulsa «Descargar con mi sesión de X»: tarjim usa tu sesión solo para esta descarga, no la guarda y no la envía a nadie más que a X."
+  },
+  "errXAccount": {
+    "message": "Ni con tu sesión X mostró esta publicación a tarjim, y no dijo por qué. Ábrela en X con la misma cuenta: si allí tampoco aparece el video, esta cuenta no puede verlo."
+  },
+  "xSigninButton": {
+    "message": "Descargar con mi sesión de X"
+  },
+  "xSigninSent": {
+    "message": "Descargando con tu sesión de X."
+  },
+  "xSigninNone": {
+    "message": "No se encontró tu sesión de X en este navegador. Inicia sesión en x.com aquí y vuelve a pulsar el botón."
+  },
+  "xSigninDenied": {
+    "message": "No permitiste que el complemento lea tu sesión de X, así que no cambió nada."
+  },
+  "xSigninTitle": {
+    "message": "Tu sesión de X"
+  },
+  "xSigninAbout": {
+    "message": "Cuando pulsas «Descargar con mi sesión de X» en una publicación, el complemento da a tarjim tu sesión de X solo para esa descarga. No se guarda y no va a nadie más que a X."
+  },
+  "xSigninStop": {
+    "message": "Dejar de usar mi sesión de X"
+  },
+  "xSigninStopped": {
+    "message": "Listo. El complemento ya no puede leer tu sesión de X; el botón volverá a preguntar si la necesitas."
   }
 }

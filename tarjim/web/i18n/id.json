@@ -804,5 +804,7 @@
   "starNo": "Tidak, terima kasih",
   "starWorking": "Sebentar…",
   "starThanks": "Bintang Anda sudah masuk. Terima kasih, ini sangat berarti.",
-  "starOpened": "Kami membuka tarjim di GitHub: tekan Star di bagian atas halaman. Terima kasih."
+  "starOpened": "Kami membuka tarjim di GitHub: tekan Star di bagian atas halaman. Terima kasih.",
+  "err_x_signin": "X tidak menampilkan postingan ini kepada orang yang belum masuk, dan tarjim mengunduh dari X tanpa akun, jadi tidak bisa mengambilnya. Kamu bisa mengunduhnya dengan akun masukmu sendiri: buka add-on tarjim di browser tempat kamu masuk ke X, lalu tekan “Unduh dengan akun X saya” di bawah terjemahan ini.",
+  "err_x_account": "Bahkan dengan akun masukmu, X tidak menampilkan postingan ini ke tarjim, dan tidak bilang alasannya. Buka di X dengan akun yang sama: jika videonya juga tidak muncul di sana, akun ini tidak bisa melihatnya."
 }

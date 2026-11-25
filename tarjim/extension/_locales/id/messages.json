@@ -691,5 +691,35 @@
   },
   "starOpened": {
     "message": "Kami membuka tarjim di GitHub: tekan Star di bagian atas halaman. Terima kasih."
+  },
+  "errXSignin": {
+    "message": "X tidak menampilkan postingan ini kepada orang yang belum masuk, dan tarjim mengunduh dari X tanpa akun, jadi tidak bisa mengambilnya. Jika kamu sudah masuk ke X di browser ini, tekan “Unduh dengan akun X saya”: tarjim memakai akun masukmu hanya untuk unduhan ini, tidak menyimpannya, dan tidak mengirimnya ke siapa pun selain X."
+  },
+  "errXAccount": {
+    "message": "Bahkan dengan akun masukmu, X tidak menampilkan postingan ini ke tarjim, dan tidak bilang alasannya. Buka di X dengan akun yang sama: jika videonya juga tidak muncul di sana, akun ini tidak bisa melihatnya."
+  },
+  "xSigninButton": {
+    "message": "Unduh dengan akun X saya"
+  },
+  "xSigninSent": {
+    "message": "Mengunduh dengan akun X kamu."
+  },
+  "xSigninNone": {
+    "message": "Akun X kamu tidak ditemukan di browser ini. Masuk ke x.com di sini, lalu tekan tombolnya lagi."
+  },
+  "xSigninDenied": {
+    "message": "Kamu tidak mengizinkan add-on membaca akun X kamu, jadi tidak ada yang berubah."
+  },
+  "xSigninTitle": {
+    "message": "Akun X kamu"
+  },
+  "xSigninAbout": {
+    "message": "Saat kamu menekan “Unduh dengan akun X saya” pada sebuah postingan, add-on memberikan akun masuk X kamu ke tarjim hanya untuk unduhan itu. Tidak disimpan, dan tidak dikirim ke siapa pun selain X."
+  },
+  "xSigninStop": {
+    "message": "Berhenti memakai akun X saya"
+  },
+  "xSigninStopped": {
+    "message": "Selesai. Add-on tidak bisa lagi membaca akun X kamu; tombolnya akan bertanya lagi kalau kamu perlu."
   }
 }

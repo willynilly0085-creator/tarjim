@@ -691,5 +691,35 @@
   },
   "starOpened": {
     "message": "tarjim'i GitHub'da açtık: sayfanın üstündeki Star'a bas. Teşekkürler."
+  },
+  "errXSignin": {
+    "message": "X bu gönderiyi oturum açmamış kişilere göstermiyor ve tarjim X'ten hesapsız indiriyor, bu yüzden alamadı. Bu tarayıcıda X'te oturumun açıksa “X oturumumla indir” düğmesine bas: tarjim oturumunu yalnızca bu indirme için kullanır, saklamaz ve X dışında kimseye göndermez."
+  },
+  "errXAccount": {
+    "message": "Oturumunla bile X bu gönderiyi tarjim'e göstermedi ve nedenini söylemedi. Aynı hesapla X'te aç: video orada da görünmüyorsa bu hesap onu göremiyor."
+  },
+  "xSigninButton": {
+    "message": "X oturumumla indir"
+  },
+  "xSigninSent": {
+    "message": "X oturumunla indiriliyor."
+  },
+  "xSigninNone": {
+    "message": "Bu tarayıcıda X oturumun bulunamadı. Burada x.com'da oturum aç, sonra düğmeye yeniden bas."
+  },
+  "xSigninDenied": {
+    "message": "Eklentinin X oturumunu okumasına izin vermedin, bu yüzden hiçbir şey değişmedi."
+  },
+  "xSigninTitle": {
+    "message": "X oturumun"
+  },
+  "xSigninAbout": {
+    "message": "Bir gönderide “X oturumumla indir” düğmesine bastığında eklenti, X oturumunu yalnızca o indirme için tarjim'e verir. Saklanmaz ve X dışında kimseye gitmez."
+  },
+  "xSigninStop": {
+    "message": "X oturumumu kullanmayı bırak"
+  },
+  "xSigninStopped": {
+    "message": "Tamam. Eklenti artık X oturumunu okuyamaz; gerekirse düğme yeniden sorar."
   }
 }

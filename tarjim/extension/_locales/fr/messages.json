@@ -691,5 +691,35 @@
   },
   "starOpened": {
     "message": "Nous avons ouvert tarjim sur GitHub : appuyez sur Star en haut de la page. Merci."
+  },
+  "errXSignin": {
+    "message": "X ne montre pas cette publication aux personnes non connectées, et tarjim télécharge depuis X sans compte : il n'a donc pas pu l'obtenir. Si vous êtes connecté à X dans ce navigateur, appuyez sur « Télécharger avec ma connexion X » : tarjim utilise votre connexion pour ce seul téléchargement, ne la garde pas et ne l'envoie qu'à X."
+  },
+  "errXAccount": {
+    "message": "Même avec votre connexion, X n'a pas montré cette publication à tarjim, sans dire pourquoi. Ouvrez-la sur X avec le même compte : si la vidéo n'y apparaît pas non plus, ce compte ne peut pas la voir."
+  },
+  "xSigninButton": {
+    "message": "Télécharger avec ma connexion X"
+  },
+  "xSigninSent": {
+    "message": "Téléchargement avec votre connexion X."
+  },
+  "xSigninNone": {
+    "message": "Votre connexion X est introuvable dans ce navigateur. Connectez-vous à x.com ici, puis appuyez de nouveau sur le bouton."
+  },
+  "xSigninDenied": {
+    "message": "Vous n'avez pas autorisé le module à lire votre connexion X : rien n'a changé."
+  },
+  "xSigninTitle": {
+    "message": "Votre connexion X"
+  },
+  "xSigninAbout": {
+    "message": "Quand vous appuyez sur « Télécharger avec ma connexion X » sur une publication, le module donne à tarjim votre connexion X pour ce seul téléchargement. Elle n'est pas gardée et ne va qu'à X."
+  },
+  "xSigninStop": {
+    "message": "Ne plus utiliser ma connexion X"
+  },
+  "xSigninStopped": {
+    "message": "C'est fait. Le module ne peut plus lire votre connexion X ; le bouton redemandera si vous en avez besoin."
   }
 }

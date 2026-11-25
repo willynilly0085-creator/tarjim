@@ -691,5 +691,35 @@
   },
   "starOpened": {
     "message": "已在 GitHub 打开 tarjim：点页面上方的 Star 即可。谢谢你。"
+  },
+  "errXSignin": {
+    "message": "X 不向未登录的人显示这条帖子，而 tarjim 以无账号方式从 X 下载，所以没能拿到。如果你在这个浏览器里已登录 X，点“用我的 X 登录下载”：tarjim 只为这一次下载使用你的登录，不保存，也只发给 X。"
+  },
+  "errXAccount": {
+    "message": "即使用了你的登录，X 也没有向 tarjim 显示这条帖子，也没说原因。用同一个账号在 X 上打开它：如果那里也看不到视频，说明这个账号看不了。"
+  },
+  "xSigninButton": {
+    "message": "用我的 X 登录下载"
+  },
+  "xSigninSent": {
+    "message": "正在用你的 X 登录下载。"
+  },
+  "xSigninNone": {
+    "message": "在这个浏览器里没找到你的 X 登录。请在这里登录 x.com，然后再点一次按钮。"
+  },
+  "xSigninDenied": {
+    "message": "你没有允许扩展读取你的 X 登录，所以什么都没变。"
+  },
+  "xSigninTitle": {
+    "message": "你的 X 登录"
+  },
+  "xSigninAbout": {
+    "message": "当你在帖子上点“用我的 X 登录下载”时，扩展只为这一次下载把你的 X 登录交给 tarjim。不会保存，也只发给 X。"
+  },
+  "xSigninStop": {
+    "message": "停止使用我的 X 登录"
+  },
+  "xSigninStopped": {
+    "message": "已停止。扩展再也无法读取你的 X 登录；需要时按钮会再次询问。"
   }
 }

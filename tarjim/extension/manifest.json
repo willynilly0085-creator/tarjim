@@ -12,6 +12,7 @@
   "background": { "service_worker": "background.js", "type": "module" },
   "permissions": ["contextMenus", "storage", "alarms", "notifications", "activeTab", "scripting", "nativeMessaging"],
   "host_permissions": ["http://127.0.0.1/*", "http://localhost/*"],
+  "optional_permissions": ["cookies"],
   "optional_host_permissions": ["<all_urls>"],
   "commands": {
     "translate-selection": {

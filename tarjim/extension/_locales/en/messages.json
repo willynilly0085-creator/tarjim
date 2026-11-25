@@ -691,5 +691,35 @@
   },
   "starOpened": {
     "message": "We opened tarjim on GitHub: press Star at the top of the page. Thank you."
+  },
+  "errXSignin": {
+    "message": "X doesn't show this post to people who aren't signed in, and tarjim downloads from X without an account, so it couldn't get it. If you're signed in to X in this browser, press “Download with my X sign-in”: tarjim uses your sign-in for this one download, doesn't keep it, and sends it to no one but X."
+  },
+  "errXAccount": {
+    "message": "Even with your sign-in, X didn't show this post to tarjim, and didn't say why. Open it on X with the same account: if the video doesn't show there either, this account can't see it."
+  },
+  "xSigninButton": {
+    "message": "Download with my X sign-in"
+  },
+  "xSigninSent": {
+    "message": "Downloading with your X sign-in."
+  },
+  "xSigninNone": {
+    "message": "Couldn't find your X sign-in in this browser. Sign in to x.com here, then press the button again."
+  },
+  "xSigninDenied": {
+    "message": "You didn't allow the add-on to read your X sign-in, so nothing changed."
+  },
+  "xSigninTitle": {
+    "message": "Your X sign-in"
+  },
+  "xSigninAbout": {
+    "message": "When you press “Download with my X sign-in” on a post, the add-on gives tarjim your X sign-in for that one download. It isn't kept, and goes to no one but X."
+  },
+  "xSigninStop": {
+    "message": "Stop using my X sign-in"
+  },
+  "xSigninStopped": {
+    "message": "Stopped. The add-on can no longer read your X sign-in; the button asks again if you need it."
   }
 }

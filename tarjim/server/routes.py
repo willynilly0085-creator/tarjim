@@ -34,6 +34,7 @@ POST_ROUTES = table([
     (r"^/upload$", "upload"), (rf"^/reveal/{JOB}$", "reveal"),
     (rf"^/open/{JOB}$", "play"), (rf"^/retry/{JOB}$", "retry"),
     (rf"^/relisten/{JOB}$", "relisten"), (r"^/keys$", "save_key"),
+    (rf"^/retry/{JOB}/x-signin$", "retry_signed_in"),
     (r"^/setup$", "save_setup"), (r"^/tools/([a-z_]+)$", "get_tool"), (r"^/pair$", "ask_pair"),
     (rf"^/pairs/{PAIR}/(allow|deny)$", "decide_pair"),
     (rf"^/jobs/{JOB}/(pause|resume|cancel)$", "steer_job"), (r"^/jobs/local$", "create_local"),

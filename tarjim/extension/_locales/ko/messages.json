@@ -691,5 +691,35 @@
   },
   "starOpened": {
     "message": "GitHub에서 tarjim을 열었어요. 페이지 위쪽의 Star를 눌러 주세요. 감사합니다."
+  },
+  "errXSignin": {
+    "message": "X는 로그인하지 않은 사람에게 이 게시물을 보여 주지 않고, tarjim은 계정 없이 X에서 내려받기 때문에 가져오지 못했습니다. 이 브라우저에서 X에 로그인되어 있다면 “내 X 로그인으로 내려받기”를 누르세요. tarjim은 로그인을 이번 내려받기에만 쓰고, 저장하지 않으며, X 말고는 어디에도 보내지 않습니다."
+  },
+  "errXAccount": {
+    "message": "로그인해도 X가 이 게시물을 tarjim에 보여 주지 않았고, 이유도 말하지 않았습니다. 같은 계정으로 X에서 열어 보세요. 거기서도 동영상이 보이지 않으면 이 계정은 볼 수 없습니다."
+  },
+  "xSigninButton": {
+    "message": "내 X 로그인으로 내려받기"
+  },
+  "xSigninSent": {
+    "message": "내 X 로그인으로 내려받는 중입니다."
+  },
+  "xSigninNone": {
+    "message": "이 브라우저에서 X 로그인을 찾지 못했습니다. 여기서 x.com에 로그인한 다음 버튼을 다시 누르세요."
+  },
+  "xSigninDenied": {
+    "message": "확장 프로그램이 X 로그인을 읽도록 허용하지 않아서 아무것도 바뀌지 않았습니다."
+  },
+  "xSigninTitle": {
+    "message": "내 X 로그인"
+  },
+  "xSigninAbout": {
+    "message": "게시물에서 “내 X 로그인으로 내려받기”를 누르면, 확장 프로그램이 그 내려받기 한 번에만 X 로그인을 tarjim에 넘깁니다. 저장되지 않고 X 말고는 어디에도 가지 않습니다."
+  },
+  "xSigninStop": {
+    "message": "내 X 로그인 사용 중지"
+  },
+  "xSigninStopped": {
+    "message": "중지했습니다. 확장 프로그램은 더 이상 X 로그인을 읽을 수 없습니다. 필요하면 버튼이 다시 묻습니다."
   }
 }

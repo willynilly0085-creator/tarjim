@@ -1,4 +1,6 @@
 """The reason a job failed, read from its error, so the page can say it in the person's words."""
+from tarjim import x_posts
+
 SIGNED_OUT = ("Failed to authenticate", "OAuth session expired", "ot logged in", "run /login",
               "login required", "ign in again")
 REFUSED_ACCOUNT = ("not eligible", "Eligibility check failed", "erify your account")
@@ -11,8 +13,13 @@ IN_USE = ("is open in another program",)
 MISSING_PART = ("LocalEntryNotFoundError", "cached snapshot folder",
                 "outgoing traffic has been disabled")
 UPDATED = ("from 'tarjim.", "named 'tarjim.")  # its code changed on disk while it ran
-REASONS = [("updated", UPDATED), ("in_use", IN_USE), ("media", NOT_MEDIA), ("long", TOO_LONG),
-           ("list", A_LIST), ("parts", MISSING_PART),
+# X kept the post from the signed-in account, or from tarjim's guest read (x_posts.py): before
+# "signin", whose marks are about the AI's sign-in, and "download"
+X_ACCOUNT = (x_posts.ACCOUNT,)
+X_GUEST = x_posts.REFUSED
+REASONS = [("updated", UPDATED), ("x_account", X_ACCOUNT), ("x_signin", X_GUEST),
+           ("in_use", IN_USE), ("media", NOT_MEDIA), ("long", TOO_LONG), ("list", A_LIST),
+           ("parts", MISSING_PART),
            ("account", REFUSED_ACCOUNT), ("quota", ("QuotaExhausted", "quota", " 429:")),
            ("signin", SIGNED_OUT),
            ("key", ("API key missing", "API key not valid", " 401:", " 403:")),

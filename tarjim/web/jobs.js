@@ -7,7 +7,7 @@ import { noticeJobs } from "./star.js";
 
 const STAGES = ["downloading", "hearing", "timing", "translating", "writing", "burning", "dubbing"];
 const ACTION = { gone: "actionGone", job: "actionStale", open: "actionOpen" };
-const ERRORS = ["updated", "in_use", "media", "long", "list", "account", "quota", "signin", "key", "download", "tools", "parts", "dub"];
+const ERRORS = ["updated", "in_use", "media", "long", "list", "account", "quota", "signin", "key", "download", "tools", "parts", "dub", "x_signin", "x_account"];
 const rows = new Map();
 const seen = new Map();
 

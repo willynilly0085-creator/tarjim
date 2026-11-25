@@ -3,6 +3,7 @@ import { keyStatus, saveKey } from "./keys.js";
 import { askToPair, claimPending, openPage, sendWaitingJob } from "./pairing.js";
 import { ApiError, api, remember, settings, t } from "./shared.js";
 import { chooseTextMode } from "./textcard.js";
+import { showXSignin, wireXSignin } from "./xsignin.js";
 
 window.addEventListener("unhandledrejection", (event) => {
   if (!(event.reason instanceof ApiError)) return;
@@ -106,6 +107,7 @@ async function pickTextMode(event) {
 }
 
 export async function openSettings() {
+  showXSignin();
   const saved = await settings();
   document.querySelector(`input[name=textMode][value=${saved.textMode}]`).checked = true;
   $("text-mode-note").textContent = t(TEXT_HINTS[saved.textMode]);
@@ -154,6 +156,7 @@ export function wirePanels({ ready, back, leave }) {
   $("settings-form").addEventListener("submit", saveSettings);
   document.querySelectorAll("input[name=textMode]").forEach((el) => el.addEventListener("change", pickTextMode));
   $("retry-connect").addEventListener("click", againOn("offline", "offline-note", "stillOffline", back));
+  wireXSignin();
   $("close-settings").addEventListener("click", back);
   $("open-settings").addEventListener("click", () => { leave(); openSettings(); });
 }

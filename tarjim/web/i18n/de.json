@@ -804,5 +804,7 @@
   "starNo": "Nein danke",
   "starWorking": "Einen Moment…",
   "starThanks": "Dein Stern ist da. Danke, das bedeutet uns viel.",
-  "starOpened": "Wir haben tarjim auf GitHub geöffnet: Drück oben auf der Seite auf Star. Danke."
+  "starOpened": "Wir haben tarjim auf GitHub geöffnet: Drück oben auf der Seite auf Star. Danke.",
+  "err_x_signin": "X zeigt diesen Beitrag niemandem, der nicht angemeldet ist, und tarjim lädt von X ohne Konto, deshalb konnte es ihn nicht laden. Du kannst ihn mit deiner eigenen Anmeldung laden: Öffne die tarjim-Erweiterung im Browser, in dem du bei X angemeldet bist, und tippe unter dieser Übersetzung auf „Mit meiner X-Anmeldung laden“.",
+  "err_x_account": "Auch mit deiner Anmeldung hat X diesen Beitrag tarjim nicht gezeigt und nicht gesagt, warum. Öffne ihn auf X mit demselben Konto: Wenn das Video auch dort nicht erscheint, kann dieses Konto es nicht sehen."
 }

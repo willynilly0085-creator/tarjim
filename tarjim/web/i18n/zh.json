@@ -804,5 +804,7 @@
   "starNo": "不用了，谢谢",
   "starWorking": "请稍候…",
   "starThanks": "星标已点亮。谢谢你，这对我们很重要。",
-  "starOpened": "已在 GitHub 打开 tarjim：点页面上方的 Star 即可。谢谢你。"
+  "starOpened": "已在 GitHub 打开 tarjim：点页面上方的 Star 即可。谢谢你。",
+  "err_x_signin": "X 不向未登录的人显示这条帖子，而 tarjim 以无账号方式从 X 下载，所以没能拿到。你可以用自己的登录来下载：在已登录 X 的浏览器里打开 tarjim 扩展，然后点这条翻译下面的“用我的 X 登录下载”。",
+  "err_x_account": "即使用了你的登录，X 也没有向 tarjim 显示这条帖子，也没说原因。用同一个账号在 X 上打开它：如果那里也看不到视频，说明这个账号看不了。"
 }

@@ -1,6 +1,7 @@
 import { api, failureText, modeLabel, post, sinceText, stageLabel, stepsFor, t } from "./shared.js";
 import { noticeJobs } from "./star.js";
 import { showNotes, showPost } from "./summary.js";
+import { xSigninButtons } from "./xsignin.js";
 
 const rows = new Map();
 const spoken = new Map();
@@ -117,7 +118,8 @@ function actionsFor(job, box, refresh) {
   const buttons = wanted === "done"
     ? [act(t(job.mode === "srt" ? "openSrt" : "play"), () => post(`/open/${job.id}`), opened),
        act(t("openFolder"), () => post(`/reveal/${job.id}`), opened)]
-    : wanted === "again" ? [act(t("retry"), () => post(`/retry/${job.id}`).then(refresh))]
+    : wanted === "again" ? [...xSigninButtons(job, (text, kind) => say(row, text, kind), refresh),
+      act(t("retry"), () => post(`/retry/${job.id}`).then(refresh))]
       : steering(job, act, refresh);
   // Listening again forgets the kept hearing: for subtitles that missed some of the speech.
   const again = act(t("listenAgain"), () => post(`/relisten/${job.id}`).then(refresh));

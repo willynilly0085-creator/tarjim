@@ -691,5 +691,35 @@
   },
   "starOpened": {
     "message": "Abrimos o tarjim no GitHub: toque em Star no topo da página. Obrigado."
+  },
+  "errXSignin": {
+    "message": "O X não mostra esta publicação para quem não entrou na conta, e o tarjim baixa do X sem conta, então não conseguiu obtê-la. Se você está conectado ao X neste navegador, toque em “Baixar com meu login do X”: o tarjim usa seu login só para este download, não o guarda e não o envia a ninguém além do X."
+  },
+  "errXAccount": {
+    "message": "Mesmo com seu login, o X não mostrou esta publicação ao tarjim, e não disse por quê. Abra-a no X com a mesma conta: se o vídeo também não aparecer lá, esta conta não pode vê-lo."
+  },
+  "xSigninButton": {
+    "message": "Baixar com meu login do X"
+  },
+  "xSigninSent": {
+    "message": "Baixando com seu login do X."
+  },
+  "xSigninNone": {
+    "message": "Não encontramos seu login do X neste navegador. Entre em x.com aqui e toque no botão de novo."
+  },
+  "xSigninDenied": {
+    "message": "Você não permitiu que a extensão lesse seu login do X, então nada mudou."
+  },
+  "xSigninTitle": {
+    "message": "Seu login do X"
+  },
+  "xSigninAbout": {
+    "message": "Quando você toca em “Baixar com meu login do X” numa publicação, a extensão entrega ao tarjim seu login do X só para aquele download. Ele não é guardado e não vai a ninguém além do X."
+  },
+  "xSigninStop": {
+    "message": "Parar de usar meu login do X"
+  },
+  "xSigninStopped": {
+    "message": "Pronto. A extensão não consegue mais ler seu login do X; o botão pergunta de novo se você precisar."
   }
 }
