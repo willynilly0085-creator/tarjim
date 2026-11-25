@@ -1,7 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.1.30 (2026-11-25)
 
+- **Selected text no longer waits a minute now and then.** Google sometimes held one request for
+  about a minute and then answered as if nothing happened. When the answer takes more than four
+  seconds, tarjim now asks once more and shows whichever answer comes first. Measured on twelve
+  short sentences: the slowest took 5.8 seconds, where it took 61 to 70 before.
 - **No third colour for two people.** When a short stretch was heard again on its own and the
   voice in it sounded unlike the person's usual voice (a laugh, a moan, a shout), tarjim made it
   a new person with a colour of its own, and could move a few of that person's other short lines

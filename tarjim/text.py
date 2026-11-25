@@ -9,6 +9,8 @@ whole, or refused as too long for one request. What was selected is never writte
 """
 from typing import Any
 
+from tarjim.engines.catalog import API, BY_ID
+from tarjim.hedge import hedged
 from tarjim.languages import language
 from tarjim.quoted import inert
 
@@ -54,7 +56,16 @@ def asked_of(provider: str, question: str, light: bool) -> Any:
     if found is not None:
         return found
     with using(text_engine.lighter(provider) if light else {}):
-        return asker(provider).ask(question, None, SCHEMA)
+        engine = asker(provider)
+        if not keyed(provider):  # a program takes seconds to start, a local model is one: once
+            return engine.ask(question, None, SCHEMA)
+        return hedged(lambda: engine.ask(question, None, SCHEMA))  # a held request (hedge.py)
+
+
+def keyed(provider: str) -> bool:
+    """Asked over the web with a key: where a request can be held for a minute (hedge.py)."""
+    found = BY_ID.get(provider)
+    return found is not None and found.method == API
 
 
 def translated(text: str, target: str, other: str = "") -> tuple[str, str]:
