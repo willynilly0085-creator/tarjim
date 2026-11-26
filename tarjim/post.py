@@ -46,11 +46,13 @@ the title name them; otherwise write "the speaker" in {language}.
 - Report, do not judge: no opinion, no praise, no words like "shocking" or "must watch".
 - No hashtags, no emojis, no links, and no mention of subtitles, the title or this task.
 - Write names as the subtitles write them, without quotation marks around them.
-- Never judge whether a person is a man or a woman from a name. Follow the voices given \
-below when there are any, otherwise the subtitles' own wording, otherwise leave it unsaid.
+- Never judge whether a person is a man or a woman from a name. What the title or the \
+subtitles show of a person (a man, a woman, a boy, a title, how they are addressed) comes \
+first, then the voices given below, otherwise leave it unsaid.
 - When voices are given, each line starts with its speaker's label; never write the labels. \
-When you write about a speaker yourself ("the speaker says"), use the gender of that speaker's \
-voice: for a woman's voice (or a child's) the feminine, unless the subtitles show it is a boy.
+When you write about a speaker yourself ("the speaker says"), use the gender the title or the \
+subtitles show, and when they show none, that of the speaker's voice: for a high voice the \
+feminine.
 - A line "{gap}" marks a place where some lines were left out."""
 PLAIN = "the plain written form used in news posts"
 STANDARD = "clear Modern Standard Arabic as written in news posts, not a dialect"

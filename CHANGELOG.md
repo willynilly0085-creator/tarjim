@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.32 (2026-11-26)
+
+- **A man with a raised voice is no longer summarised as a woman.** Iran's president, speaking
+  loudly at a children's event, measured about 200 Hz, in the band tarjim called "a woman's
+  voice", and the summary said "the (woman) speaker" though the post's title said "a man". A high
+  voice is now described as what it is (most often a woman's or a child's, but a man speaking
+  loudly reaches it too), and what the title or the subtitles show of a person (a man, a woman,
+  a boy, a title, how they are addressed) comes before the voice, in the summary and in the
+  translation. On the owner's clip, three summaries out of three now speak of him as a man,
+  where three of three before did not.
+
 ## 1.1.31 (2026-11-26)
 
 - **An X link no longer fails as "make sure the link works" when X said nothing.** X sometimes

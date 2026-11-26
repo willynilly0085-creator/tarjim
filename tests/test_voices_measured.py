@@ -50,7 +50,7 @@ def test_the_translator_is_told_each_voice_and_whose_line_each_slot_is() -> None
     assert "| S1]" not in plain and "صوت رجل" not in plain  # nothing known: asked as before
     english = build_prompt(lines, Brief(language("fr"), "", DEFAULT_RULES,
                                         voices=(("S1", "high"),)))
-    assert "S1: a woman's voice (or a child's)" in english and "from a name" in english
+    assert "S1: a high voice (most often a woman's" in english and "from a name" in english
 
 
 def test_an_exchange_names_both_speakers_in_its_heading() -> None:

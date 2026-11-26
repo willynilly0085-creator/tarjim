@@ -107,17 +107,23 @@ def told(voices: Voices, key: str) -> str:
 
 
 PHRASES: dict[str, dict[str, str]] = {
-    "ar": {"alone": "المتكلم", LOW: "صوت رجل", HIGH: "صوت امرأة (أو طفل)",
+    "ar": {"alone": "المتكلم", LOW: "صوت رجل",
+           HIGH: "صوت حاد (غالباً امرأة أو طفل، وقد يكون رجل رافع صوته)",
            "lead": "\n\nأصوات المتكلمين، مقاسة من صوت المقطع نفسه: {voices}. اعتمد عليها في "
                    "التذكير والتأنيث لما المتكلم يتكلم عن نفسه أو يخاطبه أحد، ولا تحكم على جنس "
-                   "أحد من اسمه أبداً. المتكلم اللي ما انذكر صوته هنا: اعتمد على اللي تبيّنه "
-                   "السطور نفسها، وإذا ما بيّنت شيء فاستعمل صيغة المذكر العامة زي ما تسوي "
-                   "العربية مع المجهول، ولا تأنّث أحد بالتخمين."},
-    "any": {"alone": "the speaker", LOW: "a man's voice", HIGH: "a woman's voice (or a child's)",
+                   "أحد من اسمه أبداً. وإذا السطور أو العنوان بيّنت جنس المتكلم (رجل، امرأة، "
+                   "ولد، لقب، أو صيغة يخاطبونه فيها) فهي أصدق من الصوت. المتكلم اللي ما انذكر "
+                   "صوته هنا: اعتمد على اللي تبيّنه السطور نفسها، وإذا ما بيّنت شيء فاستعمل "
+                   "صيغة المذكر العامة زي ما تسوي العربية مع المجهول، ولا تأنّث أحد بالتخمين."},
+    "any": {"alone": "the speaker", LOW: "a man's voice",
+            HIGH: "a high voice (most often a woman's or a child's, but a man speaking loudly "
+                  "reaches it too)",
             "lead": "\n\nThe speakers' voices, measured from the clip's own sound: {voices}. Use "
                     "them for grammatical gender when a speaker talks about themself or is "
-                    "spoken to, and never judge anyone's gender from a name. For a speaker whose "
-                    "voice is not listed here, go by what the lines themselves show; when they "
-                    "show nothing, use the form the language uses for a person of unknown gender "
+                    "spoken to, and never judge anyone's gender from a name. When the lines or "
+                    "the title show a speaker's gender (a man, a woman, a boy, a title, how "
+                    "they are addressed), they outweigh the voice. For a speaker whose voice is "
+                    "not listed here, go by what the lines themselves show; when they show "
+                    "nothing, use the form the language uses for a person of unknown gender "
                     "(the masculine, where it marks gender), never a guess."},
 }

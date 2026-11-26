@@ -33,6 +33,14 @@ def test_lines_carry_no_label_when_no_voice_was_measured_or_nobody_is_labelled()
 
 def test_the_model_is_told_to_write_about_a_speaker_in_their_voice_s_gender() -> None:
     asked = post.prompt("a title", AR, ["S1: مرحبا"], VOICES)
-    assert "S1: a woman's voice" in asked and "S2: a man's voice" in asked
+    assert "S1: a high voice" in asked and "S2: a man's voice" in asked
     assert "When you write about a speaker yourself" in asked
     assert "never write the labels" in asked
+
+
+def test_what_the_title_and_lines_show_of_a_person_comes_before_the_voice() -> None:
+    """2026-11-26: a president speaking loudly at a children's event measured high (about 200 Hz)
+    and the summary called him "the (woman) speaker", though the title said "a man"."""
+    asked = post.prompt("يحكمهم رجل", AR, ["S1: مرحبا"], (("S1", "high"),))
+    assert "title or the subtitles show of a person" in asked
+    assert "a man speaking loudly reaches it too" in asked and "they outweigh the voice" in asked
