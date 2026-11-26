@@ -698,6 +698,9 @@
   "errXAccount": {
     "message": "Même avec votre connexion, X n'a pas montré cette publication à tarjim, sans dire pourquoi. Ouvrez-la sur X avec le même compte : si la vidéo n'y apparaît pas non plus, ce compte ne peut pas la voir."
   },
+  "errXSilent": {
+    "message": "X a renvoyé à tarjim une réponse vide, deux fois. Le lien lui-même est bon : X le fait parfois avec les téléchargements sans compte. Réessaie dans quelques minutes. Si ça recommence et que tu es connecté à X dans ce navigateur, appuie sur le bouton de connexion X : tarjim utilise ta connexion pour ce seul téléchargement, ne garde rien et ne l'envoie qu'à X."
+  },
   "xSigninButton": {
     "message": "Télécharger avec ma connexion X"
   },

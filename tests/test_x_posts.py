@@ -139,3 +139,31 @@ def test_a_signed_in_retry_only_for_a_post_x_refused_and_the_cookies_stay_out_of
     refused = Routes(other, {"cookies": [SIGNED]})
     refused.retry_signed_in({}, plain.id)
     assert refused.said[0] == 409
+
+
+EMPTY = "ERROR: [twitter] 1: Failed to parse JSON (caused by JSONDecodeError(\"Expecting value\"))"
+
+
+def test_an_empty_answer_from_x_is_read_once_more_and_twice_empty_is_said_as_x_s_silence(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    slept: list[float] = []
+    monkeypatch.setattr(x_posts.time, "sleep", slept.append)
+    answers = iter([DownloadError(EMPTY), "read"])
+
+    def reading() -> Any:
+        found = next(answers)
+        if isinstance(found, Exception):
+            raise found
+        return found
+
+    assert x_posts.read(Reader(), POST, reading) == "read" and slept == [x_posts.PAUSE]
+
+    def silent() -> None:
+        raise DownloadError(EMPTY)
+
+    with pytest.raises(RuntimeError, match="empty answer twice") as caught:
+        x_posts.read(Reader(), POST, silent)
+    assert classify(caught.value) == "x_silent"
+    with pytest.raises(DownloadError):  # not X: its own failure, read once
+        x_posts.read(Reader(), "https://example.com/v", silent)
+    assert len(slept) == 2

@@ -806,5 +806,6 @@
   "starThanks": "Yıldızın ulaştı. Teşekkürler, bizim için çok değerli.",
   "starOpened": "tarjim'i GitHub'da açtık: sayfanın üstündeki Star'a bas. Teşekkürler.",
   "err_x_signin": "X bu gönderiyi oturum açmamış kişilere göstermiyor ve tarjim X'ten hesapsız indiriyor, bu yüzden alamadı. Kendi oturumunla indirebilirsin: X'te oturum açık olan tarayıcıda tarjim eklentisini aç ve bu çevirinin altındaki “X oturumumla indir” düğmesine bas.",
-  "err_x_account": "Oturumunla bile X bu gönderiyi tarjim'e göstermedi ve nedenini söylemedi. Aynı hesapla X'te aç: video orada da görünmüyorsa bu hesap onu göremiyor."
+  "err_x_account": "Oturumunla bile X bu gönderiyi tarjim'e göstermedi ve nedenini söylemedi. Aynı hesapla X'te aç: video orada da görünmüyorsa bu hesap onu göremiyor.",
+  "err_x_silent": "X, tarjim'e iki kez boş yanıt verdi. Bağlantının kendisinde sorun yok: X bunu bazen hesapsız indirmelere yapar. Birkaç dakika sonra yeniden dene. Yine olursa kendi girişinle indirebilirsin: X'e girişli olduğun tarayıcıda tarjim eklentisini aç ve bu çevirinin altındaki X ile giriş düğmesine bas."
 }

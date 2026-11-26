@@ -806,5 +806,6 @@
   "starThanks": "Sua estrela chegou. Obrigado, isso significa muito.",
   "starOpened": "Abrimos o tarjim no GitHub: toque em Star no topo da página. Obrigado.",
   "err_x_signin": "O X não mostra esta publicação para quem não entrou na conta, e o tarjim baixa do X sem conta, então não conseguiu obtê-la. Você pode baixá-la com seu próprio login: abra a extensão do tarjim no navegador em que você está conectado ao X e toque em “Baixar com meu login do X” abaixo desta tradução.",
-  "err_x_account": "Mesmo com seu login, o X não mostrou esta publicação ao tarjim, e não disse por quê. Abra-a no X com a mesma conta: se o vídeo também não aparecer lá, esta conta não pode vê-lo."
+  "err_x_account": "Mesmo com seu login, o X não mostrou esta publicação ao tarjim, e não disse por quê. Abra-a no X com a mesma conta: se o vídeo também não aparecer lá, esta conta não pode vê-lo.",
+  "err_x_silent": "O X deu ao tarjim uma resposta vazia, duas vezes. O link em si está certo: o X às vezes faz isso com downloads sem conta. Tente de novo daqui a alguns minutos. Se continuar, você pode baixar com seu próprio login: abra o complemento do tarjim no navegador em que está conectado ao X e aperte o botão de login do X abaixo desta tradução."
 }

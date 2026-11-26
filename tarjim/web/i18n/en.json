@@ -806,5 +806,6 @@
   "starThanks": "Your star is in. Thank you, it means a lot.",
   "starOpened": "We opened tarjim on GitHub: press Star at the top of the page. Thank you.",
   "err_x_signin": "X doesn't show this post to people who aren't signed in, and tarjim downloads from X without an account, so it couldn't get it. You can download it with your own sign-in: open tarjim's add-on in the browser where you're signed in to X, and press “Download with my X sign-in” under this translation.",
-  "err_x_account": "Even with your sign-in, X didn't show this post to tarjim, and didn't say why. Open it on X with the same account: if the video doesn't show there either, this account can't see it."
+  "err_x_account": "Even with your sign-in, X didn't show this post to tarjim, and didn't say why. Open it on X with the same account: if the video doesn't show there either, this account can't see it.",
+  "err_x_silent": "X gave tarjim an empty answer, twice. The link itself is fine: X sometimes does this to downloads made without an account. Try again in a few minutes. If it keeps happening, you can download it with your own sign-in: open the tarjim add-on in the browser where you are signed in to X and press the X sign-in button under this translation."
 }

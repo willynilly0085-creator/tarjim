@@ -698,6 +698,9 @@
   "errXAccount": {
     "message": "Mesmo com seu login, o X não mostrou esta publicação ao tarjim, e não disse por quê. Abra-a no X com a mesma conta: se o vídeo também não aparecer lá, esta conta não pode vê-lo."
   },
+  "errXSilent": {
+    "message": "O X deu ao tarjim uma resposta vazia, duas vezes. O link em si está certo: o X às vezes faz isso com downloads sem conta. Tente de novo daqui a alguns minutos. Se continuar e você estiver conectado ao X neste navegador, aperte o botão de login do X: o tarjim usa seu login só para este download, não guarda nada e não o envia a ninguém além do X."
+  },
   "xSigninButton": {
     "message": "Baixar com meu login do X"
   },

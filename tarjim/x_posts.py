@@ -10,6 +10,11 @@ The person's own sign-in (docs/decisions.md, 2026-11-25): on their press, the br
 hands over x.com's cookies for one download. They are kept in this process's memory only, never
 written, logged or put in a job, and given to that one download's yt-dlp, whose cookie jar sends
 a cookie only to the site it belongs to. The download takes them; an hour unused drops them.
+
+X at times answers a guest with nothing at all (2026-11-26: the same post read well before and
+after it), and yt-dlp then says "Failed to parse JSON" and asks for a bug report, which the person
+saw as "make sure the link works". Such a read is tried once more after PAUSE, with a new guest
+token (yt-dlp asks X for one on each call), and a second empty answer is said as X's silence.
 """
 import http.cookiejar
 import re
@@ -22,6 +27,9 @@ from typing import Any, TypeVar
 SITES = ("x.com", "twitter.com")
 GUEST = "X hid this post from a guest: its answer was a tombstone that gave no reason"
 ACCOUNT = "X hid this post from the signed-in account too"
+SILENT = "X gave an empty answer twice, so the post could not be read"
+EMPTY = "Failed to parse JSON"  # yt-dlp's words for X's answer that had nothing in it
+PAUSE = 5.0
 # yt-dlp's own words where X said why: a sensitive post, a protected account
 REFUSED = ("NSFW tweet requires authentication", "this protected tweet", GUEST)
 KEEP_SECONDS = 3600.0
@@ -111,8 +119,24 @@ def read(ydl: Any, url: str, reading: Callable[[], T]) -> T:
     for one in cookies:
         ydl.cookiejar.set_cookie(one)
     try:
-        return reading()
+        return twice(url, reading)
     except Exception as error:
         if cookies and any(mark in str(error) for mark in REFUSED):
             raise RuntimeError(f"{ACCOUNT} ({type(error).__name__})") from None
+        raise
+
+
+def twice(url: str, reading: Callable[[], T]) -> T:
+    """reading(), and once more after PAUSE when X's answer was empty."""
+    try:
+        return reading()
+    except Exception as error:
+        if not (is_x(url) and EMPTY in str(error)):
+            raise
+    time.sleep(PAUSE)
+    try:
+        return reading()
+    except Exception as error:
+        if EMPTY in str(error):
+            raise RuntimeError(SILENT) from None
         raise

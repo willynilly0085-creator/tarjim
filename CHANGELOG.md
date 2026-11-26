@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.31 (2026-11-26)
+
+- **An X link no longer fails as "make sure the link works" when X said nothing.** X sometimes
+  answers a download made without an account with an empty reply, even for a post it shows to
+  everyone; the same link read well a few minutes before and after. tarjim then showed yt-dlp's
+  "Failed to parse JSON" under the general download message. Now it waits five seconds and reads
+  the post once more with a fresh guest pass, and if X is silent again it says that X gave an
+  empty answer, that the link itself is fine, to try again in a few minutes, and offers the
+  add-on's «نزّله بدخولي في إكس» for a download with the person's own sign-in.
+
 ## 1.1.30 (2026-11-25)
 
 - **Selected text no longer waits a minute now and then.** Google sometimes held one request for

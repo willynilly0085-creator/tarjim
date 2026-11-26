@@ -698,6 +698,9 @@
   "errXAccount": {
     "message": "Auch mit deiner Anmeldung hat X diesen Beitrag tarjim nicht gezeigt und nicht gesagt, warum. Öffne ihn auf X mit demselben Konto: Wenn das Video auch dort nicht erscheint, kann dieses Konto es nicht sehen."
   },
+  "errXSilent": {
+    "message": "X hat tarjim zweimal eine leere Antwort gegeben. Der Link selbst ist in Ordnung: X macht das manchmal bei Downloads ohne Konto. Versuch es in ein paar Minuten noch einmal. Wenn es wieder passiert und du in diesem Browser bei X angemeldet bist, drück die X-Anmeldetaste: tarjim nutzt deine Anmeldung nur für diesen einen Download, speichert nichts und schickt sie nur an X."
+  },
   "xSigninButton": {
     "message": "Mit meiner X-Anmeldung laden"
   },

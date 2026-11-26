@@ -7,7 +7,7 @@ import { $ } from "./dom.js";
 import { post, t } from "./shared.js";
 
 export const X_ACCESS = { permissions: ["cookies"], origins: ["https://x.com/*"] };
-const REFUSED = new Set(["x_signin", "x_account"]);
+const REFUSED = new Set(["x_signin", "x_account", "x_silent"]);
 const PENDING = "xSigninFor";
 const FRESH = 2 * 60 * 1000;
 const SAID = { sent: "xSigninSent", none: "xSigninNone", denied: "xSigninDenied", failed: "actionFailed" };

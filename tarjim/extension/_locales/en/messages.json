@@ -698,6 +698,9 @@
   "errXAccount": {
     "message": "Even with your sign-in, X didn't show this post to tarjim, and didn't say why. Open it on X with the same account: if the video doesn't show there either, this account can't see it."
   },
+  "errXSilent": {
+    "message": "X gave tarjim an empty answer, twice. The link itself is fine: X sometimes does this to downloads made without an account. Try again in a few minutes. If it keeps happening and you are signed in to X in this browser, press the X sign-in button: tarjim uses your sign-in for this one download only, keeps nothing, and sends it to no one but X."
+  },
   "xSigninButton": {
     "message": "Download with my X sign-in"
   },

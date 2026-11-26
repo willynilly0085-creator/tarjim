@@ -698,6 +698,9 @@
   "errXAccount": {
     "message": "Oturumunla bile X bu gönderiyi tarjim'e göstermedi ve nedenini söylemedi. Aynı hesapla X'te aç: video orada da görünmüyorsa bu hesap onu göremiyor."
   },
+  "errXSilent": {
+    "message": "X, tarjim'e iki kez boş yanıt verdi. Bağlantının kendisinde sorun yok: X bunu bazen hesapsız indirmelere yapar. Birkaç dakika sonra yeniden dene. Yine olursa ve bu tarayıcıda X'e girişliysen X ile giriş düğmesine bas: tarjim girişini yalnızca bu indirme için kullanır, hiçbir şey saklamaz ve X dışında kimseye göndermez."
+  },
   "xSigninButton": {
     "message": "X oturumumla indir"
   },

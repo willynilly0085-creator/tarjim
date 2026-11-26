@@ -698,6 +698,9 @@
   "errXAccount": {
     "message": "Bahkan dengan akun masukmu, X tidak menampilkan postingan ini ke tarjim, dan tidak bilang alasannya. Buka di X dengan akun yang sama: jika videonya juga tidak muncul di sana, akun ini tidak bisa melihatnya."
   },
+  "errXSilent": {
+    "message": "X memberi tarjim jawaban kosong, dua kali. Tautannya sendiri tidak bermasalah: X kadang melakukan ini pada unduhan tanpa akun. Coba lagi beberapa menit lagi. Kalau terjadi lagi dan kamu masuk ke X di browser ini, tekan tombol masuk X: tarjim memakai login kamu hanya untuk unduhan ini, tidak menyimpan apa pun, dan tidak mengirimkannya ke siapa pun selain X."
+  },
   "xSigninButton": {
     "message": "Unduh dengan akun X saya"
   },

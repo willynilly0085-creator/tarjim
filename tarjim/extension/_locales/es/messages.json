@@ -698,6 +698,9 @@
   "errXAccount": {
     "message": "Ni con tu sesión X mostró esta publicación a tarjim, y no dijo por qué. Ábrela en X con la misma cuenta: si allí tampoco aparece el video, esta cuenta no puede verlo."
   },
+  "errXSilent": {
+    "message": "X le dio a tarjim una respuesta vacía, dos veces. El enlace está bien: X a veces hace esto con las descargas sin cuenta. Inténtalo de nuevo en unos minutos. Si vuelve a pasar y has iniciado sesión en X en este navegador, pulsa el botón de inicio de sesión de X: tarjim usa tu sesión solo para esta descarga, no guarda nada y solo la envía a X."
+  },
   "xSigninButton": {
     "message": "Descargar con mi sesión de X"
   },

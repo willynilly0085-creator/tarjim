@@ -10,7 +10,7 @@ from tarjim.server.jobs import DUBBING, MODES, Board, Order
 from tarjim.server.orders import order_from
 
 Query = dict[str, list[str]]
-X_REFUSED = ("x_signin", "x_account")
+X_REFUSED = ("x_signin", "x_account", "x_silent")
 
 
 def refusal(order: Order) -> str:

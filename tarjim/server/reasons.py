@@ -17,7 +17,9 @@ UPDATED = ("from 'tarjim.", "named 'tarjim.")  # its code changed on disk while 
 # "signin", whose marks are about the AI's sign-in, and "download"
 X_ACCOUNT = (x_posts.ACCOUNT,)
 X_GUEST = x_posts.REFUSED
+X_SILENT = (x_posts.SILENT,)
 REASONS = [("updated", UPDATED), ("x_account", X_ACCOUNT), ("x_signin", X_GUEST),
+           ("x_silent", X_SILENT),
            ("in_use", IN_USE), ("media", NOT_MEDIA), ("long", TOO_LONG), ("list", A_LIST),
            ("parts", MISSING_PART),
            ("account", REFUSED_ACCOUNT), ("quota", ("QuotaExhausted", "quota", " 429:")),
