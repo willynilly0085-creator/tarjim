@@ -25,8 +25,7 @@ def saved(monkeypatch: pytest.MonkeyPatch) -> dict[str, str]:
 def test_a_vertex_key_goes_before_the_free_key_saved_on_the_page(
         saved: dict[str, str], monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(config, "user_variable", {"VERTEX_API_KEY": PAID}.get)
-    assert config.gemini_key() == PAID
-    assert config.api_key(config.SPOKEN) == FREE  # voices: Vertex has none for tarjim
+    assert config.gemini_key() == PAID == config.api_key(config.SPOKEN)
 
 
 def test_without_a_vertex_key_nothing_changes(
@@ -35,11 +34,9 @@ def test_without_a_vertex_key_nothing_changes(
     assert config.gemini_key() == FREE == config.api_key(config.SPOKEN)
 
 
-def test_a_vertex_key_pasted_on_the_page_is_used_and_leaves_voices_without_a_key(
-        saved: dict[str, str]) -> None:
+def test_a_vertex_key_pasted_on_the_page_speaks_too(saved: dict[str, str]) -> None:
     saved["gemini_api_key"] = PAID
-    assert config.gemini_key() == PAID
-    assert config.api_key(config.SPOKEN) == ""
+    assert config.gemini_key() == PAID == config.api_key(config.SPOKEN)
 
 
 def test_each_kind_of_key_opens_its_own_door() -> None:

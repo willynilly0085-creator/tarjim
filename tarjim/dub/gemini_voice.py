@@ -2,6 +2,10 @@
 
 Each speaker's lines go in one request (the free tier allows few requests a day), and the
 word aligner cuts the recording back into lines.
+
+A Gemini API key speaks through the Interactions API. A Vertex AI key has none (404), but the same
+voices answer its generateContent with an audio reply (measured 2026-11-28: gemini-3.8-flash-tts,
+Algenib, a two-line Saudi batch heard back word for word), so a Vertex key's credit pays for them.
 """
 import base64
 from pathlib import Path
@@ -13,6 +17,7 @@ from tarjim.config import SPOKEN, api_key
 from tarjim.dub.audio import RATE, decode
 from tarjim.dub.lines import Line
 from tarjim.dub.split import split_lines
+from tarjim.google_ai import elsewhere, google_client, placed, vertex
 
 MODELS = ("gemini-3.8-flash-tts", "gemini-3.8-flash-lite-tts")
 LOW_VOICES = ("Charon", "Orus", "Fenrir", "Iapetus", "Algenib", "Schedar")
@@ -78,13 +83,14 @@ def batches(lines: list[Line]) -> list[list[int]]:
 
 class GeminiVoices:
     def __init__(self, references: dict[str, Path], language: str, dialect: str = "saudi") -> None:
-        from google import genai
         from google.genai import types
 
         options = types.HttpOptions(timeout=REQUEST_MS,
                                     retry_options=types.HttpRetryOptions(
                                         attempts=1, http_status_codes=[BUSY]))
-        self.client: Any = genai.Client(api_key=api_key(SPOKEN), http_options=options)
+        key = api_key(SPOKEN)
+        self.vertex = vertex(key)
+        self.client: Any = google_client(key, options)
         self.voices = cast(references) or {"": LOW_VOICES[0]}
         self.language = language
         from tarjim.prefs.active import active
@@ -92,6 +98,8 @@ class GeminiVoices:
         self.style = style_for(language, dialect, active().dub.gemini_tone)
 
     def request(self, model: str, text: str, voice: str) -> np.ndarray:
+        if self.vertex:
+            return self.generated(model, text, voice)
         content = {"type": "text", "text": text,
                    "annotations": [{"type": "speech_metadata", "style": self.style}]}
         answer = self.client.interactions.create(
@@ -100,11 +108,33 @@ class GeminiVoices:
             generation_config={"speech_config": [{"voice": voice}]})
         return decode(base64.b64decode(answer.output_audio.data))
 
+    def generated(self, model: str, text: str, voice: str) -> np.ndarray:
+        """The Vertex door: the same voice and style, asked through generateContent."""
+        from google.genai import types
+
+        spoken = types.SpeechConfig(voice_config=types.VoiceConfig(
+            prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice)))
+        part = types.Part(text=text, speech_metadata=types.SpeechMetadata(style=self.style))
+        answer = self.client.models.generate_content(
+            model=placed(model), contents=types.Content(role="user", parts=[part]),
+            config=types.GenerateContentConfig(response_modalities=["AUDIO"],
+                                               speech_config=spoken))
+        return decode(answer.candidates[0].content.parts[0].inline_data.data)
+
+    def attempt(self, model: str, text: str, voice: str) -> np.ndarray:
+        """A voice model the Vertex key's region lacks is asked once more at the global place."""
+        try:
+            return self.request(model, text, voice)
+        except Exception as error:
+            if not elsewhere(model, error):
+                raise
+        return self.request(model, text, voice)
+
     def record(self, text: str, voice: str) -> np.ndarray:
         problems = []
         for model in MODELS:
             try:
-                return self.request(model, text, voice)
+                return self.attempt(model, text, voice)
             except Exception as error:
                 problems.append(f"{model}: {str(error)[:160]}")
         raise VoiceUnavailable("; ".join(problems))
