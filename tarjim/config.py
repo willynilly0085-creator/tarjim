@@ -161,9 +161,11 @@ def prepare_environment() -> None:
 # kept in VERTEX_API_KEY. A Vertex key goes first wherever it is found: it is billed, with no free
 # daily quota, so whoever made one meant Gemini to use it (on 2026-10-27 the owner's free key, saved
 # on the page, ran out on gemini-3.8-flash while a Vertex key with credit sat in VERTEX_API_KEY).
-# Otherwise a key saved on tarjim's page wins over the environment's.
+# Otherwise a key saved on tarjim's page wins over the environment's. Voices follow the same
+# order: Vertex speaks with Gemini's voices through generateContent (2026-11-28, the owner's voices
+# billed to a second, paid project while his Vertex credit sat unused; dub/gemini_voice.py).
 GEMINI = "gemini_api_key"
-SPOKEN = "gemini_voice_key"  # the Gemini API key alone: Vertex AI has no voices for tarjim
+SPOKEN = "gemini_voice_key"
 
 
 def user_variable(name: str) -> str:
@@ -191,8 +193,6 @@ def api_key(name: str) -> str:
         return setting(name)
     found = google_keys()
     studio = [key for key in found if not vertex(key)]
-    if name == SPOKEN:
-        return studio[0] if studio else ""
     return next((key for key in found if vertex(key)), studio[0] if studio else "")
 
 
